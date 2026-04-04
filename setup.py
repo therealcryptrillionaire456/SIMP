@@ -19,11 +19,11 @@ setup(
     description="Standardized Inter-agent Message Protocol - Communication framework for AI agents",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/simp",
+    url="https://github.com/therealcryptrillionaire456/simp",
     project_urls={
-        "Bug Tracker": "https://github.com/yourusername/simp/issues",
-        "Documentation": "https://github.com/yourusername/simp#documentation",
-        "Source Code": "https://github.com/yourusername/simp",
+        "Bug Tracker": "https://github.com/therealcryptrillionaire456/simp/issues",
+        "Documentation": "https://github.com/therealcryptrillionaire456/simp#documentation",
+        "Source Code": "https://github.com/therealcryptrillionaire456/simp",
     },
     packages=find_packages(),
     classifiers=[
