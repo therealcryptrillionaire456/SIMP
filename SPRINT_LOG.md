@@ -1178,3 +1178,43 @@ After design review approval, implement in this order:
 
 **Design Review Status:** COMPLETE — 10 design notes written, implementation plan ready
 **Design Review Completed:** 2026-04-05T21:10:00Z
+
+---
+
+## Sprint 11 — ProjectX Skeleton + Observation Layer
+**Started:** 2026-04-05
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Create the ProjectX computer-use subpackage with the full class skeleton (14 methods across 4 tiers) and implement the Tier 0 observation methods with graceful fallback for headless environments.
+
+---
+
+### SPRINT11-KP-001: Create projectx subpackage with class skeleton
+**Status:** COMPLETE
+- Created `simp/projectx/__init__.py` exporting `ProjectXComputer`
+- Created `simp/projectx/computer.py` with full `ProjectXComputer` class
+- `TaskAbortError` exception class for task abort signaling
+- `ACTION_TIERS` dict mapping all 14 methods to tier numbers (0, 1, 2, -1)
+- `__init__` with `log_dir`, `max_tier`, `screen_resolution` parameters
+- 4 Tier-0 observation method stubs
+- 6 Tier-1 GUI action stubs (raise `NotImplementedError("Sprint 12")`)
+- 1 Tier-2 shell stub (raise `NotImplementedError("Sprint 12")`)
+- 3 Cross-tier stubs (raise `NotImplementedError("Sprint 13")`)
+
+### SPRINT11-KP-002: Implement Tier 0 observation methods
+**Status:** COMPLETE
+- `get_screenshot()` — captures via pyautogui, falls back to `_fallback_png()` in headless
+- `get_active_window()` — uses osascript on macOS, xdotool on Linux, graceful fallback to "Unknown"
+- `ocr_screen()` — uses pytesseract if available, returns empty list if not
+- `snapshot_state()` — bundles screenshot + active window + OCR + timestamp + resolution
+- `_fallback_png()` — static method generating minimal valid 1x1 transparent PNG (no external deps)
+- `_run_ocr()` — helper that runs pytesseract on a PIL Image with confidence filtering
+
+### SPRINT11-KP-003: Add Sprint 11 tests
+**Status:** COMPLETE
+- Created `tests/test_sprint11_projectx.py` with 16 tests across 3 test classes
+- `TestProjectXSkeleton` (5 tests): import, init defaults, tiers complete, tier values, TaskAbortError
+- `TestObservationMethods` (5 tests): screenshot returns PNG bytes, active window returns string, OCR returns list, snapshot_state structure, fallback_png valid
+- `TestStubsRaiseCorrectly` (6 tests): click/type_text/run_shell raise "Sprint 12", safe_execute/abort/log_action raise "Sprint 13"
