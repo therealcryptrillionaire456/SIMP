@@ -14,6 +14,7 @@ Architecture notes:
 See SPRINT_LOG.md "ProjectX Computer-Use Design Review" for full design rationale.
 """
 
+import hashlib
 import json
 import logging
 import os
@@ -46,6 +47,9 @@ ACTION_TIERS = {
     "scroll": 1,
     "focus_app": 1,
     "run_shell": 2,
+    "sync_knowledge": 0,
+    "update_knowledge": 0,
+    "check_protocol_health": 0,
     "log_action": -1,   # cross-tier, always allowed
     "safe_execute": -1,  # wrapper, always allowed
     "abort": -1,         # control, always allowed
@@ -470,6 +474,151 @@ class ProjectXComputer:
 
         self.log_action(step, result)
         return result
+
+    # ── Tier 0: Knowledge Sync (ProjectX self-maintaining kernel) ────
+
+    def sync_knowledge(self) -> Dict[str, Any]:
+        """Read SIMP docs and codebase state into ProjectX knowledge base."""
+        knowledge: Dict[str, Any] = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "protocol_version": "1.0",
+            "sources": [],
+        }
+
+        docs_to_read = [
+            "SPRINT_LOG.md",
+            "README.md",
+            "COORDINATION_PROTOCOL.md",
+        ]
+
+        repo_root = os.path.join(os.path.dirname(__file__), "..", "..")
+
+        for doc in docs_to_read:
+            doc_path = os.path.join(repo_root, doc)
+            try:
+                if os.path.exists(doc_path):
+                    with open(doc_path) as f:
+                        content = f.read()
+                    knowledge["sources"].append({
+                        "file": doc,
+                        "size": len(content),
+                        "summary": content[:500],
+                        "hash": hashlib.md5(content.encode()).hexdigest(),
+                    })
+            except Exception as exc:
+                logger.warning(f"Failed to read {doc}: {exc}")
+
+        # Read canonical intent registry
+        try:
+            from simp.models.canonical_intent import INTENT_TYPE_REGISTRY
+            knowledge["intent_types"] = list(INTENT_TYPE_REGISTRY.keys())
+            knowledge["intent_count"] = len(INTENT_TYPE_REGISTRY)
+        except ImportError:
+            pass
+
+        # Read routing policy
+        policy_path = os.path.join(repo_root, "simp", "routing", "routing_policy.json")
+        try:
+            if os.path.exists(policy_path):
+                with open(policy_path) as f:
+                    policy = json.load(f)
+                knowledge["routing_policy"] = {
+                    "agent_count": len(policy.get("pool", {}).get("primary", []))
+                    + len(policy.get("pool", {}).get("secondary", []))
+                    + len(policy.get("pool", {}).get("support", [])),
+                    "task_types_routed": len(policy.get("task_routing", {})),
+                }
+        except Exception:
+            pass
+
+        self._knowledge = knowledge
+        logger.info(
+            f"ProjectX knowledge synced: {len(knowledge.get('sources', []))} docs, "
+            f"{knowledge.get('intent_count', 0)} intent types"
+        )
+        return knowledge
+
+    def update_knowledge(self) -> Dict[str, Any]:
+        """Re-read SIMP state after changes. Compares with previous knowledge."""
+        old_knowledge = getattr(self, '_knowledge', {})
+        new_knowledge = self.sync_knowledge()
+
+        changes = []
+        old_hashes = {s["file"]: s.get("hash", "") for s in old_knowledge.get("sources", [])}
+        for source in new_knowledge.get("sources", []):
+            old_hash = old_hashes.get(source["file"], "")
+            if old_hash and old_hash != source.get("hash", ""):
+                changes.append(f"Modified: {source['file']}")
+
+        old_count = old_knowledge.get("intent_count", 0)
+        new_count = new_knowledge.get("intent_count", 0)
+        if new_count != old_count:
+            changes.append(f"Intent types changed: {old_count} → {new_count}")
+
+        new_knowledge["changes_detected"] = changes
+        return new_knowledge
+
+    def check_protocol_health(self) -> Dict[str, Any]:
+        """Run protocol invariant checks."""
+        results: Dict[str, Any] = {
+            "checks": [],
+            "healthy": True,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+
+        repo_root = os.path.join(os.path.dirname(__file__), "..", "..")
+
+        required_files = [
+            "simp/server/broker.py",
+            "simp/server/http_server.py",
+            "dashboard/server.py",
+            "simp/models/canonical_intent.py",
+            "simp/projectx/computer.py",
+            "SPRINT_LOG.md",
+            "README.md",
+        ]
+        for f in required_files:
+            path = os.path.join(repo_root, f)
+            exists = os.path.exists(path)
+            results["checks"].append({"check": f"file_exists:{f}", "passed": exists})
+            if not exists:
+                results["healthy"] = False
+
+        # Check Python modules compile
+        py_files = [f for f in required_files if f.endswith(".py")]
+        for f in py_files:
+            path = os.path.join(repo_root, f)
+            if os.path.exists(path):
+                try:
+                    import py_compile
+                    py_compile.compile(path, doraise=True)
+                    results["checks"].append({"check": f"compiles:{f}", "passed": True})
+                except py_compile.PyCompileError:
+                    results["checks"].append({"check": f"compiles:{f}", "passed": False})
+                    results["healthy"] = False
+
+        # Check intent registry is non-empty
+        try:
+            from simp.models.canonical_intent import INTENT_TYPE_REGISTRY
+            has_intents = len(INTENT_TYPE_REGISTRY) > 0
+            results["checks"].append({"check": "intent_registry_populated", "passed": has_intents})
+            if not has_intents:
+                results["healthy"] = False
+        except ImportError:
+            results["checks"].append({"check": "intent_registry_importable", "passed": False})
+            results["healthy"] = False
+
+        # Check routing policy is valid JSON
+        policy_path = os.path.join(repo_root, "simp", "routing", "routing_policy.json")
+        try:
+            with open(policy_path) as f:
+                json.load(f)
+            results["checks"].append({"check": "routing_policy_valid", "passed": True})
+        except Exception:
+            results["checks"].append({"check": "routing_policy_valid", "passed": False})
+            results["healthy"] = False
+
+        return results
 
     def abort(self, reason: str) -> None:
         """
