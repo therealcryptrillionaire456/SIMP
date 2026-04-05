@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMP Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <svg class="logo" viewBox="0 0 40 40" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="36" height="36" rx="8" fill="none" stroke="#4f98a3" stroke-width="2.5"/>
+        <circle cx="12" cy="14" r="3" fill="#4f98a3"/>
+        <circle cx="28" cy="14" r="3" fill="#4f98a3"/>
+        <circle cx="20" cy="26" r="3" fill="#4f98a3"/>
+        <line x1="12" y1="14" x2="28" y2="14" stroke="#4f98a3" stroke-width="1.5" opacity="0.5"/>
+        <line x1="12" y1="14" x2="20" y2="26" stroke="#4f98a3" stroke-width="1.5" opacity="0.5"/>
+        <line x1="28" y1="14" x2="20" y2="26" stroke="#4f98a3" stroke-width="1.5" opacity="0.5"/>
+      </svg>
+      <h1 class="header-title">SIMP <span class="header-subtitle">Dashboard</span></h1>
+    </div>
+    <div class="header-right">
+      <span class="broker-badge" id="broker-badge">
+        <span class="status-dot" id="broker-dot"></span>
+        <span id="broker-label">Checking...</span>
+      </span>
+      <button class="refresh-btn" id="refresh-btn" title="Refresh now">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+          <path d="M8 3a5 5 0 0 0-4.546 2.914.5.5 0 1 1-.908-.418A6 6 0 1 1 2.25 9.75a.5.5 0 0 1 .75-.001A5 5 0 1 0 8 3z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        Refresh
+      </button>
+      <span class="auto-refresh-label" id="auto-refresh-label">Auto-refresh: <span id="countdown">5</span>s</span>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Overview Cards -->
+    <section class="section" id="overview-section">
+      <h2 class="section-title">Overview</h2>
+      <div class="cards-grid" id="overview-cards">
+        <div class="card" id="card-broker-status">
+          <div class="card-label">Broker Status</div>
+          <div class="card-value" id="val-broker-status">--</div>
+        </div>
+        <div class="card" id="card-broker-state">
+          <div class="card-label">Broker State</div>
+          <div class="card-value" id="val-broker-state">--</div>
+        </div>
+        <div class="card" id="card-agents-online">
+          <div class="card-label">Agents Online</div>
+          <div class="card-value mono" id="val-agents-online">--</div>
+        </div>
+        <div class="card" id="card-pending">
+          <div class="card-label">Pending Intents</div>
+          <div class="card-value mono" id="val-pending">--</div>
+        </div>
+        <div class="card" id="card-received">
+          <div class="card-label">Intents Received</div>
+          <div class="card-value mono" id="val-received">--</div>
+        </div>
+        <div class="card" id="card-routed">
+          <div class="card-label">Intents Routed</div>
+          <div class="card-value mono" id="val-routed">--</div>
+        </div>
+        <div class="card" id="card-failed">
+          <div class="card-label">Intents Failed</div>
+          <div class="card-value mono" id="val-failed">--</div>
+        </div>
+        <div class="card" id="card-avg-route">
+          <div class="card-label">Avg Route Time</div>
+          <div class="card-value mono" id="val-avg-route">--</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Registered Agents Table -->
+    <section class="section" id="agents-section">
+      <h2 class="section-title">Registered Agents</h2>
+      <div class="table-wrap">
+        <table class="agents-table" id="agents-table">
+          <thead>
+            <tr>
+              <th>Agent ID</th>
+              <th>Name</th>
+              <th>Mode</th>
+              <th>Status</th>
+              <th>Capabilities</th>
+              <th class="col-num">Received</th>
+              <th class="col-num">Completed</th>
+              <th>Registered At</th>
+            </tr>
+          </thead>
+          <tbody id="agents-tbody">
+            <tr><td colspan="8" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Capability Map -->
+    <section class="section" id="capabilities-section">
+      <h2 class="section-title">Capability Map</h2>
+      <div class="cap-grid" id="cap-grid">
+        <div class="empty-state">Loading...</div>
+      </div>
+    </section>
+
+    <!-- Activity Feed -->
+    <section class="section" id="activity-section">
+      <h2 class="section-title">Recent Activity</h2>
+      <div class="activity-feed" id="activity-feed">
+        <div class="empty-state">No activity recorded yet. Events appear when broker state changes.</div>
+      </div>
+    </section>
+
+    <!-- Protocol Info Footer -->
+    <section class="section protocol-info" id="protocol-section">
+      <div class="protocol-grid">
+        <div>
+          <span class="protocol-label">Protocol</span>
+          <span class="protocol-value mono">SIMP v1</span>
+        </div>
+        <div>
+          <span class="protocol-label">Dashboard</span>
+          <span class="protocol-value mono">v1.0.0</span>
+        </div>
+        <div>
+          <span class="protocol-label">Dashboard Uptime</span>
+          <span class="protocol-value mono" id="val-uptime">--</span>
+        </div>
+        <div>
+          <span class="protocol-label">Last Refresh</span>
+          <span class="protocol-value mono" id="val-last-refresh">--</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Unreachable overlay -->
+  <div class="unreachable-banner" id="unreachable-banner" style="display:none;">
+    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+      <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 10.5a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5zM8.75 8a.75.75 0 0 1-1.5 0V4.5a.75.75 0 0 1 1.5 0V8z"/>
+    </svg>
+    <span>Broker Unreachable &mdash; Dashboard is running but cannot connect to the SIMP broker at <code>127.0.0.1:5555</code></span>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

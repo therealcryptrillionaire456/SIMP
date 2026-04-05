@@ -25,3 +25,11 @@ env/
 *.db
 .pytest_cache/
 *.egg-info/
+
+# Dashboard runtime artifacts
+dashboard/activity_log.jsonl
+
+# Claude/MCP local config
+.claude/
+.mcp.json
+CLAUDE.md
