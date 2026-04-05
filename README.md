@@ -41,6 +41,7 @@ A production-grade protocol for AI agent-to-agent communication. SIMP acts as a 
 │             Dashboard (:8050) — GET-only             │
 │  Public-safe read-only monitoring with redaction     │
 │  Agents · Tasks · Logs · Topology · Memory · Stats   │
+│  Orchestration · Computer Use (ProjectX)             │
 └──────────────────────────────────────────────────────┘
 ```
 
@@ -58,6 +59,7 @@ A production-grade protocol for AI agent-to-agent communication. SIMP acts as a 
 - **Orchestration loop** — Autonomous task queue processing
 - **Routing policy** — JSON-configurable agent routing with fallback rules
 - **Public dashboard** — Safe for reverse proxy exposure, redacts secrets
+- **Computer-use agent** — ProjectX bounded action layer for screenshot-driven GUI automation and shell execution
 
 ## Quickstart
 
@@ -85,13 +87,18 @@ python3.10 -m pytest tests/ -q
 | test_kashclaw_integration | 23 | Trading agent integration |
 | test_sprint5_audit | 19 | Security findings verification |
 | test_protocol_validation | 17 | Intent routing, schema compliance |
+| test_sprint11_projectx | 16 | ProjectX skeleton + observation layer |
+| test_sprint12_actions | 15 | GUI actions + shell execution |
+| test_sprint13_safety | 13 | Logging, safety gate, abort |
 | test_sprint8_memory | 10 | Memory layer, datetime deprecation |
 | test_sprint2_hardening | 10 | Rate limiting, auth, path safety |
 | test_sprint4_shutdown | 9 | Graceful shutdown, cleanup |
 | test_sprint3_observability | 9 | Structured logging, ring buffer |
+| test_sprint14_integration | 8 | SIMP integration + dashboard endpoint |
 | test_sprint10_final | 7 | Production readiness verification |
 | test_sprint7_orchestration | 6 | Orchestration loop integration |
 | test_intent_schema | 6 | Coordination intent schemas |
+| test_agent_manager_security | 5 | Agent manager security tests |
 | test_sprint9_protocol | 4 | Protocol cleanup, module compilation |
 | test_intent | 4 | Core intent/crypto/agent |
 
@@ -108,6 +115,26 @@ All endpoints validated. Dashboard is GET-only with sensitive field redaction.
 | Path traversal | Sanitized agent IDs in file-based delivery |
 | CORS | Configurable origins via `DASHBOARD_CORS_ORIGINS` |
 | Secret redaction | Dashboard strips API keys, tokens, file paths |
+
+## Computer Use (ProjectX)
+
+ProjectX provides a bounded, auditable interface for AI agents to interact with the host computer.
+
+| Tier | Actions | Risk Level |
+|------|---------|------------|
+| 0 — Observation | get_screenshot, get_active_window, ocr_screen, snapshot_state | Read-only, always allowed |
+| 1 — GUI | click, double_click, type_text, press, scroll, focus_app | Low-risk, reversible |
+| 2 — Shell | run_shell | Medium-risk, logged |
+| 3 — Restricted | (future) | Requires explicit approval |
+
+All actions pass through `safe_execute()` which validates, captures pre/post state, and logs to JSONL.
+
+```bash
+# Initialize ProjectX in the broker
+from simp.projectx.computer import ProjectXComputer
+pc = ProjectXComputer(log_dir="./projectx_logs", max_tier=2)
+result = pc.safe_execute({"action": "run_shell", "params": {"command": "echo hello"}})
+```
 
 ## Configuration
 
@@ -133,6 +160,11 @@ All endpoints validated. Dashboard is GET-only with sensitive field redaction.
 | 8 | Memory layer activation | Done |
 | 9 | Protocol cleanup, Pydantic v2 migration | Done |
 | 10 | Production readiness, README, version bump | Done |
+| 11 | ProjectX skeleton + observation layer | Done |
+| 12 | GUI actions + shell execution | Done |
+| 13 | Logging, safety gate, abort | Done |
+| 14 | SIMP integration + dashboard endpoint | Done |
+| 15 | Production readiness, README, version 0.3.0 | Done |
 
 ## License
 

@@ -1326,3 +1326,49 @@ Wire `ProjectXComputer` into the SIMP broker as a registered capability, add `co
 - `TestBrokerProjectXIntegration` (5 tests): attribute existence, init_projectx, event logging, safe_execute via broker, unknown action rejection
 - `TestComputerUseIntentType` (2 tests): ACTION_TIERS importable, all tiers assigned valid integers
 - `TestDashboardEndpoint` (1 test): dashboard server.py compiles without errors
+
+---
+
+## Sprint 15 — Production Readiness v0.3.0
+**Started:** 2026-04-05
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Final sprint: update README for computer-use capability, bump version to 0.3.0, create comprehensive end-to-end verification tests, and ensure everything passes cleanly.
+
+### SPRINT15-KP-001: README.md update for ProjectX computer-use
+**Status:** COMPLETE
+- Added "Computer-use agent" to Features section
+- Updated Architecture diagram to include Computer Use (ProjectX)
+- Added new "Computer Use (ProjectX)" section with action tier table and quickstart code
+- Updated Test Suites table with actual per-file test counts including sprint 11-14 test files
+- Added Sprints 11-15 to Sprint History table
+
+### SPRINT15-KP-002: Version bump to 0.3.0
+**Status:** COMPLETE
+- `setup.py`: version bumped from 0.2.0 to 0.3.0
+- `dashboard/server.py`: DASHBOARD_VERSION bumped from 1.2.0 to 1.3.0
+- `simp/server/broker.py`: version log message updated to v0.3.0
+
+### SPRINT15-KP-003: Final verification tests
+**Status:** COMPLETE
+- Created `tests/test_sprint15_final.py` with 8 tests across 2 test classes
+- `TestProjectXEndToEnd` (3 tests): full lifecycle (init → observe → execute → log → verify), rejection logging, tier gating
+- `TestProductionReadinessV3` (5 tests): README has ProjectX, version is 0.3.0, SPRINT_LOG has Sprint 15, all ProjectX modules compile, all core modules compile
+
+---
+
+## 15-Sprint Plan: COMPLETE
+
+All 15 sprints delivered. The SIMP protocol is production-ready with:
+- Full input validation and security hardening (Sprints 1-5)
+- Dashboard feature completion (Sprint 6)
+- Orchestration loop integration (Sprint 7)
+- Memory layer activation (Sprint 8)
+- Protocol cleanup and test coverage (Sprint 9)
+- Production readiness v0.2.0 (Sprint 10)
+- ProjectX computer-use skeleton + observation (Sprint 11)
+- GUI actions + shell execution (Sprint 12)
+- Logging, safety gate, and abort (Sprint 13)
+- SIMP integration + dashboard endpoint (Sprint 14)
+- Production readiness v0.3.0 (Sprint 15)
