@@ -29,6 +29,10 @@ env/
 # Dashboard runtime artifacts
 dashboard/activity_log.jsonl
 
+# Task ledger data
+data/task_ledger.jsonl
+data/
+
 # Claude/MCP local config
 .claude/
 .mcp.json

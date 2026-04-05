@@ -114,6 +114,53 @@
       </div>
     </section>
 
+    <!-- Task Queue -->
+    <section class="section" id="task-queue-section">
+      <h2 class="section-title">Task Queue</h2>
+      <div class="cards-grid" id="task-status-cards">
+        <div class="card"><div class="card-label">Queued</div><div class="card-value mono" id="val-tasks-queued">--</div></div>
+        <div class="card"><div class="card-label">Claimed</div><div class="card-value mono" id="val-tasks-claimed">--</div></div>
+        <div class="card"><div class="card-label">In Progress</div><div class="card-value mono" id="val-tasks-in-progress">--</div></div>
+        <div class="card"><div class="card-label">Completed</div><div class="card-value mono" id="val-tasks-completed">--</div></div>
+        <div class="card"><div class="card-label">Failed</div><div class="card-value mono" id="val-tasks-failed">--</div></div>
+        <div class="card"><div class="card-label">Deferred</div><div class="card-value mono" id="val-tasks-deferred">--</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table" id="task-queue-table">
+          <thead>
+            <tr>
+              <th>Task ID</th>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Agent</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="task-queue-tbody">
+            <tr><td colspan="7" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Failure Stats -->
+    <section class="section" id="failure-stats-section">
+      <h2 class="section-title">Failure Stats</h2>
+      <div class="cap-grid" id="failure-grid">
+        <div class="empty-state">Loading...</div>
+      </div>
+    </section>
+
+    <!-- Routing Policy -->
+    <section class="section" id="routing-section">
+      <h2 class="section-title">Routing Policy</h2>
+      <div class="cap-grid" id="routing-grid">
+        <div class="empty-state">Loading...</div>
+      </div>
+    </section>
+
     <!-- Activity Feed -->
     <section class="section" id="activity-section">
       <h2 class="section-title">Recent Activity</h2>

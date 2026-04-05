@@ -379,6 +379,50 @@ async def api_topology():
     }
 
 
+@app.get("/api/tasks")
+async def api_tasks():
+    """Task ledger view — lists all tasks with failure stats."""
+    data = await _broker_get("/tasks")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "tasks": [],
+            "count": 0,
+            "failure_stats": {},
+            "status_counts": {},
+        }
+    return _redact(data)
+
+
+@app.get("/api/tasks/queue")
+async def api_task_queue():
+    """Unclaimed task queue ordered by priority."""
+    data = await _broker_get("/tasks/queue")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "queue": [],
+            "count": 0,
+        }
+    return _redact(data)
+
+
+@app.get("/api/routing")
+async def api_routing():
+    """Routing policy and builder pool status."""
+    data = await _broker_get("/routing/policy")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "policy": {},
+            "pool_status": {},
+        }
+    return _redact(data)
+
+
 # ---------------------------------------------------------------------------
 # Static frontend
 # ---------------------------------------------------------------------------
