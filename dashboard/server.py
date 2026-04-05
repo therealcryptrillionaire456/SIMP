@@ -95,6 +95,8 @@ def _redact(obj: Any) -> Any:
                 # Replace actual URL with just the mode indicator
                 if v.startswith("http"):
                     cleaned[k] = "http"
+                elif v == "":
+                    cleaned[k] = "file-based"
                 elif v.startswith("/") or v.startswith("file"):
                     cleaned[k] = "file-based"
                 else:
@@ -196,14 +198,16 @@ def _flatten_snapshot(status_data: dict | None, health_data: dict | None) -> dic
     snap: dict[str, Any] = {}
     if health_data:
         snap["agents_online"] = health_data.get("agents_online", 0)
-        snap["broker_state"] = health_data.get("state", "unknown")
+        snap["broker_state"] = health_data.get("state", "paused" if health_data.get("paused") else "running")
     if status_data:
-        broker = status_data.get("broker", {})
-        stats = broker.get("stats", {})
+        # Handle both nested {broker:{stats:{...}}} and flat structures
+        broker = status_data.get("broker", status_data)
+        stats = broker.get("stats", broker)
         snap["intents_routed"] = stats.get("intents_routed", 0)
         snap["intents_failed"] = stats.get("intents_failed", 0)
         snap["intents_received"] = stats.get("intents_received", 0)
-        snap["agents_online"] = stats.get("agents_online", snap.get("agents_online", 0))
+        if stats.get("agents_online") is not None:
+            snap["agents_online"] = stats["agents_online"]
         snap["broker_state"] = broker.get("state", snap.get("broker_state", "unknown"))
     return snap
 
@@ -320,11 +324,13 @@ async def api_capabilities():
             "broker_url_reachable": False,
             "capabilities": {},
         }
-    agents = data.get("agents", {})
+    agents = data.get("agents", [])
+    if isinstance(agents, dict):
+        agents = list(agents.values())
     cap_map: dict[str, list[str]] = {}
-    for agent_id, info in agents.items():
-        metadata = info.get("metadata", {})
-        caps = metadata.get("capabilities", [])
+    for agent in agents:
+        agent_id = agent.get("agent_id", "unknown")
+        caps = agent.get("capabilities", [])
         if isinstance(caps, list):
             for cap in caps:
                 cap_map.setdefault(cap, []).append(agent_id)
@@ -345,19 +351,21 @@ async def api_topology():
             "nodes": [],
             "edges": [],
         }
-    agents = data.get("agents", {})
+    agents = data.get("agents", [])
+    if isinstance(agents, dict):
+        agents = list(agents.values())
     nodes = [{"id": "broker", "label": "SIMP Broker", "type": "broker"}]
     edges = []
-    for agent_id, info in agents.items():
-        endpoint = info.get("endpoint", "")
+    for agent in agents:
+        agent_id = agent.get("agent_id", "unknown")
+        endpoint = agent.get("endpoint", "")
         mode = "http" if isinstance(endpoint, str) and endpoint.startswith("http") else "file-based"
-        metadata = info.get("metadata", {})
         nodes.append({
             "id": agent_id,
-            "label": metadata.get("name", agent_id),
+            "label": agent.get("name", agent_id),
             "type": "agent",
             "mode": mode,
-            "capabilities": metadata.get("capabilities", []),
+            "capabilities": agent.get("capabilities", []),
         })
         edges.append({
             "source": "broker",
