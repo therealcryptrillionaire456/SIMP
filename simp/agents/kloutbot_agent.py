@@ -336,11 +336,15 @@ class KloutbotAgent(SimpAgent):
             }
 
             return {
-                "status": "success",
+                "type": "response",
+                "status": "decomposed",
                 "goal_id": goal_id,
                 "goal_type": goal_type,
                 "subtask_count": len(subtasks),
-                "subtasks": subtasks,
+                "subtasks": [
+                    {"task_type": st["task_type"], "description": st.get("description", ""), "title": st.get("title", "Subtask"), "order": st.get("order", i)}
+                    for i, st in enumerate(subtasks)
+                ],
                 "timestamp": datetime.utcnow().isoformat(),
             }
 

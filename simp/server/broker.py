@@ -337,14 +337,20 @@ class SimpBroker:
         with self.stats_lock:
             self.stats["intents_received"] += 1
 
-        # Log to task ledger
-        task_id = self.task_ledger.create_task(
-            title=f"Intent: {intent_type}",
-            description=f"Route intent {intent_id} from {source_agent} to {target_agent or 'unknown'}",
-            task_type=canonical.get_task_type(),
-            assigned_agent=target_agent,
-            tags=["intent", intent_type],
-        )
+        # Log to task ledger — reuse existing task if one was already created
+        existing_task_id = intent_data.get("task_id") or intent_data.get("params", {}).get("task_id")
+        existing_task = self.task_ledger.get_task(existing_task_id) if existing_task_id else None
+
+        if existing_task:
+            task_id = existing_task["task_id"]
+        else:
+            task_id = self.task_ledger.create_task(
+                title=f"Intent: {intent_type}",
+                description=f"Route intent {intent_id} from {source_agent} to {target_agent or 'unknown'}",
+                task_type=canonical.get_task_type(),
+                assigned_agent=target_agent,
+                tags=["intent", intent_type],
+            )
 
         # Handle computer_use intents via ProjectX
         if intent_type.startswith("computer_use") and self._projectx:
@@ -888,6 +894,16 @@ class SimpBroker:
                 "response_recorded", f"Response for intent {intent_id} ({execution_time_ms:.1f}ms)",
                 intent_id=intent_id, agent_id=record.target_agent,
             )
+
+            # If response contains decomposed subtasks, wire them into the task ledger
+            if response_data.get("status") == "decomposed" and "subtasks" in response_data:
+                subtask_defs = response_data["subtasks"]
+                # Find the task_id associated with this intent
+                task_candidates = self.task_ledger.list_tasks()
+                for tc in task_candidates:
+                    if tc.get("description", "").find(intent_id) != -1:
+                        self.task_ledger.decompose_task(tc["task_id"], subtask_defs)
+                        break
 
             # Fire memory hook on task completion
             if self.hooks:

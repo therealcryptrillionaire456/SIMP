@@ -191,7 +191,25 @@ class TaskLedger:
             task["result"] = result
             task["updated_at"] = now
             self._append(task)
+
+            # Check if completing this task unblocks siblings
+            if task.get("parent_task_id"):
+                self._check_unblock_siblings(task["parent_task_id"])
+
             return True
+
+    def _check_unblock_siblings(self, parent_task_id: str) -> None:
+        """Unblock sibling subtasks whose predecessors are now complete."""
+        siblings = [t for t in self._tasks.values() if t.get("parent_task_id") == parent_task_id]
+        for sibling in siblings:
+            if sibling.get("status") == "blocked":
+                order = sibling.get("order", 0)
+                predecessors = [s for s in siblings if s.get("order", 0) < order]
+                all_done = all(s.get("status") == "completed" for s in predecessors)
+                if all_done:
+                    sibling["status"] = "queued"
+                    sibling["updated_at"] = _now_iso()
+                    self._append(sibling)
 
     def fail_task(
         self,
@@ -271,13 +289,17 @@ class TaskLedger:
         parent_task_id: str,
         subtasks: List[Dict[str, Any]],
     ) -> List[str]:
-        """Create subtasks linked to a parent task. Returns list of new task_ids."""
+        """Create subtasks linked to a parent task. Returns list of new task_ids.
+
+        Subtasks with order > 0 start as "blocked"; order 0 starts as "queued".
+        """
         with self._lock:
             parent = self._tasks.get(parent_task_id)
             if parent is None:
                 return []
             new_ids = []
             for sub in subtasks:
+                order = sub.get("order", 0)
                 tid = self.create_task(
                     title=sub.get("title", "Subtask"),
                     description=sub.get("description", ""),
@@ -286,6 +308,14 @@ class TaskLedger:
                     parent_task_id=parent_task_id,
                     tags=sub.get("tags", []),
                 )
+                # Store the order on the task
+                task = self._tasks[tid]
+                task["order"] = order
+                # Block subtasks that depend on predecessors
+                if order > 0:
+                    task["status"] = "blocked"
+                task["updated_at"] = _now_iso()
+                self._append(task)
                 new_ids.append(tid)
             parent["subtask_ids"] = parent.get("subtask_ids", []) + new_ids
             parent["updated_at"] = _now_iso()

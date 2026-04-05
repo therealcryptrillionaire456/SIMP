@@ -597,6 +597,12 @@ class SimpHttpServer:
         return thread
 
 
+def create_app():
+    """Factory function for production WSGI servers (gunicorn)."""
+    server = SimpHttpServer()
+    return server.app
+
+
 def create_http_server(
     host: str = "127.0.0.1",
     port: int = 5555,

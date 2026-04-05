@@ -69,6 +69,21 @@ class OrchestrationLoop:
             task_id = task.get("task_id")
             task_type = task.get("task_type", "implementation")
 
+            # Enforce task dependency ordering for subtasks
+            parent_id = task.get("parent_task_id")
+            order = task.get("order", 0)
+            if parent_id and order > 0:
+                all_tasks = self.task_ledger.list_tasks()
+                predecessors = [
+                    s for s in all_tasks
+                    if s.get("parent_task_id") == parent_id and s.get("order", 0) < order
+                ]
+                incomplete = [s for s in predecessors if s.get("status") not in ("completed",)]
+                if incomplete:
+                    if task.get("status") != "blocked":
+                        self.task_ledger.update_status(task_id, "blocked")
+                    continue
+
             if not self.builder_pool:
                 self.logger.warning("No builder pool configured — cannot assign tasks")
                 break
@@ -85,12 +100,13 @@ class OrchestrationLoop:
                 self.logger.debug(f"Builder {builder} not registered as agent")
                 continue
 
-            # Route intent to the builder
+            # Route intent to the builder — forward task_id so broker reuses it
             intent_data = {
                 "intent_id": f"orch:{uuid.uuid4()}",
                 "source_agent": "orchestration_loop",
                 "target_agent": builder,
                 "intent_type": task_type,
+                "task_id": task_id,
                 "params": {
                     "task_id": task_id,
                     "title": task.get("title", ""),
