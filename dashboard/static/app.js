@@ -262,6 +262,83 @@
   }
 
   // -----------------------------------------------------------------------
+  // Render: Structured Logs
+  // -----------------------------------------------------------------------
+
+  function renderLogs(data) {
+    const tbody = document.getElementById("logs-tbody");
+    if (!tbody) return;
+    if (!data || !data.logs || data.logs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No structured logs yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.logs.slice(0, 50).map(e => {
+      const ts = e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : "--";
+      const levelClass = e.level === "error" ? "status-badge offline"
+                       : e.level === "warning" ? "status-badge degraded"
+                       : "status-badge online";
+      return `<tr>
+        <td class="mono">${ts}</td>
+        <td><span class="${levelClass}">${e.level || "info"}</span></td>
+        <td>${e.event_type || "--"}</td>
+        <td class="mono">${e.agent_id || "--"}</td>
+        <td>${e.message || "--"}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  // -----------------------------------------------------------------------
+  // Render: Network Topology
+  // -----------------------------------------------------------------------
+
+  function renderTopology(data) {
+    const container = document.getElementById("topology-container");
+    if (!container) return;
+    if (!data || !data.nodes || data.nodes.length === 0) {
+      container.innerHTML = '<p class="empty-row">No topology data</p>';
+      return;
+    }
+    const nodes = data.nodes || [];
+    const html = nodes.map(n => {
+      const mode = n.connection_mode || "unknown";
+      const statusClass = n.status === "online" ? "online"
+                        : n.status === "degraded" ? "degraded"
+                        : "offline";
+      return `<div class="topology-node">
+        <span class="status-dot ${statusClass}"></span>
+        <strong>${n.agent_id || "unknown"}</strong>
+        <span class="topology-mode">${mode}</span>
+        <span class="topology-type">${n.agent_type || ""}</span>
+      </div>`;
+    }).join("");
+    container.innerHTML = html;
+  }
+
+  // -----------------------------------------------------------------------
+  // Render: Task Queue (from /api/tasks/queue)
+  // -----------------------------------------------------------------------
+
+  function renderTaskQueue(data) {
+    const container = document.getElementById("task-queue-tbody");
+    if (!container) return;
+    if (!data || !data.queue || data.queue.length === 0) {
+      container.innerHTML = '<tr><td colspan="4" class="empty-row">Task queue empty</td></tr>';
+      return;
+    }
+    container.innerHTML = data.queue.slice(0, 20).map(t => {
+      const statusClass = t.status === "completed" ? "online"
+                        : t.status === "in_progress" ? "degraded"
+                        : "offline";
+      return `<tr>
+        <td class="mono">${t.task_id || "--"}</td>
+        <td>${t.task_type || "--"}</td>
+        <td><span class="status-badge ${statusClass}">${t.status || "--"}</span></td>
+        <td class="mono">${t.claimed_by || "unclaimed"}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  // -----------------------------------------------------------------------
   // Broker status helpers
   // -----------------------------------------------------------------------
 
@@ -620,7 +697,7 @@
 
   async function refreshAll() {
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos] = await Promise.all([
+    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -630,6 +707,9 @@
       apiFetch("/api/routing"),
       apiFetch("/api/memory/tasks"),
       apiFetch("/api/memory/conversations"),
+      apiFetch("/api/logs"),
+      apiFetch("/api/topology"),
+      apiFetch("/api/tasks/queue"),
     ]);
 
     renderHealth(health);
@@ -643,6 +723,9 @@
     renderRouting(routing);
     renderMemoryTasks(memTasks);
     renderMemoryConversations(memConvos);
+    renderLogs(logsData);
+    renderTopology(topologyData);
+    renderTaskQueue(taskQueueData);
 
     // Capture dashboard start time from health response
     if (!dashboardStartedAt && health && health.dashboard_started_at) {
