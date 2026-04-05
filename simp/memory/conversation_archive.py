@@ -9,7 +9,7 @@ import json
 import os
 import re
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -45,13 +45,13 @@ class ConversationArchive:
         """
         with self._lock:
             topic = record.get("topic", "untitled")
-            date_str = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            date_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
             slug = _slugify(topic)
             conv_id = f"{date_str}_{slug}"
             filename = f"{conv_id}.json"
 
             record.setdefault("id", conv_id)
-            record.setdefault("created_at", datetime.utcnow().isoformat() + "Z")
+            record.setdefault("created_at", datetime.now(timezone.utc).isoformat() + "Z")
             record.setdefault("participants", [])
             record.setdefault("decisions", [])
             record.setdefault("tags", [])

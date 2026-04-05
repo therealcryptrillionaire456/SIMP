@@ -22,6 +22,7 @@ from simp.server.request_guards import (
 )
 from simp.server.rate_limit import RateLimiter
 from simp.server.control_auth import require_control_auth
+from simp.memory.hooks import MemoryHooks
 from simp.memory.conversation_archive import ConversationArchive
 from simp.memory.task_memory import TaskMemory
 from simp.memory.knowledge_index import KnowledgeIndex
@@ -47,7 +48,20 @@ class SimpHttpServer:
         self.app.config["MAX_CONTENT_LENGTH"] = 64 * 1024  # 64 KB
         # Rate limiter
         self.limiter = RateLimiter()
-        self.broker = SimpBroker(broker_config or BrokerConfig())
+
+        # Memory layer components
+        self.conversation_archive = ConversationArchive()
+        self.task_memory = TaskMemory()
+        self.knowledge_index = KnowledgeIndex()
+        self._memory_hooks = MemoryHooks(
+            task_memory=self.task_memory,
+            knowledge_index=self.knowledge_index,
+            conversation_archive=self.conversation_archive,
+        )
+        self.broker = SimpBroker(
+            broker_config or BrokerConfig(),
+            hooks=self._memory_hooks,
+        )
         self.debug = debug
 
         # Shared async event loop for broker operations
@@ -58,11 +72,6 @@ class SimpHttpServer:
             name="SIMP-AsyncLoop",
         )
         self._loop_thread.start()
-
-        # Memory layer components
-        self.conversation_archive = ConversationArchive()
-        self.task_memory = TaskMemory()
-        self.knowledge_index = KnowledgeIndex()
         self.session_bootstrap = SessionBootstrap(
             task_memory=self.task_memory,
             conversation_archive=self.conversation_archive,

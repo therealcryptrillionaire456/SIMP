@@ -7,7 +7,7 @@ Each task gets its own .md file with standardized sections.
 
 import re
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -79,7 +79,7 @@ class TaskMemory:
         questions_text = "\n".join(f"- {q}" for q in (open_questions or [])) or "- (none yet)"
         locations_text = "\n".join(f"- {loc}" for loc in (code_locations or [])) or "- (none yet)"
         deps_text = "\n".join(f"- {dep}" for dep in (dependencies or [])) or "- (none)"
-        history_text = "\n".join(f"- {h}" for h in (history or [])) or f"- {datetime.utcnow().strftime('%Y-%m-%d')} — Task created"
+        history_text = "\n".join(f"- {h}" for h in (history or [])) or f"- {datetime.now(timezone.utc).strftime('%Y-%m-%d')} — Task created"
 
         content = _TASK_TEMPLATE.format(
             title=title,
@@ -127,7 +127,7 @@ class TaskMemory:
 
     def add_history_entry(self, slug: str, entry: str) -> bool:
         """Append an entry to the History section."""
-        date_str = datetime.utcnow().strftime("%Y-%m-%d")
+        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         line = f"- {date_str} — {entry}"
         with self._lock:
             path = self.base_dir / f"{slug}.md"
