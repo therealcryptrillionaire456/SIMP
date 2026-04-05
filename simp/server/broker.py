@@ -246,6 +246,7 @@ class SimpBroker:
                 "endpoint": endpoint,
                 "metadata": metadata or {},
                 "public_key": (metadata or {}).get("public_key"),
+                "simp_versions": (metadata or {}).get("simp_versions", ["1.0"]),
                 "registered_at": _utcnow_iso(),
                 "intents_received": 0,
                 "intents_completed": 0,
@@ -311,6 +312,13 @@ class SimpBroker:
         if errors:
             return {"status": "error", "errors": errors}
         intent_data = canonical.to_dict()
+
+        # Version check
+        supported_versions = {"1.0"}
+        intent_version = canonical.simp_version
+        if intent_version and intent_version not in supported_versions:
+            self.logger.warning(f"Intent has unsupported protocol version: {intent_version}")
+            # Allow through with warning (don't break backward compat yet)
 
         # Signature verification (if enabled)
         simp_config = SimpConfig()
@@ -1166,6 +1174,10 @@ class SimpBroker:
 
         # Queue depth
         stats["queue_depth"] = self.intent_queue.qsize()
+
+        # Protocol versioning
+        stats["protocol_versions"] = ["1.0"]
+        stats["simp_version"] = "0.4.0"
 
         # Calculate averages
         if stats["intents_completed"] > 0:

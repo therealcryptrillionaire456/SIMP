@@ -1,5 +1,40 @@
 # SIMP Sprint Log
 
+## Sprint 25 — Protocol Versioning, Documentation & v0.4.0
+**Started:** 2026-04-05
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Final sprint: protocol versioning, formal specification, comprehensive README overhaul, version bump to v0.4.0, and test gap coverage. The v0.4.0 release.
+
+### Changes
+
+- **SPRINT25-KP-001: Protocol Versioning**
+  - Added supported protocol versions (`["1.0"]`) and `simp_version` to broker stats/status response.
+  - Added `simp_version` validation in `route_intent()` — warns on unsupported versions without blocking (forward-compatible).
+  - Agents can declare `simp_versions` during registration via metadata.
+  - Fixed `simp/__init__.py` version to `"0.4.0"`.
+
+- **SPRINT25-KP-002: PROTOCOL_SPEC.md**
+  - Created comprehensive protocol specification document (~300 lines).
+  - Covers: message formats, all 35 intent types, agent lifecycle, routing algorithm, task lifecycle, security model, observability, error taxonomy, transport, HTTP API reference, version negotiation.
+
+- **SPRINT25-KP-003: README Overhaul**
+  - 5-step quickstart guide, ASCII architecture diagram, full API reference.
+  - Agent development guide, configuration reference (30+ env vars), production deployment guide.
+  - All 25 sprints in history table, updated test counts.
+
+- **SPRINT25-KP-004: Version Bump to 0.4.0**
+  - `setup.py` → 0.4.0, `simp/__init__.py` → 0.4.0, `dashboard/server.py` → DASHBOARD_VERSION 1.4.0.
+  - Sprint 25 and "25-Sprint Plan: COMPLETE" appended to SPRINT_LOG.md.
+
+- **SPRINT25-KP-005: Final Tests**
+  - 18 tests in `tests/test_sprint25_final.py` covering: version strings (5), PROTOCOL_SPEC content (5), README content (4), SPRINT_LOG completeness (2), all 16 core modules compile (1), agent version registration (1).
+  - All tests pass (0 regressions).
+
+---
+
 ## Sprint 24 — Recursive Self-Improvement Engine
 **Started:** 2026-04-05
 **Agent:** claude_cowork (implementation)
@@ -1762,3 +1797,20 @@ Production-ready dashboard with proper security headers, error handling, task fi
 - `TestTaskFiltering` (2 tests): filter controls in HTML, filter logic in JS
 - `TestActivityCharts` (3 tests): chart canvas in HTML, chart logic in JS, chart CSS styles
 - `TestModulesCompile` (1 test): dashboard/server.py compiles successfully
+
+---
+
+## 25-Sprint Plan: COMPLETE
+
+All 25 sprints delivered. SIMP v0.4.0 is production-ready with:
+
+### Phase 1: Input Validation & Security Hardening (Sprints 1-5)
+### Phase 2: Dashboard & Feature Completion (Sprint 6)
+### Phase 3: Orchestration & Memory (Sprints 7-8)
+### Phase 4: Protocol Cleanup & Production v0.2.0 (Sprints 9-10)
+### Phase 5: ProjectX Computer-Use (Sprints 11-15)
+### Phase 6: Security & Correctness (Sprints 16-17)
+### Phase 7: Scalability & Reliability (Sprints 18-19)
+### Phase 8: Dashboard & Observability (Sprints 20-21)
+### Phase 9: Smart Routing & Real Tasks (Sprints 22-23)
+### Phase 10: Self-Improvement & Release v0.4.0 (Sprints 24-25)

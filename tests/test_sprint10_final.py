@@ -19,7 +19,7 @@ class TestProductionReadiness:
             content = f.read()
         assert "Architecture" in content
         assert "Quickstart" in content
-        assert "Test Suites" in content
+        assert "Test Suite" in content
 
     def test_sprint_log_exists(self):
         path = os.path.join(os.path.dirname(__file__), "..", "SPRINT_LOG.md")
@@ -54,7 +54,7 @@ class TestProductionReadiness:
     def test_version_is_current(self):
         with open(os.path.join(os.path.dirname(__file__), "..", "setup.py")) as f:
             content = f.read()
-        assert '0.3.0' in content
+        assert '0.4.0' in content
 
     def test_no_dead_scaffolds(self):
         """No dead scaffold files should remain."""

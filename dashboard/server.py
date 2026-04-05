@@ -108,7 +108,7 @@ app.add_middleware(
 activity_buffer: deque[dict] = deque(maxlen=ACTIVITY_BUFFER_SIZE)
 _last_snapshot: dict[str, Any] = {}
 _started_at = datetime.now(timezone.utc).isoformat()
-DASHBOARD_VERSION = "2.0.0"  # bumped for Sprint 20 — WebSocket support
+DASHBOARD_VERSION = "1.4.0"  # bumped for Sprint 25 — v0.4.0 release
 
 # Active WebSocket connections
 _ws_clients: Set[WebSocket] = set()
