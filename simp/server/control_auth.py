@@ -6,6 +6,7 @@ When SIMP_CONTROL_TOKEN env var is set, requests must include it.
 When not set, control endpoints are open (backward compatible).
 """
 
+import hmac
 import os
 from functools import wraps
 from flask import request, jsonify
@@ -36,7 +37,7 @@ def require_control_auth(f):
             }), 401
 
         provided_token = auth_header[7:].strip()  # Strip "Bearer "
-        if provided_token != CONTROL_TOKEN:
+        if not hmac.compare_digest(provided_token, CONTROL_TOKEN):
             return jsonify({
                 "status": "error",
                 "error_code": "AUTH_FAILED",

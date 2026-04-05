@@ -2,6 +2,13 @@
 SIMP Server Validation Models — Pydantic schemas for request validation.
 
 These complement the request_guards module with structured Pydantic models.
+
+- AgentRegistration: Used in http_server.py for registration endpoint validation.
+- ResponseRecording: Used for response recording validation.
+- IntentRequest: Superseded by CanonicalIntent (simp.models.canonical_intent).
+  The canonical schema is the single source of truth for intent structure and types.
+  This model is retained only for reference; all new intent validation should use
+  CanonicalIntent.from_dict() and CanonicalIntent.validate().
 """
 
 import re
@@ -15,7 +22,11 @@ _ISO_8601_RE = re.compile(
 
 
 class IntentRequest(BaseModel):
-    """Pydantic model for validating intent routing requests."""
+    """Pydantic model for validating intent routing requests.
+
+    NOTE: Superseded by CanonicalIntent (simp.models.canonical_intent) as of Sprint 17.
+    Use CanonicalIntent.from_dict() for intent normalization and validation.
+    """
     user_id: str = Field(default="", min_length=0, max_length=100)
     intent: str = Field(..., min_length=1, max_length=100)
     parameters: Dict = Field(default_factory=dict)
@@ -28,6 +39,7 @@ class AgentRegistration(BaseModel):
     agent_type: str = Field(default="generic", max_length=64)
     capabilities: List[str] = Field(default_factory=list)
     endpoint: str = Field(default="", max_length=256)
+    public_key: Optional[str] = Field(default=None, max_length=4096)
 
     @field_validator("capabilities")
     @classmethod

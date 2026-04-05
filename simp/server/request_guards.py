@@ -9,6 +9,8 @@ import json
 import re
 from typing import Any, Dict, Optional, Tuple
 
+from simp.models.canonical_intent import INTENT_TYPE_REGISTRY
+
 # -----------------------------------------------------------------------
 # Constraints
 # -----------------------------------------------------------------------
@@ -19,16 +21,8 @@ MAX_INTENT_PAYLOAD_BYTES = 65_536  # 64 KB
 MAX_PARAMS_KEYS = 50
 MAX_STRING_VALUE_LENGTH = 10_000
 
-VALID_INTENT_TYPES = frozenset({
-    "prediction_signal", "trade_signal", "arbitrage_check",
-    "research_request", "research_finding", "system_test",
-    "orchestration_command", "code_task", "code_editing",
-    "planning", "research", "market_analysis", "trade_execution",
-    "orchestration", "scaffolding", "test_harness",
-    "detect_signal", "analyze_patterns", "vectorize",
-    "generate_strategy", "validate_action", "test",
-    "submit_goal", "check_status", "replan",
-})
+# Legacy VALID_INTENT_TYPES removed — use INTENT_TYPE_REGISTRY from
+# simp.models.canonical_intent as the single source of truth.
 
 
 # -----------------------------------------------------------------------
@@ -106,7 +100,8 @@ def validate_intent_payload(data: Any) -> Tuple[bool, Optional[str]]:
     if intent_type:
         if not isinstance(intent_type, str) or len(intent_type) > 64:
             return False, "intent_type must be a string <= 64 chars"
-        # Warn but don't block unknown types (extensibility)
+        if intent_type not in INTENT_TYPE_REGISTRY:
+            return False, f"Unknown intent_type: '{intent_type}'"
 
     # Validate params if present
     params = data.get("params")
@@ -143,6 +138,12 @@ def validate_registration_payload(data: Any) -> Tuple[bool, Optional[str]]:
     ok, err = validate_endpoint(endpoint)
     if not ok:
         return False, f"endpoint invalid: {err}"
+
+    # Validate optional public_key
+    public_key = data.get("public_key")
+    if public_key is not None:
+        if not isinstance(public_key, str) or len(public_key) > 4096:
+            return False, "public_key must be a string under 4096 chars"
 
     # Validate metadata size
     metadata = data.get("metadata", {})

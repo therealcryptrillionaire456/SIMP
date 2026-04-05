@@ -1425,3 +1425,50 @@ Lock down the open data plane. Wire API key auth, fix rate limiter XFF spoofing,
 - `TestIntentRecordEviction` (4 tests): records exist, cleanup method, evict oldest, max constant
 - `TestDashboardXSS` (4 tests): escapeHtml in app.js, innerHTML escaped, server compiles, security headers
 - `TestAllModulesCompile` (4 tests): http_server, broker, rate_limit, config all compile
+
+---
+
+## Sprint 17 — Crypto Activation & Schema Unification
+**Started:** 2026-04-05
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Activate dormant crypto layer, reconcile the two intent schemas into a single canonical source of truth, wire dead validation code, and unify the three config systems.
+
+### SPRINT17-KP-001: Activate Signature Verification
+**Status:** COMPLETE
+- Imported `SimpCrypto` in `broker.py` and wired `verify_signature()` into `route_intent()` path
+- Signature check runs when `REQUIRE_SIGNATURES=True` (from `SimpConfig`); graceful mode: verifies only when signature AND public_key are both present, warns otherwise
+- Agent `public_key` stored during `register_agent()` from metadata
+- `request_guards.py`: `validate_registration_payload()` now accepts and validates optional `public_key` field (string, max 4096 chars)
+- `control_auth.py`: Fixed constant-time comparison using `hmac.compare_digest()` instead of `==`
+
+### SPRINT17-KP-002: Unify Intent Schema
+**Status:** COMPLETE
+- Created `simp/models/canonical_intent.py` with `CanonicalIntent` dataclass and `INTENT_TYPE_REGISTRY` dict
+- Registry covers core types, computer_use types, self-improvement types, new expanded types, and legacy types for backward compat
+- `CanonicalIntent.from_dict()` handles both legacy Intent dataclass format (nested source_agent, nested intent) and broker flat dict format
+- `route_intent()` now normalizes via `CanonicalIntent.from_dict()` at entry, validates, and uses `canonical.get_task_type()`
+- Replaced hardcoded `_map_intent_to_task_type()` mapping with registry-backed lookup
+- `request_guards.py`: removed `VALID_INTENT_TYPES` frozenset, intent_type validation now uses `INTENT_TYPE_REGISTRY`
+
+### SPRINT17-KP-003: Wire Dead Validation Code
+**Status:** COMPLETE
+- `validation.py`: Added `public_key` field to `AgentRegistration` Pydantic model
+- `validation.py`: Documented `IntentRequest` as superseded by `CanonicalIntent`
+- `http_server.py`: Wired `AgentRegistration` Pydantic validation into registration endpoint
+- `http_server.py`: Registration now passes `public_key` through metadata to broker
+
+### SPRINT17-KP-004: Unify Config Systems
+**Status:** COMPLETE
+- `BrokerConfig` now reads defaults from `SimpConfig` via `__post_init__()` — port, host, max_agents, health_check_interval, health_check_timeout, log_level
+- `config/config.py`: Retained as canonical SimpConfig location with legacy aliases (Config, ProductionConfig, etc.)
+- `simp/config.py`: Converted to compatibility shim re-exporting from `config.config`
+
+### SPRINT17-KP-005: Tests
+**Status:** COMPLETE
+- Created `tests/test_sprint17_schema.py` with 19 tests across 5 test classes
+- `TestCanonicalIntent` (8 tests): creation from broker dict, legacy dict, validation, round-trip, task type mapping, priority
+- `TestIntentTypeRegistry` (4 tests): core types, computer_use types, self-improvement types, metadata completeness
+- `TestCryptoActivation` (3 tests): module importable, sign/verify round-trip, tamper detection
+- `TestConfigUnification` (4 tests): SimpConfig canonical, BrokerConfig exists, BrokerConfig reads SimpConfig defaults, legacy shim

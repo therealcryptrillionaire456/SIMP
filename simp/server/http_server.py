@@ -22,6 +22,7 @@ from simp.server.request_guards import (
     validate_registration_payload,
     sanitize_agent_id,
 )
+from simp.server.validation import AgentRegistration
 from simp.server.rate_limit import RateLimiter
 from simp.server.control_auth import require_control_auth
 from simp.memory.hooks import MemoryHooks
@@ -162,10 +163,27 @@ class SimpHttpServer:
                     400,
                 )
 
+            # Additional Pydantic validation
+            try:
+                AgentRegistration(**data)
+            except Exception as pyd_err:
+                return (
+                    jsonify({
+                        "status": "error",
+                        "error_code": "VALIDATION_FAILED",
+                        "error": str(pyd_err),
+                    }),
+                    400,
+                )
+
             agent_id = data["agent_id"]
             agent_type = data["agent_type"]
             endpoint = data["endpoint"]
             metadata = data.get("metadata", {})
+            # Store public_key in metadata for broker to pick up
+            public_key = data.get("public_key")
+            if public_key:
+                metadata["public_key"] = public_key
 
             success = self.broker.register_agent(agent_id, agent_type, endpoint, metadata)
 
