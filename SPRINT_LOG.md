@@ -147,3 +147,75 @@ Replace null-byte regex with proper ISO 8601 pattern. Consolidate with input_val
 - R4: Implement `get_logs()` (Sprint 3)
 
 ---
+
+## Sprint 2 — Rate Limiting, Auth, & Path Safety
+**Started:** 2026-04-05T17:22:00Z
+**Agent:** perplexity_research (discovery & design), claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Close all remaining HIGH/MEDIUM security findings from Sprint 1: rate limiting, request size caps, control endpoint authentication, and file-based inbox path sanitization.
+
+---
+
+### Sprint 2 Plan
+
+| # | Change | Addresses | Status |
+|---|--------|-----------|--------|
+| 1 | Lightweight token-bucket rate limiter (no external deps) | S3 | Done |
+| 2 | `MAX_CONTENT_LENGTH = 64KB` on Flask app | S5 | Done |
+| 3 | Bearer token auth on `/control/*` and `DELETE /agents/<id>` | S6 | Done |
+| 4 | Path traversal guard in `_deliver_file_based()` | S8 | Done |
+| 5 | Delete old `simp/security/rate_limiter.py` scaffold | S3 cleanup | Done |
+
+### Rate Limits Applied
+
+| Endpoint | Limit |
+|----------|-------|
+| `/agents/register` | 10/min |
+| `/intents/route` | 60/min |
+| `/intents/<id>/response` | 60/min |
+| `/intents/<id>/error` | 60/min |
+| `/control/start` | 5/min |
+| `/control/stop` | 5/min |
+| `/memory/conversations` POST | 30/min |
+
+### Sprint 2 Results (2026-04-05T17:22:00Z)
+
+**Commit:** `0832e78` — pushed to `feat/public-readonly-dashboard`
+
+**Completed:**
+- [x] NEW `simp/server/rate_limit.py` — `TokenBucket` + `RateLimiter` classes, thread-safe, zero external deps
+- [x] NEW `simp/server/control_auth.py` — `require_control_auth` decorator, opt-in via `SIMP_CONTROL_TOKEN` env var (backward compatible when unset)
+- [x] WIRED rate limits into 7 POST endpoints in `http_server.py`
+- [x] WIRED `@require_control_auth` onto `/control/start`, `/control/stop`, `DELETE /agents/<id>`
+- [x] SET `MAX_CONTENT_LENGTH = 64KB` in Flask config
+- [x] ADDED `sanitize_agent_id()` + path resolve check to `broker._deliver_file_based()`
+- [x] DELETED `simp/security/rate_limiter.py` (replaced by `simp/server/rate_limit.py`)
+- [x] NEW `tests/test_sprint2_hardening.py` — 10 tests (token bucket, refill, thread safety, cleanup, auth, path safety)
+
+**Test Results:**
+- `test_sprint2_hardening.py`: 10/10 passed
+- `test_request_guards.py`: 26/26 passed
+- `test_protocol_validation.py`: 15/17 passed (same 2 pre-existing failures)
+
+**Security findings status after Sprint 2:**
+| # | Finding | Status |
+|---|---------|--------|
+| S1 | No input validation | **CLOSED** (Sprint 1) |
+| S2 | Broken validation.py | **CLOSED** (Sprint 1) |
+| S3 | Rate limiter not wired | **CLOSED** (Sprint 2) |
+| S4 | input_validator.py scaffold | LOW — still exists, non-blocking |
+| S5 | No request size limit | **CLOSED** (Sprint 2) |
+| S6 | Control endpoints unauthed | **CLOSED** (Sprint 2) |
+| S7 | CORS `*` on dashboard | LOW — acceptable for GET-only |
+| S8 | Inbox path traversal | **CLOSED** (Sprint 2) |
+
+**Remaining for Sprint 3:**
+- R2: Refactor `route_intent()` event loop creation (resource leak under load)
+- R3: Structured JSON logging for machine-parseable error tracking
+- R4: Implement `get_logs()` (currently returns empty list)
+- R5: Harden agent list format consistency between broker and dashboard
+- Fix 2 pre-existing test failures (`test_intent_status_tracking`, `test_response_schema_validation`)
+
+---
