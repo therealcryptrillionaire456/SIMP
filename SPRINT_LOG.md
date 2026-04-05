@@ -874,3 +874,97 @@ Fix broken test imports in tests/security/test_intent_schema.py, migrate config 
   - All tests pass (TestConfigCompiles skips since config/config.py absent)
   - python3 -m pytest tests/test_sprint9_protocol.py -v passes
 - Outcome: Created protocol test suite. 3/4 tests pass, 1 skipped (config not present).
+
+---
+
+## Sprint 10 — Production Readiness
+**Started:** 2026-04-05T23:00:00Z
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Final sprint: comprehensive README refresh with architecture diagram and real test counts, version bump to 0.2.0 across broker/dashboard/setup.py, and final verification test suite.
+
+---
+
+## Task SPRINT10-KP-001
+- Title: README.md refresh with architecture, test status, and quickstart
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [README.md]
+- Created At: 2026-04-05T23:00:00Z
+- Last Updated: 2026-04-05T23:15:00Z
+- Description:
+  Replaced entire README.md with comprehensive version including ASCII architecture
+  diagram showing broker internals (rate limit, auth, request guards, intent router,
+  event log, orchestration loop, task ledger, memory hooks, builder pool), agent types
+  (HTTP and file-based), and dashboard. Added 12-item feature list, quickstart with
+  python3.10 examples, test suites table with actual counts from pytest (191 total),
+  security table (7 protections), configuration table (5 env vars), sprint history
+  (all 10 sprints marked Done), and MIT license.
+- Acceptance Criteria:
+  - README.md contains Architecture section with ASCII diagram
+  - README.md contains Quickstart section with python3.10 examples
+  - README.md contains Test Suites table with real test counts
+  - README.md contains Sprint History with all 10 sprints marked Done
+- Outcome: Comprehensive README written with all required sections. Test counts verified against actual pytest output.
+
+---
+
+## Task SPRINT10-KP-002
+- Title: Version bump to 0.2.0 and shared conftest.py
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [setup.py, dashboard/server.py, simp/server/broker.py, tests/conftest.py]
+- Created At: 2026-04-05T23:00:00Z
+- Last Updated: 2026-04-05T23:15:00Z
+- Description:
+  Bumped version across three locations: setup.py version="0.2.0", dashboard
+  DASHBOARD_VERSION="1.2.0", broker log message "SIMP Broker initialized (v0.2.0)".
+  Created tests/conftest.py with shared pytest configuration to ensure project root
+  is on sys.path for all test files.
+- Acceptance Criteria:
+  - setup.py contains version="0.2.0"
+  - dashboard/server.py contains DASHBOARD_VERSION = "1.2.0"
+  - broker.py log message says v0.2.0
+  - tests/conftest.py exists and adds project root to sys.path
+- Outcome: All three version strings bumped. conftest.py created.
+
+---
+
+## Task SPRINT10-KP-003
+- Title: Final full-suite verification test
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [tests/test_sprint10_final.py]
+- Created At: 2026-04-05T23:00:00Z
+- Last Updated: 2026-04-05T23:15:00Z
+- Description:
+  Created tests/test_sprint10_final.py with 7 tests in TestProductionReadiness class:
+  test_readme_exists, test_readme_has_architecture, test_sprint_log_exists,
+  test_sprint_log_has_10_sprints, test_all_core_modules_compile (10 core files),
+  test_version_is_0_2, test_no_dead_scaffolds (input_validator.py and rate_limiter.py
+  should not exist).
+- Acceptance Criteria:
+  - tests/test_sprint10_final.py exists with 7 tests
+  - All tests pass
+  - Covers: README, sprint log, module compilation, version, dead scaffolds
+- Outcome: All 7 verification tests pass. Full suite of 191 tests pass with no failures.
+
+---
+
+## 10-Sprint Plan: COMPLETE
+
+All 10 sprints delivered. The SIMP protocol is production-ready with:
+- Full input validation and security hardening (Sprints 1-2)
+- Structured logging and observability (Sprint 3)
+- Graceful shutdown and dead code removal (Sprint 4)
+- CORS config, dashboard health, and final audit (Sprint 5)
+- Dashboard feature completion (Sprint 6)
+- Orchestration loop integration (Sprint 7)
+- Memory layer activation (Sprint 8)
+- Protocol cleanup and test coverage (Sprint 9)
+- Production readiness, README, and version 0.2.0 (Sprint 10)

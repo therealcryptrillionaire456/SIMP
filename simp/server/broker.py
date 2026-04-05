@@ -142,7 +142,7 @@ class SimpBroker:
         # Shutdown coordination
         self._shutdown_event = threading.Event()
 
-        self.logger.info(f"🚀 SIMP Broker initialized (v0.1)")
+        self.logger.info(f"🚀 SIMP Broker initialized (v0.2.0)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
         self.logger.info(f"   Intent timeout: {self.config.intent_timeout}s")
