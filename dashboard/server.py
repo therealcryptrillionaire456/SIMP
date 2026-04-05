@@ -442,6 +442,21 @@ async def api_routing():
     return _redact(data)
 
 
+@app.get("/api/logs")
+async def api_logs(limit: int = 100):
+    """Structured broker event logs."""
+    limit = max(1, min(limit, 500))
+    data = await _broker_get(f"/logs?limit={limit}")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "logs": [],
+            "count": 0,
+        }
+    return _redact(data)
+
+
 # ---------------------------------------------------------------------------
 # Memory Layer proxy endpoints (GET-only, safe for public exposure)
 # ---------------------------------------------------------------------------

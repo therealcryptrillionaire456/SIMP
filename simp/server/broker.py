@@ -9,6 +9,7 @@ import asyncio
 import json
 import logging
 import os
+from collections import deque
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Callable
 from datetime import datetime
@@ -125,6 +126,10 @@ class SimpBroker:
         }
         self.stats_lock = threading.RLock()
 
+        # Structured event log ring buffer
+        self._event_log: deque = deque(maxlen=500)
+        self._event_log_lock = threading.RLock()
+
         self.logger.info(f"🚀 SIMP Broker initialized (v0.1)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
@@ -193,6 +198,7 @@ class SimpBroker:
             self.logger.info(
                 f"✅ Agent registered: {agent_id} ({agent_type}) → {endpoint}"
             )
+            self._log_event("agent_registered", f"Agent {agent_id} registered", agent_id=agent_id)
             return True
 
     def deregister_agent(self, agent_id: str) -> bool:
@@ -201,6 +207,7 @@ class SimpBroker:
             if agent_id in self.agents:
                 del self.agents[agent_id]
                 self.logger.info(f"✅ Agent deregistered: {agent_id}")
+                self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
                 return True
             return False
 
@@ -293,6 +300,11 @@ class SimpBroker:
                 with self.stats_lock:
                     self.stats["intents_failed"] += 1
 
+                self._log_event(
+                    "intent_failed", error_msg, level="warning",
+                    agent_id=target_agent or "unknown", intent_id=intent_id,
+                )
+
                 return error_resp
 
         # Claim task in ledger
@@ -314,6 +326,10 @@ class SimpBroker:
         self.logger.info(
             f"📤 Routing intent: {intent_id} ({intent_type}) "
             f"{source_agent} → {target_agent}"
+        )
+        self._log_event(
+            "intent_routed", f"Intent {intent_id} ({intent_type}) {source_agent} → {target_agent}",
+            agent_id=target_agent, intent_id=intent_id,
         )
 
         # Actually deliver the intent to the target agent
@@ -604,6 +620,10 @@ class SimpBroker:
                             f"🏥 Agent health changed: {agent_id} "
                             f"{old_status} → {new_status}"
                         )
+                        self._log_event(
+                            "health_change", f"Agent {agent_id} health: {old_status} → {new_status}",
+                            agent_id=agent_id,
+                        )
             await asyncio.sleep(self.config.health_check_interval)
 
     def start_health_checks(self) -> None:
@@ -647,6 +667,10 @@ class SimpBroker:
                 f"📥 Response recorded: {intent_id} "
                 f"({execution_time_ms:.1f}ms)"
             )
+            self._log_event(
+                "response_recorded", f"Response for intent {intent_id} ({execution_time_ms:.1f}ms)",
+                intent_id=intent_id, agent_id=record.target_agent,
+            )
 
             # Fire memory hook on task completion
             if self.hooks:
@@ -686,6 +710,10 @@ class SimpBroker:
                 f"❌ Intent failed: {intent_id} - {error} "
                 f"(class: {fc.value})"
             )
+            self._log_event(
+                "intent_error", f"Intent {intent_id} failed: {error}",
+                level="error", intent_id=intent_id,
+            )
             return True
 
     def _map_intent_to_task_type(self, intent_type: str) -> str:
@@ -707,6 +735,35 @@ class SimpBroker:
             "docs": "docs",
         }
         return mapping.get(intent_type, "implementation")
+
+    def _log_event(
+        self,
+        event_type: str,
+        message: str,
+        level: str = "info",
+        agent_id: Optional[str] = None,
+        intent_id: Optional[str] = None,
+        extra: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Append a structured event to the ring buffer.
+
+        This supplements (does NOT replace) Python logging. Events are
+        queryable via get_logs() and the /logs HTTP endpoint.
+        """
+        event: Dict[str, Any] = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "event_type": event_type,
+            "level": level,
+            "message": message,
+        }
+        if agent_id:
+            event["agent_id"] = agent_id
+        if intent_id:
+            event["intent_id"] = intent_id
+        if extra:
+            event.update(extra)
+        with self._event_log_lock:
+            self._event_log.append(event)
 
     def get_intent_status(self, intent_id: str) -> Optional[Dict[str, Any]]:
         """Get status of an intent"""
@@ -754,9 +811,13 @@ class SimpBroker:
         return stats
 
     def get_logs(self, limit: int = 100) -> list:
-        """Get recent broker logs (simplified)"""
-        # In real implementation, would track log entries
-        return []
+        """Get recent structured events from the ring buffer."""
+        limit = max(1, min(limit, 500))
+        with self._event_log_lock:
+            items = list(self._event_log)
+        # Most recent first
+        items.reverse()
+        return items[:limit]
 
     def start(self) -> None:
         """Start the broker"""

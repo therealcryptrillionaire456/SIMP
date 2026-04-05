@@ -4,8 +4,10 @@ SIMP HTTP Server
 REST API for SIMP broker, making it easy to test and interact with.
 """
 
+import asyncio
 import json
 import logging
+import threading
 from datetime import datetime
 from typing import Dict, Any, Optional
 from flask import Flask, request, jsonify
@@ -47,6 +49,15 @@ class SimpHttpServer:
         self.limiter = RateLimiter()
         self.broker = SimpBroker(broker_config or BrokerConfig())
         self.debug = debug
+
+        # Shared async event loop for broker operations
+        self._async_loop = asyncio.new_event_loop()
+        self._loop_thread = threading.Thread(
+            target=self._async_loop.run_forever,
+            daemon=True,
+            name="SIMP-AsyncLoop",
+        )
+        self._loop_thread.start()
 
         # Memory layer components
         self.conversation_archive = ConversationArchive()
@@ -183,8 +194,6 @@ class SimpHttpServer:
         @self.limiter.limit(60)
         def route_intent():
             """Route an intent to a target agent"""
-            import asyncio
-
             data = request.get_json(force=False, silent=True) or {}
 
             # Validate intent payload
@@ -199,14 +208,26 @@ class SimpHttpServer:
                     400,
                 )
 
-            # Route intent
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+            # Route intent via shared event loop
+            import asyncio as _asyncio
+            future = _asyncio.run_coroutine_threadsafe(
+                self.broker.route_intent(data), self._async_loop
+            )
             try:
-                result = loop.run_until_complete(self.broker.route_intent(data))
+                result = future.result(timeout=30)
                 return jsonify(result), 200
-            finally:
-                loop.close()
+            except TimeoutError:
+                return jsonify({
+                    "status": "error",
+                    "error_code": "TIMEOUT",
+                    "error": "Intent routing timed out after 30 seconds",
+                }), 504
+            except Exception as exc:
+                return jsonify({
+                    "status": "error",
+                    "error_code": "INTERNAL_ERROR",
+                    "error": str(exc),
+                }), 500
 
         @self.app.route("/intents/<intent_id>", methods=["GET"])
         def get_intent_status(intent_id):
@@ -365,6 +386,23 @@ class SimpHttpServer:
                 "policy": {},
                 "pool_status": {},
                 "message": "Builder pool not configured",
+            }), 200
+
+        # ----- Structured Event Log -----
+
+        @self.app.route("/logs", methods=["GET"])
+        def get_logs():
+            """Get recent structured broker events."""
+            try:
+                limit = int(request.args.get("limit", 100))
+            except (ValueError, TypeError):
+                limit = 100
+            limit = max(1, min(limit, 500))
+            logs = self.broker.get_logs(limit)
+            return jsonify({
+                "status": "success",
+                "count": len(logs),
+                "logs": logs,
             }), 200
 
         # ----- Memory Layer Endpoints -----

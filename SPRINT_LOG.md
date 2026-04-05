@@ -234,10 +234,10 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
 - Title: Refactor route_intent() event loop to reuse a single loop
 - Author: perplexity_research
 - Owner: claude_cowork
-- Status: OPEN
+- Status: DONE
 - Related Files: [simp/server/http_server.py]
 - Created At: 2026-04-05T17:42:00Z
-- Last Updated: 2026-04-05T17:42:00Z
+- Last Updated: 2026-04-05T18:00:00Z
 - Description:
   The `/intents/route` handler in `http_server.py` (lines 203-209) creates a new
   `asyncio.new_event_loop()` on every request and closes it after. Under load this
@@ -253,7 +253,7 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
   - The loop thread should be daemon so it doesn't block shutdown
   - Add `self._async_loop` and `self._loop_thread` to `__init__`
   - The health check loop in `broker.start_health_checks()` already runs its own thread; this is separate
-- Outcome:
+- Outcome: Refactored route_intent() to use a shared asyncio event loop created at init time. The loop runs in a daemon thread (SIMP-AsyncLoop). Handler now uses run_coroutine_threadsafe() with 30s timeout, plus proper TimeoutError and Exception handling returning 504/500 respectively. All compile checks and tests pass.
 
 ---
 
@@ -261,10 +261,10 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
 - Title: Add structured JSON logging with ring buffer
 - Author: perplexity_research
 - Owner: claude_cowork
-- Status: OPEN
+- Status: DONE
 - Related Files: [simp/server/broker.py]
 - Created At: 2026-04-05T17:42:00Z
-- Last Updated: 2026-04-05T17:42:00Z
+- Last Updated: 2026-04-05T18:00:00Z
 - Description:
   Currently all broker logging goes through Python's `logging` module with text format.
   The `get_logs()` method (line 756) is a stub that returns `[]`. Implement a structured
@@ -283,7 +283,7 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
   - Use `collections.deque(maxlen=500)` for automatic eviction
   - Thread-safe via the existing `self.intent_lock` or a new dedicated `self._log_lock`
   - Do NOT change the existing logging format or remove any existing log lines
-- Outcome:
+- Outcome: Added _log_event() method and deque(maxlen=500) ring buffer with dedicated _event_log_lock. Events logged at 7 key points: agent_registered, agent_deregistered, intent_routed, intent_failed, response_recorded, intent_error, health_change. get_logs() returns most-recent-first with configurable limit (1-500). All existing logging calls preserved. 9 new tests in test_sprint3_observability.py all pass.
 
 ---
 
@@ -291,10 +291,10 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
 - Title: Wire get_logs() to HTTP server and dashboard
 - Author: perplexity_research
 - Owner: claude_cowork
-- Status: OPEN
+- Status: DONE
 - Related Files: [simp/server/http_server.py, dashboard/server.py]
 - Created At: 2026-04-05T17:42:00Z
-- Last Updated: 2026-04-05T17:42:00Z
+- Last Updated: 2026-04-05T18:00:00Z
 - Description:
   Once SPRINT03-KP-002 implements `get_logs()` on the broker, wire it through:
   1. Add `/logs` GET endpoint in `http_server.py` that returns `broker.get_logs(limit)` where limit comes from `?limit=N` query param (default 100, max 500)
@@ -308,7 +308,7 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
 - Notes:
   - Depends on SPRINT03-KP-002 being done first
   - The dashboard `/api/activity` endpoint already exists and uses a polling-based ring buffer; `/api/logs` is complementary (broker-side structured events vs dashboard-side diff events)
-- Outcome:
+- Outcome: Added GET /logs endpoint on broker (http_server.py) with ?limit query param (default 100, clamped 1-500). Added GET /api/logs on dashboard (server.py) using FastAPI query parameter with _redact() applied. Both compile and are GET-only read-safe.
 
 ---
 
@@ -316,10 +316,10 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
 - Title: Fix 2 pre-existing test failures in test_protocol_validation.py
 - Author: perplexity_research
 - Owner: claude_cowork
-- Status: OPEN
+- Status: DONE
 - Related Files: [tests/test_protocol_validation.py]
 - Created At: 2026-04-05T17:42:00Z
-- Last Updated: 2026-04-05T17:42:00Z
+- Last Updated: 2026-04-05T18:00:00Z
 - Description:
   Two tests have been failing since before Sprint 1:
   1. `test_intent_status_tracking` (line 151): Calls `record_response(intent_id, ...)` on an
@@ -337,6 +337,6 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
   - `test_response_schema_validation` uses `broker` fixture with no agents — will need to register one first
   - Route intent needs `asyncio.run()` or `loop.run_until_complete()` since tests aren't async
   - The target agents have `localhost:XXXX` endpoints which will fail HTTP delivery, but the intent record will still be created with status "failed" — so `record_response()` should work on that record. Or use a file-based endpoint (empty string) to get "queued_no_endpoint".
-- Outcome:
+- Outcome: Fixed both tests. test_intent_status_tracking now routes intent via loop.run_until_complete() before calling record_response(). test_response_schema_validation now registers a file-based agent and routes an intent first. All 17/17 protocol tests pass.
 
 ---
