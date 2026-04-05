@@ -1218,3 +1218,39 @@ Create the ProjectX computer-use subpackage with the full class skeleton (14 met
 - `TestProjectXSkeleton` (5 tests): import, init defaults, tiers complete, tier values, TaskAbortError
 - `TestObservationMethods` (5 tests): screenshot returns PNG bytes, active window returns string, OCR returns list, snapshot_state structure, fallback_png valid
 - `TestStubsRaiseCorrectly` (6 tests): click/type_text/run_shell raise "Sprint 12", safe_execute/abort/log_action raise "Sprint 13"
+
+---
+
+## Sprint 12 — GUI Actions + Shell Execution
+**Started:** 2026-04-05
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Implement the 7 remaining action methods in ProjectXComputer: 6 Tier-1 GUI actions and 1 Tier-2 shell execution. Add `_make_result()` helper for standard return format. All methods gracefully handle headless environments.
+
+---
+
+### SPRINT12-KP-001: Implement Tier 1 GUI actions
+**Status:** COMPLETE
+- Added `_make_result(success, data, error, start_time)` helper returning standard `{"success", "data", "error", "duration_ms"}` dict
+- `click(x, y, button)` — pyautogui.click with try/except for headless
+- `double_click(x, y)` — pyautogui.doubleClick with graceful fallback
+- `type_text(text)` — pyautogui.typewrite with 0.02s interval
+- `press(keys)` — parses "+" for hotkey combos, single key otherwise
+- `scroll(dx, dy)` — pyautogui.scroll/hscroll with graceful fallback
+- `focus_app(app_name)` — osascript on macOS, wmctrl on Linux, error on other platforms
+
+### SPRINT12-KP-002: Implement Tier 2 shell execution
+**Status:** COMPLETE
+- `run_shell(command, timeout=30)` — subprocess.run with shell=True, capture_output=True, text=True
+- Handles subprocess.TimeoutExpired with descriptive error message
+- Returns stdout, stderr, return_code, and command in data dict
+- success=True only when return_code == 0
+
+### SPRINT12-KP-003: Add Sprint 12 tests
+**Status:** COMPLETE
+- Created `tests/test_sprint12_actions.py` with 15 tests across 3 test classes
+- `TestResultFormat` (2 tests): _make_result success/failure format validation
+- `TestGUIActions` (8 tests): each GUI method returns proper result dict structure (graceful in headless CI)
+- `TestShellExecution` (5 tests): echo success, exit 1 failure, timeout handling, stderr capture, duration tracking

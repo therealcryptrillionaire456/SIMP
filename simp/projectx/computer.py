@@ -214,37 +214,144 @@ class ProjectXComputer:
             "screen_resolution": resolution,
         }
 
+    # ── Helper: Standard result wrapper ────────────────────────────────
+
+    def _make_result(
+        self, success: bool, data: Any = None, error: Optional[str] = None,
+        start_time: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """Build a standard action result dict."""
+        duration_ms = int((time.time() - start_time) * 1000) if start_time else 0
+        return {
+            "success": success,
+            "data": data,
+            "error": error,
+            "duration_ms": duration_ms,
+        }
+
     # ── Tier 1: GUI Actions (low-risk, reversible) ───────────────────
 
     def click(self, x: int, y: int, button: str = "left") -> Dict[str, Any]:
         """Click at screen coordinates."""
-        raise NotImplementedError("Sprint 12")
+        start = time.time()
+        try:
+            import pyautogui
+            pyautogui.click(x=x, y=y, button=button)
+            return self._make_result(True, {"x": x, "y": y, "button": button}, start_time=start)
+        except Exception as exc:
+            return self._make_result(False, error=str(exc), start_time=start)
 
     def double_click(self, x: int, y: int) -> Dict[str, Any]:
         """Double-click at screen coordinates."""
-        raise NotImplementedError("Sprint 12")
+        start = time.time()
+        try:
+            import pyautogui
+            pyautogui.doubleClick(x=x, y=y)
+            return self._make_result(True, {"x": x, "y": y}, start_time=start)
+        except Exception as exc:
+            return self._make_result(False, error=str(exc), start_time=start)
 
     def type_text(self, text: str) -> Dict[str, Any]:
         """Type text at the current cursor position."""
-        raise NotImplementedError("Sprint 12")
+        start = time.time()
+        try:
+            import pyautogui
+            pyautogui.typewrite(text, interval=0.02)
+            return self._make_result(True, {"text_length": len(text)}, start_time=start)
+        except Exception as exc:
+            return self._make_result(False, error=str(exc), start_time=start)
 
     def press(self, keys: str) -> Dict[str, Any]:
         """Press a key or key combination (e.g., 'command+c', 'enter')."""
-        raise NotImplementedError("Sprint 12")
+        start = time.time()
+        try:
+            import pyautogui
+            if "+" in keys:
+                parts = [k.strip() for k in keys.split("+")]
+                pyautogui.hotkey(*parts)
+            else:
+                pyautogui.press(keys.strip())
+            return self._make_result(True, {"keys": keys}, start_time=start)
+        except Exception as exc:
+            return self._make_result(False, error=str(exc), start_time=start)
 
     def scroll(self, dx: int, dy: int) -> Dict[str, Any]:
-        """Scroll by (dx, dy) units."""
-        raise NotImplementedError("Sprint 12")
+        """Scroll by (dx, dy) units. Positive dy = scroll up."""
+        start = time.time()
+        try:
+            import pyautogui
+            if dy != 0:
+                pyautogui.scroll(dy)
+            if dx != 0:
+                pyautogui.hscroll(dx)
+            return self._make_result(True, {"dx": dx, "dy": dy}, start_time=start)
+        except Exception as exc:
+            return self._make_result(False, error=str(exc), start_time=start)
 
     def focus_app(self, app_name: str) -> Dict[str, Any]:
         """Bring the named application to the foreground."""
-        raise NotImplementedError("Sprint 12")
+        start = time.time()
+        import platform
+        try:
+            if platform.system() == "Darwin":
+                result = subprocess.run(
+                    ["osascript", "-e", f'tell application "{app_name}" to activate'],
+                    capture_output=True, text=True, timeout=5
+                )
+                if result.returncode == 0:
+                    return self._make_result(True, {"app": app_name}, start_time=start)
+                else:
+                    return self._make_result(
+                        False, error=result.stderr.strip() or "osascript failed",
+                        start_time=start
+                    )
+            elif platform.system() == "Linux":
+                result = subprocess.run(
+                    ["wmctrl", "-a", app_name],
+                    capture_output=True, text=True, timeout=5
+                )
+                if result.returncode == 0:
+                    return self._make_result(True, {"app": app_name}, start_time=start)
+                else:
+                    return self._make_result(False, error="wmctrl failed", start_time=start)
+            else:
+                return self._make_result(False, error=f"Unsupported platform: {platform.system()}", start_time=start)
+        except Exception as exc:
+            return self._make_result(False, error=str(exc), start_time=start)
 
     # ── Tier 2: Shell Execution (medium-risk, logged) ────────────────
 
     def run_shell(self, command: str, timeout: int = 30) -> Dict[str, Any]:
-        """Execute a shell command with timeout and output capture."""
-        raise NotImplementedError("Sprint 12")
+        """
+        Execute a shell command with timeout and output capture.
+
+        Returns standard result with data containing stdout, stderr, return_code.
+        """
+        start = time.time()
+        try:
+            result = subprocess.run(
+                command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+            return self._make_result(
+                success=(result.returncode == 0),
+                data={
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                    "return_code": result.returncode,
+                    "command": command,
+                },
+                start_time=start,
+            )
+        except subprocess.TimeoutExpired:
+            return self._make_result(
+                False, error=f"Command timed out after {timeout}s", start_time=start
+            )
+        except Exception as exc:
+            return self._make_result(False, error=str(exc), start_time=start)
 
     # ── Cross-tier: Logging & Control ────────────────────────────────
 
