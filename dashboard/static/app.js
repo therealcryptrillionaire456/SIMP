@@ -64,6 +64,10 @@
     failureGrid:     $("#failure-grid"),
     routingGrid:     $("#routing-grid"),
 
+    // Memory
+    memoryTasksTbody:  $("#memory-tasks-tbody"),
+    memoryConvosTbody: $("#memory-convos-tbody"),
+
     // Protocol
     valUptime:       $("#val-uptime"),
     valLastRefresh:  $("#val-last-refresh"),
@@ -553,12 +557,70 @@
   }
 
   // -----------------------------------------------------------------------
+  // Render: Memory — Task Memory
+  // -----------------------------------------------------------------------
+
+  function renderMemoryTasks(data) {
+    if (!data || data.status === "unreachable") {
+      dom.memoryTasksTbody.innerHTML = '<tr><td colspan="3" class="empty-row">Broker unreachable</td></tr>';
+      return;
+    }
+    var tasks = data.tasks || [];
+    if (tasks.length === 0) {
+      dom.memoryTasksTbody.innerHTML = '<tr><td colspan="3" class="empty-row">No task memory files</td></tr>';
+      return;
+    }
+    var html = "";
+    for (var i = 0; i < tasks.length; i++) {
+      var t = tasks[i];
+      var st = (t.status || "unknown").toLowerCase();
+      var badgeCls = st === "completed" ? "online" : st === "active" ? "degraded" : "unknown";
+      html += "<tr>";
+      html += td(mono(escHtml(t.slug || "--")));
+      html += td(escHtml(t.title || "--"));
+      html += td('<span class="status-badge ' + badgeCls + '">' + escHtml(capitalize(t.status || "unknown")) + "</span>");
+      html += "</tr>";
+    }
+    dom.memoryTasksTbody.innerHTML = html;
+  }
+
+  // -----------------------------------------------------------------------
+  // Render: Memory — Recent Conversations
+  // -----------------------------------------------------------------------
+
+  function renderMemoryConversations(data) {
+    if (!data || data.status === "unreachable") {
+      dom.memoryConvosTbody.innerHTML = '<tr><td colspan="4" class="empty-row">Broker unreachable</td></tr>';
+      return;
+    }
+    var convos = data.conversations || [];
+    if (convos.length === 0) {
+      dom.memoryConvosTbody.innerHTML = '<tr><td colspan="4" class="empty-row">No conversations archived</td></tr>';
+      return;
+    }
+    // Show newest first
+    var sorted = convos.slice().reverse();
+    var html = "";
+    for (var i = 0; i < Math.min(sorted.length, 20); i++) {
+      var c = sorted[i];
+      var participants = (c.participants || []).map(escHtml).join(", ") || "--";
+      html += "<tr>";
+      html += td('<span class="mono" style="font-size:0.7rem">' + escHtml((c.id || "").substring(0, 20)) + "</span>");
+      html += td(escHtml(c.topic || "--"));
+      html += td(participants);
+      html += td('<span class="mono" style="font-size:0.75rem">' + formatDate(c.created_at) + "</span>");
+      html += "</tr>";
+    }
+    dom.memoryConvosTbody.innerHTML = html;
+  }
+
+  // -----------------------------------------------------------------------
   // Main refresh cycle
   // -----------------------------------------------------------------------
 
   async function refreshAll() {
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, capabilities, tasks, routing] = await Promise.all([
+    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -566,6 +628,8 @@
       apiFetch("/api/capabilities"),
       apiFetch("/api/tasks"),
       apiFetch("/api/routing"),
+      apiFetch("/api/memory/tasks"),
+      apiFetch("/api/memory/conversations"),
     ]);
 
     renderHealth(health);
@@ -577,6 +641,8 @@
     renderTasks(tasks);
     renderFailureStats(tasks);
     renderRouting(routing);
+    renderMemoryTasks(memTasks);
+    renderMemoryConversations(memConvos);
 
     // Capture dashboard start time from health response
     if (!dashboardStartedAt && health && health.dashboard_started_at) {
