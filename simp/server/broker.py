@@ -8,17 +8,26 @@ Receives intents, routes to appropriate agents, collects responses.
 import asyncio
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Callable
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 import uuid
 import queue
 import threading
+import time
 
 from simp.task_ledger import TaskLedger
 from simp.models.failure_taxonomy import FailureHandler, FailureClass
 from simp.routing.builder_pool import BuilderPool
+
+try:
+    import httpx
+    _HTTPX_AVAILABLE = True
+except ImportError:
+    _HTTPX_AVAILABLE = False
 
 
 class BrokerState(str, Enum):
@@ -38,6 +47,10 @@ class BrokerConfig:
     max_agents: int = 100
     max_pending_intents: int = 1000
     intent_timeout: float = 30.0  # seconds
+    delivery_timeout: float = 30.0  # seconds — HTTP delivery timeout
+    health_check_interval: float = 30.0  # seconds — agent health check interval
+    health_check_timeout: float = 5.0  # seconds — per-agent health check timeout
+    inbox_base_dir: str = "data/inboxes"
     enable_logging: bool = True
     log_level: str = "INFO"
     max_log_lines: int = 10000
@@ -212,6 +225,7 @@ class SimpBroker:
         source_agent = intent_data.get("source_agent", "client")
         target_agent = intent_data.get("target_agent")
         intent_type = intent_data.get("intent_type", "unknown")
+        delivery_start = time.monotonic()
 
         with self.stats_lock:
             self.stats["intents_received"] += 1
@@ -276,7 +290,7 @@ class SimpBroker:
         self.task_ledger.claim_task(task_id, target_agent)
         self.task_ledger.update_status(task_id, "in_progress")
 
-        # Record intent
+        # Record intent as pending
         with self.intent_lock:
             record = IntentRecord(
                 intent_id=intent_id,
@@ -288,23 +302,285 @@ class SimpBroker:
             )
             self.intent_records[intent_id] = record
 
-        with self.stats_lock:
-            self.stats["intents_routed"] += 1
-
         self.logger.info(
             f"📤 Routing intent: {intent_id} ({intent_type}) "
             f"{source_agent} → {target_agent}"
         )
 
-        # In a real implementation, would send to agent via network
-        # For now, return success to show protocol works
+        # Actually deliver the intent to the target agent
+        target_endpoint = target.get("endpoint", "")
+        retry_count = 0
+        delivery_result = None
+
+        if target_endpoint and target_endpoint.startswith("http"):
+            # HTTP agent — POST the intent to their endpoint
+            delivery_result = await self._deliver_http(
+                target_endpoint, intent_data, intent_id
+            )
+
+            # On failure, classify and attempt retry/fallback
+            if delivery_result.get("delivery_status") == "failed":
+                error_resp = {
+                    "error_code": delivery_result.get("error_code", "DELIVERY_FAILED"),
+                    "error_message": delivery_result.get("error_message", "Delivery failed"),
+                }
+                fc = self.failure_handler.classify_failure(error_resp)
+                policy = self.failure_handler.get_retry_policy(fc)
+
+                if policy.get("should_retry") and self.builder_pool:
+                    fallback = self.failure_handler.get_fallback_agent(
+                        fc, intent_type, self.builder_pool, exclude=[target_agent]
+                    )
+                    if fallback:
+                        fallback_target = self.get_agent(fallback)
+                        if fallback_target:
+                            fallback_endpoint = fallback_target.get("endpoint", "")
+                            self.logger.info(
+                                f"🔄 Retrying delivery to fallback agent: {fallback}"
+                            )
+                            retry_count += 1
+                            if fallback_endpoint and fallback_endpoint.startswith("http"):
+                                delivery_result = await self._deliver_http(
+                                    fallback_endpoint, intent_data, intent_id
+                                )
+                            else:
+                                delivery_result = self._deliver_file_based(
+                                    fallback, intent_data, intent_id
+                                )
+                            delivery_result["fallback_agent"] = fallback
+        else:
+            # File-based agent — write to their inbox
+            delivery_result = self._deliver_file_based(
+                target_agent, intent_data, intent_id
+            )
+
+        delivery_latency_ms = (time.monotonic() - delivery_start) * 1000
+        delivery_status = delivery_result.get("delivery_status", "failed")
+        delivery_result["delivery_latency_ms"] = round(delivery_latency_ms, 1)
+        delivery_result["retry_count"] = retry_count
+
+        # Update intent record with delivery result
+        with self.intent_lock:
+            record = self.intent_records.get(intent_id)
+            if record:
+                if delivery_status in ("delivered", "queued", "queued_no_endpoint"):
+                    record.status = "executing" if delivery_status == "delivered" else "pending"
+                    record.execution_time_ms = delivery_latency_ms
+                else:
+                    record.status = "failed"
+                    record.error = delivery_result.get("error_message", "Delivery failed")
+                    record.execution_time_ms = delivery_latency_ms
+
+        # Update task ledger based on delivery outcome
+        if delivery_status in ("delivered", "queued", "queued_no_endpoint"):
+            with self.stats_lock:
+                self.stats["intents_routed"] += 1
+                self.stats["total_route_time_ms"] += delivery_latency_ms
+            if delivery_status == "delivered":
+                agent_response = delivery_result.get("agent_response")
+                if agent_response:
+                    self.record_response(intent_id, agent_response, delivery_latency_ms)
+                    self.task_ledger.update_status(task_id, "completed")
+                else:
+                    self.task_ledger.update_status(task_id, "in_progress")
+        else:
+            with self.stats_lock:
+                self.stats["intents_failed"] += 1
+            self.task_ledger.fail_task(
+                task_id,
+                error={"error_code": delivery_result.get("error_code"),
+                       "error_message": delivery_result.get("error_message")},
+                failure_class=delivery_result.get("failure_class", "execution_failed"),
+            )
+
         return {
             "status": "routed",
             "intent_id": intent_id,
             "target_agent": target_agent,
             "task_id": task_id,
+            "delivery_status": delivery_status,
+            "delivery_latency_ms": delivery_result.get("delivery_latency_ms"),
+            "retry_count": retry_count,
+            "fallback_agent": delivery_result.get("fallback_agent"),
             "timestamp": datetime.utcnow().isoformat(),
         }
+
+    async def _deliver_http(
+        self, endpoint: str, intent_data: Dict[str, Any], intent_id: str
+    ) -> Dict[str, Any]:
+        """Deliver an intent to an HTTP agent via POST."""
+        if not _HTTPX_AVAILABLE:
+            return {
+                "delivery_status": "failed",
+                "error_code": "HTTPX_NOT_INSTALLED",
+                "error_message": "httpx is not installed — cannot deliver via HTTP",
+                "failure_class": "execution_failed",
+            }
+
+        url = f"{endpoint.rstrip('/')}/intents/handle"
+        timeout = self.config.delivery_timeout
+
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                resp = await client.post(url, json=intent_data)
+
+            if resp.status_code == 200:
+                try:
+                    agent_response = resp.json()
+                except Exception:
+                    agent_response = {"raw": resp.text}
+                return {
+                    "delivery_status": "delivered",
+                    "http_status": resp.status_code,
+                    "agent_response": agent_response,
+                }
+            elif resp.status_code == 202:
+                return {
+                    "delivery_status": "queued",
+                    "http_status": resp.status_code,
+                }
+            elif resp.status_code == 429:
+                return {
+                    "delivery_status": "failed",
+                    "http_status": resp.status_code,
+                    "error_code": "RATE_LIMITED",
+                    "error_message": f"Agent returned 429 rate limited",
+                    "failure_class": "rate_limited",
+                }
+            elif 400 <= resp.status_code < 500:
+                error_code = "SCHEMA_INVALID" if resp.status_code == 400 else "POLICY_DENIED"
+                return {
+                    "delivery_status": "failed",
+                    "http_status": resp.status_code,
+                    "error_code": error_code,
+                    "error_message": f"Agent returned HTTP {resp.status_code}",
+                    "failure_class": "schema_invalid" if resp.status_code == 400 else "policy_denied",
+                }
+            else:
+                return {
+                    "delivery_status": "failed",
+                    "http_status": resp.status_code,
+                    "error_code": "EXECUTION_FAILED",
+                    "error_message": f"Agent returned HTTP {resp.status_code}",
+                    "failure_class": "execution_failed",
+                }
+
+        except httpx.ConnectError:
+            return {
+                "delivery_status": "failed",
+                "error_code": "AGENT_UNAVAILABLE",
+                "error_message": f"Could not connect to agent at {endpoint}",
+                "failure_class": "agent_unavailable",
+            }
+        except httpx.TimeoutException:
+            return {
+                "delivery_status": "failed",
+                "error_code": "TIMEOUT",
+                "error_message": f"Delivery timed out after {timeout}s",
+                "failure_class": "timeout",
+            }
+        except Exception as exc:
+            return {
+                "delivery_status": "failed",
+                "error_code": "DELIVERY_ERROR",
+                "error_message": str(exc),
+                "failure_class": "execution_failed",
+            }
+
+    def _deliver_file_based(
+        self, agent_id: str, intent_data: Dict[str, Any], intent_id: str
+    ) -> Dict[str, Any]:
+        """Deliver an intent by writing it to the agent's inbox directory."""
+        inbox_dir = Path(self.config.inbox_base_dir) / agent_id
+        try:
+            inbox_dir.mkdir(parents=True, exist_ok=True)
+            intent_file = inbox_dir / f"{intent_id}.json"
+            intent_file.write_text(json.dumps(intent_data, indent=2, default=str))
+            self.logger.info(f"📂 Intent written to inbox: {intent_file}")
+            return {
+                "delivery_status": "queued_no_endpoint",
+                "inbox_path": str(intent_file),
+            }
+        except OSError as exc:
+            return {
+                "delivery_status": "failed",
+                "error_code": "INBOX_WRITE_ERROR",
+                "error_message": f"Failed to write to inbox: {exc}",
+                "failure_class": "execution_failed",
+            }
+
+    # ------------------------------------------------------------------
+    # Agent Health Check System
+    # ------------------------------------------------------------------
+
+    async def _check_agent_health(self, agent_id: str) -> bool:
+        """Ping an HTTP agent's health endpoint."""
+        agent = self.get_agent(agent_id)
+        if not agent:
+            return False
+
+        endpoint = agent.get("endpoint", "")
+        if not endpoint or not endpoint.startswith("http"):
+            return True  # File-based agents are always "healthy" from broker perspective
+
+        if not _HTTPX_AVAILABLE:
+            return True  # Can't check without httpx, assume healthy
+
+        try:
+            async with httpx.AsyncClient(
+                timeout=self.config.health_check_timeout
+            ) as client:
+                resp = await client.get(f"{endpoint.rstrip('/')}/health")
+            healthy = resp.status_code == 200
+            with self.agent_lock:
+                if agent_id in self.agents:
+                    self.agents[agent_id]["status"] = "online" if healthy else "degraded"
+                    self.agents[agent_id]["last_seen"] = datetime.utcnow().isoformat()
+            if self.builder_pool:
+                self.builder_pool.report_capacity(
+                    agent_id, "available" if healthy else "busy"
+                )
+            return healthy
+        except Exception:
+            with self.agent_lock:
+                if agent_id in self.agents:
+                    self.agents[agent_id]["status"] = "unreachable"
+            if self.builder_pool:
+                self.builder_pool.report_capacity(agent_id, "offline")
+            return False
+
+    async def _health_check_loop(self) -> None:
+        """Background loop that checks all HTTP agents periodically."""
+        while self.state == BrokerState.RUNNING:
+            agents_snapshot = self.list_agents()
+            for agent_id, agent_info in agents_snapshot.items():
+                endpoint = agent_info.get("endpoint", "")
+                if endpoint and endpoint.startswith("http"):
+                    old_status = agent_info.get("status")
+                    healthy = await self._check_agent_health(agent_id)
+                    new_status = "online" if healthy else "unreachable"
+                    if old_status != new_status:
+                        self.logger.info(
+                            f"🏥 Agent health changed: {agent_id} "
+                            f"{old_status} → {new_status}"
+                        )
+            await asyncio.sleep(self.config.health_check_interval)
+
+    def start_health_checks(self) -> None:
+        """Start the background health-check loop in a daemon thread."""
+        def _run():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                loop.run_until_complete(self._health_check_loop())
+            finally:
+                loop.close()
+
+        self._health_thread = threading.Thread(
+            target=_run, daemon=True, name="SIMP-HealthCheck"
+        )
+        self._health_thread.start()
+        self.logger.info("🏥 Agent health check loop started")
 
     def record_response(
         self,
@@ -433,6 +709,7 @@ class SimpBroker:
     def start(self) -> None:
         """Start the broker"""
         self.state = BrokerState.RUNNING
+        self.start_health_checks()
         self.logger.info("✅ SIMP Broker RUNNING")
 
     def stop(self) -> None:
