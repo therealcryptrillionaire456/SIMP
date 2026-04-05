@@ -12,7 +12,7 @@ import os
 from collections import deque
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Callable
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 import uuid
@@ -30,6 +30,11 @@ try:
     _HTTPX_AVAILABLE = True
 except ImportError:
     _HTTPX_AVAILABLE = False
+
+
+def _utcnow_iso() -> str:
+    """Return current UTC time as ISO 8601 string with Z suffix."""
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 class BrokerState(str, Enum):
@@ -130,6 +135,9 @@ class SimpBroker:
         self._event_log: deque = deque(maxlen=500)
         self._event_log_lock = threading.RLock()
 
+        # Shutdown coordination
+        self._shutdown_event = threading.Event()
+
         self.logger.info(f"🚀 SIMP Broker initialized (v0.1)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
@@ -186,7 +194,7 @@ class SimpBroker:
                 "agent_type": agent_type,
                 "endpoint": endpoint,
                 "metadata": metadata or {},
-                "registered_at": datetime.utcnow().isoformat(),
+                "registered_at": _utcnow_iso(),
                 "intents_received": 0,
                 "intents_completed": 0,
                 "status": "online",
@@ -237,6 +245,13 @@ class SimpBroker:
             "timestamp": "..."
         }
         """
+        if self.state != BrokerState.RUNNING:
+            return {
+                "status": "error",
+                "error_code": "BROKER_NOT_RUNNING",
+                "error": f"Broker is {self.state.value}, not accepting intents",
+            }
+
         intent_id = intent_data.get("intent_id", str(uuid.uuid4()))
         source_agent = intent_data.get("source_agent", "client")
         target_agent = intent_data.get("target_agent")
@@ -291,7 +306,7 @@ class SimpBroker:
                         source_agent=source_agent,
                         target_agent=target_agent or "unknown",
                         intent_type=intent_type,
-                        timestamp=datetime.utcnow().isoformat(),
+                        timestamp=_utcnow_iso(),
                         status="failed",
                         error=error_msg,
                     )
@@ -318,7 +333,7 @@ class SimpBroker:
                 source_agent=source_agent,
                 target_agent=target_agent,
                 intent_type=intent_type,
-                timestamp=datetime.utcnow().isoformat(),
+                timestamp=_utcnow_iso(),
                 status="pending",
             )
             self.intent_records[intent_id] = record
@@ -427,7 +442,7 @@ class SimpBroker:
             "delivery_latency_ms": delivery_result.get("delivery_latency_ms"),
             "retry_count": retry_count,
             "fallback_agent": delivery_result.get("fallback_agent"),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utcnow_iso(),
         }
 
         # Fire memory hook after routing
@@ -591,7 +606,7 @@ class SimpBroker:
             with self.agent_lock:
                 if agent_id in self.agents:
                     self.agents[agent_id]["status"] = "online" if healthy else "degraded"
-                    self.agents[agent_id]["last_seen"] = datetime.utcnow().isoformat()
+                    self.agents[agent_id]["last_seen"] = _utcnow_iso()
             if self.builder_pool:
                 self.builder_pool.report_capacity(
                     agent_id, "available" if healthy else "busy"
@@ -607,7 +622,7 @@ class SimpBroker:
 
     async def _health_check_loop(self) -> None:
         """Background loop that checks all HTTP agents periodically."""
-        while self.state == BrokerState.RUNNING:
+        while self.state == BrokerState.RUNNING and not self._shutdown_event.is_set():
             agents_snapshot = self.list_agents()
             for agent_id, agent_info in agents_snapshot.items():
                 endpoint = agent_info.get("endpoint", "")
@@ -624,23 +639,38 @@ class SimpBroker:
                             "health_change", f"Agent {agent_id} health: {old_status} → {new_status}",
                             agent_id=agent_id,
                         )
-            await asyncio.sleep(self.config.health_check_interval)
+            # Check shutdown event more frequently than the full interval
+            for _ in range(int(self.config.health_check_interval)):
+                if self._shutdown_event.is_set():
+                    break
+                await asyncio.sleep(1)
 
-    def start_health_checks(self) -> None:
-        """Start the background health-check loop in a daemon thread."""
-        def _run():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                loop.run_until_complete(self._health_check_loop())
-            finally:
-                loop.close()
+    def start_health_checks(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
+        """Start the background health-check loop.
 
-        self._health_thread = threading.Thread(
-            target=_run, daemon=True, name="SIMP-HealthCheck"
-        )
-        self._health_thread.start()
-        self.logger.info("🏥 Agent health check loop started")
+        If an external event loop is provided, the health check coroutine is
+        scheduled on it.  Otherwise a dedicated daemon thread with its own
+        loop is created (backwards-compatible for standalone broker usage).
+        """
+        if loop is not None:
+            # Schedule on the provided loop (e.g. SimpHttpServer._async_loop)
+            asyncio.run_coroutine_threadsafe(self._health_check_loop(), loop)
+            self.logger.info("🏥 Agent health check loop started (shared loop)")
+        else:
+            # Standalone fallback — create own loop in a thread
+            def _run():
+                _loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(_loop)
+                try:
+                    _loop.run_until_complete(self._health_check_loop())
+                finally:
+                    _loop.close()
+
+            self._health_thread = threading.Thread(
+                target=_run, daemon=True, name="SIMP-HealthCheck"
+            )
+            self._health_thread.start()
+            self.logger.info("🏥 Agent health check loop started (dedicated thread)")
 
     def record_response(
         self,
@@ -751,7 +781,7 @@ class SimpBroker:
         queryable via get_logs() and the /logs HTTP endpoint.
         """
         event: Dict[str, Any] = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": _utcnow_iso(),
             "event_type": event_type,
             "level": level,
             "message": message,
@@ -819,17 +849,39 @@ class SimpBroker:
         items.reverse()
         return items[:limit]
 
-    def start(self) -> None:
-        """Start the broker"""
+    def start(self, async_loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
+        """Start the broker.
+
+        Args:
+            async_loop: Optional shared event loop for scheduling background tasks.
+        """
         self.state = BrokerState.RUNNING
-        self.start_health_checks()
+        self.start_health_checks(loop=async_loop)
         self.logger.info("✅ SIMP Broker RUNNING")
 
     def stop(self) -> None:
-        """Stop the broker"""
+        """Gracefully stop the broker.
+
+        1. Set state to SHUTTING_DOWN so no new intents are accepted
+        2. Signal the health-check loop to exit
+        3. Wait for the health thread to finish (up to 5s)
+        4. Log the event and set STOPPED
+        """
         self.state = BrokerState.SHUTTING_DOWN
+        self._log_event("broker_stopping", "Broker shutdown initiated", level="warning")
         self.logger.info("🛑 SIMP Broker shutting down...")
+
+        # Signal health-check loop to stop
+        self._shutdown_event.set()
+
+        # Wait for health thread to finish
+        if hasattr(self, "_health_thread") and self._health_thread.is_alive():
+            self._health_thread.join(timeout=5)
+            if self._health_thread.is_alive():
+                self.logger.warning("⚠️ Health check thread did not stop within 5s")
+
         self.state = BrokerState.STOPPED
+        self._log_event("broker_stopped", "Broker stopped")
         self.logger.info("✅ SIMP Broker stopped")
 
     def pause(self) -> None:
@@ -853,5 +905,5 @@ class SimpBroker:
                 for r in self.intent_records.values()
                 if r.status == "pending"
             ),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utcnow_iso(),
         }

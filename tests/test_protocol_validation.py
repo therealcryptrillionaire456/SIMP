@@ -9,7 +9,7 @@ import asyncio
 import pytest
 import time
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 import os
 
@@ -103,7 +103,7 @@ class TestSimpIntentRouting:
             "target_agent": "grok:001",
             "intent_type": "generate_strategy",
             "params": {"market": "SOL/USDC"},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         result = await broker_with_agents.route_intent(intent_data)
@@ -200,7 +200,7 @@ class TestSimpProtocolCompliance:
             "target_agent": "agent:b",
             "intent_type": "test",
             "params": {"key": "value"},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         # Should not raise exception

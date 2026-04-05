@@ -321,8 +321,10 @@ class SimpHttpServer:
         @self.limiter.limit(5)
         @require_control_auth
         def stop_broker():
-            """Stop the broker"""
+            """Stop the broker and clean up resources"""
             self.broker.stop()
+            # Stop the shared async event loop
+            self._async_loop.call_soon_threadsafe(self._async_loop.stop)
             return jsonify({
                 "status": "success",
                 "message": "Broker stopped"
@@ -503,7 +505,7 @@ class SimpHttpServer:
             port: Port to bind to
             threaded: Run in threaded mode
         """
-        self.broker.start()
+        self.broker.start(async_loop=self._async_loop)
         self.logger.info(f"🚀 SIMP HTTP Server starting on {host}:{port}")
         self.app.run(host=host, port=port, debug=self.debug, threaded=threaded)
 

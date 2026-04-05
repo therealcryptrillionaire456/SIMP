@@ -340,3 +340,101 @@ Close remaining robustness findings (R2-R5), fix pre-existing test failures, and
 - Outcome: Fixed both tests. test_intent_status_tracking now routes intent via loop.run_until_complete() before calling record_response(). test_response_schema_validation now registers a file-based agent and routes an intent first. All 17/17 protocol tests pass.
 
 ---
+
+## Sprint 4 — Shutdown, Deprecation Fixes, & Cleanup
+**Started:** 2026-04-05T18:18:00Z
+**Agent:** perplexity_research (task authoring & design), claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Add graceful shutdown, fix datetime.utcnow() deprecation warnings, delete dead code, and consolidate health check onto shared async loop.
+
+---
+
+## Task SPRINT04-KP-001
+- Title: Graceful shutdown — drain in-flight intents, stop health checks
+- Author: perplexity_research
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [simp/server/broker.py, simp/server/http_server.py]
+- Created At: 2026-04-05T18:18:00Z
+- Last Updated: 2026-04-05T18:30:00Z
+- Description:
+  The broker's stop() method just flips state. It doesn't signal the health check loop
+  to exit, wait for it to finish, or log structured events. Add _shutdown_event to
+  coordinate shutdown, rewrite stop() to signal and join the health thread, add a
+  BROKER_NOT_RUNNING guard to route_intent(), and update the /control/stop endpoint
+  to also stop the shared async event loop.
+- Acceptance Criteria:
+  - stop() sets SHUTTING_DOWN, signals _shutdown_event, joins health thread (5s timeout), then sets STOPPED
+  - route_intent() returns BROKER_NOT_RUNNING error when state != RUNNING
+  - _health_check_loop exits when _shutdown_event is set
+  - /control/stop also calls self._async_loop.call_soon_threadsafe(self._async_loop.stop)
+  - broker_stopping and broker_stopped events appear in get_logs()
+- Outcome: Added _shutdown_event (threading.Event) to broker __init__. Rewrote stop() to set SHUTTING_DOWN, signal event, join health thread (5s timeout), then set STOPPED with structured log events. Added BROKER_NOT_RUNNING guard at top of route_intent(). Updated _health_check_loop while condition and sleep to check shutdown event every 1s. Updated /control/stop to also stop shared async loop. 9/9 sprint4 tests pass.
+
+---
+
+## Task SPRINT04-KP-002
+- Title: Fix datetime.utcnow() deprecation in broker core
+- Author: perplexity_research
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [simp/server/broker.py, simp/task_ledger.py, tests/test_protocol_validation.py]
+- Created At: 2026-04-05T18:18:00Z
+- Last Updated: 2026-04-05T18:30:00Z
+- Description:
+  datetime.utcnow() is deprecated in Python 3.12+. Replace all occurrences in
+  broker.py with a new _utcnow_iso() helper using datetime.now(timezone.utc).
+  Update task_ledger.py's _now_iso() and test_protocol_validation.py's 2 occurrences.
+- Acceptance Criteria:
+  - Zero occurrences of datetime.utcnow() in broker.py, task_ledger.py, test_protocol_validation.py
+  - New _utcnow_iso() helper in broker.py returns ISO 8601 with Z suffix, seconds precision
+  - All existing tests still pass
+- Outcome: Added _utcnow_iso() helper to broker.py using datetime.now(timezone.utc) with seconds precision and Z suffix. Replaced all 7 occurrences in broker.py. Updated task_ledger.py _now_iso() to use timezone-aware datetime. Updated 2 occurrences in test_protocol_validation.py. grep confirms zero remaining datetime.utcnow() in target files. All 17/17 protocol tests pass.
+
+---
+
+## Task SPRINT04-KP-003
+- Title: Delete dead simp/security/input_validator.py scaffold
+- Author: perplexity_research
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [simp/security/input_validator.py]
+- Created At: 2026-04-05T18:18:00Z
+- Last Updated: 2026-04-05T18:30:00Z
+- Description:
+  The file simp/security/input_validator.py was flagged as S4 (standalone scaffold
+  never imported anywhere). Its functionality was superseded by simp/server/request_guards.py
+  in Sprint 1. Delete the file and the entire simp/security/ directory if empty.
+- Acceptance Criteria:
+  - simp/security/input_validator.py does not exist
+  - No file imports from simp.security.input_validator
+  - simp/security/ directory removed if empty
+- Outcome: Deleted simp/security/ directory entirely (only contained input_validator.py, no __init__.py or __pycache__). Verified no imports from simp.security.input_validator anywhere in codebase. S4 finding closed.
+
+---
+
+## Task SPRINT04-KP-004
+- Title: Consolidate health check into shared async loop
+- Author: perplexity_research
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [simp/server/broker.py, simp/server/http_server.py]
+- Created At: 2026-04-05T18:18:00Z
+- Last Updated: 2026-04-05T18:30:00Z
+- Description:
+  Currently start_health_checks() creates its own asyncio.new_event_loop() in a
+  separate thread. The http_server already creates a shared loop in self._async_loop.
+  Refactor start_health_checks() to accept an optional loop parameter. When provided,
+  schedule the health check coroutine on it via run_coroutine_threadsafe(). When not
+  provided, fall back to creating a dedicated thread (backwards-compatible). Update
+  broker.start() to accept and forward async_loop, and http_server.run() to pass it.
+- Acceptance Criteria:
+  - start_health_checks(loop=...) accepts optional event loop
+  - broker.start(async_loop=...) forwards loop to start_health_checks
+  - http_server.run() passes self._async_loop to broker.start()
+  - Standalone broker usage still works without a shared loop
+- Outcome: Refactored start_health_checks() to accept optional loop parameter. When loop is provided, uses run_coroutine_threadsafe() to schedule on shared loop. Otherwise creates dedicated daemon thread (backwards-compatible). Updated broker.start() to accept and forward async_loop. Updated http_server.run() to pass self._async_loop. test_start_with_shared_loop confirms both paths work.
+
+---
