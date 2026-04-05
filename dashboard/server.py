@@ -77,9 +77,18 @@ app = FastAPI(
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; "
+            "connect-src 'self' ws: wss:; "
+            "font-src 'self'"
+        )
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         return response
 
 
@@ -277,9 +286,14 @@ def _load_persisted_events() -> None:
         with open(ACTIVITY_LOG_PATH) as f:
             for line in f:
                 line = line.strip()
-                if line:
-                    activity_buffer.append(json.loads(line))
-    except (OSError, json.JSONDecodeError):
+                if not line:
+                    continue
+                try:
+                    event = json.loads(line)
+                    activity_buffer.append(event)
+                except json.JSONDecodeError:
+                    continue  # Skip corrupt line, don't abort
+    except OSError:
         pass
 
 

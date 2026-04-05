@@ -1613,3 +1613,53 @@ Replace polling with WebSocket push. Fix all hardcoded/misleading dashboard endp
 - `TestFrontendWebSocket` (3 tests): app.js has WebSocket, escapeHtml preserved, connection status present
 - `TestTopologyFix` (2 tests): connection_mode in server, ws-status in index.html
 - Full regression: 299 tests pass
+
+---
+
+## Sprint 21 — Dashboard UX & Security Headers
+**Started:** 2026-04-05
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Production-ready dashboard with proper security headers, error handling, task filtering/search, and activity charts.
+
+### SPRINT21-KP-001: Security Headers
+**Status:** COMPLETE
+- Enhanced CSP to allow WebSocket (`connect-src 'self' ws: wss:`) and Chart.js CDN (`script-src https://cdn.jsdelivr.net`)
+- Added `img-src 'self' data:` and `font-src 'self'` directives
+- Added `Referrer-Policy: strict-origin-when-cross-origin`
+- Added `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- CORS origins already configurable via `DASHBOARD_CORS_ORIGINS` env var (from prior sprint)
+
+### SPRINT21-KP-002: Error Handling & Loading States
+**Status:** COMPLETE
+- Added `safeGetEl()` for safe DOM element access
+- Added `setLoading()` for loading state management with CSS pulse animation
+- Added stale data indicator (`checkStaleness()` runs every 5s, 30s threshold)
+- Added `showError()` for graceful error display using `escapeHtml`
+- Fixed JSONL corruption recovery in `_load_persisted_events` — now skips bad lines instead of aborting
+
+### SPRINT21-KP-003: Task Search/Filter
+**Status:** COMPLETE
+- Added search input (`task-search`) and status filter dropdown (`task-status-filter`) in index.html
+- Added `renderTasksWithFilter()` with text search across description, task_type, source_agent, task_id
+- Status filter supports: all, queued, claimed, in_progress, completed, failed, blocked
+- Pagination at 50 tasks per page
+- Live filtering on input/change events
+
+### SPRINT21-KP-004: Activity Charts
+**Status:** COMPLETE
+- Added Chart.js 4.4.1 via CDN (`cdn.jsdelivr.net`)
+- Intent flow line chart tracks `intents_routed` over time (last 60 data points)
+- Task status doughnut chart shows distribution across queued/in_progress/completed/failed/blocked
+- Charts wired into data refresh cycle and WebSocket updates
+- Responsive grid layout (2-col desktop, 1-col mobile)
+
+### SPRINT21-KP-005: Tests
+**Status:** COMPLETE
+- Created `tests/test_sprint21_ux.py` with 12 tests across 5 test classes
+- `TestSecurityHeaders` (4 tests): CSP, X-Frame-Options, Referrer-Policy, configurable CORS
+- `TestErrorHandling` (2 tests): safeGetEl present, escapeHtml preserved
+- `TestTaskFiltering` (2 tests): filter controls in HTML, filter logic in JS
+- `TestActivityCharts` (3 tests): chart canvas in HTML, chart logic in JS, chart CSS styles
+- `TestModulesCompile` (1 test): dashboard/server.py compiles successfully

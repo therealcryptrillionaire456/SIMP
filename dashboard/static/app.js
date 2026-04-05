@@ -24,6 +24,49 @@
   }
 
   // -----------------------------------------------------------------------
+  // Safe DOM access & loading states (Sprint 21 — KP-002)
+  // -----------------------------------------------------------------------
+
+  function safeGetEl(id) {
+    return document.getElementById(id);
+  }
+
+  function setLoading(sectionId, loading) {
+    var el = safeGetEl(sectionId);
+    if (!el) return;
+    if (loading) {
+      el.classList.add('loading');
+    } else {
+      el.classList.remove('loading');
+    }
+  }
+
+  var lastUpdate = {};
+
+  function markUpdated(section) {
+    lastUpdate[section] = Date.now();
+  }
+
+  function checkStaleness() {
+    var STALE_THRESHOLD = 30000;
+    Object.keys(lastUpdate).forEach(function(section) {
+      var time = lastUpdate[section];
+      var el = safeGetEl(section + '-stale');
+      if (el) {
+        var isStale = (Date.now() - time) > STALE_THRESHOLD;
+        el.style.display = isStale ? 'inline' : 'none';
+      }
+    });
+  }
+  setInterval(checkStaleness, 5000);
+
+  function showError(sectionId, message) {
+    var el = safeGetEl(sectionId);
+    if (!el) return;
+    el.innerHTML = '<div class="error-message">' + escapeHtml(message) + '</div>';
+  }
+
+  // -----------------------------------------------------------------------
   // DOM refs
   // -----------------------------------------------------------------------
 
@@ -750,10 +793,148 @@
   }
 
   // -----------------------------------------------------------------------
+  // Task search/filter with pagination (Sprint 21 — KP-003)
+  // -----------------------------------------------------------------------
+
+  var _lastTasksData = null;
+
+  function renderTasksWithFilter(tasks) {
+    var container = safeGetEl('tasks-container');
+    if (!container) return;
+    if (!tasks || !Array.isArray(tasks)) {
+      container.innerHTML = '<div class="empty-state">No tasks</div>';
+      return;
+    }
+
+    var searchEl = safeGetEl('task-search');
+    var statusEl = safeGetEl('task-status-filter');
+    var searchTerm = searchEl ? searchEl.value.toLowerCase() : '';
+    var statusFilter = statusEl ? statusEl.value : 'all';
+
+    var filtered = tasks;
+    if (searchTerm) {
+      filtered = filtered.filter(function(t) {
+        return (t.description || '').toLowerCase().indexOf(searchTerm) !== -1 ||
+          (t.task_type || '').toLowerCase().indexOf(searchTerm) !== -1 ||
+          (t.source_agent || '').toLowerCase().indexOf(searchTerm) !== -1 ||
+          (t.task_id || '').toLowerCase().indexOf(searchTerm) !== -1;
+      });
+    }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(function(t) { return t.status === statusFilter; });
+    }
+
+    var PAGE_SIZE = 50;
+    var pageEl = safeGetEl('task-page');
+    var page = parseInt((pageEl && pageEl.value) || '1');
+    var start = (page - 1) * PAGE_SIZE;
+    var paged = filtered.slice(start, start + PAGE_SIZE);
+
+    var html = '<div class="filter-bar"><span class="mono">' + filtered.length + ' tasks</span></div>';
+    html += '<div class="task-list">';
+    paged.forEach(function(t) {
+      var statusClass = t.status === 'completed' ? 'success' : t.status === 'failed' ? 'error' : 'pending';
+      html += '<div class="task-item ' + statusClass + '">';
+      html += '<span class="task-type">' + escapeHtml(t.task_type || '') + '</span>';
+      html += '<span class="task-status status-badge ' + statusClass + '">' + escapeHtml(t.status || '') + '</span>';
+      html += '<span class="task-desc">' + escapeHtml(t.description || '').substring(0, 100) + '</span>';
+      html += '<span class="task-agent mono">' + escapeHtml(t.source_agent || '') + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    var totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+    if (totalPages > 1) {
+      html += '<div class="pagination">Page ' + page + ' of ' + totalPages + '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  // -----------------------------------------------------------------------
+  // Activity Charts (Sprint 21 — KP-004)
+  // -----------------------------------------------------------------------
+
+  var intentChart = null;
+  var taskChart = null;
+
+  function initCharts() {
+    var intentCtx = safeGetEl('intent-chart');
+    var taskCtx = safeGetEl('task-chart');
+
+    if (intentCtx && typeof Chart !== 'undefined') {
+      intentChart = new Chart(intentCtx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Intents Routed',
+            data: [],
+            borderColor: '#6366f1',
+            tension: 0.3,
+            fill: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: { y: { beginAtZero: true } },
+          plugins: { legend: { display: false } },
+          animation: false,
+        }
+      });
+    }
+
+    if (taskCtx && typeof Chart !== 'undefined') {
+      taskChart = new Chart(taskCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Queued', 'In Progress', 'Completed', 'Failed', 'Blocked'],
+          datasets: [{
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: ['#f59e0b', '#3b82f6', '#22c55e', '#ef4444', '#6b7280'],
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: false,
+        }
+      });
+    }
+  }
+
+  var intentHistory = [];
+  var MAX_HISTORY = 60;
+
+  function updateIntentChart(stats) {
+    if (!intentChart || !stats) return;
+    var now = new Date().toLocaleTimeString();
+    intentHistory.push({ time: now, count: stats.intents_routed || 0 });
+    if (intentHistory.length > MAX_HISTORY) intentHistory.shift();
+
+    intentChart.data.labels = intentHistory.map(function(h) { return h.time; });
+    intentChart.data.datasets[0].data = intentHistory.map(function(h) { return h.count; });
+    intentChart.update();
+  }
+
+  function updateTaskChart(tasks) {
+    if (!taskChart || !tasks) return;
+    var counts = { queued: 0, in_progress: 0, completed: 0, failed: 0, blocked: 0 };
+    if (Array.isArray(tasks)) {
+      tasks.forEach(function(t) {
+        if (counts.hasOwnProperty(t.status)) counts[t.status]++;
+      });
+    }
+    taskChart.data.datasets[0].data = [counts.queued, counts.in_progress, counts.completed, counts.failed, counts.blocked];
+    taskChart.update();
+  }
+
+  // -----------------------------------------------------------------------
   // Main refresh cycle
   // -----------------------------------------------------------------------
 
   async function refreshAll() {
+    setLoading('overview-section', true);
+
     // Fetch all endpoints in parallel
     const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData] = await Promise.all([
       apiFetch("/api/health"),
@@ -772,6 +953,8 @@
       apiFetch("/api/computer-use"),
     ]);
 
+    setLoading('overview-section', false);
+
     renderHealth(health);
     renderStats(stats);
     renderAgents(agents);
@@ -788,6 +971,22 @@
     renderTaskQueue(taskQueueData);
     renderOrchestration(orchestrationData);
     renderComputerUse(computerUseData);
+
+    // Sprint 21 — update charts
+    if (stats) {
+      var broker = stats.broker || stats;
+      var chartStats = broker.stats || broker;
+      updateIntentChart(chartStats);
+    }
+    if (tasks && tasks.tasks) {
+      _lastTasksData = tasks.tasks;
+      updateTaskChart(tasks.tasks);
+      renderTasksWithFilter(tasks.tasks);
+    }
+
+    markUpdated('overview');
+    markUpdated('agents');
+    markUpdated('tasks');
 
     // Capture dashboard start time from health response
     if (!dashboardStartedAt && health && health.dashboard_started_at) {
@@ -921,6 +1120,23 @@
   dom.refreshBtn.addEventListener("click", function() {
     refreshAll();
   });
+
+  // Sprint 21 — filter event listeners
+  var taskSearchEl = safeGetEl('task-search');
+  var taskStatusFilterEl = safeGetEl('task-status-filter');
+  if (taskSearchEl) {
+    taskSearchEl.addEventListener('input', function() {
+      if (_lastTasksData) renderTasksWithFilter(_lastTasksData);
+    });
+  }
+  if (taskStatusFilterEl) {
+    taskStatusFilterEl.addEventListener('change', function() {
+      if (_lastTasksData) renderTasksWithFilter(_lastTasksData);
+    });
+  }
+
+  // Sprint 21 — initialize charts
+  initCharts();
 
   // Try WebSocket first, fall back to polling
   connectWebSocket();
