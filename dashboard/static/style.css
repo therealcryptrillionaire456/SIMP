@@ -603,6 +603,59 @@ body {
   color: var(--text-muted);
 }
 
+/* ==========================================================================
+   Sprint 21 — Charts, Filters, Error States
+   ========================================================================== */
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.chart-card {
+  padding: 1rem;
+}
+.filter-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.filter-input, .filter-select {
+  padding: 0.5rem;
+  border: 1px solid #374151;
+  border-radius: 0.375rem;
+  background: #1f2937;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+}
+.error-message {
+  color: #ef4444;
+  padding: 1rem;
+  text-align: center;
+}
+.task-list .task-item {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #1f2937;
+  align-items: center;
+}
+.pagination {
+  text-align: center;
+  padding: 1rem;
+  color: #9ca3af;
+}
+.stale-indicator {
+  color: var(--amber);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .chart-grid { grid-template-columns: 1fr; }
+  .filter-controls { flex-direction: column; }
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

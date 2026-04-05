@@ -258,6 +258,42 @@
       </div>
     </section>
 
+    <!-- Activity Charts (Sprint 21) -->
+    <section class="section" id="charts-section">
+      <h2 class="section-title">Activity</h2>
+      <div class="chart-grid">
+        <div class="card chart-card">
+          <div class="card-label">Intent Flow</div>
+          <canvas id="intent-chart" height="200"></canvas>
+        </div>
+        <div class="card chart-card">
+          <div class="card-label">Task Distribution</div>
+          <canvas id="task-chart" height="200"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Task Search/Filter (Sprint 21) -->
+    <section class="section" id="task-filter-section">
+      <h2 class="section-title">Task Search</h2>
+      <div class="filter-controls">
+        <input type="text" id="task-search" placeholder="Search tasks..." class="filter-input">
+        <select id="task-status-filter" class="filter-select">
+          <option value="all">All Statuses</option>
+          <option value="queued">Queued</option>
+          <option value="claimed">Claimed</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="failed">Failed</option>
+          <option value="blocked">Blocked</option>
+        </select>
+        <input type="hidden" id="task-page" value="1">
+      </div>
+      <div id="tasks-container">
+        <div class="empty-state">Loading tasks...</div>
+      </div>
+    </section>
+
     <!-- Activity Feed -->
     <section class="section" id="activity-section">
       <h2 class="section-title">Recent Activity</h2>
@@ -319,6 +355,7 @@
     <span>Broker Unreachable &mdash; Dashboard is running but cannot connect to the SIMP broker at <code>127.0.0.1:5555</code></span>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>
