@@ -572,3 +572,80 @@ Close remaining LOW findings (S7 CORS, S4 scaffold), enhance dashboard health en
 | **Total** | **~114** |
 
 **5-Sprint Hardening Plan: COMPLETE**
+
+---
+
+## Sprint 6 — Dashboard Feature Completion
+**Started:** 2026-04-05T19:20:00Z
+**Agent:** perplexity_research (discovery & design), claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Wire the 3 missing dashboard API endpoints (/api/logs, /api/topology, /api/tasks/queue) into the frontend so the dashboard displays all available data.
+
+---
+
+## Task SPRINT06-KP-001
+- Title: Wire /api/logs into dashboard frontend
+- Author: perplexity_research
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [dashboard/static/app.js, dashboard/static/index.html]
+- Created At: 2026-04-05T19:20:00Z
+- Last Updated: 2026-04-05T19:30:00Z
+- Description:
+  The backend serves /api/logs (Sprint 3) but the frontend never fetches it. Added
+  /api/logs to the fetch batch in refreshAll(), created renderLogs(data) function that
+  renders structured log events into a table with Time, Level, Event, Agent, Message
+  columns. Level badges use existing status-badge classes (online/degraded/offline).
+  Added Structured Logs HTML section after activity-section with logs-tbody table.
+- Acceptance Criteria:
+  - /api/logs added to Promise.all fetch batch
+  - renderLogs() renders up to 50 log entries with level-colored badges
+  - New "Structured Logs" section in index.html with proper table structure
+  - python3 -m py_compile dashboard/server.py passes
+- Outcome: Implemented. renderLogs() added to app.js, logs-section with 5-column table added to index.html. Fetch and render wired into refreshAll().
+
+---
+
+## Task SPRINT06-KP-002
+- Title: Wire /api/topology into dashboard frontend
+- Author: perplexity_research
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [dashboard/static/app.js, dashboard/static/index.html, dashboard/static/style.css]
+- Created At: 2026-04-05T19:20:00Z
+- Last Updated: 2026-04-05T19:30:00Z
+- Description:
+  The backend serves /api/topology but the frontend doesn't fetch it. Added /api/topology
+  to the fetch batch, created renderTopology(data) function that renders network nodes
+  as a CSS grid of topology-node cards showing agent_id, connection_mode, agent_type,
+  and status dot. Added Network Topology subsection inside delivery-section. Added
+  topology-grid, topology-node, topology-mode, topology-type CSS styles.
+- Acceptance Criteria:
+  - /api/topology added to Promise.all fetch batch
+  - renderTopology() renders nodes with status dots and connection mode
+  - Network Topology subsection added inside delivery-section
+  - CSS styles for .topology-grid, .topology-node, .topology-mode, .topology-type
+- Outcome: Implemented. renderTopology() added to app.js, topology subsection added to delivery-section in index.html, 4 new CSS classes added to style.css.
+
+---
+
+## Task SPRINT06-KP-003
+- Title: Wire /api/tasks/queue into dashboard frontend
+- Author: perplexity_research
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [dashboard/static/app.js, dashboard/static/index.html]
+- Created At: 2026-04-05T19:20:00Z
+- Last Updated: 2026-04-05T19:30:00Z
+- Description:
+  The task queue API exists but isn't fetched by the frontend. Added /api/tasks/queue
+  to the fetch batch, created renderTaskQueue(data) function that renders queue items
+  with task_id, task_type, status badge, and claimed_by columns. Verified task-queue-section
+  already has <tbody id="task-queue-tbody"> in index.html.
+- Acceptance Criteria:
+  - /api/tasks/queue added to Promise.all fetch batch
+  - renderTaskQueue() renders up to 20 queue items with status badges
+  - task-queue-tbody exists in index.html (verified — already present)
+- Outcome: Implemented. renderTaskQueue() added to app.js, fetch wired in refreshAll(). HTML tbody already existed, no changes needed to index.html for this task.
