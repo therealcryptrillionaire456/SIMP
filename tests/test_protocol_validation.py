@@ -11,8 +11,9 @@ import time
 import json
 from datetime import datetime
 import sys
+import os
 
-sys.path.insert(0, '/sessions/fervent-elegant-johnson/projects/simp')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from simp.server.broker import SimpBroker, BrokerConfig, BrokerState
 from simp.intent import Intent, SimpResponse
