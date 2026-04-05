@@ -14,7 +14,8 @@ from typing import Dict, Any, Optional, List
 
 from simp.agent import SimpAgent
 from simp.intent import Intent, SimpResponse
-from simp.agents.q_intent_compiler import QIntentCompiler, DecisionTree
+from simp.agents.q_intent_compiler import QIntentCompiler, StrategicOptimizer, DecisionTree
+from simp.memory.knowledge_index import KnowledgeIndex
 from simp.orchestration.task_decomposer import TaskDecomposer
 
 
@@ -46,6 +47,7 @@ class KloutbotAgent(SimpAgent):
         super().__init__(agent_id, organization)
 
         self.compiler = QIntentCompiler()
+        self._optimizer = StrategicOptimizer()
         self.strategy_history: List[DecisionTree] = []
         self.max_history = 100
 
@@ -211,34 +213,58 @@ class KloutbotAgent(SimpAgent):
             }
 
     async def handle_improve_tree(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle an improvement request via SIMP intent.
+
+        Accepts: intent_type "improve_tree" with params:
+            - target: which tree/component to improve (default: "decision_tree")
+            - iterations: how many improvement iterations (default: 3)
         """
-        Recursively improve an existing decision tree
+        target = params.get("target", "decision_tree")
+        iterations = min(params.get("iterations", 3), 10)  # Cap at 10
 
-        This handles mutation/memory operations for incremental optimization.
-        """
-        try:
-            tree_data = params.get("tree")
-            iterations = params.get("iterations", 3)
-
-            if not tree_data:
-                return {
-                    "status": "error",
-                    "error_message": "Tree data required"
-                }
-
-            # Note: In production, would reconstruct DecisionTree from data
-            # For now, return analysis
+        if self._optimizer is None:
             return {
-                "status": "success",
-                "message": f"Tree improvement iterations: {iterations}",
-                "estimated_improvement": iterations * 0.15,
-                "timestamp": datetime.utcnow().isoformat()
+                "type": "response",
+                "status": "failed",
+                "error": "StrategicOptimizer not initialized",
             }
 
-        except Exception as e:
+        try:
+            # Build a baseline tree if none provided
+            streams = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "deltas": params.get("deltas", {}),
+                "foresight": params.get("foresight", {"affinity": 0.5, "drift_risk": 0.1}),
+            }
+            current_tree = self._optimizer._build_fractal_tree(streams)
+            current_tree = self._optimizer._apply_minimax(current_tree)
+
+            # Run improvement iterations
+            results = []
+            for i in range(iterations):
+                current_tree = await self._optimizer._recursive_improve(current_tree, iterations=1)
+                results.append({
+                    "iteration": i,
+                    "utility": self._optimizer._calculate_utility(current_tree),
+                })
+
             return {
-                "status": "error",
-                "error_message": str(e)
+                "type": "response",
+                "intent_id": params.get("intent_id", ""),
+                "agent_id": self.agent_id,
+                "status": "completed",
+                "response": {
+                    "target": target,
+                    "iterations_run": len(results),
+                    "results": results,
+                    "improvement_history_size": len(self._optimizer.improvement_history),
+                },
+            }
+        except Exception as exc:
+            return {
+                "type": "response",
+                "status": "failed",
+                "error": str(exc),
             }
 
     async def handle_get_status(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -478,6 +504,23 @@ class MutationMemory:
         self.max_memories = max_memories
         self.success_count = 0
         self.failure_count = 0
+        self._knowledge_index = KnowledgeIndex()
+        self._load_persisted_mutations()
+
+    def _load_persisted_mutations(self):
+        """Load mutation history from knowledge index."""
+        try:
+            entries = self._knowledge_index.search("mutation_memory")
+            if entries:
+                for entry in entries:
+                    if isinstance(entry, dict):
+                        self.memories.append(entry)
+                        if entry.get("result") == "success" or entry.get("success"):
+                            self.success_count += 1
+                        elif entry.get("result") == "failure":
+                            self.failure_count += 1
+        except Exception:
+            pass
 
     def record_mutation(
         self,
@@ -491,6 +534,7 @@ class MutationMemory:
             "original_utility": self.calculate_utility(original_tree),
             "mutated_utility": self.calculate_utility(mutated_tree),
             "result": result,
+            "success": result == "success",
             "improvement": self.calculate_utility(mutated_tree) - self.calculate_utility(original_tree)
         }
 
@@ -504,6 +548,15 @@ class MutationMemory:
         # Maintain max size
         if len(self.memories) > self.max_memories:
             self.memories = self.memories[-self.max_memories:]
+
+        # Persist to knowledge index
+        try:
+            self._knowledge_index.add_entry(
+                category="mutation_memory",
+                data=memory,
+            )
+        except Exception:
+            pass
 
     def get_success_rate(self) -> float:
         """Calculate mutation success rate"""

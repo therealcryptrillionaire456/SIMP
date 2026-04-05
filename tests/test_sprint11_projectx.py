@@ -26,11 +26,12 @@ class TestProjectXSkeleton:
         assert pc.log_dir.exists()
 
     def test_action_tiers_complete(self):
-        """All 14 methods should have tier assignments."""
+        """All methods should have tier assignments."""
         expected = {
             "get_screenshot", "get_active_window", "ocr_screen", "snapshot_state",
             "click", "double_click", "type_text", "press", "scroll", "focus_app",
             "run_shell", "log_action", "safe_execute", "abort",
+            "sync_knowledge", "update_knowledge", "check_protocol_health",
         }
         assert set(ACTION_TIERS.keys()) == expected
 

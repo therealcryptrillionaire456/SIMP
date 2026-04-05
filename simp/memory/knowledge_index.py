@@ -2,10 +2,12 @@
 SIMP Knowledge Index
 
 Central index mapping topics to conversations, task files, code locations,
-and decisions. Also stores agent profiles.
+and decisions. Also stores agent profiles and category-based entries for
+self-improvement persistence (improvement history, mutation memory).
 """
 
 import json
+import os
 import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -14,8 +16,18 @@ from typing import Any, Dict, List, Optional
 class KnowledgeIndex:
     """Manages the memory/index.json knowledge index."""
 
-    def __init__(self, index_path: str = "memory/index.json"):
-        self.index_path = Path(index_path)
+    def __init__(self, base_dir: Optional[str] = None, index_path: Optional[str] = None):
+        if base_dir is not None:
+            self._base_dir = base_dir
+            self.index_path = Path(os.path.join(base_dir, "index.json"))
+        elif index_path is not None:
+            self._base_dir = str(Path(index_path).parent)
+            self.index_path = Path(index_path)
+        else:
+            self._base_dir = os.path.join(
+                os.path.dirname(__file__), "..", "..", "memory"
+            )
+            self.index_path = Path(os.path.join(self._base_dir, "index.json"))
         self._lock = threading.RLock()
         self._data = self._load()
 
@@ -26,7 +38,7 @@ class KnowledgeIndex:
                 return json.loads(self.index_path.read_text())
             except (json.JSONDecodeError, OSError):
                 pass
-        return {"topics": {}, "agent_profiles": {}}
+        return {"topics": {}, "agent_profiles": {}, "categories": {}}
 
     def _save(self) -> None:
         """Persist index to disk."""
@@ -117,3 +129,33 @@ class KnowledgeIndex:
         """Return the complete index."""
         with self._lock:
             return dict(self._data)
+
+    # ── Category-based storage for self-improvement persistence ──────
+
+    def add_entry(self, category: str, data: Any) -> None:
+        """Add an entry to a category (used by improvement history, mutation memory)."""
+        with self._lock:
+            cats = self._data.setdefault("categories", {})
+            if category not in cats:
+                cats[category] = []
+            cats[category].append(data)
+            # Cap at 1000 entries per category
+            if len(cats[category]) > 1000:
+                cats[category] = cats[category][-1000:]
+            self._save()
+
+    def search(self, category: str, query: Optional[str] = None) -> List[Any]:
+        """Get entries from a category, optionally filtered by query string."""
+        with self._lock:
+            entries = self._data.get("categories", {}).get(category, [])
+            if query and isinstance(query, str):
+                entries = [
+                    e for e in entries
+                    if query.lower() in json.dumps(e, default=str).lower()
+                ]
+            return list(entries)
+
+    def get_categories(self) -> List[str]:
+        """List all categories."""
+        with self._lock:
+            return list(self._data.get("categories", {}).keys())

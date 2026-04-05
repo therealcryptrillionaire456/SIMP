@@ -1,5 +1,41 @@
 # SIMP Sprint Log
 
+## Sprint 24 — Recursive Self-Improvement Engine
+**Started:** 2026-04-05
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Close the feedback loop: persist improvement history, connect MutationMemory to StrategicOptimizer, add ProjectX knowledge sync, and complete the improve_tree handler.
+
+### Changes
+
+- **SPRINT24-KP-001: Persist Improvement History**
+  - Enhanced `KnowledgeIndex` with `add_entry()`, `search()`, `get_categories()` — JSON-file-backed category storage with 1000-entry cap per category, thread-safe, backward-compatible with existing topic/agent-profile API.
+  - Wired `StrategicOptimizer` to persist improvement iterations via KnowledgeIndex; loads history on init.
+  - Wired `MutationMemory` to persist mutation records via KnowledgeIndex; loads on init, persists after each `record_mutation()`.
+
+- **SPRINT24-KP-002: Directed Mutations**
+  - Replaced random perturbations in `_generate_alternatives()` with magnitude guided by MutationMemory success rate. Higher success → smaller mutations (converging), lower → larger (exploring). Default 0.5 when no history.
+
+- **SPRINT24-KP-003: ProjectX Knowledge Sync**
+  - Added `sync_knowledge()`, `update_knowledge()`, `check_protocol_health()` to `ProjectXComputer`.
+  - `sync_knowledge` reads SPRINT_LOG.md, README.md, COORDINATION_PROTOCOL.md, canonical intent registry, and routing policy.
+  - `update_knowledge` compares document hashes and intent counts to detect protocol changes.
+  - `check_protocol_health` validates required files exist, Python modules compile, intent registry is populated, routing policy is valid JSON.
+  - All three added to `ACTION_TIERS` as tier 0 (read-only).
+
+- **SPRINT24-KP-004: Complete handle_improve_tree Handler**
+  - Completed the stubbed handler in `KloutbotAgent` to build a baseline tree, run StrategicOptimizer iterations, and return structured results with iteration-level utility data.
+  - Added `_optimizer` (StrategicOptimizer instance) to KloutbotAgent init.
+
+- **SPRINT24-KP-005: Tests**
+  - 13 tests in `tests/test_sprint24_selfimprove.py` covering: KnowledgeIndex persistence (4), ProjectX knowledge sync (4), directed mutations/imports (2), module compilation (3).
+  - Updated `test_sprint11_projectx.py` to include new ACTION_TIERS entries.
+  - All 366 tests pass (0 regressions).
+
+---
+
 ## Sprint 23 — Gemma4 Agent Integration & Real Task Flow
 **Started:** 2026-04-05
 **Agent:** claude_cowork (implementation)
