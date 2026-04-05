@@ -1,5 +1,36 @@
 # SIMP Sprint Log
 
+## Sprint 23 — Gemma4 Agent Integration & Real Task Flow
+**Started:** 2026-04-05
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Create a Gemma4 agent adapter, wire it as a real SIMP agent, prove end-to-end task flow through the system.
+
+### Changes
+
+- **SPRINT23-KP-001: Gemma4Agent Adapter**
+  - Created `simp/agents/gemma4_agent.py` — Ollama + OpenAI-compatible API support, 8 intent types (research, planning, code_task, code_review, summarization, docs, spec, architecture).
+  - Prompt building, response generation, health reporting, graceful close.
+
+- **SPRINT23-KP-002: Agent Startup Script**
+  - Created `bin/start_gemma4_agent.py` — HTTP server wrapping Gemma4Agent, broker registration, env var config, graceful SIGINT/SIGTERM shutdown.
+
+- **SPRINT23-KP-003: End-to-End Task Flow Test**
+  - Created `tests/test_e2e_task_flow.py` — mock agent HTTP server on random port, full register→route→deliver lifecycle through real SimpBroker.
+  - Tests broker registration, async route_intent delivery, unregistered agent error handling.
+
+- **SPRINT23-KP-004: Routing Policy Update**
+  - Added `code_review` and `summarization` to `routing_policy.json`.
+  - Expanded `gemma4_local` to code_editing, scaffolding, spec, architecture, docs task types.
+
+- **SPRINT23-KP-005: Tests**
+  - 20 tests in `tests/test_e2e_task_flow.py` covering: e2e lifecycle (4), agent adapter (16 — import, creation, all prompt types, health, error handling, API formats, defaults).
+  - All 353 tests pass (0 regressions).
+
+---
+
 ## Sprint 22 — Smart Routing & Load Balancing
 **Started:** 2026-04-05
 **Agent:** claude_cowork (implementation)
