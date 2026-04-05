@@ -724,3 +724,82 @@ Wire the existing OrchestrationLoop class into the broker lifecycle so it starts
   - Tests use real BrokerConfig and SimpBroker instances
   - Tests that need async loop create and clean up their own event loop
 - Outcome: Implemented. 6 tests all passing. Tests adapted to actual OrchestrationLoop interface (self.running attribute, not self._running).
+
+---
+
+## Sprint 8 — Memory Layer Activation
+**Started:** 2026-04-05T21:00:00Z
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Activate the memory hooks system by wiring MemoryHooks into the broker lifecycle, ensure on_intent_routed hook exists, and fix datetime.utcnow() deprecation across memory and intent modules.
+
+---
+
+## Task SPRINT08-KP-001
+- Title: Wire MemoryHooks into SimpHttpServer
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [simp/server/http_server.py, simp/memory/hooks.py]
+- Created At: 2026-04-05T21:00:00Z
+- Last Updated: 2026-04-05T21:15:00Z
+- Description:
+  The MemoryHooks class existed but was never instantiated or passed to the broker.
+  SimpHttpServer already created TaskMemory, KnowledgeIndex, and ConversationArchive
+  instances but didn't create MemoryHooks or pass hooks to SimpBroker. Imported
+  MemoryHooks, created instance with existing memory components, and passed it to
+  SimpBroker via hooks= parameter. Reordered __init__ so memory components are
+  created before the broker.
+- Acceptance Criteria:
+  - MemoryHooks imported in http_server.py
+  - MemoryHooks instance created with task_memory, knowledge_index, conversation_archive
+  - Passed to SimpBroker via hooks= parameter
+  - All existing tests pass
+- Outcome: Implemented. MemoryHooks wired into broker lifecycle. Broker now fires on_task_completed and on_intent_routed hooks automatically.
+
+---
+
+## Task SPRINT08-KP-002
+- Title: Add on_intent_routed hook to MemoryHooks
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE (already existed)
+- Related Files: [simp/memory/hooks.py, simp/server/broker.py]
+- Created At: 2026-04-05T21:00:00Z
+- Last Updated: 2026-04-05T21:15:00Z
+- Description:
+  Verified that on_intent_routed already exists in MemoryHooks (hooks.py lines 50-75).
+  It uses knowledge_index.update_topic() and update_agent_profile() correctly. The
+  broker already calls self.hooks.on_intent_routed() in route_intent() (broker.py
+  lines 452-457). No code changes needed — hook was already implemented.
+- Acceptance Criteria:
+  - on_intent_routed method exists on MemoryHooks ✓
+  - Broker calls it after routing ✓
+  - Method uses correct KnowledgeIndex API (update_topic, not add_entry) ✓
+- Outcome: Already implemented. Verified correct wiring between broker and hooks.
+
+---
+
+## Task SPRINT08-KP-003
+- Title: Fix datetime.utcnow() deprecation in memory and intent modules
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [simp/memory/conversation_archive.py, simp/memory/task_memory.py, simp/memory/session_bootstrap.py, simp/intent.py]
+- Created At: 2026-04-05T21:00:00Z
+- Last Updated: 2026-04-05T21:15:00Z
+- Description:
+  Replaced all datetime.utcnow() calls with datetime.now(timezone.utc) in 4 files:
+  - conversation_archive.py: 2 occurrences (strftime and isoformat)
+  - task_memory.py: 2 occurrences (strftime in create_task and add_history_entry)
+  - session_bootstrap.py: 2 occurrences (isoformat in generate_context_pack and save_context_pack)
+  - intent.py: 1 occurrence (isoformat in Intent dataclass default_factory)
+  Added timezone to datetime imports in all files. Preserved existing format chains.
+- Acceptance Criteria:
+  - Zero occurrences of datetime.utcnow() in all 4 files
+  - timezone imported from datetime in all 4 files
+  - All existing format chains (.isoformat(), .strftime(), + "Z") preserved
+  - All files compile cleanly
+- Outcome: All 7 occurrences replaced. grep confirms zero remaining datetime.utcnow() in target files.

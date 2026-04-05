@@ -159,6 +159,16 @@
         "task-memory",
         "knowledge-index"
       ]
+    },
+    "test": {
+      "tags": [
+        "test",
+        "routed",
+        "completed"
+      ],
+      "decisions": [
+        "Task 'Test task' completed by unknown"
+      ]
     }
   },
   "agent_profiles": {
@@ -253,6 +263,9 @@
         "Requires real-time market data feeds"
       ],
       "notes": "Specialized agent for arbitrage task type."
+    },
+    "unknown": {
+      "notes": ""
     }
   },
   "agents": {

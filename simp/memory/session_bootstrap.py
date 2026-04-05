@@ -6,7 +6,7 @@ Pulls from task memory, conversation archive, knowledge index, and task ledger.
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -48,7 +48,7 @@ class SessionBootstrap:
         The pack is kept under MAX_PACK_SIZE bytes.
         """
         pack: Dict[str, Any] = {
-            "generated_at": datetime.utcnow().isoformat() + "Z",
+            "generated_at": datetime.now(timezone.utc).isoformat() + "Z",
             "params": {
                 "task_id": task_id,
                 "topic": topic,
@@ -130,7 +130,7 @@ class SessionBootstrap:
     def save_context_pack(self, pack: Dict[str, Any], pack_id: Optional[str] = None) -> str:
         """Save a context pack to disk. Returns the pack ID."""
         if not pack_id:
-            pack_id = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            pack_id = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
             params = pack.get("params", {})
             suffix = params.get("task_id") or params.get("topic") or params.get("agent_id") or "general"
             pack_id = f"{pack_id}_{suffix}"
