@@ -1,9 +1,10 @@
 """
-Kloutbot Agent: Autonomous Strategy Generation
+Kloutbot Agent: Autonomous Strategy Generation + Orchestration
 
 Wraps Q_IntentCompiler as a SIMP-compatible agent.
 Acts as GROK node in the pentagram, receiving market signals and generating
-optimal trading strategies.
+optimal trading strategies.  Also provides orchestration handlers for
+goal decomposition, status checking, and replanning.
 """
 
 import asyncio
@@ -14,6 +15,7 @@ from typing import Dict, Any, Optional, List
 from simp.agent import SimpAgent
 from simp.intent import Intent, SimpResponse
 from simp.agents.q_intent_compiler import QIntentCompiler, DecisionTree
+from simp.orchestration.task_decomposer import TaskDecomposer
 
 
 class KloutbotAgent(SimpAgent):
@@ -47,13 +49,22 @@ class KloutbotAgent(SimpAgent):
         self.strategy_history: List[DecisionTree] = []
         self.max_history = 100
 
-        # Register intent handlers
+        # Orchestration state
+        self.task_decomposer = TaskDecomposer()
+        self.goals: Dict[str, Dict[str, Any]] = {}  # goal_id -> goal state
+
+        # Register intent handlers — trading strategy
         self.register_handler("generate_strategy", self.handle_generate_strategy)
         self.register_handler("analyze_signals", self.handle_analyze_signals)
         self.register_handler("optimize_decision", self.handle_optimize_decision)
         self.register_handler("improve_tree", self.handle_improve_tree)
         self.register_handler("get_status", self.handle_get_status)
         self.register_handler("strategy_history", self.handle_strategy_history)
+
+        # Register intent handlers — orchestration
+        self.register_handler("submit_goal", self.handle_submit_goal)
+        self.register_handler("check_status", self.handle_check_status)
+        self.register_handler("replan", self.handle_replan)
 
     async def handle_generate_strategy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -279,6 +290,168 @@ class KloutbotAgent(SimpAgent):
                 "status": "error",
                 "error_message": str(e)
             }
+
+    # ------------------------------------------------------------------
+    # Orchestration Handlers
+    # ------------------------------------------------------------------
+
+    async def handle_submit_goal(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Accept a high-level goal, decompose into subtasks, and route them.
+
+        Input parameters:
+        {
+            "goal": "Build a new data pipeline",
+            "goal_type": "build",        # optional — auto-inferred if omitted
+            "constraints": {...}          # optional
+        }
+        """
+        try:
+            goal_text = params.get("goal")
+            if not goal_text:
+                return {
+                    "status": "error",
+                    "error_code": "MISSING_GOAL",
+                    "error_message": "A 'goal' parameter is required",
+                }
+
+            goal_type = params.get(
+                "goal_type",
+                self.task_decomposer.infer_goal_type(goal_text),
+            )
+            constraints = params.get("constraints", {})
+
+            subtasks = self.task_decomposer.decompose(goal_text, goal_type, constraints)
+            goal_id = subtasks[0]["goal_id"] if subtasks else str(uuid.uuid4())[:8]
+
+            # Store goal state
+            self.goals[goal_id] = {
+                "goal_id": goal_id,
+                "goal": goal_text,
+                "goal_type": goal_type,
+                "status": "in_progress",
+                "subtasks": subtasks,
+                "constraints": constraints,
+                "created_at": datetime.utcnow().isoformat(),
+            }
+
+            return {
+                "status": "success",
+                "goal_id": goal_id,
+                "goal_type": goal_type,
+                "subtask_count": len(subtasks),
+                "subtasks": subtasks,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "error_code": "GOAL_DECOMPOSITION_FAILED",
+                "error_message": str(e),
+            }
+
+    async def handle_check_status(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Check the status of a goal and its subtasks.
+
+        Input parameters:
+        {
+            "goal_id": "abc12345"
+        }
+        """
+        goal_id = params.get("goal_id")
+        if not goal_id:
+            return {
+                "status": "error",
+                "error_code": "MISSING_GOAL_ID",
+                "error_message": "A 'goal_id' parameter is required",
+            }
+
+        goal_state = self.goals.get(goal_id)
+        if not goal_state:
+            return {
+                "status": "error",
+                "error_code": "GOAL_NOT_FOUND",
+                "error_message": f"No goal found with id: {goal_id}",
+            }
+
+        subtasks = goal_state.get("subtasks", [])
+        completed = sum(1 for s in subtasks if s.get("status") == "completed")
+        failed = sum(1 for s in subtasks if s.get("status") == "failed")
+        total = len(subtasks)
+
+        overall = "completed" if completed == total else "failed" if failed > 0 else "in_progress"
+        goal_state["status"] = overall
+
+        return {
+            "status": "success",
+            "goal_id": goal_id,
+            "goal": goal_state.get("goal"),
+            "goal_status": overall,
+            "progress": {
+                "total": total,
+                "completed": completed,
+                "failed": failed,
+                "remaining": total - completed - failed,
+            },
+            "subtasks": subtasks,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+
+    async def handle_replan(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Re-evaluate and adjust the plan for a goal based on current state.
+
+        Input parameters:
+        {
+            "goal_id": "abc12345",
+            "reason": "optional reason for replanning"
+        }
+        """
+        goal_id = params.get("goal_id")
+        if not goal_id:
+            return {
+                "status": "error",
+                "error_code": "MISSING_GOAL_ID",
+                "error_message": "A 'goal_id' parameter is required",
+            }
+
+        goal_state = self.goals.get(goal_id)
+        if not goal_state:
+            return {
+                "status": "error",
+                "error_code": "GOAL_NOT_FOUND",
+                "error_message": f"No goal found with id: {goal_id}",
+            }
+
+        # Re-decompose from the current point: keep completed, regenerate remaining
+        old_subtasks = goal_state.get("subtasks", [])
+        completed_tasks = [s for s in old_subtasks if s.get("status") == "completed"]
+
+        new_subtasks = self.task_decomposer.decompose(
+            goal_state["goal"],
+            goal_state["goal_type"],
+            goal_state.get("constraints"),
+        )
+
+        # Skip task types that are already completed
+        completed_types = {s["task_type"] for s in completed_tasks}
+        remaining = [s for s in new_subtasks if s["task_type"] not in completed_types]
+
+        goal_state["subtasks"] = completed_tasks + remaining
+        goal_state["status"] = "in_progress"
+        goal_state["replanned_at"] = datetime.utcnow().isoformat()
+
+        return {
+            "status": "success",
+            "goal_id": goal_id,
+            "reason": params.get("reason", "manual replan"),
+            "kept_completed": len(completed_tasks),
+            "new_remaining": len(remaining),
+            "subtasks": goal_state["subtasks"],
+            "timestamp": datetime.utcnow().isoformat(),
+        }
 
     def _add_to_history(self, tree: DecisionTree):
         """Add strategy to history, maintaining max size"""
