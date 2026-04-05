@@ -1372,3 +1372,56 @@ All 15 sprints delivered. The SIMP protocol is production-ready with:
 - Logging, safety gate, and abort (Sprint 13)
 - SIMP integration + dashboard endpoint (Sprint 14)
 - Production readiness v0.3.0 (Sprint 15)
+- Data plane authentication & hardening (Sprint 16)
+
+---
+
+## Sprint 16 — Data Plane Authentication
+**Started:** 2026-04-05T22:45:00Z
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Lock down the open data plane. Wire API key auth, fix rate limiter XFF spoofing, fix intent record memory leaks, fix dashboard XSS.
+
+---
+
+### SPRINT16-KP-001: Wire API Key Auth Middleware
+**Status:** COMPLETE
+- Created `require_api_key` decorator in `simp/server/http_server.py` using `SimpConfig.REQUIRE_API_KEY` and `SimpConfig.API_KEYS`
+- Uses `hmac.compare_digest` for constant-time comparison against all valid keys
+- Supports both `Authorization: Bearer <key>` and `X-API-Key` header
+- Applied to data-plane routes: register, route, response, agents listing, tasks, routing policy, memory writes
+- NOT applied to /health, /status, /stats, or /control/* endpoints
+- Backward compatible: if API_KEYS is empty, allows access
+
+### SPRINT16-KP-002: Fix Rate Limiter Security
+**Status:** COMPLETE
+- Fixed X-Forwarded-For spoofing: extracted `get_client_id()` as standalone function, only trusts XFF from configurable `TRUSTED_PROXIES` set
+- Wired `cleanup_stale()` into background timer (every 60s via `threading.Timer`)
+- Added `get_bucket()` public alias for backward compat with tests
+- Trusted proxies configurable via `SIMP_TRUSTED_PROXIES` env var (default: 127.0.0.1, ::1)
+
+### SPRINT16-KP-003: Fix Memory Leaks
+**Status:** COMPLETE
+- Added `_cleanup_intent_records()` async coroutine: evicts completed/failed records older than 2x intent_timeout
+- Runs every 300s, started in `broker.start()` alongside health check loop
+- Added `MAX_INTENT_RECORDS = 10000` cap with `_evict_oldest_records()` helper
+- Eviction triggered before adding new records when cap reached
+- Handles both shared-loop and standalone-thread execution modes
+
+### SPRINT16-KP-004: Dashboard XSS Fix
+**Status:** COMPLETE
+- Added `escapeHtml()` function at top of `dashboard/static/app.js`
+- Escaped all user-controlled data in template literals: renderLogs, renderTopology, renderTaskQueue, renderOrchestration, renderComputerUse
+- Added `SecurityHeadersMiddleware` in `dashboard/server.py` (FastAPI/Starlette)
+- Headers: `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`
+
+### SPRINT16-KP-005: Tests
+**Status:** COMPLETE
+- Created `tests/test_sprint16_auth.py` with 21 tests across 5 test classes
+- `TestAPIKeyAuth` (4 tests): decorator exists, config has settings, empty keys allow access, hmac works
+- `TestRateLimiterSecurity` (5 tests): importable, token bucket, cleanup exists, cleanup works, get_client_id exists
+- `TestIntentRecordEviction` (4 tests): records exist, cleanup method, evict oldest, max constant
+- `TestDashboardXSS` (4 tests): escapeHtml in app.js, innerHTML escaped, server compiles, security headers
+- `TestAllModulesCompile` (4 tests): http_server, broker, rate_limit, config all compile

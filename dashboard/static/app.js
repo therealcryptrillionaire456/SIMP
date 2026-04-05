@@ -13,6 +13,16 @@
   const REFRESH_INTERVAL = 5000; // ms
   const API_BASE = "";           // same origin
 
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // -----------------------------------------------------------------------
   // DOM refs
   // -----------------------------------------------------------------------
@@ -278,11 +288,11 @@
                        : e.level === "warning" ? "status-badge degraded"
                        : "status-badge online";
       return `<tr>
-        <td class="mono">${ts}</td>
-        <td><span class="${levelClass}">${e.level || "info"}</span></td>
-        <td>${e.event_type || "--"}</td>
-        <td class="mono">${e.agent_id || "--"}</td>
-        <td>${e.message || "--"}</td>
+        <td class="mono">${escapeHtml(ts)}</td>
+        <td><span class="${escapeHtml(levelClass)}">${escapeHtml(e.level || "info")}</span></td>
+        <td>${escapeHtml(e.event_type || "--")}</td>
+        <td class="mono">${escapeHtml(e.agent_id || "--")}</td>
+        <td>${escapeHtml(e.message || "--")}</td>
       </tr>`;
     }).join("");
   }
@@ -305,10 +315,10 @@
                         : n.status === "degraded" ? "degraded"
                         : "offline";
       return `<div class="topology-node">
-        <span class="status-dot ${statusClass}"></span>
-        <strong>${n.agent_id || "unknown"}</strong>
-        <span class="topology-mode">${mode}</span>
-        <span class="topology-type">${n.agent_type || ""}</span>
+        <span class="status-dot ${escapeHtml(statusClass)}"></span>
+        <strong>${escapeHtml(n.agent_id || "unknown")}</strong>
+        <span class="topology-mode">${escapeHtml(mode)}</span>
+        <span class="topology-type">${escapeHtml(n.agent_type || "")}</span>
       </div>`;
     }).join("");
     container.innerHTML = html;
@@ -330,10 +340,10 @@
                         : t.status === "in_progress" ? "degraded"
                         : "offline";
       return `<tr>
-        <td class="mono">${t.task_id || "--"}</td>
-        <td>${t.task_type || "--"}</td>
-        <td><span class="status-badge ${statusClass}">${t.status || "--"}</span></td>
-        <td class="mono">${t.claimed_by || "unclaimed"}</td>
+        <td class="mono">${escapeHtml(t.task_id || "--")}</td>
+        <td>${escapeHtml(t.task_type || "--")}</td>
+        <td><span class="status-badge ${escapeHtml(statusClass)}">${escapeHtml(t.status || "--")}</span></td>
+        <td class="mono">${escapeHtml(t.claimed_by || "unclaimed")}</td>
       </tr>`;
     }).join("");
   }
@@ -703,7 +713,7 @@
       return;
     }
     const summary = data.task_summary || {};
-    const parts = Object.entries(summary).map(([k, v]) => `${k}: ${v}`).join(" · ");
+    const parts = Object.entries(summary).map(([k, v]) => `${escapeHtml(k)}: ${escapeHtml(v)}`).join(" · ");
     el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${parts || "no tasks"}</span>`;
   }
 
@@ -720,7 +730,7 @@
     }
     const tiers = data.action_tiers || {};
     const total = Object.values(tiers).reduce((sum, arr) => sum + arr.length, 0);
-    el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${total} actions available</span>`;
+    el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${escapeHtml(total)} actions available</span>`;
   }
 
   // -----------------------------------------------------------------------

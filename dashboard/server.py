@@ -23,6 +23,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -71,6 +72,17 @@ app = FastAPI(
     redoc_url=None,
     lifespan=lifespan,
 )
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

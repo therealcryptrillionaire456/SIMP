@@ -5,6 +5,7 @@ Uses a token-bucket algorithm with no external dependencies.
 Thread-safe for use with Flask's threaded mode.
 """
 
+import os
 import threading
 import time
 from collections import defaultdict
@@ -12,6 +13,13 @@ from functools import wraps
 from typing import Optional
 
 from flask import request, jsonify
+
+# Trusted proxy list — only trust X-Forwarded-For from these IPs
+TRUSTED_PROXIES = {
+    p.strip()
+    for p in os.environ.get("SIMP_TRUSTED_PROXIES", "127.0.0.1,::1").split(",")
+    if p.strip()
+}
 
 
 class TokenBucket:
@@ -43,12 +51,41 @@ class TokenBucket:
             return False
 
 
+def get_client_id(req) -> str:
+    """Get client identifier. Only trust X-Forwarded-For from trusted proxies."""
+    remote_addr = req.remote_addr or "unknown"
+
+    if remote_addr in TRUSTED_PROXIES:
+        forwarded = req.headers.get("X-Forwarded-For", "")
+        if forwarded:
+            # Take the first (client) IP
+            return forwarded.split(",")[0].strip()
+
+    return remote_addr
+
+
 class RateLimiter:
     """Per-client, per-endpoint rate limiter for Flask."""
 
     def __init__(self):
         self._buckets: dict[str, TokenBucket] = {}
         self._lock = threading.Lock()
+        self._cleanup_timer: Optional[threading.Timer] = None
+        self._start_cleanup_timer()
+
+    def _start_cleanup_timer(self):
+        """Run cleanup_stale every 60 seconds."""
+        self._cleanup_timer = threading.Timer(60.0, self._cleanup_loop)
+        self._cleanup_timer.daemon = True
+        self._cleanup_timer.start()
+
+    def _cleanup_loop(self):
+        """Periodic cleanup of stale buckets."""
+        try:
+            self.cleanup_stale()
+        except Exception:
+            pass
+        self._start_cleanup_timer()
 
     def _get_bucket(self, key: str, rate: float, capacity: int) -> TokenBucket:
         """Get or create a token bucket for a given key."""
@@ -57,13 +94,10 @@ class RateLimiter:
                 self._buckets[key] = TokenBucket(rate, capacity)
             return self._buckets[key]
 
-    def _get_client_id(self) -> str:
-        """Get client identifier from request."""
-        # Use X-Forwarded-For if behind a reverse proxy, else remote_addr
-        forwarded = request.headers.get("X-Forwarded-For", "")
-        if forwarded:
-            return forwarded.split(",")[0].strip()
-        return request.remote_addr or "unknown"
+    # Keep public alias for tests that reference get_bucket
+    def get_bucket(self, key: str, rate: float, capacity: int) -> TokenBucket:
+        """Public alias for _get_bucket."""
+        return self._get_bucket(key, rate, capacity)
 
     def limit(self, requests_per_minute: int):
         """Decorator to rate limit a Flask route handler.
@@ -77,7 +111,7 @@ class RateLimiter:
         def decorator(f):
             @wraps(f)
             def wrapper(*args, **kwargs):
-                client_id = self._get_client_id()
+                client_id = get_client_id(request)
                 endpoint = request.path
                 key = f"{client_id}:{endpoint}"
                 bucket = self._get_bucket(key, rate, capacity)
