@@ -25,6 +25,7 @@ from simp.models.failure_taxonomy import FailureHandler, FailureClass
 from simp.routing.builder_pool import BuilderPool
 from simp.server.request_guards import sanitize_agent_id
 from simp.orchestration.orchestration_loop import OrchestrationLoop
+from simp.projectx.computer import ProjectXComputer, ACTION_TIERS
 
 try:
     import httpx
@@ -139,6 +140,9 @@ class SimpBroker:
         # Orchestration loop (optional, enabled by default)
         self._orchestration_loop: Optional[OrchestrationLoop] = None
 
+        # ProjectX computer-use layer (optional)
+        self._projectx: Optional[ProjectXComputer] = None
+
         # Shutdown coordination
         self._shutdown_event = threading.Event()
 
@@ -146,6 +150,23 @@ class SimpBroker:
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
         self.logger.info(f"   Intent timeout: {self.config.intent_timeout}s")
+
+    def init_projectx(self, log_dir: Optional[str] = None, max_tier: int = 2) -> None:
+        """Initialize the ProjectX computer-use capability."""
+        try:
+            self._projectx = ProjectXComputer(
+                log_dir=log_dir or "./projectx_logs",
+                max_tier=max_tier,
+            )
+            self._log_event("projectx_initialized", "ProjectX computer-use layer initialized")
+            self.logger.info("🖥️ ProjectX computer-use layer initialized")
+        except Exception as exc:
+            self.logger.warning(f"⚠️ ProjectX initialization failed: {exc}")
+
+    @property
+    def projectx(self) -> Optional[ProjectXComputer]:
+        """Access the ProjectX computer-use layer."""
+        return self._projectx
 
     def _setup_logging(self) -> logging.Logger:
         """Setup logging for broker"""
@@ -273,6 +294,10 @@ class SimpBroker:
             assigned_agent=target_agent,
             tags=["intent", intent_type],
         )
+
+        # Handle computer_use intents via ProjectX
+        if intent_type.startswith("computer_use") and self._projectx:
+            return await self._handle_computer_use_intent(intent_data, task_id)
 
         # Validate target agent exists
         target = self.get_agent(target_agent)
@@ -583,6 +608,51 @@ class SimpBroker:
                 "error_message": f"Failed to write to inbox: {exc}",
                 "failure_class": "execution_failed",
             }
+
+    async def _handle_computer_use_intent(
+        self, intent_data: Dict[str, Any], task_id: str
+    ) -> Dict[str, Any]:
+        """Handle a computer_use intent by delegating to ProjectX."""
+        params = intent_data.get("params", {})
+        steps = params.get("steps", [])
+
+        if not steps:
+            # Design-only intent (like our design review) — no execution
+            return {
+                "status": "acknowledged",
+                "intent_type": intent_data.get("intent_type", ""),
+                "message": "Computer-use intent acknowledged (no execution steps provided)",
+                "task_id": task_id,
+            }
+
+        results = []
+        for step in steps:
+            try:
+                result = self._projectx.safe_execute(step)
+                results.append(result)
+                if not result.get("success"):
+                    break  # Stop on first failure
+            except Exception as exc:
+                results.append({
+                    "success": False,
+                    "error": str(exc),
+                    "step": step,
+                })
+                break
+
+        all_success = all(r.get("success") for r in results)
+        self.task_ledger.update_status(
+            task_id,
+            "completed" if all_success else "failed",
+        )
+
+        return {
+            "status": "completed" if all_success else "failed",
+            "task_id": task_id,
+            "steps_executed": len(results),
+            "steps_total": len(steps),
+            "results": results,
+        }
 
     # ------------------------------------------------------------------
     # Agent Health Check System

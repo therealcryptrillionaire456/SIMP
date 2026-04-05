@@ -1294,3 +1294,35 @@ Implement the 3 remaining cross-tier methods (`log_action`, `safe_execute`, `abo
 - `TestLogAction` (4 tests): JSONL file creation, append behavior, timestamp format, pre/post state summaries
 - `TestSafeExecute` (7 tests): unknown action rejection, tier gating, Tier 0 execution, shell execution, logging on every call, failed validation logging, duration tracking
 - `TestAbort` (3 tests): raises TaskAbortError, logs before raising, reason propagation
+
+---
+
+## Sprint 14 — Tests + SIMP Integration
+**Started:** 2026-04-05
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Wire `ProjectXComputer` into the SIMP broker as a registered capability, add `computer_use` intent type to intent routing, and create a dashboard endpoint for computer-use status.
+
+### SPRINT14-KP-001: Register ProjectX as a broker capability
+**Status:** COMPLETE
+- Added `ProjectXComputer` and `ACTION_TIERS` imports to `simp/server/broker.py`
+- Added `self._projectx: Optional[ProjectXComputer] = None` attribute in `SimpBroker.__init__`
+- Added `init_projectx(log_dir, max_tier)` method with error handling and event logging
+- Added `projectx` property for external access
+- Added `computer_use` intent routing in `route_intent` — delegates to `_handle_computer_use_intent`
+- Added `_handle_computer_use_intent` async method: executes steps sequentially, stops on first failure, updates task ledger
+
+### SPRINT14-KP-002: Add /api/computer-use dashboard endpoint
+**Status:** COMPLETE
+- Added `GET /api/computer-use` endpoint to `dashboard/server.py` returning action tier breakdown
+- Added `renderComputerUse()` function to `dashboard/static/app.js` with active/unavailable status display
+- Added Computer Use (ProjectX) section to `dashboard/static/index.html` after Orchestration section
+- Wired into the fetch cycle in `refreshAll()`
+
+### SPRINT14-KP-003: Add Sprint 14 integration tests
+**Status:** COMPLETE
+- Created `tests/test_sprint14_integration.py` with 8 tests across 3 test classes
+- `TestBrokerProjectXIntegration` (5 tests): attribute existence, init_projectx, event logging, safe_execute via broker, unknown action rejection
+- `TestComputerUseIntentType` (2 tests): ACTION_TIERS importable, all tiers assigned valid integers
+- `TestDashboardEndpoint` (1 test): dashboard server.py compiles without errors
