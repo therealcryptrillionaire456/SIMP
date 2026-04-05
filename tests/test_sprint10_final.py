@@ -51,10 +51,10 @@ class TestProductionReadiness:
             if os.path.exists(path):
                 py_compile.compile(path, doraise=True)
 
-    def test_version_is_0_2(self):
+    def test_version_is_current(self):
         with open(os.path.join(os.path.dirname(__file__), "..", "setup.py")) as f:
             content = f.read()
-        assert '0.2.0' in content
+        assert '0.3.0' in content
 
     def test_no_dead_scaffolds(self):
         """No dead scaffold files should remain."""

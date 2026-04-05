@@ -86,7 +86,7 @@ app.add_middleware(
 activity_buffer: deque[dict] = deque(maxlen=ACTIVITY_BUFFER_SIZE)
 _last_snapshot: dict[str, Any] = {}
 _started_at = datetime.now(timezone.utc).isoformat()
-DASHBOARD_VERSION = "1.2.0"  # bumped for Sprint 10
+DASHBOARD_VERSION = "1.3.0"  # bumped for Sprint 15
 
 # ---------------------------------------------------------------------------
 # Helpers
