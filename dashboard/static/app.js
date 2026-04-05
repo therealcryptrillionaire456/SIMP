@@ -82,21 +82,24 @@
     setBrokerReachable(data.status);
     dom.valBrokerStatus.textContent = data.status || "--";
     dom.valBrokerStatus.className = "card-value status-" + statusClass(data.status);
-    dom.valBrokerState.textContent = data.state || "--";
+    // Broker returns paused/bullbear_watcher instead of a single "state" string
+    const state = data.state || (data.paused ? "Paused" : "Running");
+    dom.valBrokerState.textContent = state;
     dom.valAgentsOnline.textContent = data.agents_online ?? "--";
     dom.valPending.textContent = data.pending_intents ?? "--";
   }
 
   function renderStats(data) {
     if (!data || data.status === "unreachable") return;
-    const broker = data.broker || {};
-    const stats = broker.stats || {};
+    // Handle both nested {broker:{stats:{...}}} and flat structures
+    const broker = data.broker || data;
+    const stats = broker.stats || broker;
     dom.valReceived.textContent = stats.intents_received ?? "--";
     dom.valRouted.textContent = stats.intents_routed ?? "--";
     dom.valFailed.textContent = stats.intents_failed ?? "--";
 
     const avg = stats.avg_route_time_ms;
-    dom.valAvgRoute.textContent = avg != null ? avg.toFixed(1) + " ms" : "--";
+    dom.valAvgRoute.textContent = avg != null ? Number(avg).toFixed(1) + " ms" : "--";
 
     // Update cards that may also appear in stats
     if (stats.agents_online != null) {
@@ -130,26 +133,28 @@
       dom.agentsTbody.innerHTML = '<tr><td colspan="8" class="empty-row">Broker unreachable</td></tr>';
       return;
     }
-    const agents = data.agents || {};
-    const keys = Object.keys(agents);
-    if (keys.length === 0) {
+    // Broker returns {"agents": [list of agent objects]}
+    let agents = data.agents || [];
+    // Defensive: if agents is a dict (legacy), convert to array
+    if (!Array.isArray(agents)) {
+      agents = Object.values(agents);
+    }
+    if (agents.length === 0) {
       dom.agentsTbody.innerHTML = '<tr><td colspan="8" class="empty-row">No agents registered</td></tr>';
       return;
     }
 
-    // Sort alphabetically
-    keys.sort();
+    // Sort by agent_id alphabetically
+    agents.sort((a, b) => (a.agent_id || "").localeCompare(b.agent_id || ""));
     let html = "";
-    for (const id of keys) {
-      const a = agents[id];
-      const meta = a.metadata || {};
+    for (const a of agents) {
       const mode = detectMode(a.endpoint);
-      const caps = meta.capabilities || [];
+      const caps = a.capabilities || [];
       const status = a.status || "unknown";
 
       html += "<tr>";
-      html += td(mono(escHtml(a.agent_id || id)));
-      html += td(escHtml(meta.name || a.agent_type || id));
+      html += td(mono(escHtml(a.agent_id || "--")));
+      html += td(escHtml(a.name || a.agent_id || "--"));
       html += td(modeBadge(mode));
       html += td(statusBadge(status));
       html += td(caps.map(capPill).join(" ") || '<span class="text-muted">none</span>');
@@ -254,7 +259,7 @@
   function statusClass(status) {
     if (!status) return "unknown";
     const s = status.toLowerCase();
-    if (s === "healthy" || s === "online" || s === "running") return "healthy";
+    if (s === "healthy" || s === "online" || s === "running" || s === "ok" || s === "active") return "healthy";
     if (s === "degraded" || s === "paused") return "degraded";
     if (s === "error" || s === "unreachable" || s === "stopped") return "error";
     return "unknown";
