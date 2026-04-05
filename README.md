@@ -1,409 +1,139 @@
-# SIMP: Standardized Inter-agent Message Protocol
+# SIMP — System for Inter-Agent Market Planning
 
-[![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
-[![Tests Passing](https://img.shields.io/badge/tests-17%2F17%20passing-brightgreen)](tests/)
-[![Throughput](https://img.shields.io/badge/throughput-48k%2B%20intents%2Fsec-brightgreen)](#performance)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)]()
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)]()
+[![License](https://img.shields.io/badge/license-MIT-green)]()
 
-> **The missing infrastructure layer for AI agents.**
->
-> SIMP is to autonomous agents what **HTTP is to the web** — a standardized protocol that enables multiple AI systems to communicate reliably, at scale.
-
----
-
-## Problem: The Agent Communication Crisis
-
-The AI industry is at an inflection point. Multi-agent systems are moving from research to production. But there's a critical gap:
-
-**There is no standard for how AI agents should communicate.**
-
-Today's reality:
-- ❌ Each company builds their own agent communication layer
-- ❌ Agents can't interoperate across platforms
-- ❌ No audit trails or observability
-- ❌ No compliance framework
-- ❌ Massive duplication of effort
-- ❌ Locked-in to proprietary ecosystems
-
-**This is 1995 all over again** — before HTTP standardized web communication, every site had to build its own protocol.
-
----
-
-## Solution: SIMP Protocol
-
-SIMP provides a **standardized, observable, scalable infrastructure for agent-to-agent communication.**
-
-```
-┌──────────────┐         ┌──────────────┐
-│  Vision AI   │         │  Reasoning   │
-│   Agent      │         │   Agent      │
-└──────┬───────┘         └──────┬───────┘
-       │                        │
-       └────────────┬───────────┘
-                    │
-              ┌─────▼─────┐
-              │   SIMP    │
-              │  Broker   │
-              └─────┬─────┘
-                    │
-       ┌────────────┼───────────┐
-       │            │           │
-┌──────▼──────┐ ┌──▼──────┐ ┌──▼──────┐
-│  Pattern    │ │ Vector  │ │ Trust   │
-│ Recognition │ │Embedding│ │Validation│
-└─────────────┘ └─────────┘ └─────────┘
-```
-
-What SIMP does:
-
-- **✅ Standardized Intent Format** — All agents speak the same language
-- **✅ Automatic Routing** — Broker finds the right agent, sends the message
-- **✅ Observable** — Complete audit trail of every agent interaction
-- **✅ Auditable** — Every intent, response, and error is recorded
-- **✅ Scalable** — From 5 agents on your laptop to millions globally
-- **✅ Fault-Tolerant** — Handles failures, retries, timeouts gracefully
-- **✅ Vendor-Neutral** — Works with any AI framework or model
-
----
-
-## Why SIMP Matters
-
-### For AI Developers
-Stop building communication infrastructure. Start building intelligence.
-
-```python
-# Instead of this (building custom protocols):
-# 50 lines of socket code, error handling, serialization, etc.
-
-# You get this (with SIMP):
-from simp.server.agent_client import SimpAgentClient
-
-client = SimpAgentClient()
-client.send_intent(target="reasoning", intent_type="analyze", payload=data)
-response = client.wait_for_response()
-```
-
-### For Enterprises
-Deploy agents that work together reliably. No more vendor lock-in.
-
-- Mix agents from different vendors
-- Full compliance trail (SOC 2, HIPAA, etc.)
-- Cost optimization (use best-of-breed, not locked in)
-- Cross-organization collaboration
-
-### For Infrastructure Providers
-New market category. High-margin opportunity. Strategic asset.
-
-- Run as managed service (SaaS model)
-- Enterprise support and compliance
-- Integration with cloud platforms (AWS, Azure, GCP)
-
----
-
-## Quick Start (5 Minutes)
-
-### Installation
-
-```bash
-# Clone the repo
-git clone https://github.com/your-username/simp.git
-cd simp
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Start the Server
-
-```bash
-python3 bin/start_server.py
-```
-
-Output:
-```
-╔════════════════════════════════════════════════════════════════╗
-║              SIMP Protocol Server v0.1                         ║
-║          Standardized Inter-agent Message Protocol             ║
-╚════════════════════════════════════════════════════════════════╝
-
-📡 Starting SIMP Server...
-   Host: 127.0.0.1
-   Port: 5555
-
-🎯 Available Endpoints:
-   GET    http://127.0.0.1:5555/health
-   GET    http://127.0.0.1:5555/agents
-   POST   http://127.0.0.1:5555/intents/route
-   GET    http://127.0.0.1:5555/stats
-
-✅ Server ready. Press Ctrl+C to stop.
-```
-
-### Test It
-
-In another terminal:
-
-```bash
-# Check health
-curl http://127.0.0.1:5555/health
-
-# Register an agent
-curl -X POST http://127.0.0.1:5555/agents/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent_id": "vision:001",
-    "agent_type": "vision",
-    "endpoint": "localhost:5001"
-  }'
-
-# Route an intent
-curl -X POST http://127.0.0.1:5555/intents/route \
-  -H "Content-Type: application/json" \
-  -d '{
-    "intent_id": "test:001",
-    "source_agent": "external",
-    "target_agent": "vision:001",
-    "intent_type": "analyze_image",
-    "payload": {"image_url": "https://example.com/image.jpg"}
-  }'
-
-# Get statistics
-curl http://127.0.0.1:5555/stats
-```
-
-### Run Tests
-
-Validate the entire protocol:
-
-```bash
-python3 bin/test_protocol.py
-```
-
-Expected output:
-```
-✅ SIMP Protocol Validation Complete
-
-📋 Test Summary:
-   ✅ Agent registration: PASSED
-   ✅ Intent routing: PASSED
-   ✅ Multi-agent communication: PASSED
-   ✅ Pentagram flow: PASSED
-   ✅ Response handling: PASSED
-   ✅ Error handling: PASSED
-   ✅ Statistics: PASSED
-   ✅ Health check: PASSED
-
-🎯 Conclusion: SIMP protocol is fully functional as an inter-agent
-   communication framework. All 17 test scenarios passing.
-```
-
----
+A production-grade protocol for AI agent-to-agent communication. SIMP acts as a central coordination and routing layer for multi-agent systems.
 
 ## Architecture
 
-### Intent Lifecycle
-
 ```
-1. CREATE
-   ┌─────────────────────────────┐
-   │ Client creates intent with  │
-   │ source, target, type        │
-   └──────────────┬──────────────┘
-                  │
-2. SUBMIT
-   ┌──────────────▼──────────────┐
-   │ POST /intents/route         │
-   │ Broker receives intent      │
-   └──────────────┬──────────────┘
-                  │
-3. VALIDATE & ROUTE
-   ┌──────────────▼──────────────┐
-   │ - Validate schema           │
-   │ - Look up target agent      │
-   │ - Record intent status      │
-   └──────────────┬──────────────┘
-                  │
-4. EXECUTE
-   ┌──────────────▼──────────────┐
-   │ Target agent processes      │
-   │ Executes handler            │
-   │ Generates response          │
-   └──────────────┬──────────────┘
-                  │
-5. RECORD & RESPOND
-   ┌──────────────▼──────────────┐
-   │ Broker receives response    │
-   │ Records execution time      │
-   │ Updates statistics          │
-   └──────────────┬──────────────┘
-                  │
-6. RETRIEVE
-   └─────────────────────────────┘
-   GET /intents/<intent_id>
-   Returns full transaction record
+┌──────────────────────────────────────────────────────┐
+│                    SIMP Broker (:5555)                │
+│  ┌────────────┐  ┌──────────┐  ┌──────────────────┐ │
+│  │ Rate Limit │  │ Auth     │  │ Request Guards   │ │
+│  │ (token     │  │ (bearer  │  │ (sanitize IDs,   │ │
+│  │  bucket)   │  │  token)  │  │  validate JSON)  │ │
+│  └────────────┘  └──────────┘  └──────────────────┘ │
+│  ┌────────────┐  ┌──────────┐  ┌──────────────────┐ │
+│  │ Intent     │  │ Event    │  │ Orchestration    │ │
+│  │ Router     │  │ Log Ring │  │ Loop             │ │
+│  │            │  │ Buffer   │  │                  │ │
+│  └────────────┘  └──────────┘  └──────────────────┘ │
+│  ┌────────────┐  ┌──────────┐  ┌──────────────────┐ │
+│  │ Task       │  │ Memory   │  │ Builder Pool     │ │
+│  │ Ledger     │  │ Hooks    │  │ + Routing Policy │ │
+│  └────────────┘  └──────────┘  └──────────────────┘ │
+└──────────────────────────────────────────────────────┘
+         │                    │
+    ┌────┴────┐         ┌────┴────┐
+    │ HTTP    │         │ File    │
+    │ Agents  │         │ Agents  │
+    ├─────────┤         ├─────────┤
+    │ router  │         │ bullbear│
+    │ kloutbot│         │ kashclaw│
+    │ pplx    │         │ quantum │
+    │ claude  │         │         │
+    └─────────┘         └─────────┘
+
+┌──────────────────────────────────────────────────────┐
+│             Dashboard (:8050) — GET-only             │
+│  Public-safe read-only monitoring with redaction     │
+│  Agents · Tasks · Logs · Topology · Memory · Stats   │
+└──────────────────────────────────────────────────────┘
 ```
 
-### Core Components
+## Features
 
-| Component | Purpose | Status |
-|-----------|---------|--------|
-| **Broker** (`simp/server/broker.py`) | Central message router | ✅ Production |
-| **HTTP Server** (`simp/server/http_server.py`) | REST API wrapper | ✅ Production |
-| **Agent Client** (`simp/server/agent_client.py`) | Agent-side library | ✅ Production |
-| **Agent Manager** (`simp/server/agent_manager.py`) | Process lifecycle | ✅ Production |
-| **Protocol** (`simp/protocol.py`) | Schema definitions | ✅ Production |
+- **Intent-based routing** — Agents communicate via typed intents with source/target/params
+- **7 registered agents** — HTTP-based and file-based delivery modes
+- **Structured event logging** — Ring buffer with queryable JSON events
+- **Rate limiting** — Token-bucket per-endpoint rate control
+- **Authentication** — Bearer token auth on control endpoints
+- **Request validation** — Input sanitization, size limits, path traversal protection
+- **Graceful shutdown** — Drain in-flight intents, stop background tasks
+- **Task ledger** — JSONL-backed task persistence with failure taxonomy
+- **Memory layer** — Conversation archive, task memory, knowledge index
+- **Orchestration loop** — Autonomous task queue processing
+- **Routing policy** — JSON-configurable agent routing with fallback rules
+- **Public dashboard** — Safe for reverse proxy exposure, redacts secrets
 
----
+## Quickstart
 
-## Performance
+```bash
+# Clone and install
+git clone https://github.com/therealcryptrillionaire456/SIMP.git
+cd SIMP
+pip install -r requirements.txt  # or: pip install -e .
 
-### Throughput
-- **Single Intent:** 0.06ms latency
-- **Bulk (10 intents):** 0.21ms total (47,619 intents/sec)
-- **Sustained:** 48,000+ intents/second on single laptop
+# Start the broker
+python3.10 -m simp.server.http_server
 
-### Scalability
-- **Agents:** Tested with 5, scalable to millions
-- **Concurrency:** Thread-safe for 100+ concurrent requests
-- **Memory:** ~2MB per agent baseline
-- **CPU:** Linear scaling with intent volume
+# Start the dashboard (separate terminal)
+python3.10 dashboard/server.py
 
-### Reliability
-- **Test Coverage:** 17 comprehensive scenarios, all passing
-- **Error Handling:** Comprehensive error capture and reporting
-- **Retry Logic:** Configurable retry policies
-- **Observability:** Real-time metrics and health checks
+# Run tests
+python3.10 -m pytest tests/ -q
+```
 
----
+## Test Suites
 
-## Key Features
+| Suite | Tests | What it covers |
+|-------|-------|----------------|
+| test_request_guards | 26 | Input validation, sanitization |
+| test_kashclaw_integration | 23 | Trading agent integration |
+| test_sprint5_audit | 19 | Security findings verification |
+| test_protocol_validation | 17 | Intent routing, schema compliance |
+| test_sprint8_memory | 10 | Memory layer, datetime deprecation |
+| test_sprint2_hardening | 10 | Rate limiting, auth, path safety |
+| test_sprint4_shutdown | 9 | Graceful shutdown, cleanup |
+| test_sprint3_observability | 9 | Structured logging, ring buffer |
+| test_sprint10_final | 7 | Production readiness verification |
+| test_sprint7_orchestration | 6 | Orchestration loop integration |
+| test_intent_schema | 6 | Coordination intent schemas |
+| test_sprint9_protocol | 4 | Protocol cleanup, module compilation |
+| test_intent | 4 | Core intent/crypto/agent |
 
-### 🔍 Observable
-Every agent interaction is recorded with:
-- Intent sent (what, when, who)
-- Response received (result, time)
-- Errors captured (what went wrong)
-- Metrics tracked (latency, throughput)
+## Security
 
-**Compliance ready** — Audit trail for SOC 2, HIPAA, etc.
+All endpoints validated. Dashboard is GET-only with sensitive field redaction.
 
-### 🔒 Secure
-- Thread-safe concurrent access
-- Cryptographic agent verification (ed25519)
-- Configurable access control
-- Request validation and sanitization
+| Protection | Implementation |
+|-----------|----------------|
+| Input validation | `request_guards.py` — sanitize IDs, validate JSON |
+| Rate limiting | Token-bucket per endpoint (no external deps) |
+| Auth | Bearer token on `/control/*` and `DELETE /agents` |
+| Request size | Flask `MAX_CONTENT_LENGTH = 64KB` |
+| Path traversal | Sanitized agent IDs in file-based delivery |
+| CORS | Configurable origins via `DASHBOARD_CORS_ORIGINS` |
+| Secret redaction | Dashboard strips API keys, tokens, file paths |
 
-### ⚡ Fast
-- Sub-millisecond routing latency
-- 48,000+ intents/second throughput
-- Optimized for production workloads
+## Configuration
 
-### 📈 Scalable
-- Horizontal scaling (add more brokers)
-- Vertical scaling (add more agents to broker)
-- Cloud-ready architecture
-- Kubernetes deployment ready
+| Env Var | Default | Description |
+|---------|---------|-------------|
+| `SIMP_CONTROL_TOKEN` | (unset) | Bearer token for control endpoints |
+| `SIMP_BROKER_URL` | `http://127.0.0.1:5555` | Broker URL for dashboard |
+| `DASHBOARD_CORS_ORIGINS` | `*` | Comma-separated CORS origins |
+| `DASHBOARD_HOST` | `0.0.0.0` | Dashboard bind host |
+| `DASHBOARD_PORT` | `8050` | Dashboard bind port |
 
-### 🛠️ Developer-Friendly
-- Simple Python API
-- Clear documentation with examples
-- Active community and support
-- Easy integration with existing systems
+## Sprint History
 
-### 🧠 Advanced Decision Engine (Optional)
-SIMP includes an optional **StrategicOptimizer** module for domains requiring sophisticated multi-criteria decision analysis:
-- Minimax game-theory optimization
-- Fractal decision tree analysis
-- Multi-level strategic reasoning
-- Confidence scoring and risk assessment
-
-This is useful for trading systems, resource allocation, scheduling, and other optimization domains.
-
----
-
-## Project Status
-
-| Phase | Status | Timeline |
-|-------|--------|----------|
-| Core Protocol | ✅ Complete | Complete |
-| Testing Suite | ✅ Complete | 17/17 passing |
-| Documentation | ✅ Complete | Full API docs |
-| HTTP Server | ✅ Complete | Production-ready |
-| Agent Client | ✅ Complete | Python SDK ready |
-| **Open Source Release** | 🚀 **Live** | **Now** |
-| Community Examples | 📋 In Progress | Month 1 |
-| Managed Cloud Platform | 📋 Planned | Month 2-3 |
-| Enterprise Certifications | 📋 Planned | Month 3-6 |
-
----
-
-## Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
+| Sprint | Focus | Status |
+|--------|-------|--------|
+| 1 | Input validation, broken validation.py fix | Done |
+| 2 | Rate limiting, control auth, path safety | Done |
+| 3 | Event loop refactor, structured logging, /logs | Done |
+| 4 | Graceful shutdown, datetime fix, dead code removal | Done |
+| 5 | CORS config, dashboard health, final audit | Done |
+| 6 | Dashboard feature completion (logs, topology, queue) | Done |
+| 7 | Orchestration loop integration | Done |
+| 8 | Memory layer activation | Done |
+| 9 | Protocol cleanup, Pydantic v2 migration | Done |
+| 10 | Production readiness, README, version bump | Done |
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-## Community
-
-- **Discord:** Join our community (link coming soon)
-- **GitHub Issues:** Report bugs
-- **GitHub Discussions:** Ask questions
-
----
-
-## The Vision
-
-SIMP aims to do for AI agents what **HTTP did for the web** — create a universal standard that enables innovation at the application layer while providing reliability at the infrastructure layer.
-
----
-
-**⭐ If you find SIMP useful, please star! It helps with discovery.**
-
-Built with ❤️ by developers, for developers.
-- ✅ Works with Python 3.9+
-
-## Installation
-
-```bash
-pip install -r requirements.txt
-```
-
-## Running Examples
-
-```bash
-python examples/simple_agent.py
-```
-
-## Running Tests
-
-```bash
-pytest tests/ -v
-```
-
-## Status
-
-**v0.1-alpha** - Core protocol working, examples functional, tests passing
-
-## License
-
-Apache License 2.0 - See LICENSE file
-
-## Contributing
-
-See CONTRIBUTING.md
-
----
-
-**Built with determination. Designed for scale. Open for everyone.**
-
-*For Kasey. For the Horsemen. For the dreams.* 🐴✨
+MIT
