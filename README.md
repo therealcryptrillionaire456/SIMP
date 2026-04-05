@@ -136,6 +136,19 @@ pc = ProjectXComputer(log_dir="./projectx_logs", max_tier=2)
 result = pc.safe_execute({"action": "run_shell", "params": {"command": "echo hello"}})
 ```
 
+## Production Deployment
+
+For production, use gunicorn instead of the Flask dev server:
+
+```bash
+python3.10 bin/start_production.py --workers 4 --port 8080 --host 0.0.0.0
+```
+
+Or with environment variables:
+```bash
+SIMP_HTTP_HOST=0.0.0.0 SIMP_HTTP_PORT=8080 python3.10 bin/start_production.py
+```
+
 ## Configuration
 
 | Env Var | Default | Description |

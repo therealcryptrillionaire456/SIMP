@@ -1521,3 +1521,47 @@ Make the broker handle 100+ agents without degradation. Concurrent health checks
 - `TestIntentQueueWorker` (4 tests): queue exists, worker method exists, queue_depth in stats, depth reflects items
 - `TestAllModulesCompile` (1 test): broker.py compiles without errors
 - Full regression: 273 tests pass
+
+## Sprint 19 — Production Server & Orchestration Fixes
+**Started:** 2026-04-05
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Replace Flask dev server with production WSGI (gunicorn), fix orchestration duplicate task bug, wire goal subtasks into TaskLedger, enforce task dependency ordering.
+
+---
+
+### SPRINT19-KP-001: Production WSGI Server
+**Status:** COMPLETE
+- Added `gunicorn>=21.2.0` to requirements.txt
+- Created `bin/start_production.py` launcher script with CLI args (--workers, --port, --host, --timeout)
+- Added `create_app()` factory function to `http_server.py` for gunicorn compatibility
+- Added "Production Deployment" section to README.md
+
+### SPRINT19-KP-002: Fix Orchestration Duplicate Tasks
+**Status:** COMPLETE
+- In `broker.route_intent()`, added check for existing task_id before creating a new task in the ledger
+- Checks both `intent_data["task_id"]` and `intent_data["params"]["task_id"]` for reuse
+- Modified `orchestration_loop.py` to forward `task_id` at the top level of intent_data so the broker can find and reuse existing tasks
+
+### SPRINT19-KP-003: Wire Goal Subtasks into TaskLedger
+**Status:** COMPLETE
+- Updated `kloutbot_agent.handle_submit_goal()` to return subtasks in broker-compatible format with `status: "decomposed"`
+- Updated `broker.record_response()` to detect decomposed responses and call `task_ledger.decompose_task()` to persist subtasks
+
+### SPRINT19-KP-004: Enforce Task Dependency Ordering
+**Status:** COMPLETE
+- "blocked" was already in VALID_STATUSES in task_ledger.py
+- Updated `decompose_task()` so subtasks with order > 0 start as "blocked", order 0 starts as "queued"
+- Added `_check_unblock_siblings()` to auto-unblock subtasks when predecessor tasks complete
+- Integrated unblock check into `complete_task()`
+- Added dependency enforcement in orchestration loop's `run_once()` — checks predecessor completion before assigning subtasks
+
+### SPRINT19-KP-005: Tests
+**Status:** COMPLETE
+- Created `tests/test_sprint19_production.py` with 15 tests across 5 test classes
+- `TestProductionServer` (4 tests): script exists, compiles, create_app factory, gunicorn in requirements
+- `TestOrchestrationDuplicateFix` (2 tests): get_task lookup, no-duplicate verification
+- `TestTaskDependencyOrdering` (5 tests): blocked status exists, subtask ordering, blocked initial status, unblock on predecessor complete, complete_task
+- `TestModulesCompile` (4 tests): http_server, broker, orchestration_loop, task_ledger all compile
+- Full regression: 288 tests pass
