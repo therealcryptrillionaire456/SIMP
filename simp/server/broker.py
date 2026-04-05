@@ -79,10 +79,18 @@ class SimpBroker:
     """
 
     def __init__(self, config: Optional[BrokerConfig] = None,
-                 task_ledger: Optional[TaskLedger] = None):
-        """Initialize SIMP Broker"""
+                 task_ledger: Optional[TaskLedger] = None,
+                 hooks: Optional[Any] = None):
+        """Initialize SIMP Broker
+
+        Args:
+            config: Broker configuration.
+            task_ledger: Optional TaskLedger instance.
+            hooks: Optional MemoryHooks instance for event-driven memory updates.
+        """
         self.config = config or BrokerConfig()
         self.state = BrokerState.INITIALIZING
+        self.hooks = hooks
         self.logger = self._setup_logging()
 
         # Agent registry
@@ -393,7 +401,7 @@ class SimpBroker:
                 failure_class=delivery_result.get("failure_class", "execution_failed"),
             )
 
-        return {
+        route_result = {
             "status": "routed",
             "intent_id": intent_id,
             "target_agent": target_agent,
@@ -404,6 +412,15 @@ class SimpBroker:
             "fallback_agent": delivery_result.get("fallback_agent"),
             "timestamp": datetime.utcnow().isoformat(),
         }
+
+        # Fire memory hook after routing
+        if self.hooks:
+            try:
+                self.hooks.on_intent_routed(intent_data, route_result)
+            except Exception:
+                self.logger.debug("Memory hook on_intent_routed failed", exc_info=True)
+
+        return route_result
 
     async def _deliver_http(
         self, endpoint: str, intent_data: Dict[str, Any], intent_id: str
@@ -607,6 +624,18 @@ class SimpBroker:
                 f"📥 Response recorded: {intent_id} "
                 f"({execution_time_ms:.1f}ms)"
             )
+
+            # Fire memory hook on task completion
+            if self.hooks:
+                try:
+                    self.hooks.on_task_completed({
+                        "intent_id": intent_id,
+                        "title": f"Intent {record.intent_type}",
+                        "task_type": record.intent_type,
+                        "assigned_agent": record.target_agent,
+                    })
+                except Exception:
+                    self.logger.debug("Memory hook on_task_completed failed", exc_info=True)
 
             return True
 

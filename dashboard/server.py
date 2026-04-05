@@ -443,6 +443,38 @@ async def api_routing():
 
 
 # ---------------------------------------------------------------------------
+# Memory Layer proxy endpoints (GET-only, safe for public exposure)
+# ---------------------------------------------------------------------------
+
+@app.get("/api/memory/tasks")
+async def api_memory_tasks():
+    """Task memory files from the memory layer."""
+    data = await _broker_get("/memory/tasks")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "tasks": [],
+            "count": 0,
+        }
+    return _redact(data)
+
+
+@app.get("/api/memory/conversations")
+async def api_memory_conversations():
+    """Conversation archive from the memory layer."""
+    data = await _broker_get("/memory/conversations")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "conversations": [],
+            "count": 0,
+        }
+    return _redact(data)
+
+
+# ---------------------------------------------------------------------------
 # Static frontend
 # ---------------------------------------------------------------------------
 

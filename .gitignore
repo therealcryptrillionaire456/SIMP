@@ -36,6 +36,10 @@ data/task_ledger.jsonl
 data/inboxes/*
 !data/inboxes/.gitkeep
 
+# Memory context packs (generated, not tracked)
+memory/context_packs/*.json
+!memory/context_packs/.gitkeep
+
 # Claude/MCP local config
 .claude/
 .mcp.json

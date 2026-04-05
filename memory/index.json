@@ -1,0 +1,361 @@
+{
+  "topics": {
+    "dashboard": {
+      "task_files": [
+        "dashboard"
+      ],
+      "code_locations": [
+        "dashboard/server.py",
+        "dashboard/static/app.js",
+        "dashboard/static/index.html",
+        "dashboard/static/style.css"
+      ],
+      "decisions": [
+        "FastAPI backend with vanilla JS frontend",
+        "All endpoints GET-only for public safety",
+        "Sensitive data redacted before exposure",
+        "Dark theme with auto-refresh every 5 seconds"
+      ],
+      "tags": [
+        "dashboard",
+        "monitoring",
+        "fastapi",
+        "frontend"
+      ]
+    },
+    "transport": {
+      "task_files": [
+        "transport"
+      ],
+      "code_locations": [
+        "simp/server/broker.py",
+        "simp/server/agent_http_client.py",
+        "simp/server/agent_server.py"
+      ],
+      "decisions": [
+        "httpx for async HTTP delivery",
+        "File-based inbox as fallback",
+        "Health checks every 30 seconds",
+        "Delivery timeout 30s default"
+      ],
+      "tags": [
+        "transport",
+        "http",
+        "delivery",
+        "httpx",
+        "inbox"
+      ]
+    },
+    "orchestration": {
+      "task_files": [
+        "orchestration"
+      ],
+      "code_locations": [
+        "simp/orchestration/task_decomposer.py",
+        "simp/orchestration/orchestration_loop.py",
+        "simp/agents/kloutbot_agent.py"
+      ],
+      "decisions": [
+        "Task decomposition in Kloutbot, not broker",
+        "Orchestration loop polls for subtask completion",
+        "Failed subtasks trigger re-planning"
+      ],
+      "tags": [
+        "orchestration",
+        "kloutbot",
+        "task-decomposition",
+        "multi-agent"
+      ]
+    },
+    "task-ledger": {
+      "task_files": [
+        "task-ledger"
+      ],
+      "code_locations": [
+        "simp/task_ledger.py",
+        "simp/models/failure_taxonomy.py"
+      ],
+      "decisions": [
+        "JSONL for append-only persistence",
+        "Claim/lock semantics prevent duplicate processing",
+        "Priority levels: critical, high, normal, low",
+        "Failure taxonomy with 6 classes"
+      ],
+      "tags": [
+        "task-ledger",
+        "persistence",
+        "jsonl",
+        "priority",
+        "failure-taxonomy"
+      ]
+    },
+    "routing": {
+      "task_files": [
+        "builder-pool"
+      ],
+      "code_locations": [
+        "simp/routing/builder_pool.py",
+        "simp/routing/routing_policy.json",
+        "simp/models/failure_taxonomy.py"
+      ],
+      "decisions": [
+        "Three-tier pool: primary/secondary/support",
+        "Task-type routing with ordered agent lists",
+        "Fallback rules per failure class",
+        "Dynamic capacity tracking"
+      ],
+      "tags": [
+        "routing",
+        "builder-pool",
+        "fallback",
+        "capacity"
+      ]
+    },
+    "broker": {
+      "task_files": [],
+      "code_locations": [
+        "simp/server/broker.py",
+        "simp/server/http_server.py"
+      ],
+      "decisions": [
+        "Thread-safe with RLocks for agents, intents, stats",
+        "Flask REST API wrapper for broker",
+        "Supports both HTTP and file-based agent communication"
+      ],
+      "tags": [
+        "broker",
+        "flask",
+        "api",
+        "thread-safe"
+      ]
+    },
+    "memory-layer": {
+      "task_files": [
+        "dashboard",
+        "transport",
+        "orchestration",
+        "task-ledger",
+        "builder-pool"
+      ],
+      "code_locations": [
+        "simp/memory/__init__.py",
+        "simp/memory/conversation_archive.py",
+        "simp/memory/task_memory.py",
+        "simp/memory/knowledge_index.py",
+        "simp/memory/session_bootstrap.py",
+        "simp/memory/hooks.py"
+      ],
+      "decisions": [
+        "JSON-based conversation archive",
+        "Markdown-based task memory with standard template",
+        "Central knowledge index in index.json",
+        "Context packs under 10KB for session bootstrap",
+        "Event-driven hooks for automatic memory updates"
+      ],
+      "tags": [
+        "memory",
+        "context",
+        "conversations",
+        "task-memory",
+        "knowledge-index"
+      ]
+    }
+  },
+  "agent_profiles": {
+    "kloutbot": {
+      "role": "Orchestrator and task coordinator",
+      "strengths": [
+        "Task decomposition and planning",
+        "Multi-agent coordination",
+        "Orchestration loop management"
+      ],
+      "limitations": [
+        "Cannot execute code directly",
+        "Depends on other agents for implementation"
+      ],
+      "notes": "Primary orchestration agent. Decomposes complex tasks into subtasks and dispatches to appropriate builders."
+    },
+    "claude_cowork": {
+      "role": "Primary code builder and implementation agent",
+      "strengths": [
+        "Code generation and editing",
+        "Architecture design",
+        "Test writing",
+        "Documentation"
+      ],
+      "limitations": [
+        "No real-time data access",
+        "No direct market data"
+      ],
+      "notes": "Primary builder in the pool. Handles code_task, code_editing, planning, scaffolding, test_harness, spec, architecture, docs."
+    },
+    "perplexity_research": {
+      "role": "Research and analysis agent",
+      "strengths": [
+        "Web research and information gathering",
+        "Market analysis support",
+        "Documentation and spec writing",
+        "Architecture review"
+      ],
+      "limitations": [
+        "Cannot execute code",
+        "Research may be time-bounded"
+      ],
+      "notes": "Secondary builder in the pool. Handles research, market_analysis, spec, architecture, docs."
+    },
+    "gemma4_local": {
+      "role": "Local inference support agent",
+      "strengths": [
+        "Fast local inference",
+        "No API cost",
+        "Privacy-preserving processing"
+      ],
+      "limitations": [
+        "Smaller context window",
+        "Less capable than cloud models for complex tasks"
+      ],
+      "notes": "Support agent in the pool. Used for lightweight tasks and local processing."
+    },
+    "kashclaw": {
+      "role": "Trading execution agent",
+      "strengths": [
+        "Trade execution on supported exchanges",
+        "Order management",
+        "Position tracking"
+      ],
+      "limitations": [
+        "Only handles trade_execution tasks",
+        "Requires API credentials for exchanges"
+      ],
+      "notes": "Specialized agent for trade_execution tasks. Not in the general builder pool."
+    },
+    "bullbear_predictor": {
+      "role": "Market prediction and signal agent",
+      "strengths": [
+        "Market analysis and prediction signals",
+        "Technical indicator computation",
+        "Trend detection"
+      ],
+      "limitations": [
+        "Predictions are probabilistic, not guaranteed",
+        "Only handles market_analysis and prediction_signal tasks"
+      ],
+      "notes": "Specialized agent for market_analysis and prediction_signal tasks."
+    },
+    "quantumarb": {
+      "role": "Arbitrage detection and execution agent",
+      "strengths": [
+        "Cross-exchange arbitrage detection",
+        "Fast execution for time-sensitive opportunities"
+      ],
+      "limitations": [
+        "Only handles arbitrage tasks",
+        "Requires real-time market data feeds"
+      ],
+      "notes": "Specialized agent for arbitrage task type."
+    }
+  },
+  "agents": {
+    "bullbear_predictor": {
+      "role": "Macro prediction engine",
+      "mode": "file-based",
+      "strengths": [
+        "prediction_signal",
+        "market_analysis",
+        "no_trade_gate"
+      ],
+      "limitations": [
+        "File-based only \u2014 cannot receive HTTP intents directly"
+      ],
+      "notes": "Adversarial bull/bear signal generator forked from MiroFish. Outputs signals to ~/bullbear/signals/output/"
+    },
+    "simp_router": {
+      "role": "Protocol broker and message router",
+      "mode": "http",
+      "strengths": [
+        "intent_routing",
+        "agent_registry",
+        "broadcast"
+      ],
+      "limitations": [
+        "Not a task executor \u2014 routes only"
+      ],
+      "notes": "Central SIMP broker on port 5555"
+    },
+    "kashclaw": {
+      "role": "Trading execution agent",
+      "mode": "file-based",
+      "strengths": [
+        "trade_execution",
+        "dry_run",
+        "position_sizing"
+      ],
+      "limitations": [
+        "File-based only \u2014 polls inbox for intents"
+      ],
+      "notes": "Handles spot, margin, arb, scalping, hedging, algorithmic organ types"
+    },
+    "kloutbot": {
+      "role": "Orchestration brain and task foreman",
+      "mode": "http",
+      "strengths": [
+        "orchestration",
+        "coordination",
+        "mcp_bridge",
+        "task_decomposition",
+        "goal_planning"
+      ],
+      "limitations": [
+        "Strategy generation quality depends on signal inputs"
+      ],
+      "notes": "Upgraded to handle submit_goal, check_status, replan. Port 8765."
+    },
+    "perplexity_research": {
+      "role": "Research and specification agent",
+      "mode": "http",
+      "strengths": [
+        "research",
+        "web_search",
+        "market_intelligence",
+        "spec_writing",
+        "schema_design"
+      ],
+      "limitations": [
+        "Cannot execute code directly"
+      ],
+      "notes": "Secondary builder for specs, docs, architecture. Port 8766."
+    },
+    "quantumarb": {
+      "role": "Arbitrage detection agent",
+      "mode": "file-based",
+      "strengths": [
+        "arbitrage",
+        "cross_venue",
+        "latency_arbitrage"
+      ],
+      "limitations": [
+        "File-based, analysis-only mode currently"
+      ],
+      "notes": "Deployed with analysis-only agent.py"
+    },
+    "claude_cowork": {
+      "role": "Primary code builder",
+      "mode": "http",
+      "strengths": [
+        "code_task",
+        "planning",
+        "coordination",
+        "code_editing",
+        "status_check",
+        "capability_query",
+        "scaffolding",
+        "test_harness"
+      ],
+      "limitations": [
+        "Rate limited \u2014 capacity varies"
+      ],
+      "notes": "Best for implementation, refactoring, test writing. Port 8767. Primary builder in pool."
+    }
+  },
+  "updated_at": "2026-04-05T14:30:00Z"
+}
