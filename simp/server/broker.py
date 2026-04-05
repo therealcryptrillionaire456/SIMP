@@ -162,6 +162,9 @@ class SimpBroker:
         # ProjectX computer-use layer (optional)
         self._projectx: Optional[ProjectXComputer] = None
 
+        # HTTP connection pool (initialized in start(), closed in stop())
+        self._http_pool: Optional["httpx.AsyncClient"] = None
+
         # Shutdown coordination
         self._shutdown_event = threading.Event()
 
@@ -243,6 +246,7 @@ class SimpBroker:
                 "intents_received": 0,
                 "intents_completed": 0,
                 "status": "online",
+                "health_check_failures": 0,
             }
 
             with self.stats_lock:
@@ -548,8 +552,11 @@ class SimpBroker:
         timeout = self.config.delivery_timeout
 
         try:
-            async with httpx.AsyncClient(timeout=timeout) as client:
-                resp = await client.post(url, json=intent_data)
+            if self._http_pool:
+                resp = await self._http_pool.post(url, json=intent_data)
+            else:
+                async with httpx.AsyncClient(timeout=timeout) as client:
+                    resp = await client.post(url, json=intent_data)
 
             if resp.status_code == 200:
                 try:
@@ -708,7 +715,11 @@ class SimpBroker:
     # ------------------------------------------------------------------
 
     async def _check_agent_health(self, agent_id: str) -> bool:
-        """Ping an HTTP agent's health endpoint."""
+        """Ping an HTTP agent's health endpoint.
+
+        Uses the shared ``_http_pool`` when available, falling back to a
+        one-shot client otherwise.
+        """
         agent = self.get_agent(agent_id)
         if not agent:
             return False
@@ -721,47 +732,100 @@ class SimpBroker:
             return True  # Can't check without httpx, assume healthy
 
         try:
-            async with httpx.AsyncClient(
-                timeout=self.config.health_check_timeout
-            ) as client:
-                resp = await client.get(f"{endpoint.rstrip('/')}/health")
-            healthy = resp.status_code == 200
-            with self.agent_lock:
-                if agent_id in self.agents:
-                    self.agents[agent_id]["status"] = "online" if healthy else "degraded"
-                    self.agents[agent_id]["last_seen"] = _utcnow_iso()
-            if self.builder_pool:
-                self.builder_pool.report_capacity(
-                    agent_id, "available" if healthy else "busy"
-                )
-            return healthy
+            url = f"{endpoint.rstrip('/')}/health"
+            if self._http_pool:
+                resp = await self._http_pool.get(url)
+            else:
+                async with httpx.AsyncClient(
+                    timeout=self.config.health_check_timeout
+                ) as client:
+                    resp = await client.get(url)
+
+            if resp.status_code == 200:
+                with self.agent_lock:
+                    if agent_id in self.agents:
+                        self.agents[agent_id]["status"] = "online"
+                        self.agents[agent_id]["last_seen"] = _utcnow_iso()
+                        self.agents[agent_id]["health_check_failures"] = 0
+                if self.builder_pool:
+                    self.builder_pool.report_capacity(agent_id, "available")
+                return True
+            else:
+                await self._record_health_failure(agent_id)
+                return False
         except Exception:
-            with self.agent_lock:
-                if agent_id in self.agents:
-                    self.agents[agent_id]["status"] = "unreachable"
-            if self.builder_pool:
-                self.builder_pool.report_capacity(agent_id, "offline")
+            await self._record_health_failure(agent_id)
             return False
 
+    async def _record_health_failure(self, agent_id: str) -> None:
+        """Record a health check failure. Auto-deregister after threshold."""
+        threshold = 3
+        with self.agent_lock:
+            if agent_id not in self.agents:
+                return
+            self.agents[agent_id]["health_check_failures"] = (
+                self.agents[agent_id].get("health_check_failures", 0) + 1
+            )
+            failures = self.agents[agent_id]["health_check_failures"]
+            self.agents[agent_id]["status"] = "unreachable"
+
+        if self.builder_pool:
+            self.builder_pool.report_capacity(agent_id, "offline")
+
+        if failures >= threshold:
+            self.logger.warning(
+                f"Agent '{agent_id}' failed {failures} consecutive health checks — auto-deregistering"
+            )
+            self._log_event(
+                "agent_auto_deregistered",
+                f"Agent '{agent_id}' auto-deregistered after {failures} health check failures",
+                agent_id=agent_id,
+            )
+            with self.agent_lock:
+                self.agents.pop(agent_id, None)
+            with self.stats_lock:
+                self.stats["agents_registered"] = max(
+                    0, self.stats.get("agents_registered", 0) - 1
+                )
+
+    async def _bounded_health_check(
+        self, semaphore: asyncio.Semaphore, agent_id: str, agent_info: Dict[str, Any]
+    ) -> None:
+        """Health check with semaphore-bounded concurrency."""
+        async with semaphore:
+            endpoint = agent_info.get("endpoint", "")
+            if not endpoint or not endpoint.startswith("http"):
+                return
+            old_status = agent_info.get("status")
+            healthy = await self._check_agent_health(agent_id)
+            new_status = "online" if healthy else "unreachable"
+            if old_status != new_status:
+                self.logger.info(
+                    f"🏥 Agent health changed: {agent_id} "
+                    f"{old_status} → {new_status}"
+                )
+                self._log_event(
+                    "health_change",
+                    f"Agent {agent_id} health: {old_status} → {new_status}",
+                    agent_id=agent_id,
+                )
+
     async def _health_check_loop(self) -> None:
-        """Background loop that checks all HTTP agents periodically."""
+        """Check all agent health concurrently with bounded parallelism."""
+        semaphore = asyncio.Semaphore(20)  # Max 20 concurrent checks
+
         while self.state == BrokerState.RUNNING and not self._shutdown_event.is_set():
-            agents_snapshot = self.list_agents()
-            for agent_id, agent_info in agents_snapshot.items():
-                endpoint = agent_info.get("endpoint", "")
-                if endpoint and endpoint.startswith("http"):
-                    old_status = agent_info.get("status")
-                    healthy = await self._check_agent_health(agent_id)
-                    new_status = "online" if healthy else "unreachable"
-                    if old_status != new_status:
-                        self.logger.info(
-                            f"🏥 Agent health changed: {agent_id} "
-                            f"{old_status} → {new_status}"
-                        )
-                        self._log_event(
-                            "health_change", f"Agent {agent_id} health: {old_status} → {new_status}",
-                            agent_id=agent_id,
-                        )
+            try:
+                agents_snapshot = list(self.agents.items())
+                if agents_snapshot:
+                    tasks = [
+                        self._bounded_health_check(semaphore, agent_id, agent_info)
+                        for agent_id, agent_info in agents_snapshot
+                    ]
+                    await asyncio.gather(*tasks, return_exceptions=True)
+            except Exception as exc:
+                self.logger.error(f"Health check loop error: {exc}")
+
             # Check shutdown event more frequently than the full interval
             for _ in range(int(self.config.health_check_interval)):
                 if self._shutdown_event.is_set():
@@ -981,6 +1045,9 @@ class SimpBroker:
                 if r.status == "pending"
             )
 
+        # Queue depth
+        stats["queue_depth"] = self.intent_queue.qsize()
+
         # Calculate averages
         if stats["intents_completed"] > 0:
             stats["avg_route_time_ms"] = (
@@ -1007,6 +1074,15 @@ class SimpBroker:
             async_loop: Optional shared event loop for scheduling background tasks.
         """
         self.state = BrokerState.RUNNING
+
+        # Initialize shared HTTP connection pool
+        if _HTTPX_AVAILABLE and self._http_pool is None:
+            self._http_pool = httpx.AsyncClient(
+                timeout=httpx.Timeout(self.config.delivery_timeout, connect=5.0),
+                limits=httpx.Limits(max_connections=100, max_keepalive_connections=20),
+                follow_redirects=False,
+            )
+
         self.start_health_checks(loop=async_loop)
 
         # Start intent record cleanup coroutine
@@ -1041,7 +1117,37 @@ class SimpBroker:
         except Exception as exc:
             self.logger.warning(f"⚠️ Orchestration loop failed to start: {exc}")
 
+        # Start intent queue workers (additive — does not alter inline route_intent)
+        worker_count = 4
+        if async_loop:
+            for _ in range(worker_count):
+                asyncio.run_coroutine_threadsafe(self._intent_queue_worker(), async_loop)
+        self.logger.info(f"📬 Intent queue workers started ({worker_count})")
+
         self.logger.info("✅ SIMP Broker RUNNING")
+
+    async def _intent_queue_worker(self) -> None:
+        """Worker that processes intents from the queue (additive path)."""
+        while self.state == BrokerState.RUNNING and not self._shutdown_event.is_set():
+            try:
+                try:
+                    intent_data = self.intent_queue.get_nowait()
+                except queue.Empty:
+                    await asyncio.sleep(0.1)
+                    continue
+                try:
+                    await self.route_intent(intent_data)
+                except Exception as exc:
+                    self.logger.error(f"Intent queue worker error: {exc}")
+            except Exception as exc:
+                self.logger.error(f"Intent queue worker fatal: {exc}")
+                await asyncio.sleep(1)
+
+    async def _close_http_pool(self) -> None:
+        """Close the shared HTTP connection pool."""
+        if self._http_pool:
+            await self._http_pool.aclose()
+            self._http_pool = None
 
     def stop(self) -> None:
         """Gracefully stop the broker.
@@ -1063,6 +1169,18 @@ class SimpBroker:
             self._health_thread.join(timeout=5)
             if self._health_thread.is_alive():
                 self.logger.warning("⚠️ Health check thread did not stop within 5s")
+
+        # Close HTTP connection pool
+        if self._http_pool:
+            try:
+                import asyncio as _aio
+                loop = _aio.get_event_loop()
+                if loop.is_running():
+                    _aio.ensure_future(self._close_http_pool())
+                else:
+                    loop.run_until_complete(self._close_http_pool())
+            except Exception:
+                self._http_pool = None
 
         # Stop orchestration loop
         if self._orchestration_loop:
