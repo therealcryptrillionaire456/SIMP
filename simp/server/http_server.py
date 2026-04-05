@@ -13,6 +13,11 @@ from threading import Thread
 import time
 
 from simp.server.broker import SimpBroker, BrokerConfig
+from simp.server.request_guards import (
+    validate_intent_payload,
+    validate_registration_payload,
+    sanitize_agent_id,
+)
 from simp.memory.conversation_archive import ConversationArchive
 from simp.memory.task_memory import TaskMemory
 from simp.memory.knowledge_index import KnowledgeIndex
@@ -76,21 +81,24 @@ class SimpHttpServer:
         @self.app.route("/agents/register", methods=["POST"])
         def register_agent():
             """Register a new agent"""
-            data = request.get_json() or {}
+            data = request.get_json(force=False, silent=True) or {}
 
-            agent_id = data.get("agent_id")
-            agent_type = data.get("agent_type")
-            endpoint = data.get("endpoint")
-            metadata = data.get("metadata", {})
-
-            if not all([agent_id, agent_type, endpoint]):
+            # Validate registration payload
+            ok, err = validate_registration_payload(data)
+            if not ok:
                 return (
                     jsonify({
                         "status": "error",
-                        "error": "Missing required fields: agent_id, agent_type, endpoint"
+                        "error_code": "VALIDATION_FAILED",
+                        "error": err,
                     }),
                     400,
                 )
+
+            agent_id = data["agent_id"]
+            agent_type = data["agent_type"]
+            endpoint = data["endpoint"]
+            metadata = data.get("metadata", {})
 
             success = self.broker.register_agent(agent_id, agent_type, endpoint, metadata)
 
@@ -125,6 +133,13 @@ class SimpHttpServer:
         @self.app.route("/agents/<agent_id>", methods=["GET"])
         def get_agent(agent_id):
             """Get agent details"""
+            ok, err = sanitize_agent_id(agent_id)
+            if not ok:
+                return jsonify({
+                    "status": "error",
+                    "error_code": "VALIDATION_FAILED",
+                    "error": f"Invalid agent_id: {err}",
+                }), 400
             agent = self.broker.get_agent(agent_id)
             if agent:
                 return jsonify({"status": "success", "agent": agent}), 200
@@ -137,6 +152,13 @@ class SimpHttpServer:
         @self.app.route("/agents/<agent_id>", methods=["DELETE"])
         def deregister_agent(agent_id):
             """Deregister an agent"""
+            ok, err = sanitize_agent_id(agent_id)
+            if not ok:
+                return jsonify({
+                    "status": "error",
+                    "error_code": "VALIDATION_FAILED",
+                    "error": f"Invalid agent_id: {err}",
+                }), 400
             success = self.broker.deregister_agent(agent_id)
             if success:
                 return jsonify({
@@ -154,14 +176,16 @@ class SimpHttpServer:
             """Route an intent to a target agent"""
             import asyncio
 
-            data = request.get_json() or {}
+            data = request.get_json(force=False, silent=True) or {}
 
-            # Validate intent
-            if "target_agent" not in data:
+            # Validate intent payload
+            ok, err = validate_intent_payload(data)
+            if not ok:
                 return (
                     jsonify({
                         "status": "error",
-                        "error": "Missing required field: target_agent"
+                        "error_code": "VALIDATION_FAILED",
+                        "error": err,
                     }),
                     400,
                 )
