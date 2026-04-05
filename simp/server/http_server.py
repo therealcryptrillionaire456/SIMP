@@ -18,6 +18,8 @@ from simp.server.request_guards import (
     validate_registration_payload,
     sanitize_agent_id,
 )
+from simp.server.rate_limit import RateLimiter
+from simp.server.control_auth import require_control_auth
 from simp.memory.conversation_archive import ConversationArchive
 from simp.memory.task_memory import TaskMemory
 from simp.memory.knowledge_index import KnowledgeIndex
@@ -39,6 +41,10 @@ class SimpHttpServer:
     def __init__(self, broker_config: Optional[BrokerConfig] = None, debug: bool = False):
         """Initialize HTTP server"""
         self.app = Flask("SIMP")
+        # Limit request body to 64KB to prevent memory exhaustion
+        self.app.config["MAX_CONTENT_LENGTH"] = 64 * 1024  # 64 KB
+        # Rate limiter
+        self.limiter = RateLimiter()
         self.broker = SimpBroker(broker_config or BrokerConfig())
         self.debug = debug
 
@@ -79,6 +85,7 @@ class SimpHttpServer:
             return jsonify(self.broker.health_check()), 200
 
         @self.app.route("/agents/register", methods=["POST"])
+        @self.limiter.limit(10)
         def register_agent():
             """Register a new agent"""
             data = request.get_json(force=False, silent=True) or {}
@@ -150,6 +157,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/agents/<agent_id>", methods=["DELETE"])
+        @require_control_auth
         def deregister_agent(agent_id):
             """Deregister an agent"""
             ok, err = sanitize_agent_id(agent_id)
@@ -172,6 +180,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/intents/route", methods=["POST"])
+        @self.limiter.limit(60)
         def route_intent():
             """Route an intent to a target agent"""
             import asyncio
@@ -212,6 +221,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/intents/<intent_id>/response", methods=["POST"])
+        @self.limiter.limit(60)
         def record_response(intent_id):
             """Record response to an intent"""
             data = request.get_json() or {}
@@ -235,6 +245,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/intents/<intent_id>/error", methods=["POST"])
+        @self.limiter.limit(60)
         def record_error(intent_id):
             """Record error for an intent"""
             data = request.get_json() or {}
@@ -275,6 +286,8 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/control/start", methods=["POST"])
+        @self.limiter.limit(5)
+        @require_control_auth
         def start_broker():
             """Start the broker"""
             self.broker.start()
@@ -284,6 +297,8 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/control/stop", methods=["POST"])
+        @self.limiter.limit(5)
+        @require_control_auth
         def stop_broker():
             """Stop the broker"""
             self.broker.stop()
@@ -381,6 +396,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/memory/conversations", methods=["POST"])
+        @self.limiter.limit(30)
         def save_conversation():
             """Save a new conversation record."""
             data = request.get_json() or {}

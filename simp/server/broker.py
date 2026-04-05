@@ -22,6 +22,7 @@ import time
 from simp.task_ledger import TaskLedger
 from simp.models.failure_taxonomy import FailureHandler, FailureClass
 from simp.routing.builder_pool import BuilderPool
+from simp.server.request_guards import sanitize_agent_id
 
 try:
     import httpx
@@ -508,7 +509,29 @@ class SimpBroker:
         self, agent_id: str, intent_data: Dict[str, Any], intent_id: str
     ) -> Dict[str, Any]:
         """Deliver an intent by writing it to the agent's inbox directory."""
+        # Validate agent_id to prevent path traversal
+        ok, err = sanitize_agent_id(agent_id)
+        if not ok:
+            self.logger.error(f"❌ Inbox delivery blocked — invalid agent_id: {err}")
+            return {
+                "delivery_status": "failed",
+                "error_code": "INVALID_AGENT_ID",
+                "error_message": f"agent_id failed validation: {err}",
+                "failure_class": "policy_denied",
+            }
+
         inbox_dir = Path(self.config.inbox_base_dir) / agent_id
+        # Resolve and verify the path stays within the inbox base
+        resolved = inbox_dir.resolve()
+        base_resolved = Path(self.config.inbox_base_dir).resolve()
+        if not str(resolved).startswith(str(base_resolved)):
+            self.logger.error(f"❌ Inbox path escape detected: {resolved}")
+            return {
+                "delivery_status": "failed",
+                "error_code": "PATH_ESCAPE",
+                "error_message": "Inbox path resolves outside base directory",
+                "failure_class": "policy_denied",
+            }
         try:
             inbox_dir.mkdir(parents=True, exist_ok=True)
             intent_file = inbox_dir / f"{intent_id}.json"
