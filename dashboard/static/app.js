@@ -708,12 +708,28 @@
   }
 
   // -----------------------------------------------------------------------
+  // Render: Computer Use (ProjectX)
+  // -----------------------------------------------------------------------
+
+  function renderComputerUse(data) {
+    const el = document.getElementById("computer-use-status");
+    if (!el) return;
+    if (!data || !data.projectx_available) {
+      el.innerHTML = '<span class="status-badge offline">Unavailable</span>';
+      return;
+    }
+    const tiers = data.action_tiers || {};
+    const total = Object.values(tiers).reduce((sum, arr) => sum + arr.length, 0);
+    el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${total} actions available</span>`;
+  }
+
+  // -----------------------------------------------------------------------
   // Main refresh cycle
   // -----------------------------------------------------------------------
 
   async function refreshAll() {
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData] = await Promise.all([
+    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -727,6 +743,7 @@
       apiFetch("/api/topology"),
       apiFetch("/api/tasks/queue"),
       apiFetch("/api/orchestration"),
+      apiFetch("/api/computer-use"),
     ]);
 
     renderHealth(health);
@@ -744,6 +761,7 @@
     renderTopology(topologyData);
     renderTaskQueue(taskQueueData);
     renderOrchestration(orchestrationData);
+    renderComputerUse(computerUseData);
 
     // Capture dashboard start time from health response
     if (!dashboardStartedAt && health && health.dashboard_started_at) {

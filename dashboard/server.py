@@ -499,6 +499,27 @@ async def api_orchestration():
     }
 
 
+@app.get("/api/computer-use")
+async def api_computer_use():
+    """ProjectX computer-use status."""
+    stats = await _broker_get("/stats")
+    if stats is None:
+        return {
+            "status": "unreachable",
+            "projectx_available": False,
+        }
+    return {
+        "status": "success",
+        "projectx_available": True,
+        "action_tiers": {
+            "tier_0_observation": ["get_screenshot", "get_active_window", "ocr_screen", "snapshot_state"],
+            "tier_1_gui": ["click", "double_click", "type_text", "press", "scroll", "focus_app"],
+            "tier_2_shell": ["run_shell"],
+            "tier_3_restricted": [],
+        },
+    }
+
+
 @app.get("/api/logs")
 async def api_logs(limit: int = 100):
     """Structured broker event logs."""
