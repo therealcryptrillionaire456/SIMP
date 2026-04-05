@@ -803,3 +803,74 @@ Activate the memory hooks system by wiring MemoryHooks into the broker lifecycle
   - All existing format chains (.isoformat(), .strftime(), + "Z") preserved
   - All files compile cleanly
 - Outcome: All 7 occurrences replaced. grep confirms zero remaining datetime.utcnow() in target files.
+
+---
+
+## Sprint 9 — Protocol Cleanup & Test Coverage
+**Started:** 2026-04-05T22:00:00Z
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Fix broken test imports in tests/security/test_intent_schema.py, migrate config to Pydantic v2 if applicable, and add protocol cleanup tests to ensure all modules compile and import cleanly.
+
+---
+
+## Task SPRINT09-KP-001
+- Title: Fix tests/security/test_intent_schema.py to use actual schema classes
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [tests/security/test_intent_schema.py, simp/models/intent_schema.py]
+- Created At: 2026-04-05T22:00:00Z
+- Last Updated: 2026-04-05T22:15:00Z
+- Description:
+  The test file imported IntentRequest and parse_intent_request from
+  simp.models.intent_schema, but those names never existed. The module exports
+  IntentSchema and SIMPIntent. Rewrote the test file to import the actual classes
+  and validate schema construction, required fields, optional description, and
+  SIMPIntent collection behavior.
+- Acceptance Criteria:
+  - tests/security/test_intent_schema.py imports IntentSchema and SIMPIntent (actual names)
+  - 6 tests covering valid construction, required fields, optional description, collection
+  - python3 -m py_compile tests/security/test_intent_schema.py passes
+  - python3 -m pytest tests/security/ -v passes
+- Outcome: Rewrote test file with 6 tests using actual IntentSchema and SIMPIntent classes. All tests pass.
+
+---
+
+## Task SPRINT09-KP-002
+- Title: Migrate config/config.py to Pydantic v2 syntax
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: N/A — config/config.py not in repo
+- Related Files: []
+- Created At: 2026-04-05T22:00:00Z
+- Last Updated: 2026-04-05T22:15:00Z
+- Description:
+  The config/config.py file does not exist in the repository. The only config file
+  is simp/config.py which uses plain Python classes (not Pydantic BaseSettings),
+  so no Pydantic v2 migration is needed.
+- Acceptance Criteria: N/A
+- Outcome: Skipped — config/config.py does not exist. simp/config.py is plain Python, not Pydantic-based.
+
+---
+
+## Task SPRINT09-KP-003
+- Title: Add protocol cleanup tests in tests/test_sprint9_protocol.py
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [tests/test_sprint9_protocol.py]
+- Created At: 2026-04-05T22:00:00Z
+- Last Updated: 2026-04-05T22:15:00Z
+- Description:
+  Created tests/test_sprint9_protocol.py with 3 test classes:
+  - TestIntentSchemaModule: verifies import and py_compile of intent_schema.py
+  - TestSecurityTestsPass: verifies tests/security/test_intent_schema.py imports without error
+  - TestConfigCompiles: verifies config/config.py compiles (skips if not present)
+- Acceptance Criteria:
+  - tests/test_sprint9_protocol.py exists with 3 test classes
+  - All tests pass (TestConfigCompiles skips since config/config.py absent)
+  - python3 -m pytest tests/test_sprint9_protocol.py -v passes
+- Outcome: Created protocol test suite. 3/4 tests pass, 1 skipped (config not present).
