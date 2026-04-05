@@ -1,0 +1,32 @@
+{
+  "builder_pool": {
+    "primary": "claude_cowork",
+    "secondary": "perplexity_research",
+    "support": ["gemma4_local", "kloutbot"]
+  },
+  "task_routing": {
+    "code_task": ["claude_cowork", "perplexity_research"],
+    "code_editing": ["claude_cowork"],
+    "planning": ["claude_cowork", "perplexity_research", "kloutbot"],
+    "research": ["perplexity_research"],
+    "market_analysis": ["bullbear_predictor", "perplexity_research"],
+    "trade_execution": ["kashclaw"],
+    "orchestration": ["kloutbot"],
+    "scaffolding": ["claude_cowork", "perplexity_research"],
+    "test_harness": ["claude_cowork"],
+    "prediction_signal": ["bullbear_predictor"],
+    "arbitrage": ["quantumarb"],
+    "spec": ["perplexity_research", "claude_cowork"],
+    "architecture": ["perplexity_research", "claude_cowork"],
+    "docs": ["perplexity_research", "claude_cowork"]
+  },
+  "fallback_rules": {
+    "rate_limited": "next_in_pool",
+    "agent_unavailable": "next_in_pool",
+    "timeout": "retry_then_fallback",
+    "execution_failed": "retry_then_fallback",
+    "schema_invalid": "fail_immediately",
+    "policy_denied": "escalate"
+  },
+  "capacity_check_interval_seconds": 30
+}

@@ -16,6 +16,10 @@ import uuid
 import queue
 import threading
 
+from simp.task_ledger import TaskLedger
+from simp.models.failure_taxonomy import FailureHandler, FailureClass
+from simp.routing.builder_pool import BuilderPool
+
 
 class BrokerState(str, Enum):
     """Broker operational states"""
@@ -61,7 +65,8 @@ class SimpBroker:
     Manages agent registration, intent routing, and response handling.
     """
 
-    def __init__(self, config: Optional[BrokerConfig] = None):
+    def __init__(self, config: Optional[BrokerConfig] = None,
+                 task_ledger: Optional[TaskLedger] = None):
         """Initialize SIMP Broker"""
         self.config = config or BrokerConfig()
         self.state = BrokerState.INITIALIZING
@@ -77,6 +82,15 @@ class SimpBroker:
             maxsize=self.config.max_pending_intents
         )
         self.intent_lock = threading.RLock()
+
+        # Task ledger, failure handler, and builder pool
+        self.task_ledger = task_ledger or TaskLedger()
+        self.failure_handler = FailureHandler()
+        try:
+            self.builder_pool = BuilderPool()
+        except FileNotFoundError:
+            self.builder_pool = None
+            self.logger.warning("Routing policy not found — builder pool disabled")
 
         # Statistics
         self.stats = {
@@ -202,33 +216,65 @@ class SimpBroker:
         with self.stats_lock:
             self.stats["intents_received"] += 1
 
+        # Log to task ledger
+        task_id = self.task_ledger.create_task(
+            title=f"Intent: {intent_type}",
+            description=f"Route intent {intent_id} from {source_agent} to {target_agent or 'unknown'}",
+            task_type=self._map_intent_to_task_type(intent_type),
+            assigned_agent=target_agent,
+            tags=["intent", intent_type],
+        )
+
         # Validate target agent exists
         target = self.get_agent(target_agent)
         if not target:
             error_msg = f"Target agent '{target_agent}' not found"
             self.logger.warning(f"❌ {error_msg}")
 
-            with self.intent_lock:
-                record = IntentRecord(
-                    intent_id=intent_id,
-                    source_agent=source_agent,
-                    target_agent=target_agent or "unknown",
-                    intent_type=intent_type,
-                    timestamp=datetime.utcnow().isoformat(),
-                    status="failed",
-                    error=error_msg,
-                )
-                self.intent_records[intent_id] = record
-
-            with self.stats_lock:
-                self.stats["intents_failed"] += 1
-
-            return {
+            error_resp = {
                 "status": "error",
                 "error_code": "AGENT_NOT_FOUND",
                 "error_message": error_msg,
                 "intent_id": intent_id,
             }
+
+            # Classify failure and apply policy
+            fc = self.failure_handler.classify_failure(error_resp)
+            self.task_ledger.fail_task(task_id, error=error_resp, failure_class=fc.value)
+            policy = self.failure_handler.get_retry_policy(fc)
+
+            # Try fallback agent if policy allows
+            if policy.get("should_retry") and self.builder_pool:
+                fallback = self.failure_handler.get_fallback_agent(
+                    fc, intent_type, self.builder_pool, exclude=[target_agent or ""]
+                )
+                if fallback and self.get_agent(fallback):
+                    self.logger.info(f"🔄 Falling back to agent: {fallback}")
+                    target_agent = fallback
+                    target = self.get_agent(fallback)
+                    self.task_ledger.update_status(task_id, "queued")
+
+            if not target:
+                with self.intent_lock:
+                    record = IntentRecord(
+                        intent_id=intent_id,
+                        source_agent=source_agent,
+                        target_agent=target_agent or "unknown",
+                        intent_type=intent_type,
+                        timestamp=datetime.utcnow().isoformat(),
+                        status="failed",
+                        error=error_msg,
+                    )
+                    self.intent_records[intent_id] = record
+
+                with self.stats_lock:
+                    self.stats["intents_failed"] += 1
+
+                return error_resp
+
+        # Claim task in ledger
+        self.task_ledger.claim_task(task_id, target_agent)
+        self.task_ledger.update_status(task_id, "in_progress")
 
         # Record intent
         with self.intent_lock:
@@ -256,6 +302,7 @@ class SimpBroker:
             "status": "routed",
             "intent_id": intent_id,
             "target_agent": target_agent,
+            "task_id": task_id,
             "timestamp": datetime.utcnow().isoformat(),
         }
 
@@ -290,7 +337,7 @@ class SimpBroker:
     def record_error(
         self, intent_id: str, error: str, execution_time_ms: float = 0.0
     ) -> bool:
-        """Record error for an intent"""
+        """Record error for an intent and classify failure"""
         with self.intent_lock:
             record = self.intent_records.get(intent_id)
             if not record:
@@ -303,8 +350,35 @@ class SimpBroker:
             with self.stats_lock:
                 self.stats["intents_failed"] += 1
 
-            self.logger.error(f"❌ Intent failed: {intent_id} - {error}")
+            # Classify failure for any matching ledger tasks
+            fc = self.failure_handler.classify_failure(
+                {"error_code": error, "error_message": error}
+            )
+            self.logger.error(
+                f"❌ Intent failed: {intent_id} - {error} "
+                f"(class: {fc.value})"
+            )
             return True
+
+    def _map_intent_to_task_type(self, intent_type: str) -> str:
+        """Map an intent_type string to a valid task_type."""
+        mapping = {
+            "code_task": "implementation",
+            "code_editing": "implementation",
+            "planning": "architecture",
+            "research": "research",
+            "market_analysis": "analysis",
+            "trade_execution": "implementation",
+            "orchestration": "architecture",
+            "scaffolding": "scaffold",
+            "test_harness": "test",
+            "prediction_signal": "analysis",
+            "arbitrage": "implementation",
+            "spec": "spec",
+            "architecture": "architecture",
+            "docs": "docs",
+        }
+        return mapping.get(intent_type, "implementation")
 
     def get_intent_status(self, intent_id: str) -> Optional[Dict[str, Any]]:
         """Get status of an intent"""

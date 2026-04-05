@@ -252,6 +252,66 @@ class SimpHttpServer:
                 "message": "Broker stopped"
             }), 200
 
+        # ----- Task Ledger Endpoints (GET-only, read-safe) -----
+
+        @self.app.route("/tasks", methods=["GET"])
+        def list_tasks():
+            """List tasks from the ledger with optional filters."""
+            status_filter = request.args.get("status")
+            agent_filter = request.args.get("agent")
+            type_filter = request.args.get("task_type")
+            tasks = self.broker.task_ledger.list_tasks(
+                status=status_filter,
+                agent=agent_filter,
+                task_type=type_filter,
+            )
+            return jsonify({
+                "status": "success",
+                "count": len(tasks),
+                "tasks": tasks,
+                "failure_stats": self.broker.task_ledger.get_failure_stats(),
+                "status_counts": self.broker.task_ledger.get_status_counts(),
+            }), 200
+
+        @self.app.route("/tasks/<task_id>", methods=["GET"])
+        def get_task(task_id):
+            """Get a single task by ID."""
+            task = self.broker.task_ledger.get_task(task_id)
+            if task:
+                return jsonify({"status": "success", "task": task}), 200
+            return jsonify({
+                "status": "error",
+                "error": f"Task '{task_id}' not found",
+            }), 404
+
+        @self.app.route("/tasks/queue", methods=["GET"])
+        def get_task_queue():
+            """Get unclaimed tasks ordered by priority."""
+            queue = self.broker.task_ledger.get_queue()
+            return jsonify({
+                "status": "success",
+                "count": len(queue),
+                "queue": queue,
+            }), 200
+
+        @self.app.route("/routing/policy", methods=["GET"])
+        def get_routing_policy():
+            """Return the current routing policy."""
+            if self.broker.builder_pool:
+                policy = self.broker.builder_pool.policy
+                pool_status = self.broker.builder_pool.get_pool_status()
+                return jsonify({
+                    "status": "success",
+                    "policy": policy,
+                    "pool_status": pool_status,
+                }), 200
+            return jsonify({
+                "status": "success",
+                "policy": {},
+                "pool_status": {},
+                "message": "Builder pool not configured",
+            }), 200
+
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         """
         Run the HTTP server

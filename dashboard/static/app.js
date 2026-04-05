@@ -42,6 +42,19 @@
     capGrid:         $("#cap-grid"),
     activityFeed:    $("#activity-feed"),
 
+    // Task queue
+    valTasksQueued:     $("#val-tasks-queued"),
+    valTasksClaimed:    $("#val-tasks-claimed"),
+    valTasksInProgress: $("#val-tasks-in-progress"),
+    valTasksCompleted:  $("#val-tasks-completed"),
+    valTasksFailed:     $("#val-tasks-failed"),
+    valTasksDeferred:   $("#val-tasks-deferred"),
+    taskQueueTbody:     $("#task-queue-tbody"),
+
+    // Failure stats & routing
+    failureGrid:     $("#failure-grid"),
+    routingGrid:     $("#routing-grid"),
+
     // Protocol
     valUptime:       $("#val-uptime"),
     valLastRefresh:  $("#val-last-refresh"),
@@ -343,17 +356,142 @@
   }
 
   // -----------------------------------------------------------------------
+  // Render: Task Queue
+  // -----------------------------------------------------------------------
+
+  function renderTasks(data) {
+    if (!data || data.status === "unreachable") {
+      dom.taskQueueTbody.innerHTML = '<tr><td colspan="7" class="empty-row">Broker unreachable</td></tr>';
+      return;
+    }
+    // Status counts
+    var counts = data.status_counts || {};
+    dom.valTasksQueued.textContent = counts.queued || 0;
+    dom.valTasksClaimed.textContent = counts.claimed || 0;
+    dom.valTasksInProgress.textContent = counts.in_progress || 0;
+    dom.valTasksCompleted.textContent = counts.completed || 0;
+    dom.valTasksFailed.textContent = counts.failed || 0;
+    dom.valTasksDeferred.textContent = counts.deferred_by_capacity || 0;
+
+    if ((counts.failed || 0) > 0) {
+      dom.valTasksFailed.className = "card-value mono status-error";
+    } else {
+      dom.valTasksFailed.className = "card-value mono";
+    }
+
+    // Task table — show most recent 50
+    var tasks = data.tasks || [];
+    if (tasks.length === 0) {
+      dom.taskQueueTbody.innerHTML = '<tr><td colspan="7" class="empty-row">No tasks recorded</td></tr>';
+      return;
+    }
+    tasks = tasks.slice(-50).reverse();
+    var html = "";
+    for (var i = 0; i < tasks.length; i++) {
+      var t = tasks[i];
+      var prioClass = t.priority === "critical" ? "status-error" : t.priority === "high" ? "status-degraded" : "";
+      html += "<tr>";
+      html += td('<span class="mono" style="font-size:0.7rem">' + escHtml((t.task_id || "").substring(0, 8)) + "</span>");
+      html += td(escHtml(t.title || "--"));
+      html += td(capPill(t.task_type || "--"));
+      html += td('<span class="' + prioClass + '">' + escHtml(t.priority || "--") + "</span>");
+      html += td(statusBadge(t.status || "unknown"));
+      html += td(mono(escHtml(t.assigned_agent || t.claimed_by || "--")));
+      html += td('<span class="mono" style="font-size:0.75rem">' + formatDate(t.created_at) + "</span>");
+      html += "</tr>";
+    }
+    dom.taskQueueTbody.innerHTML = html;
+  }
+
+  // -----------------------------------------------------------------------
+  // Render: Failure Stats
+  // -----------------------------------------------------------------------
+
+  function renderFailureStats(data) {
+    if (!data || data.status === "unreachable") {
+      dom.failureGrid.innerHTML = '<div class="empty-state">Broker unreachable</div>';
+      return;
+    }
+    var stats = data.failure_stats || {};
+    var entries = Object.entries(stats);
+    if (entries.length === 0) {
+      dom.failureGrid.innerHTML = '<div class="empty-state">No failures recorded</div>';
+      return;
+    }
+    entries.sort(function(a, b) { return b[1] - a[1]; });
+    var html = "";
+    for (var i = 0; i < entries.length; i++) {
+      var cls = entries[i][0];
+      var count = entries[i][1];
+      html += '<div class="cap-card">';
+      html += '<div class="cap-card-name">' + escHtml(cls) + "</div>";
+      html += '<div class="cap-card-agents"><span class="cap-agent-tag status-error">' + count + " occurrence" + (count !== 1 ? "s" : "") + "</span></div>";
+      html += "</div>";
+    }
+    dom.failureGrid.innerHTML = html;
+  }
+
+  // -----------------------------------------------------------------------
+  // Render: Routing Policy
+  // -----------------------------------------------------------------------
+
+  function renderRouting(data) {
+    if (!data || data.status === "unreachable") {
+      dom.routingGrid.innerHTML = '<div class="empty-state">Broker unreachable</div>';
+      return;
+    }
+    var policy = data.policy || {};
+    var taskRouting = policy.task_routing || {};
+    var entries = Object.entries(taskRouting);
+    if (entries.length === 0) {
+      dom.routingGrid.innerHTML = '<div class="empty-state">No routing policy configured</div>';
+      return;
+    }
+    entries.sort(function(a, b) { return a[0].localeCompare(b[0]); });
+    var html = "";
+    // Show builder pool summary
+    var pool = policy.builder_pool || {};
+    if (pool.primary) {
+      html += '<div class="cap-card">';
+      html += '<div class="cap-card-name">Builder Pool</div>';
+      html += '<div class="cap-card-agents">';
+      html += '<span class="cap-agent-tag" style="background:#2a6f2a">Primary: ' + escHtml(pool.primary) + "</span>";
+      if (pool.secondary) html += '<span class="cap-agent-tag" style="background:#6f6f2a">Secondary: ' + escHtml(pool.secondary) + "</span>";
+      var support = pool.support || [];
+      for (var s = 0; s < support.length; s++) {
+        html += '<span class="cap-agent-tag">Support: ' + escHtml(support[s]) + "</span>";
+      }
+      html += "</div></div>";
+    }
+    // Show task routing
+    for (var i = 0; i < entries.length; i++) {
+      var taskType = entries[i][0];
+      var agents = entries[i][1];
+      html += '<div class="cap-card">';
+      html += '<div class="cap-card-name">' + escHtml(taskType) + "</div>";
+      html += '<div class="cap-card-agents">';
+      for (var j = 0; j < agents.length; j++) {
+        html += '<span class="cap-agent-tag">' + escHtml(agents[j]) + "</span>";
+      }
+      html += "</div></div>";
+    }
+    dom.routingGrid.innerHTML = html;
+  }
+
+  // -----------------------------------------------------------------------
   // Main refresh cycle
   // -----------------------------------------------------------------------
 
   async function refreshAll() {
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, capabilities] = await Promise.all([
+    const [health, stats, agents, activity, capabilities, tasks, routing] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
       apiFetch("/api/activity"),
       apiFetch("/api/capabilities"),
+      apiFetch("/api/tasks"),
+      apiFetch("/api/routing"),
     ]);
 
     renderHealth(health);
@@ -361,6 +499,9 @@
     renderAgents(agents);
     renderActivity(activity);
     renderCapabilities(capabilities);
+    renderTasks(tasks);
+    renderFailureStats(tasks);
+    renderRouting(routing);
 
     // Capture dashboard start time from health response
     if (!dashboardStartedAt && health && health.dashboard_started_at) {
