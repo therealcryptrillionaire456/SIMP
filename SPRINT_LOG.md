@@ -968,3 +968,213 @@ All 10 sprints delivered. The SIMP protocol is production-ready with:
 - Memory layer activation (Sprint 8)
 - Protocol cleanup and test coverage (Sprint 9)
 - Production readiness, README, and version 0.2.0 (Sprint 10)
+
+---
+
+## ProjectX Computer-Use Design Review
+
+**Intent ID:** computer_use_design_review
+**Source Agent:** perplexity_research (discovery & design)
+**Target Agent:** claude_code (implementation — after review approval)
+**Branch:** feat/public-readonly-dashboard
+**Started:** 2026-04-05T20:53:00Z
+**Mode:** design_only_no_implementation
+**Priority:** high
+
+### Review Goal
+
+Research Agent S / S2 / S3 computer-use architectures and produce adaptation notes for ProjectX before any implementation begins. Each note maps one borrowed concept to one concrete ProjectX adaptation, distinguishing v1 features from future enhancements.
+
+### Sources
+
+- Agent S: "An Open Agentic Framework that Uses Computers Like a Human" (Agashe et al., Oct 2024) — https://arxiv.org/abs/2410.08164
+- Agent S2: "A Compositional Generalist-Specialist Framework for Computer Use" (Agashe et al., Apr 2025) — https://arxiv.org/abs/2504.00906
+- Agent S3 / bBoN: "The Unreasonable Effectiveness of Scaling Agents for Computer Use" (Simular, Oct 2025) — https://arxiv.org/abs/2510.02250
+- OSWorld benchmark & ACI grounding layer — https://os-world.github.io
+- Simular blog: Agent S3 announcement — https://www.simular.ai/articles/agent-s3
+
+---
+
+### Design Note 1: Agent-Computer Interface (ACI) — Bounded Action Space
+
+**Borrowed from Agent S:** The ACI constrains the agent to a bounded set of 11 primitive actions (click, type, scroll, hotkey, hold_and_press, drag_and_drop, save_to_buffer, switch_applications, wait, done, fail) rather than allowing arbitrary code execution. Each action produces exactly one GUI state transition, giving the agent immediate feedback before the next step.
+
+**Our adaptation for ProjectX:** `projectx_computer.py` will define a fixed action space of 14 methods (listed in the recommended methods below). Every method is atomic — one call, one GUI effect, one logged result. No compound macros in v1. The `safe_execute(step)` wrapper enforces this boundary: it accepts a single action dict, validates it against the allowlist, executes it, and returns a structured result with pre/post screenshots.
+
+**v1 / future:** v1 ships all 14 methods. Future: add `drag_and_drop(x1, y1, x2, y2)` and `save_to_clipboard(text)` once base actions are stable.
+
+---
+
+### Design Note 2: Flat Policy Over Hierarchical Manager-Worker
+
+**Borrowed from Agent S3:** S3 removed the Manager-Worker hierarchy from S2 and replaced it with a single flat policy π(a_t | I, o_t, h_t). This reduced LLM calls by 52%, task completion time by 62%, and improved success rate by 13.8 percentage points. The key insight: modern foundation models can maintain short-horizon plans in context, making a separate planner unnecessary and sometimes counterproductive when subgoals become stale.
+
+**Our adaptation for ProjectX:** ProjectX will NOT implement a separate planner/orchestrator for computer-use tasks. Instead, the executing agent (claude_code or equivalent) receives the full task instruction I plus a rolling action history h_t, and decides the next action at each step. SIMP's existing task ledger provides the outer orchestration — the computer-use module is purely an execution layer.
+
+**v1 / future:** v1 uses flat single-step execution. Future: if multi-step tasks exceed 40 steps, consider adding lightweight checkpointing (not hierarchical planning) to allow resumption.
+
+---
+
+### Design Note 3: Native Coding Agent Fallback
+
+**Borrowed from Agent S3:** S3 natively integrates a coding agent into the GUI action space. At any step, the policy can choose to invoke a bounded code-execution loop (Python/Bash in a sandboxed VM) instead of a GUI action. This enables "shell over GUI" for tasks where scripting is faster/safer. The coding session produces a summary + inspection checklist appended to the agent's history.
+
+**Our adaptation for ProjectX:** `run_shell(command, timeout=30)` is a first-class action in the ProjectX action space, not a fallback escape hatch. The SIMP intent's guardrails already specify "prefer shell/code execution over GUI execution when either can solve the task." The agent should always evaluate whether `run_shell` can accomplish the step before attempting GUI clicks. Shell output is captured in `log_action()` with stdout/stderr.
+
+**v1 / future:** v1 ships `run_shell()` with a 30-second default timeout, stdout/stderr capture, and return code. Future: add a bounded inner loop (budget B iterations with execution feedback) matching S3's coding agent pattern for multi-step scripting tasks.
+
+---
+
+### Design Note 4: Screenshot-Driven Action Grounding
+
+**Borrowed from Agent S / S2 / OSWorld:** The ACI provides dual inputs: (1) a raw screenshot for contextual understanding, and (2) an image-augmented accessibility tree for precise element grounding. OCR (PaddleOCR) supplements the accessibility tree with textual blocks not already present (checked via IOU matching). Agent S2's Mixture-of-Grounding routes actions to specialized grounding experts for precise GUI localization.
+
+**Our adaptation for ProjectX:** `get_screenshot()` captures the current screen state. `ocr_screen(region=None)` provides text extraction for grounding. `snapshot_state()` bundles screenshot + active window + OCR text into a single observation dict that the executing agent receives before each action. We do NOT implement a full accessibility tree in v1 — macOS accessibility APIs are complex, and screenshot + OCR covers the majority of grounding needs.
+
+**v1 / future:** v1 uses screenshot + OCR grounding. Future: integrate macOS Accessibility API via `pyobjc` for precise element targeting (analogous to S2's Mixture-of-Grounding with specialist models).
+
+---
+
+### Design Note 5: Behavior Best-of-N (bBoN) for Task Reliability
+
+**Borrowed from Agent S3:** bBoN runs N independent rollouts of the same task, converts each to a behavior narrative (concise per-step facts extracted by a VLM from (screenshot_before, action, screenshot_after) transitions), then uses a VLM judge to select the best rollout via comparative MCQ evaluation. This improved OSWorld scores by 7+ percentage points. The judge achieves 92.8% human-aligned accuracy.
+
+**Our adaptation for ProjectX:** ProjectX will NOT implement bBoN in v1 — it requires isolated VM snapshots for independent rollouts, which isn't available on the user's local desktop. However, we will build the foundation: `log_action(action, result)` captures the per-step (pre_screenshot, action, post_screenshot) tuple that would feed a behavior narrative generator. This logging format is designed to be bBoN-compatible for future scaling.
+
+**v1 / future:** v1 logs bBoN-compatible action traces. Future: when SIMP supports VM-sandboxed execution, enable parallel rollouts with narrative generation and judge selection.
+
+---
+
+### Design Note 6: Audit Logging and Safe Execution
+
+**Borrowed from Agent S / S3:** S3's coding agent runs in a sandboxed VM with captured stdout/stderr/return_code feedback tuples. The ACI ensures only bounded primitive actions execute — no arbitrary code blocks from the GUI path. The `done` and `fail` terminal actions provide explicit task completion signals.
+
+**Our adaptation for ProjectX:** Every action through `safe_execute(step)` follows this protocol:
+1. Validate step against the action allowlist
+2. Capture pre-state via `snapshot_state()`
+3. Execute the bounded action
+4. Capture post-state via `snapshot_state()`
+5. Log the full tuple via `log_action(action, result)`
+6. Return structured result (success/failure, pre/post state, duration)
+
+`abort(reason)` provides the explicit failure signal (equivalent to S3's FAIL token). Actions not on the allowlist are rejected — no dynamic expansion without explicit approval. The guardrail "unsafe actions require explicit allowlist or human approval" maps directly to this validation gate.
+
+**v1 / future:** v1 ships with a static allowlist of the 14 recommended methods. Future: add human-in-the-loop approval for elevated actions (e.g., `run_shell` with sudo, file deletion).
+
+---
+
+### Design Note 7: Experience Memory and Continual Learning
+
+**Borrowed from Agent S:** Agent S maintains two memory types: Narrative Memory (high-level task summaries for planning) and Episodic Memory (detailed step-by-step subtask experiences for execution). Memory is bootstrapped via self-supervised exploration on synthetic tasks and updated after each successful task completion. The Self-Evaluator summarizes experiences as textual rewards.
+
+**Our adaptation for ProjectX:** SIMP already has a memory layer (MemoryHooks, TaskMemory, KnowledgeIndex, ConversationArchive — activated in Sprint 8). Computer-use task outcomes from `log_action()` traces will flow through the existing `on_task_completed` hook into TaskMemory. This gives ProjectX a natural episodic memory for computer-use tasks without building a separate memory system.
+
+**v1 / future:** v1 uses existing SIMP memory hooks — completed computer-use tasks are stored as task memories. Future: add Agent S-style experience retrieval where similar past tasks inform the current execution plan.
+
+---
+
+### Design Note 8: Task Resumability via SIMP Protocol
+
+**Borrowed from Agent S3 / bBoN:** S3 assumes VM snapshots for rollout independence. The Behavior Narrative Generator produces self-contained step-by-step summaries that can reconstruct task state. The coding agent's summarization + inspection checklist pattern provides a clean handoff point between execution phases.
+
+**Our adaptation for ProjectX:** SIMP's task ledger already supports task persistence (JSONL-backed with failure taxonomy). For computer-use tasks, `snapshot_state()` at each step provides the checkpoint data needed for resumption. If the executing agent crashes or rate-limits, SIMP can re-route to the fallback agent (perplexity_research per the handoff_policy) with the last snapshot + action log as context. The guardrail "design for SIMP task resumability" is satisfied by making every step's log entry self-contained.
+
+**v1 / future:** v1 ensures every action log entry contains enough state to resume from. Future: implement explicit checkpoint/restore for long multi-step tasks (30+ steps).
+
+---
+
+### Design Note 9: Guardrail-First Design — Reversibility and Risk Tiers
+
+**Borrowed from Agent S ACI:** The bounded action space prevents arbitrary code execution from the GUI path. S3's coding agent is sandboxed with explicit execution feedback. The `done`/`fail` terminal actions enforce that the agent cannot silently exit — it must declare outcome.
+
+**Our adaptation for ProjectX:** Actions are tiered by risk:
+- **Tier 0 (read-only, always allowed):** `get_screenshot()`, `get_active_window()`, `ocr_screen()`, `snapshot_state()`
+- **Tier 1 (low-risk, reversible):** `click()`, `double_click()`, `type_text()`, `press()`, `scroll()`, `focus_app()`
+- **Tier 2 (medium-risk, logged):** `run_shell()` — restricted to non-destructive commands in v1
+- **Tier 3 (high-risk, requires approval):** Any `run_shell()` with file write/delete, sudo, or network mutation
+
+`safe_execute()` checks the tier and enforces the appropriate gate. This is more granular than S3's binary GUI/code split.
+
+**v1 / future:** v1 ships Tier 0-2 with Tier 3 blocked unless explicitly allowlisted in the SIMP intent params. Future: add dynamic risk assessment based on command content analysis.
+
+---
+
+### Design Note 10: Observation Format — Dual-Input for Agent Reasoning
+
+**Borrowed from Agent S / S2:** The ACI provides two parallel inputs: a screenshot (for visual context and change detection) and an augmented accessibility tree (for precise element grounding). Agent S2's Proactive Hierarchical Planning dynamically adjusts plans based on new observations at multiple temporal scales.
+
+**Our adaptation for ProjectX:** `snapshot_state()` returns a structured observation dict:
+```python
+{
+    "screenshot": bytes,           # PNG screenshot
+    "active_window": str,          # Current foreground app + title
+    "ocr_text": List[dict],        # [{text, bbox, confidence}] from OCR
+    "timestamp": str,              # ISO 8601
+    "screen_resolution": tuple,    # (width, height)
+}
+```
+This is the observation `o_t` that the executing agent receives before each action decision. It replaces S2's accessibility tree with OCR for v1 (simpler, cross-platform) while preserving the dual-input principle (visual + textual).
+
+**v1 / future:** v1 uses screenshot + OCR. Future: add accessibility tree via `pyobjc` on macOS, providing element IDs for precise targeting without coordinate-based clicking.
+
+---
+
+### Recommended Minimal Method List for projectx_computer.py
+
+```python
+class ProjectXComputer:
+    # --- Observation (Tier 0: read-only, always allowed) ---
+    def get_screenshot(self) -> bytes: ...
+    def get_active_window(self) -> str: ...
+    def ocr_screen(self, region=None) -> List[dict]: ...
+    def snapshot_state(self) -> dict: ...
+
+    # --- GUI Actions (Tier 1: low-risk, reversible) ---
+    def click(self, x, y, button='left') -> dict: ...
+    def double_click(self, x, y) -> dict: ...
+    def type_text(self, text) -> dict: ...
+    def press(self, keys) -> dict: ...
+    def scroll(self, dx, dy) -> dict: ...
+    def focus_app(self, app_name) -> dict: ...
+
+    # --- Shell Execution (Tier 2: medium-risk, logged) ---
+    def run_shell(self, command, timeout=30) -> dict: ...
+
+    # --- Logging & Control (cross-tier) ---
+    def log_action(self, action, result) -> None: ...
+    def safe_execute(self, step) -> dict: ...
+    def abort(self, reason) -> None: ...
+```
+
+All 14 methods. Every method returns a structured dict with `{success: bool, data: ..., error: str|None, duration_ms: int}`. The `safe_execute()` wrapper is the primary entry point — it validates, executes, logs, and returns in one call.
+
+---
+
+### Implementation Plan Checklist for projectx_computer.py
+
+After design review approval, implement in this order:
+
+- [ ] 1. Create `projectx_computer.py` with `ProjectXComputer` class skeleton and all 14 method stubs
+- [ ] 2. Implement Tier 0 observation methods: `get_screenshot()` (via pyautogui), `get_active_window()` (via subprocess/AppleScript on macOS), `ocr_screen()` (via pytesseract or PaddleOCR), `snapshot_state()` (bundles all three)
+- [ ] 3. Implement Tier 1 GUI actions: `click()`, `double_click()`, `type_text()`, `press()`, `scroll()`, `focus_app()` — all via pyautogui with coordinate validation
+- [ ] 4. Implement Tier 2 shell execution: `run_shell()` with subprocess, timeout enforcement, stdout/stderr capture
+- [ ] 5. Implement `log_action()` — append to JSONL log with pre/post state, timestamp, action dict, result dict
+- [ ] 6. Implement `safe_execute()` — action allowlist validation, tier-based gating, pre/post snapshot, exception handling, log_action call
+- [ ] 7. Implement `abort()` — log abort reason, raise TaskAbortError for SIMP task ledger to catch
+- [ ] 8. Write tests: test each tier independently, test safe_execute rejects unknown actions, test log_action produces valid JSONL, test abort raises correctly
+- [ ] 9. Wire into SIMP: register `projectx_computer` as a capability in the broker, add computer_use intent type to intent routing
+- [ ] 10. Verify: all existing SIMP tests still pass, new tests pass, no regressions
+
+---
+
+### Handoff Policy
+
+- After this design review is approved, Claude may implement the approved minimal methods in `projectx_computer.py`
+- Fallback agent: perplexity_research
+- Resume via SIMP: true
+- Implementation follows the checklist above, one step per commit
+
+---
+
+**Design Review Status:** COMPLETE — 10 design notes written, implementation plan ready
+**Design Review Completed:** 2026-04-05T21:10:00Z
