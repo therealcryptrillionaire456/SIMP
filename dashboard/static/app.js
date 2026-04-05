@@ -42,6 +42,15 @@
     capGrid:         $("#cap-grid"),
     activityFeed:    $("#activity-feed"),
 
+    // Delivery status
+    valDelivered:         $("#val-delivered"),
+    valQueued:            $("#val-queued"),
+    valQueuedNoEndpoint:  $("#val-queued-no-endpoint"),
+    valDeliveryFailed:    $("#val-delivery-failed"),
+    valTimeout:           $("#val-timeout"),
+    valRateLimited:       $("#val-rate-limited"),
+    deliveryTbody:        $("#delivery-tbody"),
+
     // Task queue
     valTasksQueued:     $("#val-tasks-queued"),
     valTasksClaimed:    $("#val-tasks-claimed"),
@@ -224,16 +233,25 @@
     const sorted = [...events].reverse();
     let html = "";
     for (const ev of sorted) {
-      const statusCls = ev.delivery_status === "delivered"
-        ? "delivered"
-        : ev.delivery_status === "failed"
-          ? "failed"
-          : "queued";
+      const ds = ev.delivery_status || "--";
+      const statusCls = ds === "delivered" ? "delivered"
+        : (ds === "failed" || ds === "timeout" || ds === "rate_limited") ? "failed"
+        : (ds === "queued" || ds === "queued_no_endpoint") ? "queued"
+        : "queued";
       html += '<div class="activity-item">';
       html += '<span class="activity-ts">' + formatDate(ev.timestamp) + "</span>";
       html += '<span class="activity-type">' + escHtml(ev.event_type || ev.intent_type || "--") + "</span>";
       html += '<span class="activity-result">' + escHtml(ev.result || "--") + "</span>";
-      html += '<span class="activity-status ' + statusCls + '">' + escHtml(ev.delivery_status || "--") + "</span>";
+      html += '<span class="activity-status ' + statusCls + '">' + escHtml(ds) + "</span>";
+      if (ev.delivery_latency_ms != null) {
+        html += '<span class="activity-latency mono">' + Number(ev.delivery_latency_ms).toFixed(1) + " ms</span>";
+      }
+      if (ev.retry_count && ev.retry_count > 0) {
+        html += '<span class="activity-retries mono">retries: ' + ev.retry_count + "</span>";
+      }
+      if (ev.fallback_agent) {
+        html += '<span class="activity-fallback mono">fallback: ' + escHtml(ev.fallback_agent) + "</span>";
+      }
       html += "</div>";
     }
     dom.activityFeed.innerHTML = html;
@@ -353,6 +371,62 @@
     } catch {
       return "--";
     }
+  }
+
+  // -----------------------------------------------------------------------
+  // Render: Delivery Status
+  // -----------------------------------------------------------------------
+
+  function renderDeliveryStatus(statsData) {
+    if (!statsData || statsData.status === "unreachable") return;
+    var broker = statsData.broker || statsData;
+    var stats = broker.stats || broker;
+
+    // Delivery counts from broker stats
+    var dc = stats.delivery_counts || {};
+    dom.valDelivered.textContent = dc.delivered || 0;
+    dom.valQueued.textContent = dc.queued || 0;
+    dom.valQueuedNoEndpoint.textContent = dc.queued_no_endpoint || 0;
+    dom.valDeliveryFailed.textContent = dc.failed || 0;
+    dom.valTimeout.textContent = dc.timeout || 0;
+    dom.valRateLimited.textContent = dc.rate_limited || 0;
+
+    // Color failed/timeout/rate_limited red if > 0
+    if ((dc.failed || 0) > 0) dom.valDeliveryFailed.className = "card-value mono status-error";
+    else dom.valDeliveryFailed.className = "card-value mono";
+    if ((dc.timeout || 0) > 0) dom.valTimeout.className = "card-value mono status-error";
+    else dom.valTimeout.className = "card-value mono";
+    if ((dc.rate_limited || 0) > 0) dom.valRateLimited.className = "card-value mono status-error";
+    else dom.valRateLimited.className = "card-value mono";
+
+    // Delivery detail table from recent intents
+    var intents = stats.recent_deliveries || [];
+    if (intents.length === 0) {
+      dom.deliveryTbody.innerHTML = '<tr><td colspan="6" class="empty-row">No delivery data yet</td></tr>';
+      return;
+    }
+    var html = "";
+    for (var i = 0; i < intents.length; i++) {
+      var d = intents[i];
+      var dsCls = deliveryStatusClass(d.delivery_status);
+      html += "<tr>";
+      html += td('<span class="mono" style="font-size:0.7rem">' + escHtml((d.intent_id || "").substring(0, 12)) + "</span>");
+      html += td(mono(escHtml(d.target_agent || "--")));
+      html += td('<span class="status-badge ' + dsCls + '">' + escHtml(d.delivery_status || "--") + "</span>");
+      html += td(mono(d.delivery_latency_ms != null ? Number(d.delivery_latency_ms).toFixed(1) + " ms" : "--"));
+      html += td(mono(d.retry_count != null ? String(d.retry_count) : "--"));
+      html += td(mono(escHtml(d.fallback_agent || "--")));
+      html += "</tr>";
+    }
+    dom.deliveryTbody.innerHTML = html;
+  }
+
+  function deliveryStatusClass(status) {
+    if (!status) return "unknown";
+    if (status === "delivered") return "online";
+    if (status === "queued" || status === "queued_no_endpoint") return "degraded";
+    if (status === "failed" || status === "timeout" || status === "rate_limited") return "offline";
+    return "unknown";
   }
 
   // -----------------------------------------------------------------------
@@ -499,6 +573,7 @@
     renderAgents(agents);
     renderActivity(activity);
     renderCapabilities(capabilities);
+    renderDeliveryStatus(stats);
     renderTasks(tasks);
     renderFailureStats(tasks);
     renderRouting(routing);

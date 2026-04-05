@@ -175,6 +175,25 @@ def _detect_changes(old_snapshot: dict, new_snapshot: dict) -> list[dict]:
             "redacted": True,
         })
 
+    # Detect delivery status changes from intent records
+    old_delivery = old_snapshot.get("delivery_counts", {})
+    new_delivery = new_snapshot.get("delivery_counts", {})
+    for status_key in ("queued_no_endpoint", "timeout", "rate_limited"):
+        old_val = old_delivery.get(status_key, 0)
+        new_val = new_delivery.get(status_key, 0)
+        if new_val > old_val:
+            diff = new_val - old_val
+            events.append({
+                "timestamp": now,
+                "event_type": f"delivery_{status_key}",
+                "source_agent": "broker",
+                "target_agent": "various",
+                "intent_type": "delivery",
+                "delivery_status": status_key,
+                "result": f"{diff} intent(s) {status_key}",
+                "redacted": True,
+            })
+
     # Detect broker state changes
     old_state = old_snapshot.get("broker_state")
     new_state = new_snapshot.get("broker_state")

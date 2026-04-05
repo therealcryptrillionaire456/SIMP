@@ -161,6 +161,36 @@
       </div>
     </section>
 
+    <!-- Delivery Status -->
+    <section class="section" id="delivery-section">
+      <h2 class="section-title">Delivery Status</h2>
+      <div class="cards-grid" id="delivery-cards">
+        <div class="card"><div class="card-label">Delivered</div><div class="card-value mono" id="val-delivered">--</div></div>
+        <div class="card"><div class="card-label">Queued</div><div class="card-value mono" id="val-queued">--</div></div>
+        <div class="card"><div class="card-label">Queued (No Endpoint)</div><div class="card-value mono" id="val-queued-no-endpoint">--</div></div>
+        <div class="card"><div class="card-label">Failed</div><div class="card-value mono" id="val-delivery-failed">--</div></div>
+        <div class="card"><div class="card-label">Timeout</div><div class="card-value mono" id="val-timeout">--</div></div>
+        <div class="card"><div class="card-label">Rate Limited</div><div class="card-value mono" id="val-rate-limited">--</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table" id="delivery-table">
+          <thead>
+            <tr>
+              <th>Intent ID</th>
+              <th>Target Agent</th>
+              <th>Status</th>
+              <th>Latency</th>
+              <th>Retries</th>
+              <th>Fallback</th>
+            </tr>
+          </thead>
+          <tbody id="delivery-tbody">
+            <tr><td colspan="6" class="empty-row">No delivery data yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Activity Feed -->
     <section class="section" id="activity-section">
       <h2 class="section-title">Recent Activity</h2>

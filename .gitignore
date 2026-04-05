@@ -31,7 +31,10 @@ dashboard/activity_log.jsonl
 
 # Task ledger data
 data/task_ledger.jsonl
-data/
+
+# Agent inboxes (keep the directory structure via .gitkeep)
+data/inboxes/*
+!data/inboxes/.gitkeep
 
 # Claude/MCP local config
 .claude/
