@@ -5,10 +5,10 @@
     "support": ["gemma4_local", "kloutbot"]
   },
   "task_routing": {
-    "code_task": ["claude_cowork", "perplexity_research"],
+    "code_task": ["claude_cowork", "perplexity_research", "gemma4_local"],
     "code_editing": ["claude_cowork"],
-    "planning": ["claude_cowork", "perplexity_research", "kloutbot"],
-    "research": ["perplexity_research"],
+    "planning": ["claude_cowork", "perplexity_research", "gemma4_local", "kloutbot"],
+    "research": ["perplexity_research", "gemma4_local"],
     "market_analysis": ["bullbear_predictor", "perplexity_research"],
     "trade_execution": ["kashclaw"],
     "orchestration": ["kloutbot"],

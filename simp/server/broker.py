@@ -165,6 +165,10 @@ class SimpBroker:
         # HTTP connection pool (initialized in start(), closed in stop())
         self._http_pool: Optional["httpx.AsyncClient"] = None
 
+        # Sprint 22: Circuit breaker state
+        self._circuit_failures: Dict[str, Dict[str, Any]] = {}  # agent_id -> {"count": int, "last_failure": float}
+        self._circuit_open_until: Dict[str, float] = {}  # agent_id -> timestamp
+
         # Shutdown coordination
         self._shutdown_event = threading.Event()
 
@@ -670,6 +674,105 @@ class SimpBroker:
                 "error_message": f"Failed to write to inbox: {exc}",
                 "failure_class": "execution_failed",
             }
+
+    # ------------------------------------------------------------------
+    # Sprint 22: Circuit Breaker
+    # ------------------------------------------------------------------
+
+    def _record_circuit_failure(self, agent_id: str) -> None:
+        """Record a delivery failure for the circuit breaker."""
+        now = time.time()
+        entry = self._circuit_failures.setdefault(agent_id, {"count": 0, "last_failure": 0})
+        # Reset if last failure was >10 min ago
+        if now - entry["last_failure"] > 600:
+            entry["count"] = 0
+        entry["count"] += 1
+        entry["last_failure"] = now
+        # Open circuit after 5 failures in 10 minutes
+        if entry["count"] >= 5:
+            self._circuit_open_until[agent_id] = now + 300  # 5 min cooldown
+            self._log_event("circuit_breaker_opened", f"Circuit breaker opened for '{agent_id}'")
+
+    def _record_circuit_success(self, agent_id: str) -> None:
+        """Reset circuit breaker state on successful delivery."""
+        self._circuit_failures.pop(agent_id, None)
+        self._circuit_open_until.pop(agent_id, None)
+
+    def _is_circuit_open(self, agent_id: str) -> bool:
+        """Check if the circuit breaker is open for an agent."""
+        until = self._circuit_open_until.get(agent_id, 0)
+        if time.time() < until:
+            return True
+        # Circuit closed — remove entry
+        self._circuit_open_until.pop(agent_id, None)
+        return False
+
+    async def _deliver_with_retry(
+        self, intent_data: Dict[str, Any], task_id: str, max_retries: int = 3
+    ) -> Dict[str, Any]:
+        """Deliver intent with multi-hop retry and exponential backoff."""
+        target = intent_data.get("target_agent", "")
+        excluded: set = set()
+        last_error = None
+
+        for attempt in range(max_retries):
+            if attempt > 0:
+                # Exponential backoff
+                delay = min(2 ** attempt, 30)
+                await asyncio.sleep(delay)
+
+            # Check circuit breaker
+            if self._is_circuit_open(target):
+                excluded.add(target)
+                # Find alternative via builder pool
+                if self.builder_pool:
+                    task_type = intent_data.get("task_type", intent_data.get("intent_type", "implementation"))
+                    target = self.builder_pool.get_builder(task_type, exclude=excluded)
+                    if not target:
+                        last_error = "No available agents after circuit breaker exclusion"
+                        continue
+
+            if not target:
+                last_error = "No target agent available"
+                continue
+
+            # Look up target endpoint
+            agent_info = self.get_agent(target)
+            if not agent_info:
+                excluded.add(target)
+                if self.builder_pool:
+                    task_type = intent_data.get("task_type", intent_data.get("intent_type", "implementation"))
+                    target = self.builder_pool.get_builder(task_type, exclude=excluded)
+                last_error = f"Agent '{target}' not registered"
+                continue
+
+            endpoint = agent_info.get("endpoint", "")
+            try:
+                if endpoint and endpoint.startswith("http"):
+                    result = await self._deliver_http(endpoint, intent_data, intent_data.get("intent_id", ""))
+                else:
+                    result = self._deliver_file_based(target, intent_data, intent_data.get("intent_id", ""))
+
+                if result.get("delivery_status") in ("delivered", "queued", "queued_no_endpoint"):
+                    self._record_circuit_success(target)
+                    return result
+                else:
+                    last_error = result.get("error_message", "Delivery failed")
+                    self._record_circuit_failure(target)
+                    excluded.add(target)
+                    # Get next candidate
+                    if self.builder_pool:
+                        task_type = intent_data.get("task_type", intent_data.get("intent_type", "implementation"))
+                        target = self.builder_pool.get_builder(task_type, exclude=excluded)
+            except Exception as exc:
+                last_error = str(exc)
+                self._record_circuit_failure(target)
+                excluded.add(target)
+                if self.builder_pool:
+                    task_type = intent_data.get("task_type", intent_data.get("intent_type", "implementation"))
+                    target = self.builder_pool.get_builder(task_type, exclude=excluded)
+
+        return {"delivery_status": "failed", "error_message": f"All retry attempts exhausted: {last_error}"}
 
     async def _handle_computer_use_intent(
         self, intent_data: Dict[str, Any], task_id: str

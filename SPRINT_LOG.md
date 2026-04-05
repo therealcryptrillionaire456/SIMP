@@ -1,5 +1,37 @@
 # SIMP Sprint Log
 
+## Sprint 22 — Smart Routing & Load Balancing
+**Started:** 2026-04-05
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Dynamic routing with load balancing, multi-hop retry with backoff, circuit breaker, and priority-aware dispatch.
+
+### Changes
+
+- **SPRINT22-KP-001: Dynamic Routing Policy Hot-Reload**
+  - Added `_load_policy()`, `check_reload()` to `BuilderPool` — watches `routing_policy.json` mtime and reloads on change.
+  - Added `gemma4_local` to routing table for `research`, `planning`, `code_task`.
+
+- **SPRINT22-KP-002: Weighted Round-Robin Agent Selection**
+  - Replaced "first available" selection in `get_builder()` with scored selection: health factor, task-load factor, round-robin tiebreaker.
+  - Added `_compute_agent_score()`, `report_task_assigned()`, `report_task_completed()`.
+
+- **SPRINT22-KP-003: Multi-Hop Retry & Circuit Breaker**
+  - Added `_deliver_with_retry()` to broker: exponential backoff, multi-agent fallback on delivery failure.
+  - Added circuit breaker: `_record_circuit_failure()`, `_record_circuit_success()`, `_is_circuit_open()`. 5 failures in 10 min → 5 min cooldown.
+
+- **SPRINT22-KP-004: Priority-Aware Dispatch**
+  - Orchestration loop now calls `check_reload()` each iteration and tracks task assignments/completions in builder pool.
+  - `get_queue()` already sorts by priority (critical first) — confirmed and leveraged.
+
+- **SPRINT22-KP-005: Tests**
+  - 22 tests in `tests/test_sprint22_routing.py` covering: dynamic reload, load balancing, circuit breaker, priority dispatch, module compilation.
+  - All 333 tests pass (0 regressions).
+
+---
+
 ## Sprint 1 — Hardening & Security Baseline
 **Started:** 2026-04-05T17:07:00Z
 **Agent:** perplexity_research (discovery & design), claude_cowork (implementation)

@@ -58,7 +58,11 @@ class OrchestrationLoop:
             "tasks_failed": 0,
         }
 
-        # Get unclaimed tasks from the queue
+        # Sprint 22: Check for routing policy hot-reload
+        if self.builder_pool:
+            self.builder_pool.check_reload()
+
+        # Get unclaimed tasks from the queue (sorted by priority: critical first)
         queue = self.task_ledger.get_queue()
         summary["tasks_checked"] = len(queue)
 
@@ -68,6 +72,7 @@ class OrchestrationLoop:
         for task in queue:
             task_id = task.get("task_id")
             task_type = task.get("task_type", "implementation")
+            priority = task.get("priority", "medium")
 
             # Enforce task dependency ordering for subtasks
             parent_id = task.get("parent_task_id")
@@ -100,6 +105,9 @@ class OrchestrationLoop:
                 self.logger.debug(f"Builder {builder} not registered as agent")
                 continue
 
+            # Sprint 22: Track task assignment in builder pool
+            self.builder_pool.report_task_assigned(builder)
+
             # Route intent to the builder — forward task_id so broker reuses it
             intent_data = {
                 "intent_id": f"orch:{uuid.uuid4()}",
@@ -111,6 +119,7 @@ class OrchestrationLoop:
                     "task_id": task_id,
                     "title": task.get("title", ""),
                     "description": task.get("description", ""),
+                    "priority": priority,
                 },
                 "timestamp": datetime.utcnow().isoformat(),
             }
@@ -122,9 +131,12 @@ class OrchestrationLoop:
                 self.tasks_assigned += 1
                 summary["tasks_assigned"] += 1
                 self.logger.info(
-                    f"Assigned task {task_id} to {builder} ({delivery_status})"
+                    f"Assigned task {task_id} [{priority}] to {builder} ({delivery_status})"
                 )
             else:
+                # Sprint 22: Track task completion on failure (undo the assignment)
+                self.builder_pool.report_task_completed(builder)
+
                 # Delivery failed — classify and attempt fallback
                 error_resp = {
                     "error_code": result.get("error_code", "DELIVERY_FAILED"),
@@ -138,6 +150,7 @@ class OrchestrationLoop:
                         fc, task_type, self.builder_pool, exclude=[builder]
                     )
                     if fallback and self.broker.get_agent(fallback):
+                        self.builder_pool.report_task_assigned(fallback)
                         intent_data["target_agent"] = fallback
                         retry_result = await self.broker.route_intent(intent_data)
                         retry_status = retry_result.get("delivery_status", "")
@@ -145,14 +158,16 @@ class OrchestrationLoop:
                             self.tasks_assigned += 1
                             summary["tasks_assigned"] += 1
                             self.logger.info(
-                                f"Fallback: assigned task {task_id} to {fallback}"
+                                f"Fallback: assigned task {task_id} [{priority}] to {fallback}"
                             )
                             continue
+                        else:
+                            self.builder_pool.report_task_completed(fallback)
 
                 self.tasks_failed += 1
                 summary["tasks_failed"] += 1
                 self.logger.warning(
-                    f"Failed to assign task {task_id}: {delivery_status}"
+                    f"Failed to assign task {task_id} [{priority}]: {delivery_status}"
                 )
 
         return summary
