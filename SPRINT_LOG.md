@@ -1565,3 +1565,51 @@ Replace Flask dev server with production WSGI (gunicorn), fix orchestration dupl
 - `TestTaskDependencyOrdering` (5 tests): blocked status exists, subtask ordering, blocked initial status, unblock on predecessor complete, complete_task
 - `TestModulesCompile` (4 tests): http_server, broker, orchestration_loop, task_ledger all compile
 - Full regression: 288 tests pass
+
+---
+
+## Sprint 20 — Dashboard Live Data & WebSocket
+**Started:** 2026-04-05
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Replace polling with WebSocket push. Fix all hardcoded/misleading dashboard endpoints. Fix topology field mismatch. Add WS status indicator.
+
+### SPRINT20-KP-001: WebSocket Endpoint
+**Status:** COMPLETE
+- Added `/ws` WebSocket endpoint in `dashboard/server.py` using FastAPI native WebSocket support
+- Tracks connected clients in `_ws_clients` set, handles ping/pong keepalive, 35s timeout heartbeat
+- Added `_broadcast_ws()` to push events to all connected clients
+- Integrated with `_poll_broker()` — broadcasts stats, agents, tasks, activity on state changes
+
+### SPRINT20-KP-002: Fix Hardcoded Endpoints
+**Status:** COMPLETE
+- Replaced `/api/health` — removed hardcoded `hardening_sprints_completed`, `test_suites`, `security_findings_closed`; now queries real broker stats
+- Replaced `/api/orchestration` — queries actual task queue depth and broker state instead of hardcoded `orchestration_active: True`
+- Replaced `/api/computer-use` — dynamically queries `projectx` info from broker stats with sensible fallback defaults
+- Bumped `DASHBOARD_VERSION` to `2.0.0`
+
+### SPRINT20-KP-003: Frontend WebSocket Client
+**Status:** COMPLETE
+- Added WebSocket connection manager in `app.js` with auto-reconnect (10 retries, 3s delay)
+- Routes WS messages to existing render functions (stats, agents, tasks, logs, activity)
+- Falls back to polling after exhausting WS retries
+- Debounced broker unreachable banner — only shows after 3 consecutive failures
+- Preserved `escapeHtml` XSS protection from Sprint 16
+
+### SPRINT20-KP-004: Topology Field Mismatch
+**Status:** COMPLETE
+- Backend topology now sends `connection_mode` and `status` fields (was sending `mode`)
+- Frontend already reads `connection_mode` — fields now aligned
+- Added `ws-status` indicator to `index.html` header
+- Added `.ws-status` CSS styles (connected=green, disconnected=amber, error=red)
+- Added dynamic `dashboard-version` display in protocol footer
+
+### SPRINT20-KP-005: Tests
+**Status:** COMPLETE
+- Created `tests/test_sprint20_dashboard.py` with 11 tests across 4 test classes
+- `TestWebSocketEndpoint` (3 tests): server compiles, has websocket route, has broadcast function
+- `TestLiveDataEndpoints` (3 tests): no hardcoded metadata, orchestration queries real data, computer-use queries broker
+- `TestFrontendWebSocket` (3 tests): app.js has WebSocket, escapeHtml preserved, connection status present
+- `TestTopologyFix` (2 tests): connection_mode in server, ws-status in index.html
+- Full regression: 299 tests pass

@@ -91,6 +91,8 @@
   let countdownValue = REFRESH_INTERVAL / 1000;
   let countdownTimer = null;
   let dashboardStartedAt = null;
+  let unreachableCount = 0;
+  const UNREACHABLE_THRESHOLD = 3;
 
   // -----------------------------------------------------------------------
   // Fetch helpers
@@ -111,18 +113,26 @@
   // -----------------------------------------------------------------------
 
   function renderHealth(data) {
-    if (!data || data.status === "unreachable") {
-      setBrokerUnreachable();
-      return;
+    if (!data || data.status === "unreachable" || data.status === "degraded") {
+      if (!data || data.status === "unreachable") {
+        setBrokerUnreachable();
+        return;
+      }
+      // degraded — broker not reachable but dashboard is running
+      setBrokerReachable(data.status);
+    } else {
+      setBrokerReachable(data.status);
     }
-    setBrokerReachable(data.status);
     dom.valBrokerStatus.textContent = data.status || "--";
     dom.valBrokerStatus.className = "card-value status-" + statusClass(data.status);
-    // Broker returns paused/bullbear_watcher instead of a single "state" string
-    const state = data.state || (data.paused ? "Paused" : "Running");
-    dom.valBrokerState.textContent = state;
-    dom.valAgentsOnline.textContent = data.agents_online ?? "--";
-    dom.valPending.textContent = data.pending_intents ?? "--";
+    dom.valBrokerState.textContent = data.broker_state || "--";
+    dom.valAgentsOnline.textContent = data.agents_registered ?? "--";
+
+    // Update version display
+    if (data.dashboard_version) {
+      var versionEl = document.getElementById('dashboard-version');
+      if (versionEl) versionEl.textContent = 'v' + data.dashboard_version;
+    }
   }
 
   function renderStats(data) {
@@ -354,9 +364,14 @@
 
   function setBrokerUnreachable() {
     brokerReachable = false;
+    unreachableCount++;
     dom.brokerDot.className = "status-dot red";
     dom.brokerLabel.textContent = "Unreachable";
-    dom.unreachable.style.display = "flex";
+
+    // Only show banner after UNREACHABLE_THRESHOLD consecutive failures
+    if (unreachableCount >= UNREACHABLE_THRESHOLD) {
+      dom.unreachable.style.display = "flex";
+    }
 
     // Set all card values to show unreachable state
     dom.valBrokerStatus.textContent = "Unreachable";
@@ -372,6 +387,7 @@
 
   function setBrokerReachable(status) {
     brokerReachable = true;
+    unreachableCount = 0;
     dom.unreachable.style.display = "none";
     const cls = statusClass(status);
     dom.brokerDot.className = "status-dot " + (cls === "healthy" ? "green" : cls === "degraded" ? "amber" : "gray");
@@ -804,16 +820,112 @@
   }
 
   // -----------------------------------------------------------------------
+  // WebSocket connection
+  // -----------------------------------------------------------------------
+
+  var ws = null;
+  var wsRetryCount = 0;
+  var MAX_WS_RETRIES = 10;
+  var WS_RETRY_DELAY = 3000;
+  var wsPingInterval = null;
+
+  function connectWebSocket() {
+    var protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var wsUrl = protocol + '//' + location.host + '/ws';
+
+    try {
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = function() {
+        wsRetryCount = 0;
+        updateConnectionStatus('connected');
+        if (wsPingInterval) clearInterval(wsPingInterval);
+        wsPingInterval = setInterval(function() {
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send('ping');
+          }
+        }, 30000);
+      };
+
+      ws.onmessage = function(event) {
+        try {
+          var msg = JSON.parse(event.data);
+          handleWsMessage(msg);
+        } catch (e) {
+          // ignore parse errors
+        }
+      };
+
+      ws.onclose = function() {
+        updateConnectionStatus('disconnected');
+        if (wsPingInterval) clearInterval(wsPingInterval);
+        if (wsRetryCount < MAX_WS_RETRIES) {
+          wsRetryCount++;
+          setTimeout(connectWebSocket, WS_RETRY_DELAY);
+        } else {
+          startPollingFallback();
+        }
+      };
+
+      ws.onerror = function() {
+        updateConnectionStatus('error');
+      };
+    } catch (e) {
+      startPollingFallback();
+    }
+  }
+
+  function handleWsMessage(msg) {
+    switch (msg.type) {
+      case 'stats':
+        renderStats(msg.data);
+        renderDeliveryStatus(msg.data);
+        break;
+      case 'agents':
+        renderAgents(msg.data);
+        break;
+      case 'tasks':
+        renderTasks(msg.data);
+        renderFailureStats(msg.data);
+        break;
+      case 'logs':
+        renderLogs(msg.data);
+        break;
+      case 'activity':
+        renderActivity(msg.data);
+        break;
+      case 'heartbeat':
+      case 'pong':
+        break;
+      default:
+        refreshAll();
+    }
+  }
+
+  function updateConnectionStatus(status) {
+    var el = document.getElementById('ws-status');
+    if (!el) return;
+    el.className = 'ws-status ' + status;
+    el.textContent = status === 'connected' ? 'Live' : status === 'disconnected' ? 'Reconnecting...' : 'Polling';
+  }
+
+  function startPollingFallback() {
+    updateConnectionStatus('error');
+    setInterval(refreshAll, REFRESH_INTERVAL);
+  }
+
+  // -----------------------------------------------------------------------
   // Init
   // -----------------------------------------------------------------------
 
-  dom.refreshBtn.addEventListener("click", () => {
+  dom.refreshBtn.addEventListener("click", function() {
     refreshAll();
   });
 
-  // Initial load
+  // Try WebSocket first, fall back to polling
+  connectWebSocket();
+  // Initial fetch + countdown
   refreshAll();
   startCountdown();
-  setInterval(refreshAll, REFRESH_INTERVAL);
 
 })();

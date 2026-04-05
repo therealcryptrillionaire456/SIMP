@@ -26,6 +26,7 @@
       <h1 class="header-title">SIMP <span class="header-subtitle">Dashboard</span></h1>
     </div>
     <div class="header-right">
+      <span id="ws-status" class="ws-status disconnected">Connecting...</span>
       <span class="broker-badge" id="broker-badge">
         <span class="status-dot" id="broker-dot"></span>
         <span id="broker-label">Checking...</span>
@@ -295,7 +296,7 @@
         </div>
         <div>
           <span class="protocol-label">Dashboard</span>
-          <span class="protocol-value mono">v1.0.0</span>
+          <span class="protocol-value mono" id="dashboard-version">v2.0.0</span>
         </div>
         <div>
           <span class="protocol-label">Dashboard Uptime</span>

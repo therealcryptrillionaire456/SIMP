@@ -10,16 +10,17 @@ Run:
 """
 
 import asyncio
+import json
 import os
 import time
 from collections import deque
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Set
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -98,7 +99,10 @@ app.add_middleware(
 activity_buffer: deque[dict] = deque(maxlen=ACTIVITY_BUFFER_SIZE)
 _last_snapshot: dict[str, Any] = {}
 _started_at = datetime.now(timezone.utc).isoformat()
-DASHBOARD_VERSION = "1.3.0"  # bumped for Sprint 15
+DASHBOARD_VERSION = "2.0.0"  # bumped for Sprint 20 — WebSocket support
+
+# Active WebSocket connections
+_ws_clients: Set[WebSocket] = set()
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -280,6 +284,44 @@ def _load_persisted_events() -> None:
 
 
 # ---------------------------------------------------------------------------
+# WebSocket endpoint
+# ---------------------------------------------------------------------------
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """WebSocket for real-time dashboard updates."""
+    await websocket.accept()
+    _ws_clients.add(websocket)
+    try:
+        while True:
+            try:
+                data = await asyncio.wait_for(websocket.receive_text(), timeout=35.0)
+                if data == "ping":
+                    await websocket.send_text(json.dumps({"type": "pong"}))
+            except asyncio.TimeoutError:
+                await websocket.send_text(json.dumps({"type": "heartbeat"}))
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        pass
+    finally:
+        _ws_clients.discard(websocket)
+
+
+async def _broadcast_ws(event_type: str, data: dict):
+    """Broadcast an event to all connected WebSocket clients."""
+    message = json.dumps({"type": event_type, "data": data})
+    disconnected = set()
+    for ws in _ws_clients:
+        try:
+            await ws.send_text(message)
+        except Exception:
+            disconnected.add(ws)
+    _ws_clients -= disconnected
+
+
+# ---------------------------------------------------------------------------
 # Background poller
 # ---------------------------------------------------------------------------
 
@@ -295,6 +337,21 @@ async def _poll_broker() -> None:
             if events:
                 activity_buffer.extend(events)
                 _persist_events(events)
+                # Broadcast changes to WebSocket clients
+                if _ws_clients:
+                    if status_data:
+                        await _broadcast_ws("stats", _redact(status_data))
+                    agents_data = await _broker_get("/agents")
+                    if agents_data:
+                        await _broadcast_ws("agents", _redact(agents_data))
+                    tasks_data = await _broker_get("/tasks")
+                    if tasks_data:
+                        await _broadcast_ws("tasks", _redact(tasks_data))
+                    await _broadcast_ws("activity", {
+                        "status": "success",
+                        "count": len(activity_buffer),
+                        "events": list(activity_buffer),
+                    })
         if new_snap:
             _last_snapshot = new_snap
         await asyncio.sleep(POLL_INTERVAL)
@@ -306,39 +363,17 @@ async def _poll_broker() -> None:
 
 @app.get("/api/health")
 async def api_health():
-    """Combined dashboard + broker health status."""
-    broker_data = await _broker_get("/health")
-
-    dashboard_health = {
-        "dashboard_version": DASHBOARD_VERSION,
-        "dashboard_started_at": _started_at,
-        "dashboard_status": "running",
-        "cors_origins": CORS_ORIGINS,
-        "hardening_sprints_completed": 5,
-        "test_suites": {
-            "request_guards": "26/26",
-            "sprint2_hardening": "10/10",
-            "sprint3_observability": "9/9",
-            "sprint4_shutdown": "9/9",
-            "protocol_validation": "17/17",
-            "sprint5_audit": "see tests",
-        },
-        "security_findings_closed": "8/8",
-    }
-
-    if broker_data is None:
-        return {
-            **dashboard_health,
-            "broker_status": "unreachable",
-            "broker_url_reachable": False,
-            "message": "Broker is not responding.",
-        }
+    """Health check with real data."""
+    stats = await _broker_get("/stats")
+    broker_up = stats is not None
 
     return {
-        **dashboard_health,
-        "broker_status": "connected",
-        "broker_url_reachable": True,
-        "broker": _redact(broker_data),
+        "status": "healthy" if broker_up else "degraded",
+        "broker_reachable": broker_up,
+        "dashboard_version": DASHBOARD_VERSION,
+        "broker_state": stats.get("state", "unknown") if stats else "unreachable",
+        "agents_registered": stats.get("agents_registered", 0) if stats else 0,
+        "uptime_seconds": stats.get("uptime_seconds", 0) if stats else 0,
     }
 
 
@@ -424,18 +459,20 @@ async def api_topology():
     for agent in agents:
         agent_id = agent.get("agent_id", "unknown")
         endpoint = agent.get("endpoint", "")
-        mode = "http" if isinstance(endpoint, str) and endpoint.startswith("http") else "file-based"
+        connection_mode = agent.get("connection_mode", agent.get("mode",
+            "http" if isinstance(endpoint, str) and endpoint.startswith("http") else "file-based"))
         nodes.append({
             "id": agent_id,
             "label": agent.get("name", agent_id),
             "type": "agent",
-            "mode": mode,
+            "connection_mode": connection_mode,
+            "status": agent.get("status", "unknown"),
             "capabilities": agent.get("capabilities", []),
         })
         edges.append({
             "source": "broker",
             "target": agent_id,
-            "mode": mode,
+            "connection_mode": connection_mode,
         })
     return {
         "status": "success",
@@ -490,45 +527,44 @@ async def api_routing():
 
 @app.get("/api/orchestration")
 async def api_orchestration():
-    """Orchestration loop status."""
+    """Orchestration status — real data from broker."""
     stats = await _broker_get("/stats")
-    tasks_data = await _broker_get("/tasks")
     if stats is None:
-        return {
-            "status": "unreachable",
-            "orchestration_active": False,
-        }
+        return {"status": "unreachable", "orchestration_active": False}
 
-    task_counts = {}
-    if tasks_data and "status_counts" in tasks_data:
-        task_counts = tasks_data["status_counts"]
+    tasks = await _broker_get("/tasks/queue")
+    task_count = len(tasks) if isinstance(tasks, list) else 0
 
     return {
         "status": "success",
-        "orchestration_active": True,
-        "task_summary": task_counts,
-        "broker_state": _redact(stats).get("state", "unknown") if isinstance(stats, dict) else "unknown",
+        "orchestration_active": stats.get("state", "") == "RUNNING",
+        "queue_depth": task_count,
+        "intents_routed": stats.get("intents_routed", 0),
+        "intents_completed": stats.get("intents_completed", 0),
+        "intents_failed": stats.get("intents_failed", 0),
     }
 
 
 @app.get("/api/computer-use")
 async def api_computer_use():
-    """ProjectX computer-use status."""
+    """ProjectX computer-use status — dynamic from broker."""
     stats = await _broker_get("/stats")
     if stats is None:
-        return {
-            "status": "unreachable",
-            "projectx_available": False,
-        }
+        return {"status": "unreachable", "projectx_available": False}
+
+    projectx_info = stats.get("projectx", {})
+
     return {
         "status": "success",
-        "projectx_available": True,
-        "action_tiers": {
+        "projectx_available": bool(projectx_info) or True,
+        "action_tiers": projectx_info.get("action_tiers", {
             "tier_0_observation": ["get_screenshot", "get_active_window", "ocr_screen", "snapshot_state"],
             "tier_1_gui": ["click", "double_click", "type_text", "press", "scroll", "focus_app"],
             "tier_2_shell": ["run_shell"],
             "tier_3_restricted": [],
-        },
+        }),
+        "action_count": projectx_info.get("action_count", 0),
+        "log_path": projectx_info.get("log_path", ""),
     }
 
 

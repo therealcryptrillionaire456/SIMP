@@ -500,6 +500,21 @@ body {
 }
 
 /* ==========================================================================
+   WebSocket Status Indicator
+   ========================================================================== */
+
+.ws-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.ws-status.connected { background: #22c55e; color: white; }
+.ws-status.disconnected { background: #f59e0b; color: white; }
+.ws-status.error { background: #ef4444; color: white; }
+
+/* ==========================================================================
    Unreachable banner
    ========================================================================== */
 
