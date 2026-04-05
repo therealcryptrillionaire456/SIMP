@@ -649,3 +649,78 @@ Wire the 3 missing dashboard API endpoints (/api/logs, /api/topology, /api/tasks
   - renderTaskQueue() renders up to 20 queue items with status badges
   - task-queue-tbody exists in index.html (verified — already present)
 - Outcome: Implemented. renderTaskQueue() added to app.js, fetch wired in refreshAll(). HTML tbody already existed, no changes needed to index.html for this task.
+
+---
+
+## Sprint 7 — Orchestration Loop Integration
+**Started:** 2026-04-05T20:00:00Z
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Wire the existing OrchestrationLoop class into the broker lifecycle so it starts/stops with the broker, add a dashboard endpoint for orchestration status, and add integration tests.
+
+---
+
+## Task SPRINT07-KP-001
+- Title: Wire OrchestrationLoop into broker lifecycle
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [simp/server/broker.py, simp/orchestration/orchestration_loop.py]
+- Created At: 2026-04-05T20:00:00Z
+- Last Updated: 2026-04-05T20:15:00Z
+- Description:
+  The OrchestrationLoop class exists but is never instantiated. Wire it into
+  SimpBroker so it starts with broker.start() and stops with broker.stop().
+  Import OrchestrationLoop, add _orchestration_loop attribute, create and start
+  it in start() using the shared async loop, stop it in stop(), and log events.
+- Acceptance Criteria:
+  - OrchestrationLoop imported in broker.py
+  - _orchestration_loop attribute initialized to None in __init__
+  - start() creates OrchestrationLoop and schedules run() on shared async loop
+  - stop() calls orchestration_loop.stop()
+  - orchestration_started and orchestration_stopped events logged
+- Outcome: Implemented. OrchestrationLoop imported, created in start() with broker and task_ledger, scheduled via run_coroutine_threadsafe on shared async loop. stop() calls loop.stop() and logs event. Wrapped in try/except so broker still starts if orchestration fails.
+
+---
+
+## Task SPRINT07-KP-002
+- Title: Add /api/orchestration dashboard endpoint
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [dashboard/server.py, dashboard/static/app.js, dashboard/static/index.html]
+- Created At: 2026-04-05T20:00:00Z
+- Last Updated: 2026-04-05T20:15:00Z
+- Description:
+  Add GET /api/orchestration endpoint to dashboard that fetches broker stats and
+  tasks to report orchestration loop status. Add renderOrchestration() to app.js
+  and orchestration-section to index.html.
+- Acceptance Criteria:
+  - GET /api/orchestration returns orchestration_active, task_summary, broker_state
+  - renderOrchestration() renders Active/Inactive badge with task summary
+  - Orchestration section added to index.html after task-queue-section
+  - All routes remain GET-only
+- Outcome: Implemented. Endpoint fetches /stats and /tasks from broker, returns orchestration status. Frontend renders status badge and task counts. HTML section added between task-queue and failure-stats sections.
+
+---
+
+## Task SPRINT07-KP-003
+- Title: Add orchestration integration tests
+- Author: claude_cowork
+- Owner: claude_cowork
+- Status: DONE
+- Related Files: [tests/test_sprint7_orchestration.py]
+- Created At: 2026-04-05T20:00:00Z
+- Last Updated: 2026-04-05T20:15:00Z
+- Description:
+  Create test_sprint7_orchestration.py with 6 tests covering: loop creation,
+  stop, broker start creates orchestration, broker stop stops orchestration,
+  orchestration started event logged, orchestration stopped event logged.
+- Acceptance Criteria:
+  - 6 tests in TestOrchestrationLoop class
+  - All tests pass with pytest
+  - Tests use real BrokerConfig and SimpBroker instances
+  - Tests that need async loop create and clean up their own event loop
+- Outcome: Implemented. 6 tests all passing. Tests adapted to actual OrchestrationLoop interface (self.running attribute, not self._running).
