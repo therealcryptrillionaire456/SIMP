@@ -12,7 +12,7 @@ import os
 from collections import deque
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Callable
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
 import uuid
@@ -357,6 +357,8 @@ class SimpBroker:
 
         # Record intent as pending
         with self.intent_lock:
+            if len(self.intent_records) >= self.MAX_INTENT_RECORDS:
+                self._evict_oldest_records(count=1000)
             record = IntentRecord(
                 intent_id=intent_id,
                 source_agent=source_agent,
@@ -869,6 +871,45 @@ class SimpBroker:
         with self._event_log_lock:
             self._event_log.append(event)
 
+    MAX_INTENT_RECORDS = 10000
+
+    def _evict_oldest_records(self, count: int = 1000) -> int:
+        """Evict the oldest completed/failed records. Must hold intent_lock."""
+        removable = [
+            (iid, rec)
+            for iid, rec in self.intent_records.items()
+            if rec.status in ("completed", "failed", "delivered")
+        ]
+        removable.sort(key=lambda x: x[1].timestamp)
+        evicted = 0
+        for iid, _ in removable[:count]:
+            del self.intent_records[iid]
+            evicted += 1
+        return evicted
+
+    async def _cleanup_intent_records(self):
+        """Evict completed/failed intent records older than TTL."""
+        while self.state in (BrokerState.RUNNING, BrokerState.INITIALIZING) and not self._shutdown_event.is_set():
+            try:
+                cutoff = datetime.now(timezone.utc) - timedelta(seconds=self.config.intent_timeout * 120)
+                with self.intent_lock:
+                    to_remove = []
+                    for intent_id, record in self.intent_records.items():
+                        if record.status in ("completed", "failed", "delivered"):
+                            record_time = record.timestamp
+                            try:
+                                if record_time and datetime.fromisoformat(record_time.replace("Z", "+00:00")) < cutoff:
+                                    to_remove.append(intent_id)
+                            except (ValueError, TypeError):
+                                pass
+                    for intent_id in to_remove:
+                        del self.intent_records[intent_id]
+                    if to_remove:
+                        self._log_event("intent_records_evicted", f"Evicted {len(to_remove)} stale intent records")
+            except Exception as exc:
+                self.logger.error(f"Intent record cleanup error: {exc}")
+            await asyncio.sleep(300)
+
     def get_intent_status(self, intent_id: str) -> Optional[Dict[str, Any]]:
         """Get status of an intent"""
         with self.intent_lock:
@@ -931,6 +972,22 @@ class SimpBroker:
         """
         self.state = BrokerState.RUNNING
         self.start_health_checks(loop=async_loop)
+
+        # Start intent record cleanup coroutine
+        if async_loop:
+            asyncio.run_coroutine_threadsafe(self._cleanup_intent_records(), async_loop)
+        else:
+            def _run_cleanup():
+                _loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(_loop)
+                try:
+                    _loop.run_until_complete(self._cleanup_intent_records())
+                finally:
+                    _loop.close()
+            self._cleanup_thread = threading.Thread(
+                target=_run_cleanup, daemon=True, name="SIMP-IntentCleanup"
+            )
+            self._cleanup_thread.start()
 
         # Start orchestration loop
         try:

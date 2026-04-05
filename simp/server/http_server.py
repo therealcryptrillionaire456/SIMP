@@ -5,6 +5,8 @@ REST API for SIMP broker, making it easy to test and interact with.
 """
 
 import asyncio
+import functools
+import hmac
 import json
 import logging
 import threading
@@ -27,6 +29,43 @@ from simp.memory.conversation_archive import ConversationArchive
 from simp.memory.task_memory import TaskMemory
 from simp.memory.knowledge_index import KnowledgeIndex
 from simp.memory.session_bootstrap import SessionBootstrap
+from config.config import SimpConfig
+
+
+def require_api_key(f):
+    """Require valid API key for data-plane endpoints."""
+    @functools.wraps(f)
+    def decorated(*args, **kwargs):
+        config = SimpConfig()
+        if not config.REQUIRE_API_KEY:
+            return f(*args, **kwargs)
+
+        api_keys_raw = config.API_KEYS
+        if not api_keys_raw:
+            # No keys configured = open access (log warning once)
+            return f(*args, **kwargs)
+
+        valid_keys = {k.strip() for k in api_keys_raw.split(",") if k.strip()}
+        if not valid_keys:
+            return f(*args, **kwargs)
+
+        # Check Authorization header
+        auth_header = request.headers.get("Authorization", "")
+        provided_key = ""
+        if auth_header.startswith("Bearer "):
+            provided_key = auth_header[7:]
+        elif request.headers.get("X-API-Key"):
+            provided_key = request.headers["X-API-Key"]
+
+        if not provided_key:
+            return jsonify({"error": "API key required", "hint": "Set Authorization: Bearer <key> or X-API-Key header"}), 401
+
+        # Constant-time comparison against all valid keys
+        if not any(hmac.compare_digest(provided_key, k) for k in valid_keys):
+            return jsonify({"error": "Invalid API key"}), 403
+
+        return f(*args, **kwargs)
+    return decorated
 
 
 class SimpHttpServer:
@@ -105,6 +144,7 @@ class SimpHttpServer:
             return jsonify(self.broker.health_check()), 200
 
         @self.app.route("/agents/register", methods=["POST"])
+        @require_api_key
         @self.limiter.limit(10)
         def register_agent():
             """Register a new agent"""
@@ -148,6 +188,7 @@ class SimpHttpServer:
                 )
 
         @self.app.route("/agents", methods=["GET"])
+        @require_api_key
         def list_agents():
             """List all registered agents"""
             agents = self.broker.list_agents()
@@ -200,6 +241,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/intents/route", methods=["POST"])
+        @require_api_key
         @self.limiter.limit(60)
         def route_intent():
             """Route an intent to a target agent"""
@@ -251,6 +293,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/intents/<intent_id>/response", methods=["POST"])
+        @require_api_key
         @self.limiter.limit(60)
         def record_response(intent_id):
             """Record response to an intent"""
@@ -342,6 +385,7 @@ class SimpHttpServer:
         # ----- Task Ledger Endpoints (GET-only, read-safe) -----
 
         @self.app.route("/tasks", methods=["GET"])
+        @require_api_key
         def list_tasks():
             """List tasks from the ledger with optional filters."""
             status_filter = request.args.get("status")
@@ -361,6 +405,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/tasks/<task_id>", methods=["GET"])
+        @require_api_key
         def get_task(task_id):
             """Get a single task by ID."""
             task = self.broker.task_ledger.get_task(task_id)
@@ -372,6 +417,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/tasks/queue", methods=["GET"])
+        @require_api_key
         def get_task_queue():
             """Get unclaimed tasks ordered by priority."""
             queue = self.broker.task_ledger.get_queue()
@@ -382,6 +428,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/routing/policy", methods=["GET"])
+        @require_api_key
         def get_routing_policy():
             """Return the current routing policy."""
             if self.broker.builder_pool:
@@ -445,6 +492,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/memory/conversations", methods=["POST"])
+        @require_api_key
         @self.limiter.limit(30)
         def save_conversation():
             """Save a new conversation record."""
