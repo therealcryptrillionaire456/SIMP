@@ -1472,3 +1472,52 @@ Activate dormant crypto layer, reconcile the two intent schemas into a single ca
 - `TestIntentTypeRegistry` (4 tests): core types, computer_use types, self-improvement types, metadata completeness
 - `TestCryptoActivation` (3 tests): module importable, sign/verify round-trip, tamper detection
 - `TestConfigUnification` (4 tests): SimpConfig canonical, BrokerConfig exists, BrokerConfig reads SimpConfig defaults, legacy shim
+
+---
+
+## Sprint 18 — Connection Pooling & Async Health Checks
+**Started:** 2026-04-05
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Make the broker handle 100+ agents without degradation. Concurrent health checks, connection pooling, dead agent cleanup, and queue-based routing.
+
+### SPRINT18-KP-001: Async Health Checks with Concurrency Limit
+**Status:** COMPLETE
+- Rewrote `_health_check_loop()` to use `asyncio.gather()` with `asyncio.Semaphore(20)` for concurrent agent health checks
+- Added `_bounded_health_check()` method that wraps each check with semaphore-bounded concurrency
+- At 100 agents with 5s timeout each: from ~500s sequential down to ~25s concurrent
+- Preserved existing health/degraded/unreachable status logic and health change logging
+
+### SPRINT18-KP-002: HTTP Connection Pooling
+**Status:** COMPLETE
+- Created shared `httpx.AsyncClient` with `Limits(max_connections=100, max_keepalive_connections=20)` in `start()`
+- Pool used by both `_deliver_http()` and `_check_agent_health()` — replaced per-request `async with httpx.AsyncClient()` patterns
+- Added `_close_http_pool()` async method, called from `stop()` for graceful cleanup
+- Added `httpx>=0.27.0` to `requirements.txt`
+- Fallback to one-shot clients when pool is unavailable (pre-start or httpx missing)
+
+### SPRINT18-KP-003: Auto-Deregister Dead Agents
+**Status:** COMPLETE
+- Added `health_check_failures` counter (initialized to 0) in `register_agent()` agent info dict
+- `_check_agent_health()`: resets counter to 0 on success (HTTP 200), calls `_record_health_failure()` on non-200 or exception
+- `_record_health_failure()`: increments counter, sets status to unreachable, auto-deregisters after 3 consecutive failures
+- Auto-deregistration holds `agent_lock` when modifying `self.agents`, emits structured log event
+- Agents can re-register after auto-deregistration
+
+### SPRINT18-KP-004: Intent Queue Worker
+**Status:** COMPLETE
+- Created `_intent_queue_worker()` async method that drains `self.intent_queue` (already existed with maxsize=1000)
+- 4 worker coroutines started in `start()` when async_loop is provided
+- Workers are additive — existing `route_intent()` inline flow unchanged
+- Added `queue_depth` to `get_statistics()` output via `self.intent_queue.qsize()`
+
+### SPRINT18-KP-005: Tests
+**Status:** COMPLETE
+- Created `tests/test_sprint18_scalability.py` with 18 tests across 5 test classes
+- `TestAsyncHealthChecks` (4 tests): loop is async, bounded check exists/async, check_agent_health is async, empty registry handling
+- `TestConnectionPooling` (5 tests): pool attribute exists, None before start, created on start, httpx in requirements, close method
+- `TestDeadAgentCleanup` (4 tests): failure counter initialized, record_health_failure exists, counter increments, auto-deregister after 3 failures
+- `TestIntentQueueWorker` (4 tests): queue exists, worker method exists, queue_depth in stats, depth reflects items
+- `TestAllModulesCompile` (1 test): broker.py compiles without errors
+- Full regression: 273 tests pass
