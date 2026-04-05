@@ -476,6 +476,29 @@ async def api_routing():
     return _redact(data)
 
 
+@app.get("/api/orchestration")
+async def api_orchestration():
+    """Orchestration loop status."""
+    stats = await _broker_get("/stats")
+    tasks_data = await _broker_get("/tasks")
+    if stats is None:
+        return {
+            "status": "unreachable",
+            "orchestration_active": False,
+        }
+
+    task_counts = {}
+    if tasks_data and "status_counts" in tasks_data:
+        task_counts = tasks_data["status_counts"]
+
+    return {
+        "status": "success",
+        "orchestration_active": True,
+        "task_summary": task_counts,
+        "broker_state": _redact(stats).get("state", "unknown") if isinstance(stats, dict) else "unknown",
+    }
+
+
 @app.get("/api/logs")
 async def api_logs(limit: int = 100):
     """Structured broker event logs."""

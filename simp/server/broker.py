@@ -24,6 +24,7 @@ from simp.task_ledger import TaskLedger
 from simp.models.failure_taxonomy import FailureHandler, FailureClass
 from simp.routing.builder_pool import BuilderPool
 from simp.server.request_guards import sanitize_agent_id
+from simp.orchestration.orchestration_loop import OrchestrationLoop
 
 try:
     import httpx
@@ -134,6 +135,9 @@ class SimpBroker:
         # Structured event log ring buffer
         self._event_log: deque = deque(maxlen=500)
         self._event_log_lock = threading.RLock()
+
+        # Orchestration loop (optional, enabled by default)
+        self._orchestration_loop: Optional[OrchestrationLoop] = None
 
         # Shutdown coordination
         self._shutdown_event = threading.Event()
@@ -857,6 +861,23 @@ class SimpBroker:
         """
         self.state = BrokerState.RUNNING
         self.start_health_checks(loop=async_loop)
+
+        # Start orchestration loop
+        try:
+            self._orchestration_loop = OrchestrationLoop(
+                broker=self,
+                task_ledger=self.task_ledger,
+            )
+            if async_loop:
+                import asyncio as _asyncio
+                _asyncio.run_coroutine_threadsafe(
+                    self._orchestration_loop.run(), async_loop
+                )
+            self._log_event("orchestration_started", "Orchestration loop started")
+            self.logger.info("🔄 Orchestration loop started")
+        except Exception as exc:
+            self.logger.warning(f"⚠️ Orchestration loop failed to start: {exc}")
+
         self.logger.info("✅ SIMP Broker RUNNING")
 
     def stop(self) -> None:
@@ -879,6 +900,11 @@ class SimpBroker:
             self._health_thread.join(timeout=5)
             if self._health_thread.is_alive():
                 self.logger.warning("⚠️ Health check thread did not stop within 5s")
+
+        # Stop orchestration loop
+        if self._orchestration_loop:
+            self._orchestration_loop.stop()
+            self._log_event("orchestration_stopped", "Orchestration loop stopped")
 
         self.state = BrokerState.STOPPED
         self._log_event("broker_stopped", "Broker stopped")

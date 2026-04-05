@@ -692,12 +692,28 @@
   }
 
   // -----------------------------------------------------------------------
+  // Render: Orchestration Status
+  // -----------------------------------------------------------------------
+
+  function renderOrchestration(data) {
+    const el = document.getElementById("orchestration-status");
+    if (!el) return;
+    if (!data || !data.orchestration_active) {
+      el.innerHTML = '<span class="status-badge offline">Inactive</span>';
+      return;
+    }
+    const summary = data.task_summary || {};
+    const parts = Object.entries(summary).map(([k, v]) => `${k}: ${v}`).join(" · ");
+    el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${parts || "no tasks"}</span>`;
+  }
+
+  // -----------------------------------------------------------------------
   // Main refresh cycle
   // -----------------------------------------------------------------------
 
   async function refreshAll() {
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData] = await Promise.all([
+    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -710,6 +726,7 @@
       apiFetch("/api/logs"),
       apiFetch("/api/topology"),
       apiFetch("/api/tasks/queue"),
+      apiFetch("/api/orchestration"),
     ]);
 
     renderHealth(health);
@@ -726,6 +743,7 @@
     renderLogs(logsData);
     renderTopology(topologyData);
     renderTaskQueue(taskQueueData);
+    renderOrchestration(orchestrationData);
 
     // Capture dashboard start time from health response
     if (!dashboardStartedAt && health && health.dashboard_started_at) {
