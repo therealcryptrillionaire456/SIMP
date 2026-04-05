@@ -79,7 +79,7 @@ class TestProductionReadinessV3:
         path = os.path.join(os.path.dirname(__file__), "..", "setup.py")
         with open(path) as f:
             content = f.read()
-        assert "0.3.0" in content
+        assert "0.4.0" in content
 
     def test_sprint_log_has_15_sprints(self):
         path = os.path.join(os.path.dirname(__file__), "..", "SPRINT_LOG.md")

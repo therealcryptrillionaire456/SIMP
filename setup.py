@@ -13,7 +13,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="simp-protocol",
-    version="0.3.0",
+    version="0.4.0",
     author="Kasey Marcelle",
     author_email="automationkasey@gmail.com",
     description="Standardized Inter-agent Message Protocol - Communication framework for AI agents",
