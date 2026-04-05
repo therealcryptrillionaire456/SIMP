@@ -20,7 +20,10 @@ import queue
 import threading
 import time
 
+from config.config import SimpConfig
+from simp.crypto import SimpCrypto
 from simp.task_ledger import TaskLedger
+from simp.models.canonical_intent import CanonicalIntent, INTENT_TYPE_REGISTRY
 from simp.models.failure_taxonomy import FailureHandler, FailureClass
 from simp.routing.builder_pool import BuilderPool
 from simp.server.request_guards import sanitize_agent_id
@@ -50,19 +53,35 @@ class BrokerState(str, Enum):
 
 @dataclass
 class BrokerConfig:
-    """Configuration for SIMP Broker"""
-    port: int = 5555
-    host: str = "127.0.0.1"
-    max_agents: int = 100
+    """Broker configuration — reads defaults from SimpConfig."""
+    port: int = 0
+    host: str = ""
+    max_agents: int = 0
     max_pending_intents: int = 1000
     intent_timeout: float = 30.0  # seconds
     delivery_timeout: float = 30.0  # seconds — HTTP delivery timeout
-    health_check_interval: float = 30.0  # seconds — agent health check interval
-    health_check_timeout: float = 5.0  # seconds — per-agent health check timeout
+    health_check_interval: float = 0.0  # seconds — agent health check interval
+    health_check_timeout: float = 0.0  # seconds — per-agent health check timeout
     inbox_base_dir: str = "data/inboxes"
     enable_logging: bool = True
-    log_level: str = "INFO"
+    log_level: str = ""
     max_log_lines: int = 10000
+
+    def __post_init__(self):
+        """Fill in defaults from SimpConfig if not explicitly set."""
+        sc = SimpConfig()
+        if not self.port:
+            self.port = sc.PORT
+        if not self.host:
+            self.host = sc.HOST
+        if not self.max_agents:
+            self.max_agents = sc.MAX_AGENTS
+        if not self.health_check_interval:
+            self.health_check_interval = sc.HEALTH_CHECK_INTERVAL
+        if not self.health_check_timeout:
+            self.health_check_timeout = sc.HEALTH_CHECK_TIMEOUT
+        if not self.log_level:
+            self.log_level = sc.LOG_LEVEL
 
 
 @dataclass
@@ -219,6 +238,7 @@ class SimpBroker:
                 "agent_type": agent_type,
                 "endpoint": endpoint,
                 "metadata": metadata or {},
+                "public_key": (metadata or {}).get("public_key"),
                 "registered_at": _utcnow_iso(),
                 "intents_received": 0,
                 "intents_completed": 0,
@@ -277,6 +297,33 @@ class SimpBroker:
                 "error": f"Broker is {self.state.value}, not accepting intents",
             }
 
+        # Normalize to canonical format
+        canonical = CanonicalIntent.from_dict(intent_data)
+        errors = canonical.validate()
+        if errors:
+            return {"status": "error", "errors": errors}
+        intent_data = canonical.to_dict()
+
+        # Signature verification (if enabled)
+        simp_config = SimpConfig()
+        if simp_config.REQUIRE_SIGNATURES:
+            signature = intent_data.get("signature")
+            source_id = intent_data.get("source_agent", "")
+            source_info = self.agents.get(source_id, {})
+            public_key_pem = source_info.get("public_key")
+
+            if signature and public_key_pem:
+                try:
+                    pub_key = SimpCrypto.load_public_key(public_key_pem.encode() if isinstance(public_key_pem, str) else public_key_pem)
+                    if not SimpCrypto.verify_signature(intent_data, pub_key):
+                        return {"status": "error", "error": "Invalid signature"}
+                except Exception as exc:
+                    self.logger.warning(f"Signature verification failed: {exc}")
+                    return {"status": "error", "error": f"Signature verification error: {exc}"}
+            elif signature and not public_key_pem:
+                self.logger.warning(f"Agent '{source_id}' has no public key; signature cannot be verified")
+            # If no signature provided, allow through with warning (graceful mode)
+
         intent_id = intent_data.get("intent_id", str(uuid.uuid4()))
         source_agent = intent_data.get("source_agent", "client")
         target_agent = intent_data.get("target_agent")
@@ -290,7 +337,7 @@ class SimpBroker:
         task_id = self.task_ledger.create_task(
             title=f"Intent: {intent_type}",
             description=f"Route intent {intent_id} from {source_agent} to {target_agent or 'unknown'}",
-            task_type=self._map_intent_to_task_type(intent_type),
+            task_type=canonical.get_task_type(),
             assigned_agent=target_agent,
             tags=["intent", intent_type],
         )
@@ -823,24 +870,13 @@ class SimpBroker:
             return True
 
     def _map_intent_to_task_type(self, intent_type: str) -> str:
-        """Map an intent_type string to a valid task_type."""
-        mapping = {
-            "code_task": "implementation",
-            "code_editing": "implementation",
-            "planning": "architecture",
-            "research": "research",
-            "market_analysis": "analysis",
-            "trade_execution": "implementation",
-            "orchestration": "architecture",
-            "scaffolding": "scaffold",
-            "test_harness": "test",
-            "prediction_signal": "analysis",
-            "arbitrage": "implementation",
-            "spec": "spec",
-            "architecture": "architecture",
-            "docs": "docs",
-        }
-        return mapping.get(intent_type, "implementation")
+        """Map an intent_type string to a valid task_type.
+
+        Delegates to INTENT_TYPE_REGISTRY via CanonicalIntent.
+        Retained for backward compatibility.
+        """
+        entry = INTENT_TYPE_REGISTRY.get(intent_type, {})
+        return entry.get("task_type", "implementation")
 
     def _log_event(
         self,

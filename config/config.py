@@ -2,6 +2,9 @@
 SIMP configuration via Pydantic v2 BaseSettings.
 
 Environment variables override defaults.  An optional .env file is also loaded.
+
+This is the canonical config module. All new code should import from here:
+    from config.config import SimpConfig
 """
 
 import os
@@ -85,3 +88,9 @@ class SimpConfig(BaseSettings):
 
 # Singleton used by the rest of the codebase: `from config.config import config`
 config = SimpConfig()
+
+# Legacy aliases for backward compatibility
+Config = SimpConfig
+ProductionConfig = SimpConfig
+DevelopmentConfig = SimpConfig
+TestingConfig = SimpConfig
