@@ -89,17 +89,17 @@ class TestStubsRaiseCorrectly:
     def pc(self, tmp_path):
         return ProjectXComputer(log_dir=str(tmp_path / "logs"))
 
-    def test_click_stub(self, pc):
-        with pytest.raises(NotImplementedError, match="Sprint 12"):
-            pc.click(0, 0)
+    def test_click_implemented(self, pc):
+        r = pc.click(0, 0)
+        assert isinstance(r, dict) and "success" in r
 
-    def test_type_text_stub(self, pc):
-        with pytest.raises(NotImplementedError, match="Sprint 12"):
-            pc.type_text("test")
+    def test_type_text_implemented(self, pc):
+        r = pc.type_text("test")
+        assert isinstance(r, dict) and "success" in r
 
-    def test_run_shell_stub(self, pc):
-        with pytest.raises(NotImplementedError, match="Sprint 12"):
-            pc.run_shell("echo hi")
+    def test_run_shell_implemented(self, pc):
+        r = pc.run_shell("echo hi")
+        assert isinstance(r, dict) and "success" in r
 
     def test_safe_execute_stub(self, pc):
         with pytest.raises(NotImplementedError, match="Sprint 13"):
