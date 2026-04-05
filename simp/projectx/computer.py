@@ -356,8 +356,48 @@ class ProjectXComputer:
     # ── Cross-tier: Logging & Control ────────────────────────────────
 
     def log_action(self, action: Dict[str, Any], result: Dict[str, Any]) -> None:
-        """Append an action+result entry to the JSONL audit log."""
-        raise NotImplementedError("Sprint 13")
+        """
+        Append an action+result entry to the JSONL audit log.
+
+        Each log line is a self-contained JSON object with:
+        - action_index: sequential counter
+        - timestamp: ISO 8601 UTC
+        - action: the action dict (method name + params)
+        - result: the result dict (success, data, error, duration_ms)
+        - pre_state: snapshot before action (if available in result)
+        - post_state: snapshot after action (if available in result)
+        """
+        self._action_count += 1
+        entry = {
+            "action_index": self._action_count,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "action": action,
+            "result": {
+                k: v for k, v in result.items()
+                if k != "pre_state" and k != "post_state"
+            },
+        }
+        # Include pre/post state references (not full screenshots — too large for JSONL)
+        if "pre_state" in result:
+            entry["pre_state"] = {
+                "active_window": result["pre_state"].get("active_window", ""),
+                "timestamp": result["pre_state"].get("timestamp", ""),
+                "screen_resolution": result["pre_state"].get("screen_resolution", (0, 0)),
+                "ocr_summary": len(result["pre_state"].get("ocr_text", [])),
+            }
+        if "post_state" in result:
+            entry["post_state"] = {
+                "active_window": result["post_state"].get("active_window", ""),
+                "timestamp": result["post_state"].get("timestamp", ""),
+                "screen_resolution": result["post_state"].get("screen_resolution", (0, 0)),
+                "ocr_summary": len(result["post_state"].get("ocr_text", [])),
+            }
+
+        try:
+            with open(self._action_log_path, "a") as f:
+                f.write(json.dumps(entry, default=str) + "\n")
+        except Exception as exc:
+            logger.error(f"Failed to write action log: {exc}")
 
     def safe_execute(self, step: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -369,8 +409,78 @@ class ProjectXComputer:
         Returns:
             {"success": bool, "data": ..., "error": str|None, "duration_ms": int}
         """
-        raise NotImplementedError("Sprint 13")
+        start = time.time()
+        action_name = step.get("action", "")
+        params = step.get("params", {})
+
+        # 1. Validate action exists in the allowlist
+        if action_name not in ACTION_TIERS:
+            error = f"Unknown action: '{action_name}'. Allowed: {sorted(k for k, v in ACTION_TIERS.items() if v >= 0)}"
+            result = self._make_result(False, error=error, start_time=start)
+            self.log_action(step, result)
+            return result
+
+        # 2. Check tier
+        tier = ACTION_TIERS[action_name]
+        if tier > self.max_tier:
+            error = f"Action '{action_name}' requires tier {tier} but max allowed is {self.max_tier}"
+            result = self._make_result(False, error=error, start_time=start)
+            self.log_action(step, result)
+            return result
+
+        # 3. Get the method
+        method = getattr(self, action_name, None)
+        if method is None or not callable(method):
+            error = f"Action '{action_name}' not implemented"
+            result = self._make_result(False, error=error, start_time=start)
+            self.log_action(step, result)
+            return result
+
+        # 4. Capture pre-state for tier 1+ actions
+        pre_state = None
+        if tier >= 1:
+            try:
+                pre_state = self.snapshot_state()
+            except Exception:
+                pre_state = None
+
+        # 5. Execute
+        try:
+            result = method(**params)
+            if not isinstance(result, dict):
+                result = self._make_result(True, data=result, start_time=start)
+        except TaskAbortError:
+            raise  # Let abort propagate
+        except Exception as exc:
+            result = self._make_result(False, error=str(exc), start_time=start)
+
+        # 6. Capture post-state for tier 1+ actions
+        post_state = None
+        if tier >= 1:
+            try:
+                post_state = self.snapshot_state()
+            except Exception:
+                post_state = None
+
+        # 7. Enrich result with states and log
+        if pre_state:
+            result["pre_state"] = pre_state
+        if post_state:
+            result["post_state"] = post_state
+
+        self.log_action(step, result)
+        return result
 
     def abort(self, reason: str) -> None:
-        """Abort the current task with a logged reason."""
-        raise NotImplementedError("Sprint 13")
+        """
+        Abort the current task with a logged reason.
+
+        Logs the abort event and raises TaskAbortError for the SIMP task ledger
+        to catch and record as a task failure.
+        """
+        self.log_action(
+            {"action": "abort", "params": {"reason": reason}},
+            self._make_result(False, error=f"Task aborted: {reason}"),
+        )
+        logger.warning(f"ProjectX task aborted: {reason}")
+        raise TaskAbortError(reason)

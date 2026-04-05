@@ -101,17 +101,17 @@ class TestStubsRaiseCorrectly:
         r = pc.run_shell("echo hi")
         assert isinstance(r, dict) and "success" in r
 
-    def test_safe_execute_stub(self, pc):
-        with pytest.raises(NotImplementedError, match="Sprint 13"):
-            pc.safe_execute({"action": "click", "params": {}})
+    def test_safe_execute_implemented(self, pc):
+        r = pc.safe_execute({"action": "get_active_window", "params": {}})
+        assert isinstance(r, dict) and "success" in r
 
-    def test_abort_stub(self, pc):
-        with pytest.raises(NotImplementedError, match="Sprint 13"):
+    def test_abort_implemented(self, pc):
+        with pytest.raises(TaskAbortError):
             pc.abort("test")
 
-    def test_log_action_stub(self, pc):
-        with pytest.raises(NotImplementedError, match="Sprint 13"):
-            pc.log_action({}, {})
+    def test_log_action_implemented(self, pc):
+        pc.log_action({}, {"success": True})
+        assert pc._action_log_path.exists()
 
 
 if __name__ == "__main__":

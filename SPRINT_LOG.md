@@ -1254,3 +1254,43 @@ Implement the 7 remaining action methods in ProjectXComputer: 6 Tier-1 GUI actio
 - `TestResultFormat` (2 tests): _make_result success/failure format validation
 - `TestGUIActions` (8 tests): each GUI method returns proper result dict structure (graceful in headless CI)
 - `TestShellExecution` (5 tests): echo success, exit 1 failure, timeout handling, stderr capture, duration tracking
+
+---
+
+## Sprint 13 — Logging, Safety, and Control
+**Started:** 2026-04-05
+**Agent:** claude_cowork (implementation)
+**Branch:** feat/public-readonly-dashboard
+
+### Sprint Goal
+Implement the 3 remaining cross-tier methods (`log_action`, `safe_execute`, `abort`) to complete the `ProjectXComputer` class, plus full test coverage.
+
+### SPRINT13-KP-001: Implement log_action()
+**Status:** COMPLETE
+- JSONL audit logging with sequential `action_index` counter
+- ISO 8601 UTC timestamps on every entry
+- Pre/post state summaries (active_window, timestamp, screen_resolution, ocr_summary) extracted from result dict
+- Graceful error handling — logs write failures without crashing
+
+### SPRINT13-KP-002: Implement safe_execute()
+**Status:** COMPLETE
+- Primary entry point: validate action name against `ACTION_TIERS` allowlist
+- Tier-based gating: rejects actions above `self.max_tier`
+- Captures pre/post state snapshots for Tier 1+ actions
+- Executes action method with `**params`, wraps non-dict returns in standard result
+- Lets `TaskAbortError` propagate, catches all other exceptions
+- Logs every execution (including validation failures) via `log_action()`
+- Returns standard result dict with `success`, `data`, `error`, `duration_ms`
+
+### SPRINT13-KP-003: Implement abort()
+**Status:** COMPLETE
+- Logs abort event with reason before raising
+- Raises `TaskAbortError` for task ledger to catch and record as failure
+- Logged with action name "abort" and reason in params
+
+### SPRINT13-KP-004: Add Sprint 13 tests
+**Status:** COMPLETE
+- Created `tests/test_sprint13_safety.py` with 14 tests across 3 test classes
+- `TestLogAction` (4 tests): JSONL file creation, append behavior, timestamp format, pre/post state summaries
+- `TestSafeExecute` (7 tests): unknown action rejection, tier gating, Tier 0 execution, shell execution, logging on every call, failed validation logging, duration tracking
+- `TestAbort` (3 tests): raises TaskAbortError, logs before raising, reason propagation
