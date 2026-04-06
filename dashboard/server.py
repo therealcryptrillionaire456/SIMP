@@ -983,6 +983,12 @@ async def api_health():
     }
 
 
+@app.get("/health")
+async def health_alias():
+    """Compatibility alias for ProjectX and operator health probes."""
+    return await api_health()
+
+
 @app.get("/api/stats")
 async def api_stats():
     """Broker statistics."""
