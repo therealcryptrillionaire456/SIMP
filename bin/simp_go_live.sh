@@ -5,10 +5,9 @@
 #   bash bin/simp_go_live.sh
 #
 # What this does:
-#   1. Checks broker is reachable
-#   2. Installs cowork_bridge launchd service if not running
-#   3. Registers claude_cowork agent with the broker
-#   4. Queues all startup intents in priority order
+#   1. Starts broker if not already running
+#   2. Registers the existing cowork_bridge (port 8767) and other agents
+#   3. Queues all startup intents in priority order
 
 set -e
 
@@ -30,66 +29,80 @@ echo "  SIMP Go-Live  v0.4.0"
 echo "══════════════════════════════════════════"
 echo ""
 
-# ── Step 1: Check broker ──────────────────────────────────────────────────────
+# ── Step 1: Check / start broker ─────────────────────────────────────────────
 info "Checking SIMP broker at $BROKER..."
 if curl -sf "$BROKER/health" > /dev/null 2>&1; then
     ok "Broker is up"
 else
-    fail "Broker not reachable at $BROKER"
-    echo ""
-    echo "  Start it with:"
-    echo "    bash ~/bullbear/launchd/install_services.sh"
-    echo "  Or manually:"
-    echo "    cd $REPO && python3.10 bin/start_server.py &"
-    exit 1
+    warn "Broker not reachable — starting it..."
+    if [ -x "$REPO/bin/start_broker.sh" ]; then
+        bash "$REPO/bin/start_broker.sh"
+    else
+        # Fallback: start directly
+        mkdir -p "$HOME/bullbear/logs" "$REPO/data" "$REPO/data/inboxes" "$REPO/data/tmp" "$REPO/logs"
+        cd "$REPO"
+        nohup python3.10 bin/start_server.py >> "$HOME/bullbear/logs/simp_broker.log" 2>&1 &
+        echo "  Started broker (PID $!)"
+    fi
+
+    # Wait up to 10 seconds for broker to come up
+    WAITED=0
+    while [ $WAITED -lt 10 ]; do
+        if curl -sf "$BROKER/health" > /dev/null 2>&1; then
+            ok "Broker is up (took ${WAITED}s)"
+            break
+        fi
+        sleep 1
+        WAITED=$((WAITED + 1))
+    done
+
+    if ! curl -sf "$BROKER/health" > /dev/null 2>&1; then
+        fail "Broker did not start after 10 seconds"
+        echo ""
+        echo "  Check the log:"
+        echo "    tail -30 $HOME/bullbear/logs/simp_broker.log"
+        tail -20 "$HOME/bullbear/logs/simp_broker.log" 2>/dev/null || true
+        exit 1
+    fi
 fi
 
-# ── Step 2: Check / install cowork_bridge ────────────────────────────────────
+# ── Step 2: Check cowork_bridge ──────────────────────────────────────────────
 info "Checking cowork_bridge at $COWORK..."
 if curl -sf "$COWORK/health" > /dev/null 2>&1; then
     ok "cowork_bridge is running"
 else
-    warn "cowork_bridge not running — installing launchd service..."
-    if [ -f "$REPO/launchd/install.sh" ]; then
-        bash "$REPO/launchd/install.sh"
-        sleep 3
-        if curl -sf "$COWORK/health" > /dev/null 2>&1; then
-            ok "cowork_bridge started"
-        else
-            fail "cowork_bridge failed to start. Run manually:"
-            echo "    python3.10 $REPO/bin/cowork_bridge.py --repo-path $REPO &"
-        fi
-    else
-        warn "launchd/install.sh not found. Start bridge manually:"
-        echo "    python3.10 $REPO/bin/cowork_bridge.py --repo-path $REPO &"
-    fi
+    warn "cowork_bridge not running at $COWORK"
+    echo "  The cowork_bridge Flask app should be running from ~/bullbear/"
+    echo "  Start it with: python3.10 $REPO/bin/cowork_bridge.py --repo-path $REPO &"
+    echo "  Or: bash $REPO/launchd/install.sh"
+    echo ""
+    echo "  Continuing — broker will accept registrations but can't dispatch to cowork yet."
 fi
 
-# ── Step 3: Register claude_cowork with broker ───────────────────────────────
-info "Registering claude_cowork with broker..."
-
-AUTH_HEADER=""
-if [ -n "$API_KEY" ]; then
-    AUTH_HEADER="-H 'Authorization: Bearer $API_KEY'"
-fi
-
-REG_RESULT=$(curl -sf -X POST "$BROKER/agents/register" \
-    -H "Content-Type: application/json" \
-    ${API_KEY:+-H "Authorization: Bearer $API_KEY"} \
-    -d '{
-        "agent_id": "claude_cowork",
-        "agent_type": "llm",
-        "endpoint": "'"$COWORK"'",
-        "metadata": {
-            "model": "claude-code",
-            "capabilities": ["code_task","code_editing","planning","research","scaffolding","test_harness","spec","architecture","docs","code_review","orchestration"]
-        }
-    }' 2>&1) || true
-
-if echo "$REG_RESULT" | grep -q '"status"'; then
-    ok "claude_cowork registered"
+# ── Step 3: Register agents ─────────────────────────────────────────────────
+info "Registering agents with broker..."
+if [ -x "$REPO/bin/register_agents.sh" ]; then
+    bash "$REPO/bin/register_agents.sh"
 else
-    warn "Registration response: $REG_RESULT"
+    # Inline fallback: register claude_cowork only
+    REG_RESULT=$(curl -sf -X POST "$BROKER/agents/register" \
+        -H "Content-Type: application/json" \
+        ${API_KEY:+-H "Authorization: Bearer $API_KEY"} \
+        -d '{
+            "agent_id": "claude_cowork",
+            "agent_type": "llm",
+            "endpoint": "'"$COWORK"'",
+            "metadata": {
+                "model": "claude-code",
+                "capabilities": ["code_task","code_editing","planning","research","scaffolding","test_harness","spec","architecture","docs","code_review","orchestration"]
+            }
+        }' 2>&1) || true
+
+    if echo "$REG_RESULT" | grep -q '"status"'; then
+        ok "claude_cowork registered"
+    else
+        warn "Registration response: $REG_RESULT"
+    fi
 fi
 
 # ── Helper: queue an intent ───────────────────────────────────────────────────
