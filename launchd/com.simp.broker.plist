@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.simp.broker</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>REPLACE_PYTHON</string>
+        <string>REPLACE_WITH_REPO_PATH/bin/start_server.py</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>SIMP_HOST</key>
+        <string>127.0.0.1</string>
+        <key>SIMP_PORT</key>
+        <string>5555</string>
+        <key>SIMP_HTTP_PORT</key>
+        <string>8080</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>REPLACE_WITH_HOME/bullbear/logs/simp_broker.log</string>
+    <key>StandardErrorPath</key>
+    <string>REPLACE_WITH_HOME/bullbear/logs/simp_broker_err.log</string>
+    <key>WorkingDirectory</key>
+    <string>REPLACE_WITH_REPO_PATH</string>
+</dict>
+</plist>
