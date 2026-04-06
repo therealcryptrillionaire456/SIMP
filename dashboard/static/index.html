@@ -80,7 +80,85 @@
           <div class="card-label">Avg Route Time</div>
           <div class="card-value mono" id="val-avg-route">--</div>
         </div>
+        <div class="card" id="card-projectx-status">
+          <div class="card-label">ProjectX Native</div>
+          <div class="card-value" id="val-projectx-status">--</div>
+        </div>
+        <div class="card" id="card-gemma4-status">
+          <div class="card-label">Gemma4 Planner</div>
+          <div class="card-value" id="val-gemma4-status">--</div>
+        </div>
+        <div class="card" id="card-dashboard-status">
+          <div class="card-label">KashClaw Dashboard</div>
+          <div class="card-value" id="val-dashboard-status">--</div>
+        </div>
+        <div class="card" id="card-protocol-update">
+          <div class="card-label">Last Protocol Update</div>
+          <div class="card-value mono" id="val-protocol-update">--</div>
+        </div>
       </div>
+    </section>
+
+    <section class="section" id="projectx-process-section">
+      <h2 class="section-title">Processes</h2>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Health</th>
+              <th>Port</th>
+              <th>Log</th>
+            </tr>
+          </thead>
+          <tbody id="projectx-processes-tbody">
+            <tr><td colspan="6" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="stack-command-row">
+        <div><span class="card-label">Ignite</span><div class="mono" id="stack-start-command">--</div></div>
+        <div><span class="card-label">Restart Managed</span><div class="mono" id="stack-restart-command">--</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="projectx-actions-section">
+      <h2 class="section-title">Recent Actions</h2>
+      <div class="activity-feed" id="projectx-actions-feed">
+        <div class="empty-state">No ProjectX actions recorded yet.</div>
+      </div>
+    </section>
+
+    <section class="section" id="projectx-protocol-section">
+      <h2 class="section-title">Protocol Facts</h2>
+      <div class="cards-grid" id="projectx-protocol-cards">
+        <div class="card"><div class="card-label">Protocol Version</div><div class="card-value mono" id="val-projectx-protocol-version">--</div></div>
+        <div class="card"><div class="card-label">Intent Definitions</div><div class="card-value mono" id="val-projectx-intent-count">--</div></div>
+        <div class="card"><div class="card-label">Agent Definitions</div><div class="card-value mono" id="val-projectx-agent-count">--</div></div>
+        <div class="card"><div class="card-label">Safety Policies</div><div class="card-value mono" id="val-projectx-policy-count">--</div></div>
+      </div>
+      <div class="protocol-summary" id="projectx-protocol-summary">
+        <div class="empty-state">Protocol facts not loaded.</div>
+      </div>
+    </section>
+
+    <section class="section" id="projectx-chat-section">
+      <h2 class="section-title">ProjectX Chat</h2>
+      <div class="chat-controls">
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_health_check">Health Check</button>
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_repo_scan">Repo Scan</button>
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_task_audit">Task Audit</button>
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_security_audit">Security Audit</button>
+      </div>
+      <div class="chat-panel" id="projectx-chat-feed">
+        <div class="empty-state">Ask ProjectX about system state or trigger an allowlisted audit job.</div>
+      </div>
+      <form class="chat-form" id="projectx-chat-form">
+        <textarea id="projectx-chat-input" class="chat-input" placeholder="Ask ProjectX a system question..." rows="3"></textarea>
+        <button type="submit" class="refresh-btn">Send</button>
+      </form>
     </section>
 
     <!-- Registered Agents Table -->
