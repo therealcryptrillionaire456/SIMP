@@ -74,6 +74,48 @@ from simp.compat.ops_policy import (
     SPEND_LEDGER,
 )
 
+# Sprint 41 — payment connector
+from simp.compat.payment_connector import (
+    PaymentConnectorConfig,
+    PaymentResult,
+    PaymentConnector,
+    StubPaymentConnector,
+    ALLOWED_CONNECTORS,
+    ALLOWED_VENDOR_CATEGORIES,
+    DISALLOWED_PAYMENT_TYPES,
+    build_connector,
+    validate_payment_request,
+    ConnectorHealthTracker,
+    HEALTH_TRACKER,
+)
+
+# Sprint 43 — approval queue
+from simp.compat.approval_queue import (
+    PaymentProposalStatus,
+    PaymentProposal,
+    ApprovalQueue,
+    PolicyChangeQueue,
+    APPROVAL_QUEUE,
+    POLICY_CHANGE_QUEUE,
+)
+
+# Sprint 44 — live ledger
+from simp.compat.live_ledger import (
+    LivePaymentRecord,
+    LiveSpendLedger,
+    LIVE_LEDGER,
+)
+
+# Sprint 45 — reconciliation & payment events
+from simp.compat.reconciliation import (
+    ReconciliationResult,
+    run_reconciliation,
+)
+from simp.compat.event_stream import (
+    build_payment_event,
+    PAYMENT_EVENT_KINDS,
+)
+
 __all__ = [
     # Sprint 1
     "build_security_schemes",
@@ -120,4 +162,32 @@ __all__ = [
     "get_policy_dict",
     "SpendRecord",
     "SPEND_LEDGER",
+    # Sprint 41
+    "PaymentConnectorConfig",
+    "PaymentResult",
+    "PaymentConnector",
+    "StubPaymentConnector",
+    "ALLOWED_CONNECTORS",
+    "ALLOWED_VENDOR_CATEGORIES",
+    "DISALLOWED_PAYMENT_TYPES",
+    "build_connector",
+    "validate_payment_request",
+    "ConnectorHealthTracker",
+    "HEALTH_TRACKER",
+    # Sprint 43
+    "PaymentProposalStatus",
+    "PaymentProposal",
+    "ApprovalQueue",
+    "PolicyChangeQueue",
+    "APPROVAL_QUEUE",
+    "POLICY_CHANGE_QUEUE",
+    # Sprint 44
+    "LivePaymentRecord",
+    "LiveSpendLedger",
+    "LIVE_LEDGER",
+    # Sprint 45
+    "ReconciliationResult",
+    "run_reconciliation",
+    "build_payment_event",
+    "PAYMENT_EVENT_KINDS",
 ]

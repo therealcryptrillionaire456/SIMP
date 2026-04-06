@@ -52,19 +52,19 @@ class TestFinancialOpsCard:
 
 
 class TestValidateFinancialOp:
-    def test_always_returns_false(self):
-        ok, reason = validate_financial_op("small_purchase", 5.0)
-        assert ok is False
-        assert "manual approval" in reason
+    def test_always_returns_pending(self):
+        state, reason = validate_financial_op("small_purchase", 5.0)
+        assert state == "pending_approval"
+        assert "manual approval" in reason.lower()
 
     def test_invalid_op_type(self):
-        ok, reason = validate_financial_op("hack_the_planet", 5.0)
-        assert ok is False
+        state, reason = validate_financial_op("hack_the_planet", 5.0)
+        assert state == "rejected"
         assert "Unknown" in reason
 
     def test_overspend(self):
-        ok, reason = validate_financial_op("small_purchase", 999.0)
-        assert ok is False
+        state, reason = validate_financial_op("small_purchase", 999.0)
+        assert state == "rejected"
         assert "exceeds" in reason
 
 

@@ -59,6 +59,51 @@
     </div>
   </div>
 
+  <!-- FinancialOps Status Panel (Sprint 42) -->
+  <div class="panel" id="finops-panel">
+    <div class="panel-header" onclick="togglePanel('finops-panel')">
+      <h2>FinancialOps Status <span class="badge badge-planned">DRY RUN ONLY</span></h2>
+      <span id="finops-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+      <div id="finops-mode"></div>
+      <h2>Connector Health</h2>
+      <table id="finops-health-table">
+        <tr><th>Connector</th><th>Consecutive OK</th><th>Gate-1 Ready</th></tr>
+      </table>
+      <div id="finops-error"></div>
+    </div>
+  </div>
+
+  <!-- Proposed Payments Panel (Sprint 43) -->
+  <div class="panel" id="proposals-panel">
+    <div class="panel-header" onclick="togglePanel('proposals-panel')">
+      <h2>Proposed Payments</h2>
+      <span id="proposals-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+      <table id="proposals-table">
+        <tr><th>Proposal ID</th><th>Vendor</th><th>Amount</th><th>Status</th><th>Risk Flags</th></tr>
+      </table>
+      <div id="proposals-error"></div>
+    </div>
+  </div>
+
+  <!-- Ledger Panel (Sprint 45) -->
+  <div class="panel" id="ledger-panel">
+    <div class="panel-header" onclick="togglePanel('ledger-panel')">
+      <h2>Financial Ledger</h2>
+      <span id="ledger-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+      <h2>Simulated Spend</h2>
+      <div id="ledger-simulated"></div>
+      <h2>Live Spend</h2>
+      <div id="ledger-live"></div>
+      <div id="ledger-error"></div>
+    </div>
+  </div>
+
   <script>
     function escapeHtml(str) {
       var d = document.createElement('div');
@@ -116,6 +161,69 @@
     }
 
     loadA2AStatus();
+
+    // FinancialOps status (Sprint 42)
+    fetch('/dashboard/financial-ops/status')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var mode = document.getElementById('finops-mode');
+        mode.innerHTML = '<p>Mode: <span class="badge ' + (data.live_payments_enabled ? 'badge-active' : 'badge-planned') + '">'
+          + escapeHtml(data.mode) + '</span></p>';
+        var ht = document.getElementById('finops-health-table');
+        var connectors = (data.health && data.health.connectors) || {};
+        for (var c in connectors) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + escapeHtml(c) + '</td>'
+            + '<td>' + connectors[c].consecutive_ok + '</td>'
+            + '<td><span class="badge ' + (connectors[c].gate1_ready ? 'badge-enabled' : 'badge-planned') + '">'
+            + (connectors[c].gate1_ready ? 'yes' : 'no') + '</span></td>';
+          ht.appendChild(tr);
+        }
+      })
+      .catch(function(err) {
+        document.getElementById('finops-error').textContent = 'Failed to load FinancialOps status: ' + err;
+      });
+
+    // Proposals (Sprint 43)
+    fetch('/dashboard/financial-ops/proposals')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var pt = document.getElementById('proposals-table');
+        (data.proposals || []).forEach(function(p) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + escapeHtml(p.proposal_id.substring(0,8)) + '</td>'
+            + '<td>' + escapeHtml(p.vendor) + '</td>'
+            + '<td>$' + p.amount.toFixed(2) + '</td>'
+            + '<td><span class="badge ' + badgeClass(p.status === 'approved' ? 'enabled' : (p.status === 'pending' ? 'planned' : 'inactive')) + '">'
+            + escapeHtml(p.status) + '</span></td>'
+            + '<td>' + escapeHtml((p.risk_flags || []).join(', ')) + '</td>';
+          pt.appendChild(tr);
+        });
+      })
+      .catch(function(err) {
+        document.getElementById('proposals-error').textContent = 'Failed to load proposals: ' + err;
+      });
+
+    // Ledger (Sprint 45)
+    fetch('/dashboard/financial-ops/ledger')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var sim = data.simulated || {};
+        document.getElementById('ledger-simulated').innerHTML = '<table>'
+          + '<tr><td>Total Would-Spend</td><td>$' + (sim.total_would_spend || 0).toFixed(2) + '</td></tr>'
+          + '<tr><td>Count</td><td>' + (sim.count || 0) + '</td></tr>'
+          + '</table>';
+        var live = data.live || {};
+        document.getElementById('ledger-live').innerHTML = '<table>'
+          + '<tr><td>Total Live Spend</td><td>$' + (live.total_live_spend || 0).toFixed(2) + '</td></tr>'
+          + '<tr><td>Succeeded</td><td>' + (live.succeeded || 0) + '</td></tr>'
+          + '<tr><td>Failed</td><td>' + (live.failed || 0) + '</td></tr>'
+          + '<tr><td>Pending</td><td>' + (live.pending || 0) + '</td></tr>'
+          + '</table>';
+      })
+      .catch(function(err) {
+        document.getElementById('ledger-error').textContent = 'Failed to load ledger: ' + err;
+      });
   </script>
 </body>
 </html>

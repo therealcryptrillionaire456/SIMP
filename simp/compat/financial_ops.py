@@ -1,19 +1,27 @@
 """
-SIMP FinancialOps Agent — Simulated Only (Sprint S7, Sprint 37)
+SIMP FinancialOps Agent — Sprints S7, 41-45
 
-Implements the simulated financial_ops agent skeleton with strict policies,
-an immutable simulated spend ledger, and A2A-compatible card generation.
+Implements the financial_ops agent skeleton with strict policies,
+an immutable simulated spend ledger, payment connector integration,
+approval queue, live execution, and A2A-compatible card generation.
 
-CRITICAL: ALL OPERATIONS ARE SIMULATED. No real spend. No credential storage.
-No external API calls. This is a "would-spend ledger" only.
-Status: planned (not yet production-enabled).
+CRITICAL: ALL OPERATIONS ARE SIMULATED unless FINANCIAL_OPS_LIVE_ENABLED=true.
+No credential storage. No external API calls with real keys.
 """
 
 import logging
-from typing import Dict, Any, Tuple, List
+import os
+import uuid
+from typing import Dict, Any, Tuple, List, Optional
 
-from simp.compat.ops_policy import SPEND_LEDGER
+from simp.compat.ops_policy import SPEND_LEDGER, OpsPolicy
 from simp.compat.a2a_security import build_a2a_security_schemes_block
+from simp.compat.payment_connector import (
+    build_connector,
+    validate_payment_request,
+    ALLOWED_CONNECTORS,
+    HEALTH_TRACKER,
+)
 
 logger = logging.getLogger("SIMP.FinancialOps")
 
@@ -55,6 +63,8 @@ def build_financial_ops_card(broker_base_url: str = "http://127.0.0.1:5555") -> 
         for cap in FINANCIAL_OPS_CAPABILITIES
     ]
 
+    live_enabled = os.environ.get("FINANCIAL_OPS_LIVE_ENABLED", "").lower() == "true"
+
     return {
         "name": "SIMP FinancialOps Agent",
         "description": (
@@ -87,31 +97,48 @@ def build_financial_ops_card(broker_base_url: str = "http://127.0.0.1:5555") -> 
             "all_ops_require_approval": True,
             "environment": "development",
             "protocol": "simp/1.0",
+            "livePaymentPolicy": {
+                "enabled": live_enabled,
+                "connectors": sorted(ALLOWED_CONNECTORS.keys()),
+                "pilotLimits": {
+                    "maxPerTransaction": 20.00,
+                    "maxPerDay": 50.00,
+                    "maxPerMonth": 200.00,
+                },
+            },
         },
     }
 
 
 # ---------------------------------------------------------------------------
-# Validation
+# Validation — Sprint 43: 3-state return
 # ---------------------------------------------------------------------------
 
 
-def validate_financial_op(op_type: str, would_spend: float) -> Tuple[bool, str]:
+def validate_financial_op(
+    op_type: str, would_spend: float, vendor: str = "", category: str = ""
+) -> Tuple[str, str]:
     """
     Validate a financial operation request.
 
-    ALWAYS returns (False, ...) — no autonomous financial action is ever allowed.
+    Returns (state, message) where state is one of:
+      - "rejected": operation is not allowed
+      - "pending_approval": structurally valid, needs approval
+      - "approved_for_execution": already approved (not used directly here)
     """
     if op_type not in FINANCIAL_OPS_CAPABILITIES:
-        return False, f"Unknown financial operation type: {op_type}"
+        return "rejected", f"Unknown financial operation type: {op_type}"
 
     if would_spend > FINANCIAL_OPS_LIMITS["maxSpendPerTask"]:
-        return False, (
+        return "rejected", (
             f"Would-spend amount ${would_spend:.2f} exceeds per-task limit "
             f"${FINANCIAL_OPS_LIMITS['maxSpendPerTask']:.2f}"
         )
 
-    return False, "manual approval required — all financial ops require explicit approval"
+    if would_spend <= 0:
+        return "rejected", "Amount must be positive"
+
+    return "pending_approval", "Manual approval required — all financial ops require explicit approval"
 
 
 # ---------------------------------------------------------------------------
@@ -140,3 +167,119 @@ def record_would_spend(
         would_spend=would_spend,
     )
     return record.to_dict()
+
+
+# ---------------------------------------------------------------------------
+# Execute approved payment — Sprint 44
+# ---------------------------------------------------------------------------
+
+
+def execute_approved_payment(proposal_id: str) -> Dict[str, Any]:
+    """
+    Execute a previously approved payment proposal.
+
+    Steps:
+      1. Check FINANCIAL_OPS_LIVE_ENABLED env var
+      2. Load proposal, verify status="approved"
+      3. Re-validate against OpsPolicy (defense in depth)
+      4. Idempotency check via LIVE_LEDGER
+      5. Record attempt, call connector, record outcome
+
+    Returns {"status": "succeeded|failed|already_executed", ...}
+    """
+    import simp.compat.approval_queue as _aq_mod
+    import simp.compat.live_ledger as _ll_mod
+    APPROVAL_QUEUE = _aq_mod.APPROVAL_QUEUE
+    LIVE_LEDGER = _ll_mod.LIVE_LEDGER
+    PaymentProposalStatus = _aq_mod.PaymentProposalStatus
+
+    # Step 1: env var gate
+    live_enabled = os.environ.get("FINANCIAL_OPS_LIVE_ENABLED", "").lower() == "true"
+    if not live_enabled:
+        raise RuntimeError(
+            "Live payments are not enabled. Set FINANCIAL_OPS_LIVE_ENABLED=true."
+        )
+
+    # Step 2: load and verify proposal
+    proposal = APPROVAL_QUEUE.get_proposal(proposal_id)
+    if proposal is None:
+        raise ValueError(f"Proposal {proposal_id!r} not found")
+    if proposal.status != PaymentProposalStatus.APPROVED:
+        raise ValueError(
+            f"Proposal {proposal_id!r} is {proposal.status}, not approved"
+        )
+
+    # Step 3: re-validate against policy (defense in depth)
+    state, msg = validate_financial_op(
+        proposal.op_type, proposal.amount,
+        vendor=proposal.vendor, category=proposal.category,
+    )
+    if state == "rejected":
+        raise ValueError(f"Policy re-validation failed: {msg}")
+
+    # Step 4: idempotency check
+    idempotency_key = f"proposal-{proposal_id}"
+    if LIVE_LEDGER.is_already_executed(idempotency_key):
+        return {
+            "status": "already_executed",
+            "proposal_id": proposal_id,
+            "message": "This proposal has already been executed (idempotency guard).",
+        }
+
+    # Step 5: record attempt, execute, record outcome
+    attempt = LIVE_LEDGER.record_attempt(
+        proposal_id=proposal_id,
+        idempotency_key=idempotency_key,
+        connector_name=proposal.connector_name,
+        vendor=proposal.vendor,
+        category=proposal.category,
+        amount=proposal.amount,
+    )
+
+    try:
+        connector = build_connector(proposal.connector_name)
+        result = connector.execute_small_payment(
+            amount=proposal.amount,
+            vendor=proposal.vendor,
+            description=proposal.description,
+            idempotency_key=idempotency_key,
+        )
+
+        if result.success:
+            LIVE_LEDGER.record_outcome(
+                record_id=attempt.record_id,
+                status="succeeded",
+                provider_reference=result.reference_id,
+            )
+            return {
+                "status": "succeeded",
+                "record_id": attempt.record_id,
+                "proposal_id": proposal_id,
+                "amount": proposal.amount,
+                "dry_run": result.dry_run,
+            }
+        else:
+            LIVE_LEDGER.record_outcome(
+                record_id=attempt.record_id,
+                status="failed",
+                error=result.error or result.message,
+            )
+            return {
+                "status": "failed",
+                "record_id": attempt.record_id,
+                "proposal_id": proposal_id,
+                "error": result.error or result.message,
+            }
+
+    except Exception as exc:
+        LIVE_LEDGER.record_outcome(
+            record_id=attempt.record_id,
+            status="failed",
+            error=str(exc),
+        )
+        return {
+            "status": "failed",
+            "record_id": attempt.record_id,
+            "proposal_id": proposal_id,
+            "error": str(exc),
+        }

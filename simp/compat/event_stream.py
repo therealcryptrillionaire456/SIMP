@@ -115,3 +115,53 @@ def build_a2a_events_list(
             "limit": limit,
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# Payment-specific event builder — Sprint 45
+# ---------------------------------------------------------------------------
+
+PAYMENT_EVENT_KINDS = frozenset({
+    "proposal_created",
+    "approval_granted",
+    "execution_started",
+    "execution_succeeded",
+    "execution_failed",
+})
+
+
+def build_payment_event(
+    event_kind: str,
+    proposal_id: str,
+    amount: float = 0.0,
+    vendor: str = "",
+    connector: str = "",
+    status: str = "",
+    error: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Build a payment-specific A2A event.
+
+    NEVER includes PAN, card details, or payment credentials.
+    """
+    if event_kind not in PAYMENT_EVENT_KINDS:
+        raise ValueError(f"Unknown payment event kind: {event_kind!r}")
+
+    event: Dict[str, Any] = {
+        "eventKind": event_kind,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "x-simp": {
+            "protocol": "simp/1.0",
+            "proposal_id": proposal_id,
+            "amount": amount,
+            "vendor": vendor,
+            "connector": connector,
+            "status": status,
+        },
+    }
+
+    if error:
+        # Truncate error to 200 chars
+        event["error"] = error[:200] + "..." if len(error) > 200 else error
+
+    return event

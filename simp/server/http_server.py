@@ -33,11 +33,26 @@ from simp.compat.a2a_security import (
     build_a2a_security_schemes_block,
     build_replay_guard_note,
 )
+from simp.compat.ops_policy import SPEND_LEDGER
 from simp.compat.financial_ops import (
     build_financial_ops_card,
     validate_financial_op,
     record_would_spend,
+    execute_approved_payment,
 )
+from simp.compat.payment_connector import (
+    HEALTH_TRACKER,
+    ALLOWED_CONNECTORS,
+    build_connector,
+    validate_payment_request,
+)
+from simp.compat.approval_queue import (
+    APPROVAL_QUEUE,
+    POLICY_CHANGE_QUEUE,
+    PaymentProposalStatus,
+)
+from simp.compat.live_ledger import LIVE_LEDGER
+from simp.compat.reconciliation import run_reconciliation
 from simp.compat.projectx_diagnostics import build_projectx_health_report
 
 # Max payload for A2A task submissions (64 KB)
@@ -481,8 +496,8 @@ class SimpHttpServer:
             would_spend = float(data.get("would_spend", 0.0))
             description = data.get("description", "A2A financial op request")
 
-            ok, reason = validate_financial_op(op_type, would_spend)
-            # Always record the simulated spend regardless (ok is always False)
+            state, reason = validate_financial_op(op_type, would_spend)
+            # Always record the simulated spend regardless
             record = record_would_spend(
                 agent_id=data.get("agent_id", "a2a_client"),
                 op_type=op_type if op_type else "unknown",
@@ -500,6 +515,167 @@ class SimpHttpServer:
                 "would_spend": would_spend,
                 "x-simp": {"mode": "simulate_only", "approved": False},
             }), 202
+
+        # --- Connector health (Sprint 42) ---
+        @self.app.route("/a2a/agents/financial-ops/connector-health", methods=["GET"])
+        def financial_ops_connector_health():
+            """Return connector health status (unauthenticated, no secrets)."""
+            return jsonify(HEALTH_TRACKER.get_status()), 200
+
+        # --- Proposal routes (Sprint 43) ---
+        @self.app.route("/a2a/agents/financial-ops/proposals", methods=["POST"])
+        @_require_api_key
+        def financial_ops_submit_proposal():
+            data = request.get_json(silent=True) or {}
+            try:
+                proposal = APPROVAL_QUEUE.submit_proposal(
+                    op_type=data.get("op_type", "small_purchase"),
+                    vendor=data.get("vendor", ""),
+                    category=data.get("category", ""),
+                    amount=float(data.get("amount", 0)),
+                    connector_name=data.get("connector_name", "stripe_small_payments"),
+                    description=data.get("description", ""),
+                    submitted_by=data.get("submitted_by", "a2a_client"),
+                )
+                return jsonify({
+                    "status": "pending",
+                    "proposal": proposal.to_dict(),
+                }), 201
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/proposals", methods=["GET"])
+        @_require_api_key
+        def financial_ops_list_proposals():
+            proposals = APPROVAL_QUEUE.get_all_proposals()
+            return jsonify({
+                "proposals": [p.to_dict() for p in proposals],
+                "count": len(proposals),
+            }), 200
+
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>", methods=["GET"])
+        @_require_api_key
+        def financial_ops_get_proposal(proposal_id):
+            proposal = APPROVAL_QUEUE.get_proposal(proposal_id)
+            if proposal is None:
+                return jsonify({"status": "error", "error": "Proposal not found"}), 404
+            return jsonify({"proposal": proposal.to_dict()}), 200
+
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>/approve", methods=["POST"])
+        @_require_api_key
+        def financial_ops_approve_proposal(proposal_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+            try:
+                proposal = APPROVAL_QUEUE.approve_proposal(proposal_id, operator)
+                return jsonify({"status": "approved", "proposal": proposal.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>/reject", methods=["POST"])
+        @_require_api_key
+        def financial_ops_reject_proposal(proposal_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            reason = data.get("reason", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+            try:
+                proposal = APPROVAL_QUEUE.reject_proposal(proposal_id, operator, reason)
+                return jsonify({"status": "rejected", "proposal": proposal.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        # --- Policy change routes (Sprint 43) ---
+        @self.app.route("/a2a/agents/financial-ops/policy-changes", methods=["POST"])
+        @_require_api_key
+        def financial_ops_submit_policy_change():
+            data = request.get_json(silent=True) or {}
+            try:
+                change = POLICY_CHANGE_QUEUE.submit_change(
+                    change_type=data.get("change_type", ""),
+                    description=data.get("description", ""),
+                    proposed_by=data.get("proposed_by", ""),
+                )
+                return jsonify({"status": "pending", "change": change.to_dict()}), 201
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/policy-changes/<change_id>/approve", methods=["POST"])
+        @_require_api_key
+        def financial_ops_approve_policy_change(change_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+            try:
+                change = POLICY_CHANGE_QUEUE.approve_change(change_id, operator)
+                return jsonify({"status": change.status, "change": change.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        # --- Execute approved payment (Sprint 44) ---
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>/execute", methods=["POST"])
+        @_require_api_key
+        def financial_ops_execute_proposal(proposal_id):
+            live_enabled = os.environ.get("FINANCIAL_OPS_LIVE_ENABLED", "").lower() == "true"
+            if not live_enabled:
+                return jsonify({
+                    "status": "error",
+                    "error": "Live payments are not enabled (FINANCIAL_OPS_LIVE_ENABLED != true)",
+                }), 403
+            try:
+                result = execute_approved_payment(proposal_id)
+                return jsonify(result), 200
+            except (ValueError, RuntimeError) as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        # --- Ledger (Sprint 45) ---
+        @self.app.route("/a2a/agents/financial-ops/ledger", methods=["GET"])
+        @_require_api_key
+        def financial_ops_ledger():
+            """Combined simulated + live ledger, PII-minimized."""
+            sim = SPEND_LEDGER.get_ledger_summary()
+            live = LIVE_LEDGER.get_summary()
+            return jsonify({
+                "simulated": sim,
+                "live": live,
+                "x-simp": {"pii_minimized": True},
+            }), 200
+
+        # --- Reconciliation (Sprint 45) ---
+        @self.app.route("/a2a/agents/financial-ops/reconciliation", methods=["POST"])
+        @_require_api_key
+        def financial_ops_reconciliation():
+            data = request.get_json(silent=True) or {}
+            period_start = data.get("period_start", "2000-01-01T00:00:00+00:00")
+            period_end = data.get("period_end", "2099-12-31T23:59:59+00:00")
+            ref_total = data.get("reference_total")
+            if ref_total is not None:
+                ref_total = float(ref_total)
+            result = run_reconciliation(period_start, period_end, ref_total)
+            return jsonify(result.to_dict()), 200
+
+        # --- Export (Sprint 45) ---
+        @self.app.route("/a2a/agents/financial-ops/export", methods=["GET"])
+        @_require_api_key
+        def financial_ops_export():
+            """Export safe fields only."""
+            from simp.compat.approval_queue import APPROVAL_QUEUE
+            proposals = APPROVAL_QUEUE.get_all_proposals()
+            safe = []
+            for p in proposals:
+                safe.append({
+                    "proposal_id": p.proposal_id,
+                    "vendor": p.vendor,
+                    "category": p.category,
+                    "amount": p.amount,
+                    "status": p.status,
+                    "submitted_at": p.submitted_at,
+                })
+            return jsonify({"records": safe, "count": len(safe)}), 200
 
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         """
