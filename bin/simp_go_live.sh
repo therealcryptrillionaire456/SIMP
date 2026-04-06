@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
-# simp_go_live.sh — Bring SIMP online and queue all startup tasks
+# simp_go_live.sh — Connect SIMP repo to the live bullbear broker and queue startup tasks
 #
 # Usage:
 #   bash bin/simp_go_live.sh
 #
 # What this does:
-#   1. Starts broker if not already running
-#   2. Registers the existing cowork_bridge (port 8767) and other agents
-#   3. Queues all startup intents in priority order
+#   1. Checks if the bullbear broker is running on port 5555 (does NOT start a new one)
+#   2. Checks if cowork_bridge is running on port 8767
+#   3. Registers claude_cowork with the bullbear broker
+#   4. Queues all startup intents in priority order via /intents/route
 
 set -e
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BROKER="http://127.0.0.1:5555"
-COWORK="http://127.0.0.1:8767"
+BROKER="${SIMP_BROKER:-http://127.0.0.1:5555}"
+COWORK="${COWORK_URL:-http://127.0.0.1:8767}"
 API_KEY="${SIMP_API_KEY:-}"  # Optional — set if broker requires auth
 
 # ── Color output ──────────────────────────────────────────────────────────────
@@ -26,86 +27,66 @@ info() { echo -e "${BLUE}  →${NC} $*"; }
 echo ""
 echo "══════════════════════════════════════════"
 echo "  SIMP Go-Live  v0.4.0"
+echo "  Targeting bullbear broker at $BROKER"
 echo "══════════════════════════════════════════"
 echo ""
 
-# ── Step 1: Check / start broker ─────────────────────────────────────────────
-info "Checking SIMP broker at $BROKER..."
-if curl -sf "$BROKER/health" > /dev/null 2>&1; then
+# ── Step 1: Check bullbear broker (DO NOT start a new one) ──────────────────
+info "Checking bullbear broker at $BROKER..."
+if curl -sf --max-time 5 "$BROKER/health" > /dev/null 2>&1; then
     ok "Broker is up"
 else
-    warn "Broker not reachable — starting it..."
-    if [ -x "$REPO/bin/start_broker.sh" ]; then
-        bash "$REPO/bin/start_broker.sh"
-    else
-        # Fallback: start directly
-        mkdir -p "$HOME/bullbear/logs" "$REPO/data" "$REPO/data/inboxes" "$REPO/data/tmp" "$REPO/logs"
-        cd "$REPO"
-        nohup python3.10 bin/start_server.py >> "$HOME/bullbear/logs/simp_broker.log" 2>&1 &
-        echo "  Started broker (PID $!)"
-    fi
-
-    # Wait up to 10 seconds for broker to come up
-    WAITED=0
-    while [ $WAITED -lt 10 ]; do
-        if curl -sf "$BROKER/health" > /dev/null 2>&1; then
-            ok "Broker is up (took ${WAITED}s)"
-            break
-        fi
-        sleep 1
-        WAITED=$((WAITED + 1))
-    done
-
-    if ! curl -sf "$BROKER/health" > /dev/null 2>&1; then
-        fail "Broker did not start after 10 seconds"
-        echo ""
-        echo "  Check the log:"
-        echo "    tail -30 $HOME/bullbear/logs/simp_broker.log"
-        tail -20 "$HOME/bullbear/logs/simp_broker.log" 2>/dev/null || true
-        exit 1
-    fi
+    fail "Bullbear broker is NOT reachable at $BROKER"
+    echo ""
+    echo "  The live broker runs from ~/bullbear/, not from this repo."
+    echo "  This script does NOT start a competing broker."
+    echo ""
+    echo "  To start/restart the bullbear broker:"
+    echo "    cd ~/bullbear && python3.10 bin/start_server.py &"
+    echo ""
+    echo "  Check the log:"
+    echo "    tail -30 ~/bullbear/logs/simp_broker.log"
+    echo ""
+    echo "  Check what's on port 5555:"
+    lsof -i :5555 2>/dev/null | head -5 || echo "    (nothing on port 5555)"
+    echo ""
+    exit 1
 fi
 
 # ── Step 2: Check cowork_bridge ──────────────────────────────────────────────
 info "Checking cowork_bridge at $COWORK..."
-if curl -sf "$COWORK/health" > /dev/null 2>&1; then
+if curl -sf --max-time 3 "$COWORK/health" > /dev/null 2>&1; then
     ok "cowork_bridge is running"
 else
     warn "cowork_bridge not running at $COWORK"
-    echo "  The cowork_bridge Flask app should be running from ~/bullbear/"
-    echo "  Start it with: python3.10 $REPO/bin/cowork_bridge.py --repo-path $REPO &"
-    echo "  Or: bash $REPO/launchd/install.sh"
+    echo "  The cowork_bridge Flask app runs from ~/bullbear/"
+    echo "  Start it with: cd ~/bullbear && python3.10 cowork_bridge.py &"
     echo ""
     echo "  Continuing — broker will accept registrations but can't dispatch to cowork yet."
 fi
 
-# ── Step 3: Register agents ─────────────────────────────────────────────────
-info "Registering agents with broker..."
-if [ -x "$REPO/bin/register_agents.sh" ]; then
-    bash "$REPO/bin/register_agents.sh"
-else
-    # Inline fallback: register claude_cowork only
-    REG_RESULT=$(curl -sf -X POST "$BROKER/agents/register" \
-        -H "Content-Type: application/json" \
-        ${API_KEY:+-H "Authorization: Bearer $API_KEY"} \
-        -d '{
-            "agent_id": "claude_cowork",
-            "agent_type": "llm",
-            "endpoint": "'"$COWORK"'",
-            "metadata": {
-                "model": "claude-code",
-                "capabilities": ["code_task","code_editing","planning","research","scaffolding","test_harness","spec","architecture","docs","code_review","orchestration"]
-            }
-        }' 2>&1) || true
+# ── Step 3: Register claude_cowork with the bullbear broker ─────────────────
+info "Registering claude_cowork with bullbear broker..."
+REG_RESULT=$(curl -sf -X POST "$BROKER/agents/register" \
+    -H "Content-Type: application/json" \
+    ${API_KEY:+-H "Authorization: Bearer $API_KEY"} \
+    -d '{
+        "agent_id": "claude_cowork",
+        "agent_type": "llm",
+        "endpoint": "'"$COWORK"'",
+        "metadata": {
+            "model": "claude-code",
+            "capabilities": ["code_task","code_editing","planning","research","scaffolding","test_harness","spec","architecture","docs","code_review","orchestration"]
+        }
+    }' 2>&1) || true
 
-    if echo "$REG_RESULT" | grep -q '"status"'; then
-        ok "claude_cowork registered"
-    else
-        warn "Registration response: $REG_RESULT"
-    fi
+if echo "$REG_RESULT" | grep -q '"status"'; then
+    ok "claude_cowork registered"
+else
+    warn "Registration response: $REG_RESULT"
 fi
 
-# ── Helper: queue an intent ───────────────────────────────────────────────────
+# ── Helper: queue an intent to the bullbear broker ───────────────────────────
 queue_intent() {
     local label="$1"
     local json="$2"
@@ -114,16 +95,16 @@ queue_intent() {
         -H "Content-Type: application/json" \
         ${API_KEY:+-H "Authorization: Bearer $API_KEY"} \
         -d "$json" 2>&1) || true
-    if echo "$RESULT" | grep -qE '"status"|"task_id"'; then
+    if echo "$RESULT" | grep -qE '"status"|"task_id"|"intent_id"'; then
         ok "$label → queued"
     else
         warn "$label → $RESULT"
     fi
 }
 
-# ── Step 4: Queue startup intents in priority order ───────────────────────────
+# ── Step 4: Queue startup intents in priority order ─────────────────────────
 echo ""
-echo "── Queuing startup tasks ─────────────────"
+echo "── Queuing startup tasks to bullbear broker ──"
 
 # 4a. Fix protocol_updater.py (CRITICAL — from user)
 queue_intent "Fix protocol_updater.py syntax error" '{
@@ -193,12 +174,15 @@ queue_intent "Create PR: merge feat/public-readonly-dashboard to main" '{
 
 echo ""
 echo "══════════════════════════════════════════"
-echo "  All tasks queued."
+echo "  All tasks queued to bullbear broker."
 echo ""
 echo "  Monitor progress:"
-echo "    curl -s $BROKER/tasks | python3 -m json.tool"
-echo "    curl -s $BROKER/logs?limit=20 | python3 -m json.tool"
+echo "    curl -s $BROKER/stats | python3 -m json.tool"
+echo "    curl -s $BROKER/agents | python3 -m json.tool"
 echo ""
-echo "  Check cowork_bridge logs:"
+echo "  Check cowork bridge logs:"
 echo "    tail -f ~/bullbear/logs/cowork_bridge.log"
+echo ""
+echo "  Queue more tasks:"
+echo "    bash bin/queue_intent.sh \"Your task here\" code_task high"
 echo "══════════════════════════════════════════"
