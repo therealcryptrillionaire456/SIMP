@@ -116,3 +116,40 @@
 - Routes: connector health, proposals CRUD, approve/reject, execute, policy changes, ledger, export, reconciliation.
 - Extended `dashboard/server.py`: Added /dashboard/financial-ops/status, proposals, ledger endpoints.
 - Extended `dashboard/index.html`: Added FinancialOps Status, Proposed Payments, Ledger panels.
+
+## Sprint 46 — Rollback System
+- Created `simp/compat/rollback.py`: RollbackState (ACTIVE/INACTIVE/NEVER_LIVE), RollbackRecord, RollbackManager.
+- JSONL-backed rollback log (append-only). ROLLBACK_MANAGER singleton.
+- LedgerFrozenError: LiveSpendLedger.freeze()/unfreeze()/is_frozen() block writes during rollback.
+- record_attempt() and record_outcome() raise LedgerFrozenError when frozen.
+- execute_approved_payment() checks rollback state before execution.
+- Routes: POST /a2a/agents/financial-ops/rollback, GET /rollback/status, GET /rollback/history.
+- When FINANCIAL_OPS_LIVE_ENABLED != "true", rollback state is always ACTIVE or NEVER_LIVE.
+
+## Sprint 47 — Graduation Gate Manager
+- Created `simp/compat/gate_manager.py`: GateStatus, GateCondition, GateCheckResult, GateManager.
+- Two-gate graduation system with automated and manual conditions.
+- Gate 1: connector_health_7_days, simulated_payments_20, no_connector_errors (auto), ops_policy_reviewed (manual).
+- Gate 2: gate1_signed_off, approval_workflow_tested, live_ledger_validated, reconciliation_run, rollback_system_operational (auto), security_review_signed_off, pilot_limits_set (manual).
+- sign_off_gate raises ValueError when automated conditions not met.
+- Routes: GET /gates, GET /gates/1, GET /gates/2, POST /gates/1/sign-off, POST /gates/2/sign-off, POST /gates/1/promote, POST /gates/2/promote.
+
+## Sprint 48 — Stripe Test Connector
+- Created `simp/compat/stripe_connector.py`: StripeTestConnector(PaymentConnector) using stdlib urllib only.
+- Enforces sk_test_ key prefix. NEVER logs full key (only last 4 chars).
+- health_check() GET /v1/account. authorize() POST /v1/payment_intents with confirm=false.
+- execute_small_payment() and refund() raise RuntimeError in dry_run mode.
+- Updated ALLOWED_CONNECTORS: build_connector() uses StripeTestConnector when STRIPE_TEST_SECRET_KEY set, falls back to StubPaymentConnector.
+
+## Sprint 49 — Budget Monitor
+- Created `simp/compat/budget_monitor.py`: AlertSeverity, BudgetAlert, BudgetMonitor.
+- WARNING at >=75% of limit, CRITICAL at >=100%. Anomaly detection (>2x historical avg).
+- BUDGET_MONITOR singleton. CRITICAL task/daily alerts block execute_approved_payment().
+- Routes: GET /a2a/agents/financial-ops/budget (public), GET /alerts (auth), POST /alerts/<id>/acknowledge (auth).
+
+## Sprint 50 — Hardening & Release v0.6.0
+- Created `tests/test_financial_ops_contracts.py`: 20 invariant/contract tests.
+- Ledger append-only, no secrets in cards, idempotency, rollback, gate, A2A card shape.
+- Updated `simp/compat/__init__.py`: Exported Sprint 46-49 symbols.
+- Bumped _SIMP_VERSION to "0.6.0" in `simp/compat/agent_card.py`.
+- Created `docs/FINANCIAL_OPS.md`: 10-section operator guide.

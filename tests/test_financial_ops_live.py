@@ -3,10 +3,12 @@
 import json
 import os
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import simp.compat.approval_queue as aq_mod
 import simp.compat.live_ledger as ll_mod
+import simp.compat.rollback as rb_mod
+import simp.compat.budget_monitor as bm_mod
 from simp.compat.live_ledger import (
     LivePaymentRecord,
     LiveSpendLedger,
@@ -17,6 +19,8 @@ from simp.compat.approval_queue import (
     PaymentProposalStatus,
 )
 from simp.compat.financial_ops import execute_approved_payment
+from simp.compat.rollback import RollbackManager, RollbackState
+from simp.compat.budget_monitor import BudgetMonitor
 
 
 class TestLivePaymentRecord:
@@ -118,27 +122,45 @@ class TestExecuteApprovedPayment:
         # Use temp files for queues and ledgers
         proposals_file = str(tmp_path / "proposals.jsonl")
         live_file = str(tmp_path / "live.jsonl")
+        # Provide a clean rollback manager in INACTIVE state for live tests
+        rb = RollbackManager(filepath=str(tmp_path / "rb.jsonl"))
+        rb.deactivate_rollback("test", "test setup")
+        self._rb = rb
+        # Provide a clean budget monitor with no alerts
+        bm = BudgetMonitor()
+        self._bm = bm
         return proposals_file, live_file
 
-    def test_live_not_enabled_raises(self, monkeypatch):
+    def _patch_rollback_and_budget(self):
+        """Return context managers for patching rollback and budget."""
+        return (
+            patch.object(rb_mod, "ROLLBACK_MANAGER", self._rb),
+            patch.object(bm_mod, "BUDGET_MONITOR", self._bm),
+        )
+
+    def test_live_not_enabled_raises(self, tmp_path, monkeypatch):
         monkeypatch.delenv("FINANCIAL_OPS_LIVE_ENABLED", raising=False)
-        with pytest.raises(RuntimeError, match="not enabled"):
-            execute_approved_payment("some-id")
+        # Create a rollback manager with NEVER_LIVE state (no history)
+        rb = RollbackManager(filepath=str(tmp_path / "rb.jsonl"))
+        with patch.object(rb_mod, "ROLLBACK_MANAGER", rb):
+            with pytest.raises(RuntimeError, match="not enabled"):
+                execute_approved_payment("some-id")
 
     def test_nonexistent_proposal_raises(self, setup_env, monkeypatch):
         from simp.compat.approval_queue import ApprovalQueue
         q = ApprovalQueue(filepath=setup_env[0])
-        with patch.object(aq_mod, "APPROVAL_QUEUE", q):
+        p1, p2 = self._patch_rollback_and_budget()
+        with patch.object(aq_mod, "APPROVAL_QUEUE", q), p1, p2:
             with pytest.raises(ValueError, match="not found"):
                 execute_approved_payment("nonexistent")
 
     def test_unapproved_proposal_raises(self, setup_env, monkeypatch):
         from simp.compat.approval_queue import ApprovalQueue
-        from simp.compat.live_ledger import LiveSpendLedger
         q = ApprovalQueue(filepath=setup_env[0])
         p = q.submit_proposal("small_purchase", "Acme", "cloud_infrastructure", 5.0, "stripe_small_payments")
         # Proposal is pending, not approved
-        with patch.object(aq_mod, "APPROVAL_QUEUE", q):
+        p1, p2 = self._patch_rollback_and_budget()
+        with patch.object(aq_mod, "APPROVAL_QUEUE", q), p1, p2:
             with pytest.raises(ValueError, match="not approved"):
                 execute_approved_payment(p.proposal_id)
 
@@ -150,8 +172,9 @@ class TestExecuteApprovedPayment:
         p = q.submit_proposal("small_purchase", "Acme", "cloud_infrastructure", 5.0, "stripe_small_payments")
         q.approve_proposal(p.proposal_id, "operator@example.com")
 
+        p1, p2 = self._patch_rollback_and_budget()
         with patch.object(aq_mod, "APPROVAL_QUEUE", q), \
-             patch.object(ll_mod, "LIVE_LEDGER", ll):
+             patch.object(ll_mod, "LIVE_LEDGER", ll), p1, p2:
             result = execute_approved_payment(p.proposal_id)
             assert result["status"] == "succeeded"
             assert result["proposal_id"] == p.proposal_id
@@ -164,8 +187,9 @@ class TestExecuteApprovedPayment:
         p = q.submit_proposal("small_purchase", "Acme", "cloud_infrastructure", 5.0, "stripe_small_payments")
         q.approve_proposal(p.proposal_id, "operator@example.com")
 
+        p1, p2 = self._patch_rollback_and_budget()
         with patch.object(aq_mod, "APPROVAL_QUEUE", q), \
-             patch.object(ll_mod, "LIVE_LEDGER", ll):
+             patch.object(ll_mod, "LIVE_LEDGER", ll), p1, p2:
             result1 = execute_approved_payment(p.proposal_id)
             assert result1["status"] == "succeeded"
 
@@ -181,8 +205,9 @@ class TestExecuteApprovedPayment:
         p = q.submit_proposal("small_purchase", "Acme", "cloud_infrastructure", 5.0, "stripe_small_payments")
         q.approve_proposal(p.proposal_id, "operator@example.com")
 
+        p1, p2 = self._patch_rollback_and_budget()
         with patch.object(aq_mod, "APPROVAL_QUEUE", q), \
-             patch.object(ll_mod, "LIVE_LEDGER", ll):
+             patch.object(ll_mod, "LIVE_LEDGER", ll), p1, p2:
             execute_approved_payment(p.proposal_id)
             execute_approved_payment(p.proposal_id)
             s = ll.get_summary()

@@ -54,6 +54,9 @@ from simp.compat.approval_queue import (
 from simp.compat.live_ledger import LIVE_LEDGER
 from simp.compat.reconciliation import run_reconciliation
 from simp.compat.projectx_diagnostics import build_projectx_health_report
+from simp.compat.rollback import ROLLBACK_MANAGER
+from simp.compat.gate_manager import GATE_MANAGER
+from simp.compat.budget_monitor import BUDGET_MONITOR
 
 # Max payload for A2A task submissions (64 KB)
 _A2A_MAX_PAYLOAD = 64 * 1024
@@ -676,6 +679,121 @@ class SimpHttpServer:
                     "submitted_at": p.submitted_at,
                 })
             return jsonify({"records": safe, "count": len(safe)}), 200
+
+        # --- Rollback routes (Sprint 46) ---
+        @self.app.route("/a2a/agents/financial-ops/rollback", methods=["POST"])
+        @_require_api_key
+        def financial_ops_rollback():
+            data = request.get_json(silent=True) or {}
+            triggered_by = data.get("triggered_by", "operator")
+            reason = data.get("reason", "Manual rollback")
+            record = ROLLBACK_MANAGER.trigger_rollback(triggered_by, reason)
+            return jsonify({"status": "rollback_active", "record": record.to_dict()}), 200
+
+        @self.app.route("/rollback/status", methods=["GET"])
+        def rollback_status():
+            return jsonify(ROLLBACK_MANAGER.get_rollback_status()), 200
+
+        @self.app.route("/rollback/history", methods=["GET"])
+        def rollback_history():
+            return jsonify({"history": ROLLBACK_MANAGER.get_rollback_history()}), 200
+
+        # --- Gate routes (Sprint 47) ---
+        @self.app.route("/gates", methods=["GET"])
+        def gates_status():
+            return jsonify(GATE_MANAGER.get_current_gate_status()), 200
+
+        @self.app.route("/gates/1", methods=["GET"])
+        def gate1_status():
+            return jsonify(GATE_MANAGER.check_gate1().to_dict()), 200
+
+        @self.app.route("/gates/2", methods=["GET"])
+        def gate2_status():
+            return jsonify(GATE_MANAGER.check_gate2().to_dict()), 200
+
+        @self.app.route("/gates/1/sign-off", methods=["POST"])
+        @_require_api_key
+        def gate1_signoff_condition():
+            data = request.get_json(silent=True) or {}
+            condition = data.get("condition", "")
+            operator = data.get("operator", "")
+            if not condition or not operator:
+                return jsonify({"status": "error", "error": "condition and operator required"}), 400
+            try:
+                cond = GATE_MANAGER.sign_off_condition(1, condition, operator)
+                return jsonify({"status": "signed_off", "condition": cond.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/gates/2/sign-off", methods=["POST"])
+        @_require_api_key
+        def gate2_signoff_condition():
+            data = request.get_json(silent=True) or {}
+            condition = data.get("condition", "")
+            operator = data.get("operator", "")
+            if not condition or not operator:
+                return jsonify({"status": "error", "error": "condition and operator required"}), 400
+            try:
+                cond = GATE_MANAGER.sign_off_condition(2, condition, operator)
+                return jsonify({"status": "signed_off", "condition": cond.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/gates/1/promote", methods=["POST"])
+        @_require_api_key
+        def gate1_promote():
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator required"}), 400
+            try:
+                result = GATE_MANAGER.promote_gate(1, operator)
+                return jsonify({"status": "promoted", "gate": result.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/gates/2/promote", methods=["POST"])
+        @_require_api_key
+        def gate2_promote():
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator required"}), 400
+            try:
+                result = GATE_MANAGER.promote_gate(2, operator)
+                return jsonify({"status": "promoted", "gate": result.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        # --- Budget routes (Sprint 49) ---
+        @self.app.route("/a2a/agents/financial-ops/budget", methods=["GET"])
+        def financial_ops_budget():
+            """Public budget summary — no auth required."""
+            live_summary = LIVE_LEDGER.get_summary()
+            daily_spend = live_summary.get("total_live_spend", 0.0)
+            summary = BUDGET_MONITOR.get_budget_summary(
+                daily_spend=daily_spend,
+                monthly_spend=daily_spend,
+            )
+            return jsonify(summary), 200
+
+        @self.app.route("/alerts", methods=["GET"])
+        @_require_api_key
+        def budget_alerts():
+            include_ack = request.args.get("include_acknowledged", "false").lower() == "true"
+            alerts = BUDGET_MONITOR.get_alerts(include_acknowledged=include_ack)
+            return jsonify({"alerts": alerts, "count": len(alerts)}), 200
+
+        @self.app.route("/alerts/<alert_id>/acknowledge", methods=["POST"])
+        @_require_api_key
+        def acknowledge_alert(alert_id):
+            data = request.get_json(silent=True) or {}
+            ack_by = data.get("acknowledged_by", "operator")
+            try:
+                alert = BUDGET_MONITOR.acknowledge_alert(alert_id, ack_by)
+                return jsonify({"status": "acknowledged", "alert": alert.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
 
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         """

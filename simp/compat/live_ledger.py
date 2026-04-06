@@ -70,6 +70,7 @@ class LiveSpendLedger:
     """
     Append-only live spend ledger backed by JSONL file.
     Records payment attempts and outcomes.
+    Supports freeze/unfreeze for rollback scenarios.
     """
 
     def __init__(self, filepath: Optional[str] = None):
@@ -78,6 +79,7 @@ class LiveSpendLedger:
         self._lock = threading.Lock()
         self._records: Dict[str, LivePaymentRecord] = {}
         self._idempotency_keys: set = set()
+        self._frozen: bool = False
         self._rebuild_from_events()
 
     def _rebuild_from_events(self) -> None:
@@ -127,6 +129,23 @@ class LiveSpendLedger:
         with open(self._filepath, "a") as f:
             f.write(json.dumps(event, default=str) + "\n")
 
+    def freeze(self) -> None:
+        """Freeze the ledger — no new writes allowed."""
+        with self._lock:
+            self._frozen = True
+        logger.warning("LiveSpendLedger FROZEN — writes blocked")
+
+    def unfreeze(self) -> None:
+        """Unfreeze the ledger — writes allowed again."""
+        with self._lock:
+            self._frozen = False
+        logger.info("LiveSpendLedger unfrozen — writes allowed")
+
+    def is_frozen(self) -> bool:
+        """Check if the ledger is currently frozen."""
+        with self._lock:
+            return self._frozen
+
     def record_attempt(
         self,
         proposal_id: str,
@@ -136,7 +155,10 @@ class LiveSpendLedger:
         category: str,
         amount: float,
     ) -> LivePaymentRecord:
-        """Record a payment attempt (before execution)."""
+        """Record a payment attempt (before execution). Raises LedgerFrozenError if frozen."""
+        from simp.compat.rollback import LedgerFrozenError
+        if self.is_frozen():
+            raise LedgerFrozenError("Ledger is frozen — writes are blocked during rollback")
         rec = LivePaymentRecord(
             proposal_id=proposal_id,
             idempotency_key=idempotency_key,
@@ -173,7 +195,10 @@ class LiveSpendLedger:
         provider_reference: str = "",
         error: Optional[str] = None,
     ) -> LivePaymentRecord:
-        """Record the outcome of a payment attempt."""
+        """Record the outcome of a payment attempt. Raises LedgerFrozenError if frozen."""
+        from simp.compat.rollback import LedgerFrozenError
+        if self.is_frozen():
+            raise LedgerFrozenError("Ledger is frozen — writes are blocked during rollback")
         with self._lock:
             rec = self._records.get(record_id)
             if rec is None:

@@ -163,10 +163,23 @@ class StubPaymentConnector(PaymentConnector):
 # Allowed connectors registry
 # ---------------------------------------------------------------------------
 
+def _get_stripe_connector_class():
+    """Lazy import to avoid circular imports."""
+    from simp.compat.stripe_connector import StripeTestConnector
+    return StripeTestConnector
+
+
 ALLOWED_CONNECTORS: Dict[str, type] = {
-    "stripe_small_payments": StubPaymentConnector,
+    "stripe_small_payments": StubPaymentConnector,  # Updated at module load if Stripe key set
     "internal_corp_card_proxy": StubPaymentConnector,
 }
+
+# Register StripeTestConnector if Stripe key is available
+try:
+    if os.environ.get("STRIPE_TEST_SECRET_KEY", ""):
+        ALLOWED_CONNECTORS["stripe_small_payments"] = _get_stripe_connector_class()
+except Exception:
+    pass  # Fallback to StubPaymentConnector
 
 # ---------------------------------------------------------------------------
 # Vendor & payment-type guardrails
@@ -200,11 +213,24 @@ def build_connector(name: str) -> PaymentConnector:
 
     Reads FINANCIAL_OPS_LIVE_ENABLED env var to decide dry_run mode.
     If the env var is not set or is not "true", dry_run defaults to True.
+
+    For stripe_small_payments: uses StripeTestConnector when STRIPE_TEST_SECRET_KEY
+    is set, otherwise falls back to StubPaymentConnector.
     """
     if name not in ALLOWED_CONNECTORS:
         raise ValueError(f"Unknown connector: {name!r}. Allowed: {sorted(ALLOWED_CONNECTORS)}")
 
     live_enabled = os.environ.get("FINANCIAL_OPS_LIVE_ENABLED", "").lower() == "true"
+
+    # For stripe connector, check if key is available
+    if name == "stripe_small_payments" and os.environ.get("STRIPE_TEST_SECRET_KEY", ""):
+        from simp.compat.stripe_connector import StripeTestConnector
+        config = PaymentConnectorConfig(
+            name=name,
+            connector_type="stripe_test",
+            dry_run=not live_enabled,
+        )
+        return StripeTestConnector(config=config)
 
     config = PaymentConnectorConfig(
         name=name,
