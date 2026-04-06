@@ -172,6 +172,10 @@ class SimpBroker:
         # Shutdown coordination
         self._shutdown_event = threading.Event()
 
+        # Background task tracking for clean cancellation
+        self._background_tasks: list = []
+        self._async_loop: Optional[asyncio.AbstractEventLoop] = None
+
         self.logger.info(f"🚀 SIMP Broker initialized (v0.3.0)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
@@ -958,7 +962,8 @@ class SimpBroker:
         """
         if loop is not None:
             # Schedule on the provided loop (e.g. SimpHttpServer._async_loop)
-            asyncio.run_coroutine_threadsafe(self._health_check_loop(), loop)
+            fut = asyncio.run_coroutine_threadsafe(self._health_check_loop(), loop)
+            self._background_tasks.append(fut)
             self.logger.info("🏥 Agent health check loop started (shared loop)")
         else:
             # Standalone fallback — create own loop in a thread
@@ -1205,6 +1210,8 @@ class SimpBroker:
             async_loop: Optional shared event loop for scheduling background tasks.
         """
         self.state = BrokerState.RUNNING
+        self._background_tasks = []
+        self._async_loop = async_loop
 
         # Initialize shared HTTP connection pool
         if _HTTPX_AVAILABLE and self._http_pool is None:
@@ -1218,7 +1225,8 @@ class SimpBroker:
 
         # Start intent record cleanup coroutine
         if async_loop:
-            asyncio.run_coroutine_threadsafe(self._cleanup_intent_records(), async_loop)
+            fut = asyncio.run_coroutine_threadsafe(self._cleanup_intent_records(), async_loop)
+            self._background_tasks.append(fut)
         else:
             def _run_cleanup():
                 _loop = asyncio.new_event_loop()
@@ -1239,10 +1247,10 @@ class SimpBroker:
                 task_ledger=self.task_ledger,
             )
             if async_loop:
-                import asyncio as _asyncio
-                _asyncio.run_coroutine_threadsafe(
+                fut = asyncio.run_coroutine_threadsafe(
                     self._orchestration_loop.run(), async_loop
                 )
+                self._background_tasks.append(fut)
             self._log_event("orchestration_started", "Orchestration loop started")
             self.logger.info("🔄 Orchestration loop started")
         except Exception as exc:
@@ -1252,7 +1260,8 @@ class SimpBroker:
         worker_count = 4
         if async_loop:
             for _ in range(worker_count):
-                asyncio.run_coroutine_threadsafe(self._intent_queue_worker(), async_loop)
+                fut = asyncio.run_coroutine_threadsafe(self._intent_queue_worker(), async_loop)
+                self._background_tasks.append(fut)
         self.logger.info(f"📬 Intent queue workers started ({worker_count})")
 
         self.logger.info("✅ SIMP Broker RUNNING")
@@ -1284,13 +1293,19 @@ class SimpBroker:
         """Gracefully stop the broker.
 
         1. Set state to SHUTTING_DOWN so no new intents are accepted
-        2. Signal the health-check loop to exit
-        3. Wait for the health thread to finish (up to 5s)
-        4. Log the event and set STOPPED
+        2. Cancel background async tasks on the event loop
+        3. Signal the health-check loop to exit
+        4. Wait for the health thread to finish (up to 5s)
+        5. Log the event and set STOPPED
         """
         self.state = BrokerState.SHUTTING_DOWN
         self._log_event("broker_stopping", "Broker shutdown initiated", level="warning")
         self.logger.info("🛑 SIMP Broker shutting down...")
+
+        # Cancel all background tasks scheduled on the async loop
+        for fut in getattr(self, '_background_tasks', []):
+            fut.cancel()
+        self._background_tasks = []
 
         # Signal health-check loop to stop
         self._shutdown_event.set()
