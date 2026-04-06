@@ -1,0 +1,123 @@
+"""
+SIMP A2A Compatibility Layer — Sprints 1-5, S1-S7
+
+Adapter surface that adds A2A protocol interoperability to SIMP
+without touching CanonicalIntent or broker routing.
+"""
+
+# Sprint 1 — auth mapping
+from simp.compat.auth_map import (
+    build_security_schemes,
+    get_recommended_scopes_for_agent,
+    map_simp_auth_to_a2a,
+)
+
+# Sprint 1 — agent card
+from simp.compat.agent_card import AgentCardGenerator
+
+# Sprint 2 — capability mapping
+from simp.compat.capability_map import capabilities_to_skills, get_capability_map
+
+# Sprint 2 — task translation
+from simp.compat.task_map import (
+    A2A_TO_SIMP_INTENT,
+    translate_a2a_to_simp,
+    validate_a2a_payload,
+    simp_state_to_a2a,
+    build_a2a_task_status,
+    is_a2a_terminal,
+)
+
+# Sprint 3 — capability schema
+from simp.compat.capability_schema import (
+    StructuredCapability,
+    normalise_capabilities,
+    capabilities_to_a2a_skills,
+)
+
+# Sprint 4 — discovery cache + errors
+from simp.compat.discovery_cache import (
+    CardCache,
+    CompatError,
+    CompatErrorCode,
+    validate_agent_card,
+)
+
+# Sprint 5 — lifecycle map
+from simp.compat.lifecycle_map import (
+    SimpLifecycleState,
+    A2ATaskState,
+    simp_to_a2a_state,
+    build_progress_event,
+    build_completion_event,
+    build_failure_event,
+    events_from_intent_history,
+)
+
+# Sprint S1 — policy map
+from simp.compat.policy_map import (
+    get_agent_policy,
+    get_agent_security_schemes,
+    get_agent_security_requirements,
+    AGENT_SAFETY_POLICIES,
+    AGENT_SECURITY_SCHEMES,
+    AGENT_SECURITY_REQUIREMENTS,
+)
+
+# Sprint S4 — ops policy
+from simp.compat.ops_policy import (
+    OpsPolicy,
+    AutonomousOpType,
+    validate_op_request,
+    get_policy_dict,
+    SpendRecord,
+    SPEND_LEDGER,
+)
+
+__all__ = [
+    # Sprint 1
+    "build_security_schemes",
+    "get_recommended_scopes_for_agent",
+    "map_simp_auth_to_a2a",
+    "AgentCardGenerator",
+    # Sprint 2
+    "capabilities_to_skills",
+    "get_capability_map",
+    "A2A_TO_SIMP_INTENT",
+    "translate_a2a_to_simp",
+    "validate_a2a_payload",
+    "simp_state_to_a2a",
+    "build_a2a_task_status",
+    "is_a2a_terminal",
+    # Sprint 3
+    "StructuredCapability",
+    "normalise_capabilities",
+    "capabilities_to_a2a_skills",
+    # Sprint 4
+    "CardCache",
+    "CompatError",
+    "CompatErrorCode",
+    "validate_agent_card",
+    # Sprint 5
+    "SimpLifecycleState",
+    "A2ATaskState",
+    "simp_to_a2a_state",
+    "build_progress_event",
+    "build_completion_event",
+    "build_failure_event",
+    "events_from_intent_history",
+    # Sprint S1
+    "get_agent_policy",
+    "get_agent_security_schemes",
+    "get_agent_security_requirements",
+    "AGENT_SAFETY_POLICIES",
+    "AGENT_SECURITY_SCHEMES",
+    "AGENT_SECURITY_REQUIREMENTS",
+    # Sprint S4
+    "OpsPolicy",
+    "AutonomousOpType",
+    "validate_op_request",
+    "get_policy_dict",
+    "SpendRecord",
+    "SPEND_LEDGER",
+]
