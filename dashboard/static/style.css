@@ -839,6 +839,18 @@ body {
   gap: 8px;
 }
 
+.intent-action-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.intent-action-note {
+  color: var(--text-muted, #98a2b3);
+  font-size: 0.82rem;
+}
+
 /* ==========================================================================
    Responsive
    ========================================================================== */

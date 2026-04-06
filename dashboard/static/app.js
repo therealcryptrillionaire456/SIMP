@@ -139,6 +139,7 @@
     intentDrawerCorrelation: $("#intent-drawer-correlation"),
     intentDrawerAttempts: $("#intent-drawer-attempts"),
     intentDrawerLifecycle: $("#intent-drawer-lifecycle"),
+    intentDrawerActions: $("#intent-drawer-actions"),
     intentDrawerClose: $("#intent-drawer-close"),
 
     // Task queue
@@ -665,6 +666,44 @@
     el.innerHTML = rows.map(formatter).join("");
   }
 
+  function remediationActionsForIntent(detail) {
+    var actions = [];
+    var status = String(detail.delivery_status || "unknown");
+    var target = String(detail.target_agent || "");
+
+    if (status === "connection_refused" || status === "timeout") {
+      actions.push({
+        label: "Check broker health",
+        job: "native_agent_health_check",
+        note: "Validate the control plane before retrying delivery."
+      });
+    }
+    if (status === "queued_no_endpoint" || target === "projectx_native") {
+      actions.push({
+        label: "Run task audit",
+        job: "native_agent_task_audit",
+        note: "Inspect recent task and registration state for this target."
+      });
+    }
+    if (status !== "delivered") {
+      actions.push({
+        label: "Run repo scan",
+        job: "native_agent_repo_scan",
+        note: "Use a bounded ProjectX inspection before deeper repair work."
+      });
+    }
+
+    var deduped = [];
+    var seen = {};
+    actions.forEach(function(action) {
+      if (!seen[action.job]) {
+        deduped.push(action);
+        seen[action.job] = true;
+      }
+    });
+    return deduped;
+  }
+
   async function openIntentDrawer(intentId) {
     if (!intentId) return;
     var payload = await apiFetch("/api/intents/" + encodeURIComponent(intentId));
@@ -702,6 +741,20 @@
         + '<span>' + escHtml(event.reason || event.note || event.failure_reason || "--") + '</span>'
         + '</div>';
     });
+    renderDiagnosticList(dom.intentDrawerActions, remediationActionsForIntent(detail), function(action) {
+      return '<div class="intent-action-row">'
+        + '<button type="button" class="refresh-btn intent-remediation-btn" data-job="' + escHtml(action.job) + '">' + escHtml(action.label) + '</button>'
+        + '<span class="intent-action-note">' + escHtml(action.note || "") + '</span>'
+        + '</div>';
+    });
+    if (dom.intentDrawerActions) {
+      dom.intentDrawerActions.querySelectorAll("[data-job]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          var job = button.getAttribute("data-job");
+          submitProjectXChat({ job: job }, "Run " + job);
+        });
+      });
+    }
 
     if (dom.intentDrawerBackdrop) dom.intentDrawerBackdrop.hidden = false;
     if (dom.intentDrawer) dom.intentDrawer.hidden = false;
@@ -997,6 +1050,10 @@
       dom.memoryTasksTbody.innerHTML = '<tr><td colspan="3" class="empty-row">Broker unreachable</td></tr>';
       return;
     }
+    if (data.supported === false || data.status === "not_supported") {
+      dom.memoryTasksTbody.innerHTML = '<tr><td colspan="3" class="empty-row">' + escHtml(data.reason || "Task memory is not supported by the broker") + '</td></tr>';
+      return;
+    }
     var tasks = data.tasks || [];
     if (tasks.length === 0) {
       dom.memoryTasksTbody.innerHTML = '<tr><td colspan="3" class="empty-row">No task memory files</td></tr>';
@@ -1023,6 +1080,10 @@
   function renderMemoryConversations(data) {
     if (!data || data.status === "unreachable") {
       dom.memoryConvosTbody.innerHTML = '<tr><td colspan="4" class="empty-row">Broker unreachable</td></tr>';
+      return;
+    }
+    if (data.supported === false || data.status === "not_supported") {
+      dom.memoryConvosTbody.innerHTML = '<tr><td colspan="4" class="empty-row">' + escHtml(data.reason || "Conversation memory is not supported by the broker") + '</td></tr>';
       return;
     }
     var convos = data.conversations || [];
