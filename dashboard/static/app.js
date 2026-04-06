@@ -107,6 +107,9 @@
     valProjectxAgentCount: $("#val-projectx-agent-count"),
     valProjectxPolicyCount: $("#val-projectx-policy-count"),
     projectxProtocolSummary: $("#projectx-protocol-summary"),
+    systemOverviewSummary: $("#system-overview-summary"),
+    systemOverviewCards: $("#system-overview-cards"),
+    systemOverviewActions: $("#system-overview-actions"),
     projectxChatFeed: $("#projectx-chat-feed"),
     projectxChatForm: $("#projectx-chat-form"),
     projectxChatInput: $("#projectx-chat-input"),
@@ -1165,7 +1168,57 @@
     summaryHtml += '<div class="protocol-summary-row"><span class="card-label">Schema Path</span><span class="mono">' + escHtml(facts.path || "--") + '</span></div>';
     var drifts = facts.drift_indicators || [];
     summaryHtml += '<div class="protocol-summary-row"><span class="card-label">Drift Indicators</span><span>' + escHtml(String(drifts.length)) + '</span></div>';
+    summaryHtml += '<div class="protocol-summary-row"><span class="card-label">Docs Path</span><span class="mono">' + escHtml(facts.protocol_docs_path || "--") + '</span></div>';
     dom.projectxProtocolSummary.innerHTML = summaryHtml;
+    renderSystemOverview(facts.protocol_docs || null);
+  }
+
+  function renderSystemOverview(docs) {
+    if (!dom.systemOverviewSummary || !dom.systemOverviewCards || !dom.systemOverviewActions) return;
+    if (!docs || !docs.system_identity) {
+      dom.systemOverviewSummary.innerHTML = '<div class="empty-state">Protocol docs not loaded.</div>';
+      dom.systemOverviewCards.innerHTML = '<div class="empty-state">Component summaries unavailable.</div>';
+      dom.systemOverviewActions.innerHTML = '<div class="empty-state">No operator recommendations loaded.</div>';
+      return;
+    }
+
+    var systemIdentity = docs.system_identity || {};
+    var nonGoals = Array.isArray(systemIdentity.non_goals) ? systemIdentity.non_goals : [];
+    dom.systemOverviewSummary.innerHTML =
+      '<div class="system-overview-summary-card">'
+      + '<div class="system-overview-header">'
+      + '<div class="system-overview-title">' + escHtml(systemIdentity.full_name || systemIdentity.name || "SIMP") + '</div>'
+      + '<div class="system-overview-version mono">Docs v' + escHtml(docs.version || "--") + '</div>'
+      + '</div>'
+      + '<div class="system-overview-line">' + escHtml(systemIdentity.one_line_summary || "--") + '</div>'
+      + '<div class="system-overview-operator">' + escHtml(systemIdentity.operator_summary || "--") + '</div>'
+      + '<div class="system-overview-non-goals">'
+      + nonGoals.slice(0, 3).map(function(goal) {
+        return '<div>' + escHtml(goal) + '</div>';
+      }).join("")
+      + '</div>'
+      + '</div>';
+
+    var preferredOrder = ["projectx", "kashclaw", "dashboard", "broker", "a2a", "financial_ops"];
+    var components = docs.component_summaries || {};
+    var componentKeys = preferredOrder.filter(function(key) { return components[key]; });
+    dom.systemOverviewCards.innerHTML = componentKeys.map(function(key) {
+      var item = components[key] || {};
+      return '<div class="system-overview-card">'
+        + '<div class="system-overview-card-title">' + escHtml(item.name || key) + '</div>'
+        + '<div class="system-overview-card-copy">' + escHtml(item.one_line_summary || "--") + '</div>'
+        + '<div class="system-overview-card-copy">' + escHtml(item.operator_summary || "--") + '</div>'
+        + '</div>';
+    }).join("") || '<div class="empty-state">Component summaries unavailable.</div>';
+
+    var actions = ((docs.operator_actions || {}).recommended_first_steps) || [];
+    dom.systemOverviewActions.innerHTML = actions.map(function(action) {
+      return '<div class="operator-action-card">'
+        + '<div class="operator-action-label">' + escHtml(action.label || "--") + '</div>'
+        + '<div class="operator-action-intent mono">' + escHtml(action.intent_type || "--") + '</div>'
+        + '<div class="operator-action-description">' + escHtml(action.description || "--") + '</div>'
+        + '</div>';
+    }).join("") || '<div class="empty-state">No operator recommendations loaded.</div>';
   }
 
   function appendChatMessage(role, text, meta) {
@@ -1187,7 +1240,11 @@
     }
     var body = response.response.response || response.response;
     var answer = body.answer || body.summary || JSON.stringify(body, null, 2);
-    appendChatMessage("assistant", typeof answer === "string" ? answer : JSON.stringify(answer), body.intent_type || response.mode);
+    var meta = body.answer_source_path || body.intent_type || response.mode;
+    if (body.matched_faq_id) {
+      meta = body.matched_faq_id + " • " + meta;
+    }
+    appendChatMessage("assistant", typeof answer === "string" ? answer : JSON.stringify(answer), meta);
     refreshAll();
   }
 
