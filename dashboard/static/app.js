@@ -616,9 +616,9 @@
 
   function deliveryStatusClass(status) {
     if (!status) return "unknown";
-    if (status === "delivered") return "online";
-    if (status === "queued" || status === "queued_no_endpoint" || status === "pending") return "degraded";
-    if (status === "failed" || status === "connection_refused" || status === "timeout" || status === "rate_limited") return "offline";
+    if (status === "delivered" || status === "ok" || status === "healthy" || status === "clean" || status === "ready" || status === "success") return "online";
+    if (status === "queued" || status === "queued_no_endpoint" || status === "pending" || status === "requested" || status === "degraded" || status === "dry_run") return "degraded";
+    if (status === "failed" || status === "connection_refused" || status === "timeout" || status === "rate_limited" || status === "error" || status === "blocked" || status === "unreachable") return "offline";
     if (String(status).startsWith("http_") || String(status).startsWith("error_")) return "offline";
     return "unknown";
   }
