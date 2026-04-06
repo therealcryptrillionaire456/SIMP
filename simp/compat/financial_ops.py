@@ -193,6 +193,15 @@ def execute_approved_payment(proposal_id: str) -> Dict[str, Any]:
     LIVE_LEDGER = _ll_mod.LIVE_LEDGER
     PaymentProposalStatus = _aq_mod.PaymentProposalStatus
 
+    # Step 0: check rollback state
+    from simp.compat.rollback import ROLLBACK_MANAGER, RollbackState
+    rollback_state = ROLLBACK_MANAGER.get_state()
+    if rollback_state == RollbackState.ACTIVE:
+        raise RuntimeError(
+            "Rollback is ACTIVE — live payments are blocked. "
+            "Deactivate rollback before executing payments."
+        )
+
     # Step 1: env var gate
     live_enabled = os.environ.get("FINANCIAL_OPS_LIVE_ENABLED", "").lower() == "true"
     if not live_enabled:
@@ -207,6 +216,15 @@ def execute_approved_payment(proposal_id: str) -> Dict[str, Any]:
     if proposal.status != PaymentProposalStatus.APPROVED:
         raise ValueError(
             f"Proposal {proposal_id!r} is {proposal.status}, not approved"
+        )
+
+    # Step 2b: budget monitor check — CRITICAL task/daily alerts block execution
+    from simp.compat.budget_monitor import BUDGET_MONITOR
+    BUDGET_MONITOR.check_task_limit(proposal.amount)
+    if BUDGET_MONITOR.has_critical_alert(categories=["task", "daily"]):
+        raise RuntimeError(
+            "Budget monitor has CRITICAL alerts (task or daily limit). "
+            "Acknowledge alerts before executing payments."
         )
 
     # Step 3: re-validate against policy (defense in depth)

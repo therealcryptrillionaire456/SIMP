@@ -116,6 +116,35 @@ from simp.compat.event_stream import (
     PAYMENT_EVENT_KINDS,
 )
 
+# Sprint 46 — rollback
+from simp.compat.rollback import (
+    RollbackManager,
+    ROLLBACK_MANAGER,
+    RollbackState,
+    RollbackRecord,
+    LedgerFrozenError,
+)
+
+# Sprint 47 — gate manager
+from simp.compat.gate_manager import (
+    GateManager,
+    GATE_MANAGER,
+    GateStatus,
+    GateCondition,
+    GateCheckResult,
+)
+
+# Sprint 48 — stripe connector
+from simp.compat.stripe_connector import StripeTestConnector
+
+# Sprint 49 — budget monitor
+from simp.compat.budget_monitor import (
+    BudgetMonitor,
+    BUDGET_MONITOR,
+    AlertSeverity,
+    BudgetAlert,
+)
+
 __all__ = [
     # Sprint 1
     "build_security_schemes",
@@ -190,4 +219,23 @@ __all__ = [
     "run_reconciliation",
     "build_payment_event",
     "PAYMENT_EVENT_KINDS",
+    # Sprint 46
+    "RollbackManager",
+    "ROLLBACK_MANAGER",
+    "RollbackState",
+    "RollbackRecord",
+    "LedgerFrozenError",
+    # Sprint 47
+    "GateManager",
+    "GATE_MANAGER",
+    "GateStatus",
+    "GateCondition",
+    "GateCheckResult",
+    # Sprint 48
+    "StripeTestConnector",
+    # Sprint 49
+    "BudgetMonitor",
+    "BUDGET_MONITOR",
+    "AlertSeverity",
+    "BudgetAlert",
 ]
