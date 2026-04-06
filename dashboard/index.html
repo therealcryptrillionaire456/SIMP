@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMP Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: monospace; background: #0d1117; color: #c9d1d9; padding: 20px; }
+    h1 { color: #58a6ff; margin-bottom: 16px; }
+    h2 { color: #58a6ff; margin: 16px 0 8px; font-size: 1.1em; }
+    .panel { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+    .panel-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .panel-header h2 { margin: 0; }
+    .panel-body { margin-top: 12px; }
+    .collapsed .panel-body { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #30363d; font-size: 0.9em; }
+    th { color: #8b949e; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; }
+    .badge-enabled { background: #238636; color: #fff; }
+    .badge-planned { background: #6e4009; color: #ffa657; }
+    .badge-active { background: #1f6feb; color: #fff; }
+    .badge-inactive { background: #484f58; color: #8b949e; }
+    #a2a-error { color: #f85149; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>SIMP Dashboard</h1>
+
+  <div class="panel" id="health-panel">
+    <div class="panel-header"><h2>Broker Health</h2><span>-</span></div>
+    <div class="panel-body">
+      <p>Use <code>GET /health</code> to check broker status.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="a2a-panel">
+    <div class="panel-header" onclick="togglePanel('a2a-panel')">
+      <h2>A2A Compatibility</h2>
+      <span id="a2a-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+
+      <h2>Enforcement Status</h2>
+      <table id="enforcement-table">
+        <tr><th>Control</th><th>Status</th></tr>
+      </table>
+
+      <h2>Quota Status</h2>
+      <div id="quota-info"></div>
+
+      <h2>A2A-Capable Agents</h2>
+      <table id="agents-table">
+        <tr><th>Agent ID</th><th>Type</th><th>Security Schemes</th><th>Status</th></tr>
+      </table>
+
+      <div id="a2a-error"></div>
+    </div>
+  </div>
+
+  <script>
+    function escapeHtml(str) {
+      var d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function badgeClass(val) {
+      if (val === 'enabled') return 'badge-enabled';
+      if (val === 'planned') return 'badge-planned';
+      if (val === 'active') return 'badge-active';
+      return 'badge-inactive';
+    }
+
+    function togglePanel(id) {
+      document.getElementById(id).classList.toggle('collapsed');
+    }
+
+    function loadA2AStatus() {
+      fetch('/dashboard/a2a/status')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          // Enforcement
+          var et = document.getElementById('enforcement-table');
+          var es = data.enforcement_status || {};
+          for (var k in es) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + escapeHtml(k.replace(/_/g, ' ')) + '</td>'
+              + '<td><span class="badge ' + badgeClass(es[k]) + '">' + escapeHtml(es[k]) + '</span></td>';
+            et.appendChild(tr);
+          }
+          // Quota
+          var qi = document.getElementById('quota-info');
+          var qs = data.quota_status || {};
+          var html = '<table>';
+          for (var q in qs) {
+            html += '<tr><td>' + escapeHtml(q.replace(/_/g, ' ')) + '</td><td>' + escapeHtml(qs[q]) + '</td></tr>';
+          }
+          html += '</table>';
+          qi.innerHTML = html;
+          // Agents
+          var at = document.getElementById('agents-table');
+          (data.a2a_capable_agents || []).forEach(function(a) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + escapeHtml(a.agent_id) + '</td>'
+              + '<td>' + escapeHtml(a.agent_type) + '</td>'
+              + '<td>' + escapeHtml((a.security_schemes || []).join(', ')) + '</td>'
+              + '<td><span class="badge ' + badgeClass(a.status) + '">' + escapeHtml(a.status) + '</span></td>';
+            at.appendChild(tr);
+          });
+        })
+        .catch(function(err) {
+          document.getElementById('a2a-error').textContent = 'Failed to load A2A status: ' + err;
+        });
+    }
+
+    loadA2AStatus();
+  </script>
+</body>
+</html>

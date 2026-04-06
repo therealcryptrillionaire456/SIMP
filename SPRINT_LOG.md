@@ -1,0 +1,81 @@
+# SIMP Sprint Log
+
+## Sprint 26 — A2A Compatibility Layer: Authentication Mapping (Sprint 1)
+- Created `simp/compat/auth_map.py`: Maps SIMP auth mechanisms to A2A securitySchemes declarations.
+- Created `simp/compat/agent_card.py`: AgentCardGenerator builds A2A-compatible Agent Cards.
+- Created `simp/compat/capability_map.py`: Maps SIMP capabilities to A2A AgentSkill declarations.
+- Added `/.well-known/agent-card.json` route to `http_server.py`.
+
+## Sprint 27 — A2A Task Translation (Sprint 2)
+- Created `simp/compat/task_map.py`: Allowlist-gated A2A-to-SIMP task translation.
+- `translate_a2a_to_simp()` maps 10 task types + aliases to CanonicalIntent types.
+- `simp_state_to_a2a()` projects all SIMP lifecycle states to A2A states.
+- `build_a2a_task_status()` builds structured A2A TaskStatus responses.
+- New routes: POST /a2a/tasks, GET /a2a/tasks/<id>, GET /a2a/tasks/types.
+
+## Sprint 28 — Structured Capability Metadata (Sprint 3)
+- Created `simp/compat/capability_schema.py`: StructuredCapability dataclass with A2A AgentSkill alignment.
+- `normalise_capabilities()` accepts flat strings, dicts, or mixed lists.
+- Well-known capability registry enriches 18 known SIMP capability types.
+
+## Sprint 29 — Discovery Cache + Error Taxonomy (Sprint 4)
+- Created `simp/compat/discovery_cache.py`: Thread-safe TTL memoisation (60s agent, 300s broker).
+- `CompatError` / `CompatErrorCode`: Typed errors with HTTP status hints.
+- `validate_agent_card()`: Validates required A2A AgentCard fields.
+
+## Sprint 30 — Lifecycle State Machine + Event Envelopes (Sprint 5)
+- Created `simp/compat/lifecycle_map.py`: Exhaustive state mapping from SIMP to A2A.
+- `SimpLifecycleState` + `A2ATaskState` enumerations.
+- Event envelope builders: `build_progress_event`, `build_completion_event`, `build_failure_event`.
+- `events_from_intent_history()` reconstructs task event sequence from broker records.
+
+## Sprint 31 — Policy-Rich Agent Cards (Sprint S1)
+- Created `simp/compat/policy_map.py`: Per-agent-type safety policies, security schemes, and requirements.
+- Updated `AgentCardGenerator.build_agent_card()` to include securitySchemes, security, safetyPolicies, resourceLimits.
+- Updated `build_broker_card()` with transport security info and autonomous operations policy.
+- No file paths or secrets ever appear in card output.
+
+## Sprint 32 — ProjectX Maintenance as A2A Capability (Sprint S2)
+- Created `simp/compat/projectx_card.py`: Standalone A2A Agent Card for ProjectX native agent.
+- 4 read-only maintenance skills: health_check, audit, security_audit, repo_scan.
+- Write operations (code_maintenance, provider_repair) explicitly rejected.
+- New routes: GET /a2a/agents/projectx/agent.json, POST /a2a/agents/projectx/tasks.
+
+## Sprint 33 — A2A Events & SIMP Telemetry (Sprint S3)
+- Created `simp/compat/event_stream.py`: Converts SIMP ledger records to A2A-compatible task events.
+- Sensitive fields redacted, error strings truncated to 200 chars.
+- New routes: GET /a2a/events, GET /a2a/events/<intent_id>.
+
+## Sprint 34 — Autonomous Operations Policy Model (Sprint S4)
+- Created `simp/compat/ops_policy.py`: Type-safe policy document and validation layer.
+- OpsPolicy dataclass with spend limits, approval requirements, logging rules.
+- SimulatedSpendLedger: Thread-safe, append-only, simulated-only spend tracking.
+- All operations require manual approval. spend_mode always "simulation".
+
+## Sprint 35 — A2A Security Hardening (Sprint S5)
+- Created `simp/compat/a2a_security.py`: Security scheme declarations, bearer-claim validation, quota checking.
+- `validate_bearer_claims()`: Structural JWT claim validator (no crypto — gateway's job).
+- `build_replay_guard_note()`: Replay protection posture (planned).
+- New route: GET /a2a/security (unauthenticated).
+
+## Sprint 36 — ProjectX Durability & Recovery (Sprint S6)
+- Created `simp/compat/projectx_diagnostics.py`: Read-only diagnostic helpers.
+- `check_task_ledger_integrity()`: JSONL integrity check with corrupt-line detection.
+- `build_projectx_health_report()`: Aggregated health report (never exposes file paths).
+- New route: GET /a2a/agents/projectx/health (unauthenticated).
+
+## Sprint 37 — FinancialOps Agent (Simulated) (Sprint S7)
+- Created `simp/compat/financial_ops.py`: Simulated-only financial operations agent.
+- 3 capabilities: small_purchase, subscription_management, license_renewal.
+- All operations recorded as simulated spend. No real payments ever occur.
+- New routes: GET /a2a/agents/financial-ops/agent.json, POST /a2a/agents/financial-ops/tasks.
+
+## Sprint 38 — A2A-Aware Dashboard (Sprint S8)
+- Created `dashboard/server.py`: FastAPI dashboard with A2A status endpoint.
+- Created `dashboard/index.html`: Collapsible A2A Compatibility panel.
+- GET /dashboard/a2a/status returns agent list, enforcement status, quota info.
+
+## Sprint 39 — End-to-End A2A Demo (Sprint S9)
+- Created `examples/a2a_demo.py`: Reference A2A client demonstrating full flow.
+- Created `docs/A2A_DEMO.md`: Architecture overview, flow diagram, security posture summary.
+- Flow: Discover -> Plan -> Maintain -> Simulate Financial Op -> Query Events.
