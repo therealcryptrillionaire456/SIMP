@@ -104,3 +104,21 @@ def test_memory_conversations_endpoint_derives_rows_from_operator_events(monkeyp
     assert body["status"] == "success"
     assert body["source"] == "derived_operator_events"
     assert body["conversations"][0]["id"] == "req-1"
+
+
+def test_dashboard_health_alias_uses_api_health(monkeypatch):
+    async def fake_snapshot(*, force_refresh=False):
+        return {
+            "dashboard": {"broker": {"status": "running", "agents_online": 3}},
+            "health": {"agents_online": 3, "paused": False},
+        }
+
+    monkeypatch.setattr(ds, "_broker_snapshot", fake_snapshot)
+
+    with TestClient(ds.app) as client:
+        response = client.get("/health")
+
+    body = response.json()
+    assert response.status_code == 200
+    assert body["status"] == "healthy"
+    assert body["broker_reachable"] is True
