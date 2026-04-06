@@ -269,10 +269,10 @@
         <div class="card"><div class="card-label">Delivered</div><div class="card-value mono" id="val-delivered">--</div></div>
         <div class="card"><div class="card-label">Queued</div><div class="card-value mono" id="val-queued">--</div></div>
         <div class="card"><div class="card-label">Queued (No Endpoint)</div><div class="card-value mono" id="val-queued-no-endpoint">--</div></div>
-        <div class="card"><div class="card-label">Failed</div><div class="card-value mono" id="val-delivery-failed">--</div></div>
-        <div class="card"><div class="card-label">Connection Refused</div><div class="card-value mono" id="val-connection-refused">--</div></div>
-        <div class="card"><div class="card-label">Timeout</div><div class="card-value mono" id="val-timeout">--</div></div>
-        <div class="card"><div class="card-label">Rate Limited</div><div class="card-value mono" id="val-rate-limited">--</div></div>
+        <div class="card" id="card-delivery-failed"><div class="card-label">Failed</div><div class="card-value mono" id="val-delivery-failed">--</div></div>
+        <div class="card" id="card-connection-refused"><div class="card-label">Connection Refused</div><div class="card-value mono" id="val-connection-refused">--</div></div>
+        <div class="card" id="card-timeout"><div class="card-label">Timeout</div><div class="card-value mono" id="val-timeout">--</div></div>
+        <div class="card" id="card-rate-limited"><div class="card-label">Rate Limited</div><div class="card-value mono" id="val-rate-limited">--</div></div>
       </div>
       <div class="table-wrap">
         <table class="agents-table" id="delivery-table">
@@ -295,6 +295,47 @@
         <div id="topology-container" class="topology-grid">
           <p class="empty-row">No topology data</p>
         </div>
+    </section>
+
+    <section class="section" id="failed-intents-section">
+      <h2 class="section-title">Failed Intents</h2>
+      <div class="cards-grid" id="failed-intent-cards">
+        <div class="card"><div class="card-label">Recent Failed Intents</div><div class="card-value mono" id="val-failed-intents-count">--</div></div>
+        <div class="card"><div class="card-label">Latest Failure</div><div class="card-value mono" id="val-failed-intents-latest">--</div></div>
+        <div class="card"><div class="card-label">Affected Targets</div><div class="card-value mono" id="val-failed-intents-targets">--</div></div>
+        <div class="card"><div class="card-label">Active Filter</div><div class="card-value mono" id="val-failed-intents-filter">all</div></div>
+      </div>
+      <div class="diagnostic-grid">
+        <div class="card diagnostic-card">
+          <div class="card-label">By Status</div>
+          <div id="failed-status-breakdown" class="diagnostic-breakdown">
+            <div class="empty-state">No failed intents.</div>
+          </div>
+        </div>
+        <div class="card diagnostic-card">
+          <div class="card-label">By Target Agent</div>
+          <div id="failed-target-breakdown" class="diagnostic-breakdown">
+            <div class="empty-state">No failed intents.</div>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table" id="failed-intents-table">
+          <thead>
+            <tr>
+              <th>Intent ID</th>
+              <th>Timestamp</th>
+              <th>Target Agent</th>
+              <th>Status</th>
+              <th>Reason</th>
+              <th>Correlation</th>
+            </tr>
+          </thead>
+          <tbody id="failed-intents-tbody">
+            <tr><td colspan="6" class="empty-row">No failed intents captured.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Memory -->
@@ -433,6 +474,32 @@
     </svg>
     <span>Broker Unreachable &mdash; Dashboard is running but cannot connect to the SIMP broker at <code>127.0.0.1:5555</code></span>
   </div>
+
+  <div class="intent-drawer-backdrop" id="intent-drawer-backdrop" hidden></div>
+  <aside class="intent-drawer" id="intent-drawer" hidden>
+    <div class="intent-drawer-header">
+      <div>
+        <div class="card-label">Intent Diagnostic</div>
+        <div class="mono intent-drawer-title" id="intent-drawer-title">--</div>
+      </div>
+      <button class="refresh-btn" id="intent-drawer-close" type="button">Close</button>
+    </div>
+    <div class="intent-drawer-body">
+      <div class="diagnostic-pairs" id="intent-drawer-summary"></div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Correlation IDs</div>
+        <div class="diagnostic-pairs" id="intent-drawer-correlation"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Route Attempts</div>
+        <div id="intent-drawer-attempts" class="diagnostic-list"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Lifecycle</div>
+        <div id="intent-drawer-lifecycle" class="diagnostic-list"></div>
+      </div>
+    </div>
+  </aside>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="/static/app.js"></script>

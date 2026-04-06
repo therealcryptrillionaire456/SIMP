@@ -121,6 +121,23 @@
     valRateLimited:       $("#val-rate-limited"),
     deliveryTbody:        $("#delivery-tbody"),
 
+    // Failed intent diagnostics
+    valFailedIntentsCount: $("#val-failed-intents-count"),
+    valFailedIntentsLatest: $("#val-failed-intents-latest"),
+    valFailedIntentsTargets: $("#val-failed-intents-targets"),
+    valFailedIntentsFilter: $("#val-failed-intents-filter"),
+    failedStatusBreakdown: $("#failed-status-breakdown"),
+    failedTargetBreakdown: $("#failed-target-breakdown"),
+    failedIntentsTbody: $("#failed-intents-tbody"),
+    intentDrawer: $("#intent-drawer"),
+    intentDrawerBackdrop: $("#intent-drawer-backdrop"),
+    intentDrawerTitle: $("#intent-drawer-title"),
+    intentDrawerSummary: $("#intent-drawer-summary"),
+    intentDrawerCorrelation: $("#intent-drawer-correlation"),
+    intentDrawerAttempts: $("#intent-drawer-attempts"),
+    intentDrawerLifecycle: $("#intent-drawer-lifecycle"),
+    intentDrawerClose: $("#intent-drawer-close"),
+
     // Task queue
     valTasksQueued:     $("#val-tasks-queued"),
     valTasksClaimed:    $("#val-tasks-claimed"),
@@ -153,6 +170,8 @@
   let dashboardStartedAt = null;
   let unreachableCount = 0;
   const UNREACHABLE_THRESHOLD = 3;
+  let failedIntentData = { intents: [], summary: {} };
+  let failedIntentFilter = { type: "all", value: null };
 
   // -----------------------------------------------------------------------
   // Fetch helpers
@@ -344,7 +363,11 @@
       html += '<div class="activity-item">';
       html += '<span class="activity-ts">' + formatDate(ev.timestamp) + "</span>";
       html += '<span class="activity-type">' + escHtml(ev.event_type || ev.intent_type || "--") + "</span>";
-      html += '<span class="activity-result">' + escHtml(result) + "</span>";
+      if (ev.intent_id) {
+        html += '<span class="activity-result"><button type="button" class="intent-row-button" data-intent-id="' + escHtml(ev.intent_id) + '">' + escHtml(result) + "</button></span>";
+      } else {
+        html += '<span class="activity-result">' + escHtml(result) + "</span>";
+      }
       html += '<span class="activity-status ' + statusCls + '">' + escHtml(ds) + "</span>";
       if (ev.delivery_latency_ms != null) {
         html += '<span class="activity-latency mono">' + Number(ev.delivery_latency_ms).toFixed(1) + " ms</span>";
@@ -358,6 +381,11 @@
       html += "</div>";
     }
     dom.activityFeed.innerHTML = html;
+    dom.activityFeed.querySelectorAll("[data-intent-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openIntentDrawer(button.getAttribute("data-intent-id"));
+      });
+    });
   }
 
   // -----------------------------------------------------------------------
@@ -559,6 +587,128 @@
     }
   }
 
+  function setInteractiveDiagnostic(el, enabled, handler) {
+    if (!el) return;
+    el.classList.toggle("interactive", Boolean(enabled));
+    el.onclick = enabled ? handler : null;
+  }
+
+  function currentFailedIntentRows() {
+    var intents = (failedIntentData && failedIntentData.intents) || [];
+    if (failedIntentFilter.type === "status" && failedIntentFilter.value) {
+      return intents.filter(function(intent) {
+        return (intent.delivery_status || "unknown") === failedIntentFilter.value;
+      });
+    }
+    if (failedIntentFilter.type === "target" && failedIntentFilter.value) {
+      return intents.filter(function(intent) {
+        return (intent.target_agent || "unknown") === failedIntentFilter.value;
+      });
+    }
+    return intents;
+  }
+
+  function updateFailedIntentFilterLabel() {
+    if (!dom.valFailedIntentsFilter) return;
+    if (failedIntentFilter.type === "status") {
+      dom.valFailedIntentsFilter.textContent = "status:" + failedIntentFilter.value;
+      return;
+    }
+    if (failedIntentFilter.type === "target") {
+      dom.valFailedIntentsFilter.textContent = "target:" + failedIntentFilter.value;
+      return;
+    }
+    dom.valFailedIntentsFilter.textContent = "all";
+  }
+
+  function focusFailedIntentPanel(openFirst) {
+    var section = safeGetEl("failed-intents-section");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    var rows = currentFailedIntentRows();
+    if (openFirst && rows.length > 0) {
+      openIntentDrawer(rows[0].intent_id);
+    }
+  }
+
+  function applyFailedIntentFilter(type, value, options) {
+    options = options || {};
+    failedIntentFilter = { type: type || "all", value: value || null };
+    updateFailedIntentFilterLabel();
+    renderFailedIntentRows();
+    if (options.focus) {
+      focusFailedIntentPanel(Boolean(options.openFirst));
+    }
+  }
+
+  function renderDiagnosticPairs(el, pairs) {
+    if (!el) return;
+    if (!pairs.length) {
+      el.innerHTML = '<div class="empty-state">No diagnostic metadata.</div>';
+      return;
+    }
+    el.innerHTML = pairs.map(function(pair) {
+      return '<div class="diagnostic-pair"><span class="card-label">' + escHtml(pair.label) + '</span><span class="mono">' + escHtml(pair.value) + '</span></div>';
+    }).join("");
+  }
+
+  function renderDiagnosticList(el, rows, formatter) {
+    if (!el) return;
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-state">No records.</div>';
+      return;
+    }
+    el.innerHTML = rows.map(formatter).join("");
+  }
+
+  async function openIntentDrawer(intentId) {
+    if (!intentId) return;
+    var payload = await apiFetch("/api/intents/" + encodeURIComponent(intentId));
+    var detail = (payload && payload.detail) || { intent_id: intentId, failure_reason: "unknown", route_attempts: [], lifecycle: [], correlation_ids: {}, fallback_behavior: {} };
+
+    if (dom.intentDrawerTitle) {
+      dom.intentDrawerTitle.textContent = detail.intent_id || intentId;
+    }
+    renderDiagnosticPairs(dom.intentDrawerSummary, [
+      { label: "Source", value: detail.source_agent || "--" },
+      { label: "Target", value: detail.target_agent || "--" },
+      { label: "Type", value: detail.intent_type || "--" },
+      { label: "Status", value: detail.delivery_status || "--" },
+      { label: "Reason", value: detail.failure_reason || "unknown" },
+      { label: "Fallback", value: (detail.fallback_behavior && detail.fallback_behavior.mode) || "unknown" },
+    ]);
+    renderDiagnosticPairs(dom.intentDrawerCorrelation, Object.entries(detail.correlation_ids || {}).filter(function(entry) {
+      return entry[1];
+    }).map(function(entry) {
+      return { label: entry[0], value: String(entry[1]) };
+    }));
+    renderDiagnosticList(dom.intentDrawerAttempts, detail.route_attempts || [], function(attempt) {
+      return '<div class="diagnostic-row">'
+        + '<span class="mono">' + escHtml(formatDate(attempt.timestamp)) + '</span>'
+        + '<span>' + escHtml((attempt.transport || "route") + " -> " + (attempt.status || "unknown")) + '</span>'
+        + '<span class="mono">' + escHtml(attempt.endpoint || "--") + '</span>'
+        + '<span>' + escHtml(attempt.error || "--") + '</span>'
+        + '</div>';
+    });
+    renderDiagnosticList(dom.intentDrawerLifecycle, detail.lifecycle || [], function(event) {
+      return '<div class="diagnostic-row">'
+        + '<span class="mono">' + escHtml(formatDate(event.timestamp)) + '</span>'
+        + '<span>' + escHtml(event.event || "--") + '</span>'
+        + '<span class="mono">' + escHtml(event.status || "--") + '</span>'
+        + '<span>' + escHtml(event.reason || event.note || event.failure_reason || "--") + '</span>'
+        + '</div>';
+    });
+
+    if (dom.intentDrawerBackdrop) dom.intentDrawerBackdrop.hidden = false;
+    if (dom.intentDrawer) dom.intentDrawer.hidden = false;
+  }
+
+  function closeIntentDrawer() {
+    if (dom.intentDrawerBackdrop) dom.intentDrawerBackdrop.hidden = true;
+    if (dom.intentDrawer) dom.intentDrawer.hidden = true;
+  }
+
   // -----------------------------------------------------------------------
   // Render: Delivery Status
   // -----------------------------------------------------------------------
@@ -592,6 +742,22 @@
       dom.valRateLimited.className = (dc.rate_limited || 0) > 0 ? "card-value mono status-error" : "card-value mono";
     }
 
+    setInteractiveDiagnostic(safeGetEl("card-failed"), (stats.intents_failed || 0) > 0, function() {
+      applyFailedIntentFilter("all", null, { focus: true });
+    });
+    setInteractiveDiagnostic(safeGetEl("card-delivery-failed"), (dc.failed || 0) > 0, function() {
+      applyFailedIntentFilter("all", null, { focus: true });
+    });
+    setInteractiveDiagnostic(safeGetEl("card-connection-refused"), (dc.connection_refused || 0) > 0, function() {
+      applyFailedIntentFilter("status", "connection_refused", { focus: true });
+    });
+    setInteractiveDiagnostic(safeGetEl("card-timeout"), (dc.timeout || 0) > 0, function() {
+      applyFailedIntentFilter("status", "timeout", { focus: true });
+    });
+    setInteractiveDiagnostic(safeGetEl("card-rate-limited"), (dc.rate_limited || 0) > 0, function() {
+      applyFailedIntentFilter("status", "rate_limited", { focus: true });
+    });
+
     // Delivery detail table from recent intents
     var intents = stats.recent_deliveries || [];
     if (intents.length === 0) {
@@ -603,7 +769,11 @@
       var d = intents[i];
       var dsCls = deliveryStatusClass(d.delivery_status);
       html += "<tr>";
-      html += td('<span class="mono" style="font-size:0.7rem">' + escHtml((d.intent_id || "").substring(0, 12)) + "</span>");
+      if (d.intent_id) {
+        html += td('<button type="button" class="intent-row-button mono" data-intent-id="' + escHtml(d.intent_id) + '">' + escHtml((d.intent_id || "").substring(0, 12)) + "</button>");
+      } else {
+        html += td('<span class="mono" style="font-size:0.7rem">' + escHtml((d.intent_id || "").substring(0, 12)) + "</span>");
+      }
       html += td(mono(escHtml(d.target_agent || "--")));
       html += td('<span class="status-badge ' + dsCls + '">' + escHtml(d.delivery_status || "--") + "</span>");
       html += td(mono(d.delivery_latency_ms != null ? Number(d.delivery_latency_ms).toFixed(1) + " ms" : "--"));
@@ -612,6 +782,11 @@
       html += "</tr>";
     }
     dom.deliveryTbody.innerHTML = html;
+    dom.deliveryTbody.querySelectorAll("[data-intent-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openIntentDrawer(button.getAttribute("data-intent-id"));
+      });
+    });
   }
 
   function deliveryStatusClass(status) {
@@ -621,6 +796,70 @@
     if (status === "failed" || status === "connection_refused" || status === "timeout" || status === "rate_limited" || status === "error" || status === "blocked" || status === "unreachable") return "offline";
     if (String(status).startsWith("http_") || String(status).startsWith("error_")) return "offline";
     return "unknown";
+  }
+
+  function renderFailedIntentRows() {
+    if (!dom.failedIntentsTbody) return;
+    var intents = currentFailedIntentRows();
+    if (!intents.length) {
+      dom.failedIntentsTbody.innerHTML = '<tr><td colspan="6" class="empty-row">No failed intents captured.</td></tr>';
+      return;
+    }
+    dom.failedIntentsTbody.innerHTML = intents.map(function(intent) {
+      var correlation = (((intent.correlation_ids || {}).correlation_id) || ((intent.correlation_ids || {}).request_id) || "--");
+      return "<tr>"
+        + td('<button type="button" class="intent-row-button mono" data-intent-id="' + escHtml(intent.intent_id || "") + '">' + escHtml((intent.intent_id || "").substring(0, 12)) + "</button>")
+        + td('<span class="mono">' + escHtml(formatDate(intent.delivered_at || intent.timestamp)) + "</span>")
+        + td(mono(escHtml(intent.target_agent || "--")))
+        + td('<span class="status-badge ' + deliveryStatusClass(intent.delivery_status || "") + '">' + escHtml(intent.delivery_status || "--") + "</span>")
+        + td(escHtml(intent.failure_reason || "unknown"))
+        + td('<span class="mono">' + escHtml(String(correlation).substring(0, 18)) + "</span>")
+        + "</tr>";
+    }).join("");
+    dom.failedIntentsTbody.querySelectorAll("[data-intent-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openIntentDrawer(button.getAttribute("data-intent-id"));
+      });
+    });
+  }
+
+  function renderFailedIntents(data) {
+    failedIntentData = data || { intents: [], summary: {} };
+    var summary = failedIntentData.summary || {};
+    var intents = failedIntentData.intents || [];
+    if (dom.valFailedIntentsCount) dom.valFailedIntentsCount.textContent = String(summary.count != null ? summary.count : intents.length);
+    if (dom.valFailedIntentsLatest) dom.valFailedIntentsLatest.textContent = formatDate(summary.latest_failure_at);
+    if (dom.valFailedIntentsTargets) dom.valFailedIntentsTargets.textContent = String(Object.keys(summary.by_target_agent || {}).length);
+    updateFailedIntentFilterLabel();
+
+    if (dom.failedStatusBreakdown) {
+      var statusEntries = Object.entries(summary.by_status || {});
+      dom.failedStatusBreakdown.innerHTML = statusEntries.length ? statusEntries.map(function(entry) {
+        return '<button type="button" class="diagnostic-chip" data-filter-type="status" data-filter-value="' + escHtml(entry[0]) + '"><span>' + escHtml(entry[0]) + '</span><span class="diagnostic-chip-value">' + escHtml(String(entry[1])) + '</span></button>';
+      }).join("") : '<div class="empty-state">No failed intents.</div>';
+      dom.failedStatusBreakdown.querySelectorAll("[data-filter-type]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          applyFailedIntentFilter(button.getAttribute("data-filter-type"), button.getAttribute("data-filter-value"));
+        });
+      });
+    }
+
+    if (dom.failedTargetBreakdown) {
+      var targetEntries = Object.entries(summary.by_target_agent || {});
+      dom.failedTargetBreakdown.innerHTML = targetEntries.length ? targetEntries.map(function(entry) {
+        return '<button type="button" class="diagnostic-chip" data-filter-type="target" data-filter-value="' + escHtml(entry[0]) + '"><span>' + escHtml(entry[0]) + '</span><span class="diagnostic-chip-value">' + escHtml(String(entry[1])) + '</span></button>';
+      }).join("") : '<div class="empty-state">No failed intents.</div>';
+      dom.failedTargetBreakdown.querySelectorAll("[data-filter-type]").forEach(function(button) {
+        button.addEventListener("click", function() {
+          applyFailedIntentFilter(button.getAttribute("data-filter-type"), button.getAttribute("data-filter-value"));
+        });
+      });
+    }
+
+    renderFailedIntentRows();
+    setInteractiveDiagnostic(dom.unreachable, intents.length > 0, function() {
+      applyFailedIntentFilter("all", null, { focus: true, openFirst: true });
+    });
   }
 
   // -----------------------------------------------------------------------
@@ -1096,11 +1335,12 @@
     setLoading('overview-section', true);
 
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts] = await Promise.all([
+    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
       apiFetch("/api/activity"),
+      apiFetch("/api/intents/failed"),
       apiFetch("/api/capabilities"),
       apiFetch("/api/tasks"),
       apiFetch("/api/routing"),
@@ -1123,6 +1363,7 @@
     renderStats(stats);
     renderAgents(agents);
     renderActivity(activity);
+    renderFailedIntents(failedIntents);
     renderCapabilities(capabilities);
     renderDeliveryStatus(stats);
     renderTasks(tasks);
@@ -1288,6 +1529,13 @@
   dom.refreshBtn.addEventListener("click", function() {
     refreshAll();
   });
+
+  if (dom.intentDrawerClose) {
+    dom.intentDrawerClose.addEventListener("click", closeIntentDrawer);
+  }
+  if (dom.intentDrawerBackdrop) {
+    dom.intentDrawerBackdrop.addEventListener("click", closeIntentDrawer);
+  }
 
   if (dom.projectxChatForm) {
     dom.projectxChatForm.addEventListener("submit", function(event) {
