@@ -12,7 +12,9 @@ Status: planned (not yet production-enabled).
 import logging
 from typing import Dict, Any, Tuple, List
 
-from simp.compat.ops_policy import SPEND_LEDGER
+import os
+
+from simp.compat.ops_policy import SPEND_LEDGER, get_live_policy_dict
 from simp.compat.a2a_security import build_a2a_security_schemes_block
 
 logger = logging.getLogger("SIMP.FinancialOps")
@@ -87,6 +89,7 @@ def build_financial_ops_card(broker_base_url: str = "http://127.0.0.1:5555") -> 
             "all_ops_require_approval": True,
             "environment": "development",
             "protocol": "simp/1.0",
+            "livePaymentPolicy": get_live_policy_dict(),
         },
     }
 
@@ -140,3 +143,143 @@ def record_would_spend(
         would_spend=would_spend,
     )
     return record.to_dict()
+
+
+# ---------------------------------------------------------------------------
+# Live payment execution (Sprint 44) — feature-flagged OFF by default
+# ---------------------------------------------------------------------------
+
+
+def _is_live_enabled() -> bool:
+    return os.getenv("FINANCIAL_OPS_LIVE_ENABLED", "false").lower() == "true"
+
+
+def execute_approved_payment(proposal_id: str) -> Dict[str, Any]:
+    """
+    Execute an approved payment proposal through the connector pipeline.
+
+    Guards:
+    1. FINANCIAL_OPS_LIVE_ENABLED must be 'true'
+    2. Proposal must exist and be approved
+    3. Idempotency: already-executed proposals are silently returned
+    4. Connector must be allowed and healthy
+    """
+    from simp.compat.approval_queue import APPROVAL_QUEUE
+    from simp.compat.payment_connector import (
+        build_connector, validate_payment_request, HEALTH_TRACKER,
+    )
+    from simp.compat.live_ledger import LIVE_SPEND_LEDGER
+
+    # Gate 1: feature flag
+    if not _is_live_enabled():
+        return {
+            "success": False,
+            "error": "Live payments not enabled. Set FINANCIAL_OPS_LIVE_ENABLED=true.",
+            "proposal_id": proposal_id,
+        }
+
+    # Gate 2: idempotency
+    if LIVE_SPEND_LEDGER.is_proposal_already_executed(proposal_id):
+        return {
+            "success": True,
+            "message": "Payment already executed (idempotent).",
+            "proposal_id": proposal_id,
+        }
+
+    # Gate 3: proposal lookup
+    proposal = APPROVAL_QUEUE.get_proposal(proposal_id)
+    if proposal is None:
+        return {"success": False, "error": f"Proposal '{proposal_id}' not found."}
+
+    if proposal.status != "approved":
+        return {
+            "success": False,
+            "error": f"Proposal status is '{proposal.status}', must be 'approved'.",
+            "proposal_id": proposal_id,
+        }
+
+    # Gate 4: validate payment request
+    ok, err = validate_payment_request(
+        vendor=proposal.vendor,
+        category=proposal.category,
+        amount=proposal.would_spend,
+        connector_name=proposal.connector_name,
+    )
+    if not ok:
+        return {"success": False, "error": err, "proposal_id": proposal_id}
+
+    # Gate 5: connector health
+    health_status = HEALTH_TRACKER.get_status(proposal.connector_name)
+    if health_status.get("status") not in ("ok", "unknown"):
+        return {
+            "success": False,
+            "error": f"Connector '{proposal.connector_name}' health: {health_status.get('status')}",
+            "proposal_id": proposal_id,
+        }
+
+    # Execute
+    try:
+        connector = build_connector(proposal.connector_name)
+        result = connector.execute_small_payment(
+            vendor=proposal.vendor,
+            amount=proposal.would_spend,
+            category=proposal.category,
+            idempotency_key=proposal_id,
+            proposal_id=proposal_id,
+        )
+
+        if result.success:
+            record = LIVE_SPEND_LEDGER.record_live_spend(
+                proposal_id=proposal_id,
+                connector_name=proposal.connector_name,
+                vendor=proposal.vendor,
+                category=proposal.category,
+                amount=proposal.would_spend,
+                reference_id=result.reference_id,
+                operator_subject=proposal.approved_by or "",
+                provider_response=result.provider_response,
+                idempotency_key=proposal_id,
+            )
+            logger.info(
+                "LIVE PAYMENT EXECUTED: $%.2f to %s via %s (proposal %s)",
+                proposal.would_spend, proposal.vendor,
+                proposal.connector_name, proposal_id,
+            )
+            return {
+                "success": True,
+                "proposal_id": proposal_id,
+                "reference_id": result.reference_id,
+                "amount": proposal.would_spend,
+                "vendor": proposal.vendor,
+                "connector": proposal.connector_name,
+                "record_id": record.record_id if record else None,
+            }
+        else:
+            LIVE_SPEND_LEDGER.record_failed_spend(
+                proposal_id=proposal_id,
+                connector_name=proposal.connector_name,
+                vendor=proposal.vendor,
+                category=proposal.category,
+                amount=proposal.would_spend,
+                error=result.error or "Unknown connector error",
+            )
+            return {
+                "success": False,
+                "error": result.error or "Payment failed",
+                "proposal_id": proposal_id,
+            }
+    except Exception as exc:
+        logger.error("Payment execution failed for proposal %s: %s", proposal_id, exc)
+        LIVE_SPEND_LEDGER.record_failed_spend(
+            proposal_id=proposal_id,
+            connector_name=proposal.connector_name,
+            vendor=proposal.vendor,
+            category=proposal.category,
+            amount=proposal.would_spend,
+            error=str(exc),
+        )
+        return {
+            "success": False,
+            "error": str(exc),
+            "proposal_id": proposal_id,
+        }

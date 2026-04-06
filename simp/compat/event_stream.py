@@ -115,3 +115,81 @@ def build_a2a_events_list(
             "limit": limit,
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# Payment-specific A2A events (Sprint 43-45)
+# ---------------------------------------------------------------------------
+
+PAYMENT_EVENT_KINDS = frozenset([
+    "payment.proposal_created",
+    "payment.proposal_approved",
+    "payment.proposal_rejected",
+    "payment.proposal_expired",
+    "payment.dry_run_completed",
+    "payment.execution_started",
+    "payment.execution_completed",
+    "payment.execution_failed",
+    "payment.refund_completed",
+    "payment.policy_change_requested",
+    "payment.policy_change_approved",
+    "payment.reconciliation_completed",
+])
+
+
+def build_payment_event(
+    event_kind: str,
+    proposal_id: str,
+    **kwargs: Any,
+) -> Dict[str, Any]:
+    """
+    Build an A2A-compatible event for payment lifecycle changes.
+
+    event_kind must be one of PAYMENT_EVENT_KINDS.
+    Additional context passed via kwargs appears in x-simp namespace.
+    """
+    if event_kind not in PAYMENT_EVENT_KINDS:
+        raise ValueError(f"Unknown payment event kind: {event_kind}")
+
+    # Determine terminal state
+    terminal = event_kind in (
+        "payment.execution_completed",
+        "payment.execution_failed",
+        "payment.proposal_rejected",
+        "payment.proposal_expired",
+        "payment.refund_completed",
+    )
+
+    # Map to A2A state
+    if "completed" in event_kind or "approved" in event_kind:
+        a2a_state = "completed"
+    elif "failed" in event_kind or "rejected" in event_kind or "expired" in event_kind:
+        a2a_state = "failed"
+    else:
+        a2a_state = "working"
+
+    event: Dict[str, Any] = {
+        "taskId": proposal_id,
+        "state": a2a_state,
+        "terminal": terminal,
+        "eventKind": event_kind,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "x-simp": {
+            "protocol": "simp/1.0",
+            "proposal_id": proposal_id,
+            "event_kind": event_kind,
+        },
+    }
+
+    # Add extra kwargs to x-simp (filter sensitive keys)
+    for k, v in kwargs.items():
+        if not _is_sensitive_key(k) and v is not None:
+            event["x-simp"][k] = v
+
+    if "error" in kwargs and kwargs["error"]:
+        error = str(kwargs["error"])
+        if len(error) > 200:
+            error = error[:200] + "..."
+        event["error"] = error
+
+    return event
