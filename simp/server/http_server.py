@@ -37,8 +37,17 @@ from simp.compat.financial_ops import (
     build_financial_ops_card,
     validate_financial_op,
     record_would_spend,
+    execute_approved_payment,
 )
 from simp.compat.projectx_diagnostics import build_projectx_health_report
+from simp.compat.payment_connector import (
+    build_connector, validate_payment_request,
+    ALLOWED_CONNECTORS, HEALTH_TRACKER,
+)
+from simp.compat.approval_queue import APPROVAL_QUEUE, POLICY_CHANGE_QUEUE
+from simp.compat.live_ledger import LIVE_SPEND_LEDGER
+from simp.compat.reconciliation import reconcile
+from simp.compat.event_stream import build_payment_event
 
 # Max payload for A2A task submissions (64 KB)
 _A2A_MAX_PAYLOAD = 64 * 1024
@@ -101,6 +110,7 @@ class SimpHttpServer:
 
         self._setup_routes()
         self._setup_a2a_routes()
+        self._setup_financial_ops_routes()
         self.logger.info("SIMP HTTP Server initialized")
 
     def _setup_routes(self):
@@ -500,6 +510,220 @@ class SimpHttpServer:
                 "would_spend": would_spend,
                 "x-simp": {"mode": "simulate_only", "approved": False},
             }), 202
+
+    # ------------------------------------------------------------------
+    # Financial Ops routes (Sprints 41-45)
+    # ------------------------------------------------------------------
+
+    def _setup_financial_ops_routes(self):
+        """Setup FinancialOps payment pipeline routes."""
+
+        # --- Connector health ---
+        @self.app.route("/a2a/financial-ops/connectors/health", methods=["GET"])
+        @_require_api_key
+        def financial_ops_connector_health():
+            results = {}
+            for name in ALLOWED_CONNECTORS:
+                try:
+                    connector = build_connector(name)
+                    health = connector.health_check()
+                    HEALTH_TRACKER.record_check(name, health)
+                    results[name] = HEALTH_TRACKER.get_status(name)
+                except Exception as exc:
+                    results[name] = {"status": "error", "error": str(exc)}
+            return jsonify({
+                "connectors": results,
+                "x-simp": {"protocol": "simp/1.0"},
+            }), 200
+
+        # --- Proposals CRUD ---
+        @self.app.route("/a2a/financial-ops/proposals", methods=["POST"])
+        @_require_api_key
+        def financial_ops_submit_proposal():
+            data = request.get_json(silent=True) or {}
+            required = ["vendor", "category", "would_spend", "connector_name"]
+            missing = [f for f in required if f not in data]
+            if missing:
+                return jsonify({"status": "error", "error": f"Missing fields: {missing}"}), 400
+
+            ok, err = validate_payment_request(
+                vendor=data["vendor"],
+                category=data["category"],
+                amount=float(data["would_spend"]),
+                connector_name=data["connector_name"],
+            )
+            if not ok:
+                return jsonify({"status": "error", "error": err}), 400
+
+            proposal = APPROVAL_QUEUE.submit_proposal(
+                requester_agent_id=data.get("agent_id", "api_client"),
+                vendor=data["vendor"],
+                category=data["category"],
+                would_spend=float(data["would_spend"]),
+                description=data.get("description", ""),
+                connector_name=data["connector_name"],
+                dry_run_result=data.get("dry_run_result"),
+            )
+            from dataclasses import asdict
+            return jsonify({
+                "status": "pending_approval",
+                "proposal": asdict(proposal),
+                "x-simp": {"protocol": "simp/1.0"},
+            }), 201
+
+        @self.app.route("/a2a/financial-ops/proposals", methods=["GET"])
+        @_require_api_key
+        def financial_ops_list_proposals():
+            status_filter = request.args.get("status")
+            try:
+                limit = min(max(int(request.args.get("limit", 50)), 1), 200)
+            except (ValueError, TypeError):
+                limit = 50
+
+            if status_filter == "pending":
+                proposals = APPROVAL_QUEUE.get_pending_proposals()
+            else:
+                proposals = APPROVAL_QUEUE.get_all_proposals(limit=limit)
+
+            from dataclasses import asdict
+            return jsonify({
+                "proposals": [asdict(p) for p in proposals],
+                "count": len(proposals),
+                "x-simp": {"protocol": "simp/1.0"},
+            }), 200
+
+        @self.app.route("/a2a/financial-ops/proposals/<proposal_id>", methods=["GET"])
+        @_require_api_key
+        def financial_ops_get_proposal(proposal_id):
+            proposal = APPROVAL_QUEUE.get_proposal(proposal_id)
+            if proposal is None:
+                return jsonify({"status": "error", "error": "Proposal not found"}), 404
+            from dataclasses import asdict
+            return jsonify({
+                "proposal": asdict(proposal),
+                "x-simp": {"protocol": "simp/1.0"},
+            }), 200
+
+        # --- Approve / Reject ---
+        @self.app.route("/a2a/financial-ops/proposals/<proposal_id>/approve", methods=["POST"])
+        @_require_api_key
+        def financial_ops_approve(proposal_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+
+            ok, err = APPROVAL_QUEUE.approve_proposal(proposal_id, operator)
+            if ok:
+                return jsonify({
+                    "status": "approved",
+                    "proposal_id": proposal_id,
+                    "x-simp": {"protocol": "simp/1.0"},
+                }), 200
+            return jsonify({"status": "error", "error": err}), 400
+
+        @self.app.route("/a2a/financial-ops/proposals/<proposal_id>/reject", methods=["POST"])
+        @_require_api_key
+        def financial_ops_reject(proposal_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            reason = data.get("reason", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+
+            ok, err = APPROVAL_QUEUE.reject_proposal(proposal_id, operator, reason)
+            if ok:
+                return jsonify({
+                    "status": "rejected",
+                    "proposal_id": proposal_id,
+                    "x-simp": {"protocol": "simp/1.0"},
+                }), 200
+            return jsonify({"status": "error", "error": err}), 400
+
+        # --- Execute approved payment ---
+        @self.app.route("/a2a/financial-ops/proposals/<proposal_id>/execute", methods=["POST"])
+        @_require_api_key
+        def financial_ops_execute(proposal_id):
+            result = execute_approved_payment(proposal_id)
+            status_code = 200 if result.get("success") else 400
+            result["x-simp"] = {"protocol": "simp/1.0"}
+            return jsonify(result), status_code
+
+        # --- Policy changes (dual-control) ---
+        @self.app.route("/a2a/financial-ops/policy-changes", methods=["POST"])
+        @_require_api_key
+        def financial_ops_submit_policy_change():
+            data = request.get_json(silent=True) or {}
+            description = data.get("description", "")
+            requested_by = data.get("requested_by", "")
+            if not description or not requested_by:
+                return jsonify({"status": "error", "error": "description and requested_by required"}), 400
+
+            record = POLICY_CHANGE_QUEUE.submit_policy_change(description, requested_by)
+            from dataclasses import asdict
+            return jsonify({
+                "status": "pending",
+                "change": asdict(record),
+                "x-simp": {"protocol": "simp/1.0"},
+            }), 201
+
+        @self.app.route("/a2a/financial-ops/policy-changes/<change_id>/approve", methods=["POST"])
+        @_require_api_key
+        def financial_ops_approve_policy_change(change_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+
+            ok, msg = POLICY_CHANGE_QUEUE.approve_policy_change(change_id, operator)
+            if ok:
+                return jsonify({
+                    "status": "ok",
+                    "message": msg,
+                    "x-simp": {"protocol": "simp/1.0"},
+                }), 200
+            return jsonify({"status": "error", "error": msg}), 400
+
+        # --- Live ledger ---
+        @self.app.route("/a2a/financial-ops/ledger", methods=["GET"])
+        @_require_api_key
+        def financial_ops_ledger():
+            try:
+                limit = min(max(int(request.args.get("limit", 50)), 1), 200)
+            except (ValueError, TypeError):
+                limit = 50
+            records = LIVE_SPEND_LEDGER.get_records_raw(limit=limit)
+            summary = LIVE_SPEND_LEDGER.get_summary()
+            return jsonify({
+                "records": records,
+                "summary": summary,
+                "x-simp": {"protocol": "simp/1.0"},
+            }), 200
+
+        @self.app.route("/a2a/financial-ops/ledger/export", methods=["GET"])
+        @_require_api_key
+        def financial_ops_ledger_export():
+            content = LIVE_SPEND_LEDGER.export_jsonl()
+            from flask import Response
+            return Response(
+                content,
+                mimetype="application/x-ndjson",
+                headers={"Content-Disposition": "attachment; filename=live_spend_ledger.jsonl"},
+            )
+
+        # --- Reconciliation ---
+        @self.app.route("/a2a/financial-ops/reconciliation", methods=["POST"])
+        @_require_api_key
+        def financial_ops_reconcile():
+            data = request.get_json(silent=True) or {}
+            ref_total = data.get("reference_total")
+            if ref_total is not None:
+                ref_total = float(ref_total)
+            result = reconcile(reference_total=ref_total)
+            return jsonify({
+                "reconciliation": result.to_dict(),
+                "x-simp": {"protocol": "simp/1.0"},
+            }), 200
 
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         """

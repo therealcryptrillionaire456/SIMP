@@ -44,6 +44,23 @@ class OpsPolicy:
     global_max_spend_per_month: float = 200.00
     currency: str = "USD"
     approval_required: bool = True
+    # Sprint 41-44: live payment policy fields
+    live_payments_allowed: bool = False
+    live_payment_connectors: List[str] = field(
+        default_factory=lambda: ["stripe_small_payments", "internal_corp_card_proxy"]
+    )
+    allowed_vendor_categories: List[str] = field(
+        default_factory=lambda: [
+            "software_subscription", "developer_tool_license", "small_cloud_addon"
+        ]
+    )
+    disallowed_payment_types: List[str] = field(
+        default_factory=lambda: [
+            "wire_transfers", "crypto_payments", "peer_to_peer", "payroll"
+        ]
+    )
+    pilot_max_spend_per_month: float = 100.00
+    pilot_max_payments_per_month: int = 20
     log_all_decisions: bool = True
     log_destination: str = "immutable_ledger"
     include_reasoning_summary: bool = True
@@ -99,6 +116,24 @@ def get_policy_dict() -> Dict[str, Any]:
     return d
 
 
+def get_live_policy_dict() -> Dict[str, Any]:
+    """
+    Serialise live payment policy fields for A2A cards / API responses.
+    Sprint 41-44.
+    """
+    policy = _DEFAULT_POLICY
+    return {
+        "live_payments_allowed": policy.live_payments_allowed,
+        "live_payment_connectors": list(policy.live_payment_connectors),
+        "allowed_vendor_categories": list(policy.allowed_vendor_categories),
+        "disallowed_payment_types": list(policy.disallowed_payment_types),
+        "pilot_max_spend_per_month": policy.pilot_max_spend_per_month,
+        "pilot_max_payments_per_month": policy.pilot_max_payments_per_month,
+        "spend_mode": policy.spend_mode,
+        "approval_required": policy.approval_required,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Spend record + ledger
 # ---------------------------------------------------------------------------
@@ -114,6 +149,10 @@ class SpendRecord:
     currency: str = "USD"
     status: str = "simulated"
     approved: bool = False
+    # Sprint 42: dry-run enrichment fields
+    dry_run_result: Optional[str] = None
+    connector_used: Optional[str] = None
+    dry_run_reference_id: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -142,6 +181,34 @@ class SimulatedSpendLedger:
             currency="USD",
             status="simulated",
             approved=False,
+        )
+        with self._lock:
+            self._records.append(rec)
+        return rec
+
+    def record_with_dry_run(
+        self,
+        agent_id: str,
+        description: str,
+        would_spend: float,
+        dry_run_result: str,
+        connector_used: str,
+        dry_run_reference_id: str,
+    ) -> SpendRecord:
+        """Record a simulated spend enriched with dry-run connector results (Sprint 42)."""
+        rec = SpendRecord(
+            record_id=str(uuid.uuid4()),
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            op_type=AutonomousOpType.SIMULATED_SPEND,
+            agent_id=agent_id,
+            description=description,
+            would_spend=would_spend,
+            currency="USD",
+            status="simulated",
+            approved=False,
+            dry_run_result=dry_run_result,
+            connector_used=connector_used,
+            dry_run_reference_id=dry_run_reference_id,
         )
         with self._lock:
             self._records.append(rec)

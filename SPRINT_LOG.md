@@ -79,3 +79,40 @@
 - Created `examples/a2a_demo.py`: Reference A2A client demonstrating full flow.
 - Created `docs/A2A_DEMO.md`: Architecture overview, flow diagram, security posture summary.
 - Flow: Discover -> Plan -> Maintain -> Simulate Financial Op -> Query Events.
+
+## Sprint 41 — Payment Connector Framework
+- Created `simp/compat/payment_connector.py`: PaymentConnector ABC with StubPaymentConnector.
+- PaymentConnectorConfig, PaymentResult dataclasses.
+- ALLOWED_CONNECTORS allowlist (stripe_small_payments, internal_corp_card_proxy).
+- ALLOWED_VENDOR_CATEGORIES, DISALLOWED_PAYMENT_TYPES policy frozensets.
+- ConnectorHealthTracker with Gate 1 readiness (7 consecutive OK days).
+- build_connector(), validate_payment_request() factory and validation.
+
+## Sprint 42 — Dry-Run Enrichment & Health Tracking
+- Extended `simp/compat/ops_policy.py`: Added live payment policy fields to OpsPolicy.
+- Added dry_run_result, connector_used, dry_run_reference_id to SpendRecord.
+- Added record_with_dry_run() to SimulatedSpendLedger.
+- Added get_live_policy_dict() for A2A card serialisation.
+
+## Sprint 43 — Approval Queue & Payment Events
+- Created `simp/compat/approval_queue.py`: Append-only JSONL approval queue.
+- PaymentProposal state machine: pending -> approved | rejected.
+- PolicyChangeQueue with dual-control (two distinct operator approvals).
+- Extended `simp/compat/event_stream.py`: Added PAYMENT_EVENT_KINDS frozenset.
+- Added build_payment_event() for payment lifecycle A2A events.
+
+## Sprint 44 — Live Execution Pipeline (Feature-Flagged OFF)
+- Created `simp/compat/live_ledger.py`: Append-only JSONL live spend ledger.
+- Idempotency guard: repeated executions with same proposal_id silently ignored.
+- Extended `simp/compat/financial_ops.py`: Added execute_approved_payment().
+- 5-gate execution pipeline: feature flag, idempotency, proposal lookup, validation, health.
+- FINANCIAL_OPS_LIVE_ENABLED=false by default — no live payments until explicit opt-in.
+- Added livePaymentPolicy to financial-ops A2A card x-simp namespace.
+
+## Sprint 45 — Reconciliation, Dashboard & HTTP Routes
+- Created `simp/compat/reconciliation.py`: Reconciliation engine comparing live vs simulated ledgers.
+- ReconciliationResult with per-vendor breakdowns and discrepancy detection.
+- Extended `simp/server/http_server.py`: Added _setup_financial_ops_routes() with 12 new endpoints.
+- Routes: connector health, proposals CRUD, approve/reject, execute, policy changes, ledger, export, reconciliation.
+- Extended `dashboard/server.py`: Added /dashboard/financial-ops/status, proposals, ledger endpoints.
+- Extended `dashboard/index.html`: Added FinancialOps Status, Proposed Payments, Ledger panels.
