@@ -12,7 +12,9 @@ Run:
 import asyncio
 import json
 import os
+import re
 import time
+import uuid
 from collections import deque
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -20,7 +22,7 @@ from pathlib import Path
 from typing import Any, Set
 
 import httpx
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -31,11 +33,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 # ---------------------------------------------------------------------------
 
 BROKER_URL = os.environ.get("SIMP_BROKER_URL", "http://127.0.0.1:5555")
+PROJECTX_GUARD_URL = os.environ.get("PROJECTX_GUARD_URL", "http://127.0.0.1:8771")
 DASHBOARD_HOST = os.environ.get("DASHBOARD_HOST", "0.0.0.0")
 DASHBOARD_PORT = int(os.environ.get("DASHBOARD_PORT", "8050"))
 POLL_INTERVAL = int(os.environ.get("POLL_INTERVAL", "5"))  # seconds
 ACTIVITY_BUFFER_SIZE = 100
 ACTIVITY_LOG_PATH = Path(__file__).parent / "activity_log.jsonl"
+OPERATOR_LOG_PATH = Path(__file__).parent / "operator_events.jsonl"
 
 # Comma-separated list of allowed CORS origins.
 # Default "*" is acceptable for a GET-only public dashboard but can be
@@ -51,6 +55,24 @@ SENSITIVE_KEYS = frozenset({
     "api_key", "api_secret", "secret", "token", "password", "credential",
     "private_key", "access_token", "refresh_token", "auth",
 })
+_STRING_REDACTION_PATTERNS = (
+    (
+        re.compile(r"(?i)\b((?:x-[a-z0-9-]*api-key|authorization)\s*:\s*)([^\"\n\r]+)(?=\")"),
+        lambda match: f"{match.group(1)}<redacted>",
+    ),
+    (
+        re.compile(r"(?i)\b((?:x-[a-z0-9-]*api-key|authorization)\s*:\s*)([^\s`]+)"),
+        lambda match: f"{match.group(1)}<redacted>",
+    ),
+    (
+        re.compile(r"\b([A-Z0-9_]*(?:API_KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*\s*=\s*)(['\"]?)([^'\"\s`]+)(\2)", re.IGNORECASE),
+        lambda match: f"{match.group(1)}{match.group(2)}<redacted>{match.group(4)}",
+    ),
+    (
+        re.compile(r"(?i)\b(Bearer\s+)([A-Za-z0-9._:-]+)"),
+        lambda match: f"{match.group(1)}<redacted>",
+    ),
+)
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -145,6 +167,11 @@ def _redact(obj: Any) -> Any:
         return cleaned
     if isinstance(obj, list):
         return [_redact(item) for item in obj]
+    if isinstance(obj, str):
+        redacted = obj
+        for pattern, repl in _STRING_REDACTION_PATTERNS:
+            redacted = pattern.sub(repl, redacted)
+        return redacted
     return obj
 
 
@@ -157,6 +184,77 @@ async def _broker_get(path: str) -> dict | None:
             return resp.json()
     except Exception:
         return None
+
+
+async def _projectx_get(path: str) -> dict | None:
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(f"{PROJECTX_GUARD_URL}{path}")
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return None
+
+
+async def _projectx_post(path: str, payload: dict) -> dict | None:
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(f"{PROJECTX_GUARD_URL}{path}", json=payload)
+            resp.raise_for_status()
+            return resp.json()
+    except Exception:
+        return None
+
+
+def _append_operator_event(
+    *,
+    request_id: str,
+    intent_type: str | None,
+    action_type: str,
+    status: str,
+    summary: str,
+    source_agent: str = "dashboard_ui",
+    target_agent: str = "projectx_native",
+    latency_ms: float | None = None,
+    details: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    payload = _redact(
+        {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "request_id": request_id,
+            "intent_type": intent_type,
+            "source_agent": source_agent,
+            "target_agent": target_agent,
+            "action_type": action_type,
+            "status": status,
+            "latency_ms": round(latency_ms, 2) if latency_ms is not None else None,
+            "summary": summary,
+            "details": details or {},
+        }
+    )
+    OPERATOR_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with OPERATOR_LOG_PATH.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(payload) + "\n")
+    return payload
+
+
+def _tail_operator_events(limit: int = 25) -> list[dict]:
+    if limit <= 0 or not OPERATOR_LOG_PATH.exists():
+        return []
+    try:
+        lines = OPERATOR_LOG_PATH.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    rows = []
+    for line in lines[-limit:]:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            rows.append(_redact(json.loads(line)))
+        except json.JSONDecodeError:
+            continue
+    return rows[::-1]
 
 
 def _detect_changes(old_snapshot: dict, new_snapshot: dict) -> list[dict]:
@@ -595,6 +693,133 @@ async def api_logs(limit: int = 100):
             "count": 0,
         }
     return _redact(data)
+
+
+@app.get("/api/projectx/system")
+async def api_projectx_system():
+    data = await _projectx_get("/system/status")
+    if data is None:
+        return {"status": "unreachable", "projectx_guard_reachable": False}
+    return _redact(data)
+
+
+@app.get("/api/projectx/processes")
+async def api_projectx_processes():
+    data = await _projectx_get("/system/status")
+    if data is None:
+        return {"status": "unreachable", "services": []}
+    return {
+        "status": "success",
+        "services": _redact(data.get("stack", {}).get("services", [])),
+        "summary": _redact(data.get("stack", {}).get("summary", {})),
+        "startup_command": data.get("stack", {}).get("startup_command"),
+        "restart_command": data.get("stack", {}).get("restart_command"),
+    }
+
+
+@app.get("/api/projectx/actions")
+async def api_projectx_actions():
+    data = await _projectx_get("/actions")
+    if data is None:
+        return {"status": "unreachable", "actions": []}
+    return _redact(data)
+
+
+@app.get("/api/projectx/protocol-facts")
+async def api_projectx_protocol_facts():
+    data = await _projectx_get("/protocol-facts")
+    if data is None:
+        return {"status": "unreachable", "protocol_facts": {}}
+    return _redact(data)
+
+
+@app.get("/api/projectx/events")
+async def api_projectx_events():
+    data = await _projectx_get("/events")
+    if data is None:
+        return {"status": "unreachable", "events": []}
+    return _redact(data)
+
+
+@app.get("/api/projectx/chat/history")
+async def api_projectx_chat_history():
+    return {"status": "success", "events": _tail_operator_events(limit=20)}
+
+
+@app.post("/api/projectx/chat")
+async def api_projectx_chat(request: Request):
+    body = await request.json()
+    message = str(body.get("message", "")).strip()
+    job = str(body.get("job", "")).strip() or None
+    request_id = str(body.get("request_id") or uuid.uuid4())
+    started = time.time()
+    if not message and not job:
+        return {"status": "error", "error": "message_or_job_required"}
+
+    if job:
+        allowed_jobs = {
+            "native_agent_health_check": {"intent_type": "native_agent_health_check", "params": {"quick": True}},
+            "native_agent_repo_scan": {"intent_type": "native_agent_repo_scan", "params": {"sync_protocol_facts": True}},
+            "native_agent_task_audit": {"intent_type": "native_agent_task_audit", "params": {"quick": True}},
+            "native_agent_security_audit": {"intent_type": "native_agent_security_audit", "params": {"persist": True}},
+        }
+        if job not in allowed_jobs:
+            return {"status": "error", "error": "job_not_allowed", "job": job}
+        payload = {
+            "intent_id": request_id,
+            "source_agent": "dashboard_ui",
+            "target_agent": "projectx_native",
+            "intent_type": allowed_jobs[job]["intent_type"],
+            "params": allowed_jobs[job]["params"],
+        }
+        _append_operator_event(
+            request_id=request_id,
+            intent_type=job,
+            action_type="dashboard.job_request",
+            status="received",
+            summary=f"Dashboard requested {job}",
+            details={"job": job},
+        )
+        response = await _projectx_post("/intents/handle", payload)
+        latency_ms = (time.time() - started) * 1000
+        _append_operator_event(
+            request_id=request_id,
+            intent_type=job,
+            action_type="dashboard.job_result",
+            status="ok" if response else "error",
+            summary=f"Dashboard job completed: {job}",
+            latency_ms=latency_ms,
+            details={"response": response or {"status": "unreachable"}},
+        )
+        return {"status": "success" if response else "unreachable", "mode": "job", "response": _redact(response)}
+
+    payload = {
+        "intent_id": request_id,
+        "source_agent": "dashboard_ui",
+        "target_agent": "projectx_native",
+        "intent_type": "projectx_query",
+        "params": {"question": message, "source_agent": "dashboard_ui"},
+    }
+    _append_operator_event(
+        request_id=request_id,
+        intent_type="projectx_query",
+        action_type="dashboard.query_received",
+        status="received",
+        summary=message[:120],
+        details={"message": message[:200]},
+    )
+    response = await _projectx_post("/intents/handle", payload)
+    latency_ms = (time.time() - started) * 1000
+    _append_operator_event(
+        request_id=request_id,
+        intent_type="projectx_query",
+        action_type="dashboard.query_completed",
+        status="ok" if response else "error",
+        summary=f"Dashboard query completed for request {request_id}",
+        latency_ms=latency_ms,
+        details={"response": response or {"status": "unreachable"}},
+    )
+    return {"status": "success" if response else "unreachable", "mode": "query", "response": _redact(response)}
 
 
 # ---------------------------------------------------------------------------

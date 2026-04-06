@@ -89,11 +89,27 @@
     valRouted:       $("#val-routed"),
     valFailed:       $("#val-failed"),
     valAvgRoute:     $("#val-avg-route"),
+    valProjectXStatus: $("#val-projectx-status"),
+    valGemma4Status: $("#val-gemma4-status"),
+    valDashboardStatus: $("#val-dashboard-status"),
+    valProtocolUpdate: $("#val-protocol-update"),
 
     // Tables / grids
     agentsTbody:     $("#agents-tbody"),
     capGrid:         $("#cap-grid"),
     activityFeed:    $("#activity-feed"),
+    projectxProcessesTbody: $("#projectx-processes-tbody"),
+    projectxActionsFeed: $("#projectx-actions-feed"),
+    stackStartCommand: $("#stack-start-command"),
+    stackRestartCommand: $("#stack-restart-command"),
+    valProjectxProtocolVersion: $("#val-projectx-protocol-version"),
+    valProjectxIntentCount: $("#val-projectx-intent-count"),
+    valProjectxAgentCount: $("#val-projectx-agent-count"),
+    valProjectxPolicyCount: $("#val-projectx-policy-count"),
+    projectxProtocolSummary: $("#projectx-protocol-summary"),
+    projectxChatFeed: $("#projectx-chat-feed"),
+    projectxChatForm: $("#projectx-chat-form"),
+    projectxChatInput: $("#projectx-chat-input"),
 
     // Delivery status
     valDelivered:         $("#val-delivered"),
@@ -144,6 +160,20 @@
   async function apiFetch(path) {
     try {
       const res = await fetch(API_BASE + path);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
+  async function apiPost(path, payload) {
+    try {
+      const res = await fetch(API_BASE + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       if (!res.ok) return null;
       return await res.json();
     } catch {
@@ -210,6 +240,10 @@
 
     if (!dashboardStartedAt && data.dashboard_started_at) {
       dashboardStartedAt = data.dashboard_started_at;
+    }
+    if (dom.valDashboardStatus) {
+      dom.valDashboardStatus.textContent = "Healthy";
+      dom.valDashboardStatus.className = "card-value status-healthy";
     }
   }
 
@@ -792,6 +826,122 @@
     el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${escapeHtml(total)} actions available</span>`;
   }
 
+  function renderProjectXSystem(data) {
+    if (!data || data.status === "unreachable") {
+      if (dom.valProjectXStatus) {
+        dom.valProjectXStatus.textContent = "Down";
+        dom.valProjectXStatus.className = "card-value status-error";
+      }
+      if (dom.valGemma4Status) {
+        dom.valGemma4Status.textContent = "Down";
+        dom.valGemma4Status.className = "card-value status-error";
+      }
+      return;
+    }
+    const services = ((data.stack || {}).services || []);
+    const byName = {};
+    services.forEach(function(service) { byName[service.name] = service; });
+    var projectx = byName.projectx_guard;
+    var gemma = byName.gemma4_local;
+    if (dom.valProjectXStatus) {
+      dom.valProjectXStatus.textContent = capitalize((projectx && projectx.status) || "unknown");
+      dom.valProjectXStatus.className = "card-value status-" + statusClass((projectx && projectx.status) || "unknown");
+    }
+    if (dom.valGemma4Status) {
+      dom.valGemma4Status.textContent = capitalize((gemma && gemma.status) || "unknown");
+      dom.valGemma4Status.className = "card-value status-" + statusClass((gemma && gemma.status) || "unknown");
+    }
+    if (dom.valProtocolUpdate && data.protocol_facts) {
+      dom.valProtocolUpdate.textContent = formatDate(data.protocol_facts.last_updated);
+    }
+  }
+
+  function renderProjectXProcesses(data) {
+    if (!dom.projectxProcessesTbody) return;
+    if (!data || data.status === "unreachable") {
+      dom.projectxProcessesTbody.innerHTML = '<tr><td colspan="6" class="empty-row">ProjectX guard unreachable</td></tr>';
+      return;
+    }
+    const services = data.services || [];
+    if (!services.length) {
+      dom.projectxProcessesTbody.innerHTML = '<tr><td colspan="6" class="empty-row">No services discovered</td></tr>';
+      return;
+    }
+    dom.stackStartCommand.textContent = data.startup_command || "--";
+    dom.stackRestartCommand.textContent = data.restart_command || "--";
+    dom.projectxProcessesTbody.innerHTML = services.map(function(service) {
+      var port = "--";
+      if (service.health_url) {
+        var match = String(service.health_url).match(/:(\d+)\//);
+        if (match) port = match[1];
+      }
+      return "<tr>"
+        + td(escHtml(service.name))
+        + td(capPill(service.category || "--"))
+        + td(statusBadge(service.status || "unknown"))
+        + td(mono(escHtml(service.health_url || "--")))
+        + td(mono(port))
+        + td('<span class="mono" style="font-size:0.72rem">' + escHtml(service.log_path || "--") + "</span>")
+        + "</tr>";
+    }).join("");
+  }
+
+  function renderProjectXActions(data) {
+    if (!dom.projectxActionsFeed) return;
+    var actions = (data && data.actions) || [];
+    if (!actions.length) {
+      dom.projectxActionsFeed.innerHTML = '<div class="empty-state">No ProjectX actions recorded yet.</div>';
+      return;
+    }
+    dom.projectxActionsFeed.innerHTML = actions.map(function(action) {
+      return '<div class="activity-item">'
+        + '<span class="activity-ts">' + formatDate(action.timestamp) + "</span>"
+        + '<span class="activity-type">' + escHtml(action.action_type || "--") + "</span>"
+        + '<span class="activity-result">' + escHtml(action.summary || "--") + "</span>"
+        + '<span class="activity-status ' + deliveryStatusClass(action.status || "") + '">' + escHtml(action.status || "--") + "</span>"
+        + '<span class="activity-latency mono">' + (action.latency_ms != null ? escapeHtml(Number(action.latency_ms).toFixed(1) + " ms") : "--") + "</span>"
+        + '</div>';
+    }).join("");
+  }
+
+  function renderProjectXProtocolFacts(data) {
+    var facts = (data && data.protocol_facts) || null;
+    if (!facts) return;
+    dom.valProjectxProtocolVersion.textContent = facts.version != null ? String(facts.version) : "--";
+    dom.valProjectxIntentCount.textContent = facts.intent_count != null ? String(facts.intent_count) : "--";
+    dom.valProjectxAgentCount.textContent = facts.agent_count != null ? String(facts.agent_count) : "--";
+    dom.valProjectxPolicyCount.textContent = facts.policy_count != null ? String(facts.policy_count) : "--";
+    var summaryHtml = "";
+    summaryHtml += '<div class="protocol-summary-row"><span class="card-label">Last Updated</span><span class="mono">' + escHtml(formatDate(facts.last_updated)) + '</span></div>';
+    summaryHtml += '<div class="protocol-summary-row"><span class="card-label">Schema Path</span><span class="mono">' + escHtml(facts.path || "--") + '</span></div>';
+    var drifts = facts.drift_indicators || [];
+    summaryHtml += '<div class="protocol-summary-row"><span class="card-label">Drift Indicators</span><span>' + escHtml(String(drifts.length)) + '</span></div>';
+    dom.projectxProtocolSummary.innerHTML = summaryHtml;
+  }
+
+  function appendChatMessage(role, text, meta) {
+    if (!dom.projectxChatFeed) return;
+    var wrapper = document.createElement("div");
+    wrapper.className = "chat-message " + role;
+    wrapper.innerHTML = '<div class="chat-role">' + escHtml(role === "user" ? "Operator" : "ProjectX") + '</div>'
+      + '<div class="chat-text">' + escHtml(text || "--") + '</div>'
+      + (meta ? '<div class="chat-meta mono">' + escHtml(meta) + '</div>' : '');
+    dom.projectxChatFeed.prepend(wrapper);
+  }
+
+  async function submitProjectXChat(payload, previewText) {
+    appendChatMessage("user", previewText, null);
+    const response = await apiPost("/api/projectx/chat", payload);
+    if (!response || !response.response) {
+      appendChatMessage("assistant", "ProjectX guard unreachable.", "dashboard proxy error");
+      return;
+    }
+    var body = response.response.response || response.response;
+    var answer = body.answer || body.summary || JSON.stringify(body, null, 2);
+    appendChatMessage("assistant", typeof answer === "string" ? answer : JSON.stringify(answer), body.intent_type || response.mode);
+    refreshAll();
+  }
+
   // -----------------------------------------------------------------------
   // Task search/filter with pagination (Sprint 21 — KP-003)
   // -----------------------------------------------------------------------
@@ -936,7 +1086,7 @@
     setLoading('overview-section', true);
 
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData] = await Promise.all([
+    const [health, stats, agents, activity, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -951,6 +1101,10 @@
       apiFetch("/api/tasks/queue"),
       apiFetch("/api/orchestration"),
       apiFetch("/api/computer-use"),
+      apiFetch("/api/projectx/system"),
+      apiFetch("/api/projectx/processes"),
+      apiFetch("/api/projectx/actions"),
+      apiFetch("/api/projectx/protocol-facts"),
     ]);
 
     setLoading('overview-section', false);
@@ -971,6 +1125,10 @@
     renderTaskQueue(taskQueueData);
     renderOrchestration(orchestrationData);
     renderComputerUse(computerUseData);
+    renderProjectXSystem(projectxSystem);
+    renderProjectXProcesses(projectxProcesses);
+    renderProjectXActions(projectxActions);
+    renderProjectXProtocolFacts(projectxProtocolFacts);
 
     // Sprint 21 — update charts
     if (stats) {
@@ -1119,6 +1277,23 @@
 
   dom.refreshBtn.addEventListener("click", function() {
     refreshAll();
+  });
+
+  if (dom.projectxChatForm) {
+    dom.projectxChatForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      var message = (dom.projectxChatInput.value || "").trim();
+      if (!message) return;
+      dom.projectxChatInput.value = "";
+      submitProjectXChat({ message: message }, message);
+    });
+  }
+
+  $$(".projectx-job-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var job = btn.getAttribute("data-job");
+      submitProjectXChat({ job: job }, "Run " + job);
+    });
   });
 
   // Sprint 21 — filter event listeners
