@@ -116,6 +116,7 @@
     valQueued:            $("#val-queued"),
     valQueuedNoEndpoint:  $("#val-queued-no-endpoint"),
     valDeliveryFailed:    $("#val-delivery-failed"),
+    valConnectionRefused: $("#val-connection-refused"),
     valTimeout:           $("#val-timeout"),
     valRateLimited:       $("#val-rate-limited"),
     deliveryTbody:        $("#delivery-tbody"),
@@ -327,7 +328,7 @@
     const events = data.events || [];
     if (events.length === 0) {
       dom.activityFeed.innerHTML =
-        '<div class="empty-state">No activity recorded yet. Events appear when broker state changes.</div>';
+        '<div class="empty-state">No broker intents recorded yet.</div>';
       return;
     }
     // Show newest first
@@ -335,14 +336,15 @@
     let html = "";
     for (const ev of sorted) {
       const ds = ev.delivery_status || "--";
-      const statusCls = ds === "delivered" ? "delivered"
-        : (ds === "failed" || ds === "timeout" || ds === "rate_limited") ? "failed"
-        : (ds === "queued" || ds === "queued_no_endpoint") ? "queued"
+      const deliveryCls = deliveryStatusClass(ds);
+      const statusCls = deliveryCls === "online" ? "delivered"
+        : deliveryCls === "offline" ? "failed"
         : "queued";
+      const result = ev.result || [ev.source_agent || "unknown", ev.target_agent || "unknown"].join(" -> ");
       html += '<div class="activity-item">';
       html += '<span class="activity-ts">' + formatDate(ev.timestamp) + "</span>";
       html += '<span class="activity-type">' + escHtml(ev.event_type || ev.intent_type || "--") + "</span>";
-      html += '<span class="activity-result">' + escHtml(ev.result || "--") + "</span>";
+      html += '<span class="activity-result">' + escHtml(result) + "</span>";
       html += '<span class="activity-status ' + statusCls + '">' + escHtml(ds) + "</span>";
       if (ev.delivery_latency_ms != null) {
         html += '<span class="activity-latency mono">' + Number(ev.delivery_latency_ms).toFixed(1) + " ms</span>";
@@ -568,20 +570,27 @@
 
     // Delivery counts from broker stats
     var dc = stats.delivery_counts || {};
-    dom.valDelivered.textContent = dc.delivered || 0;
-    dom.valQueued.textContent = dc.queued || 0;
-    dom.valQueuedNoEndpoint.textContent = dc.queued_no_endpoint || 0;
-    dom.valDeliveryFailed.textContent = dc.failed || 0;
-    dom.valTimeout.textContent = dc.timeout || 0;
-    dom.valRateLimited.textContent = dc.rate_limited || 0;
+    if (dom.valDelivered) dom.valDelivered.textContent = dc.delivered || 0;
+    if (dom.valQueued) dom.valQueued.textContent = dc.queued || 0;
+    if (dom.valQueuedNoEndpoint) dom.valQueuedNoEndpoint.textContent = dc.queued_no_endpoint || 0;
+    if (dom.valDeliveryFailed) dom.valDeliveryFailed.textContent = dc.failed || 0;
+    if (dom.valConnectionRefused) dom.valConnectionRefused.textContent = dc.connection_refused || 0;
+    if (dom.valTimeout) dom.valTimeout.textContent = dc.timeout || 0;
+    if (dom.valRateLimited) dom.valRateLimited.textContent = dc.rate_limited || 0;
 
     // Color failed/timeout/rate_limited red if > 0
-    if ((dc.failed || 0) > 0) dom.valDeliveryFailed.className = "card-value mono status-error";
-    else dom.valDeliveryFailed.className = "card-value mono";
-    if ((dc.timeout || 0) > 0) dom.valTimeout.className = "card-value mono status-error";
-    else dom.valTimeout.className = "card-value mono";
-    if ((dc.rate_limited || 0) > 0) dom.valRateLimited.className = "card-value mono status-error";
-    else dom.valRateLimited.className = "card-value mono";
+    if (dom.valDeliveryFailed) {
+      dom.valDeliveryFailed.className = (dc.failed || 0) > 0 ? "card-value mono status-error" : "card-value mono";
+    }
+    if (dom.valConnectionRefused) {
+      dom.valConnectionRefused.className = (dc.connection_refused || 0) > 0 ? "card-value mono status-error" : "card-value mono";
+    }
+    if (dom.valTimeout) {
+      dom.valTimeout.className = (dc.timeout || 0) > 0 ? "card-value mono status-error" : "card-value mono";
+    }
+    if (dom.valRateLimited) {
+      dom.valRateLimited.className = (dc.rate_limited || 0) > 0 ? "card-value mono status-error" : "card-value mono";
+    }
 
     // Delivery detail table from recent intents
     var intents = stats.recent_deliveries || [];
@@ -608,8 +617,9 @@
   function deliveryStatusClass(status) {
     if (!status) return "unknown";
     if (status === "delivered") return "online";
-    if (status === "queued" || status === "queued_no_endpoint") return "degraded";
-    if (status === "failed" || status === "timeout" || status === "rate_limited") return "offline";
+    if (status === "queued" || status === "queued_no_endpoint" || status === "pending") return "degraded";
+    if (status === "failed" || status === "connection_refused" || status === "timeout" || status === "rate_limited") return "offline";
+    if (String(status).startsWith("http_") || String(status).startsWith("error_")) return "offline";
     return "unknown";
   }
 

@@ -7,7 +7,7 @@ Usage:
     agent = Gemma4Agent(
         agent_id="gemma4_local",
         model_endpoint="http://localhost:11434",  # Ollama default
-        model_name="gemma2:2b",
+        model_name="gemma4:e2b",
     )
 """
 
@@ -37,7 +37,7 @@ class Gemma4Agent:
         self,
         agent_id: str = "gemma4_local",
         model_endpoint: str = "http://localhost:11434",
-        model_name: str = "gemma2:2b",
+        model_name: str = "gemma4:e2b",
         api_format: str = "ollama",  # "ollama" or "openai"
         timeout: float = 120.0,
         max_tokens: int = 4096,
@@ -50,6 +50,15 @@ class Gemma4Agent:
         self.max_tokens = max_tokens
         self.intents_handled = 0
         self._client = httpx.Client(timeout=timeout)
+        self._last_health_check_at = 0.0
+        self._last_health_result: Dict[str, Any] = {
+            "status": "starting",
+            "agent_id": self.agent_id,
+            "model": self.model_name,
+            "model_available": False,
+            "backend_reachable": False,
+            "intents_handled": 0,
+        }
 
     def handle_intent(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """Handle a SIMP intent by generating a response from the local model.
@@ -161,31 +170,52 @@ class Gemma4Agent:
 
     def health(self) -> Dict[str, Any]:
         """Return health status."""
+        now = time.time()
+        if now - self._last_health_check_at < 5.0:
+            cached = dict(self._last_health_result)
+            cached["intents_handled"] = self.intents_handled
+            cached["cached"] = True
+            return cached
+
         try:
             # Try to ping the model endpoint
             if self.api_format == "ollama":
-                resp = self._client.get(f"{self.model_endpoint}/api/tags", timeout=5.0)
+                with httpx.Client(timeout=2.0) as health_client:
+                    resp = health_client.get(f"{self.model_endpoint}/api/tags")
+                model_prefix = self.model_name.split(":")[0].lower()
                 model_available = any(
-                    m.get("name", "").startswith(self.model_name.split(":")[0])
+                    m.get("name", "").lower().startswith(model_prefix)
                     for m in resp.json().get("models", [])
                 )
             else:
-                resp = self._client.get(f"{self.model_endpoint}/v1/models", timeout=5.0)
+                with httpx.Client(timeout=2.0) as health_client:
+                    resp = health_client.get(f"{self.model_endpoint}/v1/models")
                 model_available = resp.status_code == 200
 
-            return {
+            payload = {
                 "status": "ok" if model_available else "degraded",
                 "agent_id": self.agent_id,
                 "model": self.model_name,
                 "model_available": model_available,
+                "backend_reachable": True,
                 "intents_handled": self.intents_handled,
             }
+            self._last_health_check_at = now
+            self._last_health_result = dict(payload)
+            return payload
         except Exception as exc:
-            return {
+            payload = {
                 "status": "error",
                 "agent_id": self.agent_id,
+                "model": self.model_name,
+                "model_available": False,
+                "backend_reachable": False,
+                "intents_handled": self.intents_handled,
                 "error": str(exc),
             }
+            self._last_health_check_at = now
+            self._last_health_result = dict(payload)
+            return payload
 
     def close(self):
         """Close the HTTP client."""
