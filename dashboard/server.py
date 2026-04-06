@@ -103,6 +103,41 @@ def a2a_status():
 # Dashboard HTML
 # ---------------------------------------------------------------------------
 
+@app.get("/dashboard/financial-ops/status")
+def financial_ops_status():
+    """Return FinancialOps connector health and mode status."""
+    from simp.compat.payment_connector import HEALTH_TRACKER, ALLOWED_CONNECTORS
+    live_enabled = os.environ.get("FINANCIAL_OPS_LIVE_ENABLED", "").lower() == "true"
+    return JSONResponse({
+        "mode": "live" if live_enabled else "dry_run",
+        "live_payments_enabled": live_enabled,
+        "connectors": sorted(ALLOWED_CONNECTORS.keys()),
+        "health": HEALTH_TRACKER.get_status(),
+    })
+
+
+@app.get("/dashboard/financial-ops/proposals")
+def financial_ops_proposals():
+    """Return proposals for dashboard display."""
+    from simp.compat.approval_queue import APPROVAL_QUEUE
+    proposals = APPROVAL_QUEUE.get_all_proposals()
+    return JSONResponse({
+        "proposals": [p.to_dict() for p in proposals],
+        "count": len(proposals),
+    })
+
+
+@app.get("/dashboard/financial-ops/ledger")
+def financial_ops_ledger():
+    """Return combined ledger for dashboard display."""
+    from simp.compat.ops_policy import SPEND_LEDGER
+    from simp.compat.live_ledger import LIVE_LEDGER
+    return JSONResponse({
+        "simulated": SPEND_LEDGER.get_ledger_summary(),
+        "live": LIVE_LEDGER.get_summary(),
+    })
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
     html_path = os.path.join(os.path.dirname(__file__), "index.html")
