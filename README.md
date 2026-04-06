@@ -390,9 +390,42 @@ python examples/simple_agent.py
 pytest tests/ -v
 ```
 
+## A2A Compatibility Layer
+
+SIMP includes a comprehensive A2A (Agent-to-Agent) compatibility layer that enables standard A2A clients to interact with SIMP agents without modifying the core protocol.
+
+### New A2A Endpoints
+
+| Endpoint | Auth | Description |
+|----------|------|-------------|
+| `GET /.well-known/agent-card.json` | No | Broker-level A2A Agent Card |
+| `POST /a2a/tasks` | API Key | Submit A2A task (translated to SIMP intent) |
+| `GET /a2a/tasks/<id>` | API Key | Get task status |
+| `GET /a2a/tasks/types` | No | List supported task types |
+| `GET /a2a/events` | API Key | Recent A2A-formatted task events |
+| `GET /a2a/events/<intent_id>` | API Key | Events for specific intent |
+| `GET /a2a/security` | No | Security posture and scheme declarations |
+| `GET /a2a/agents/projectx/agent.json` | No | ProjectX native agent card |
+| `POST /a2a/agents/projectx/tasks` | API Key | Submit maintenance task |
+| `GET /a2a/agents/projectx/health` | No | ProjectX health diagnostics |
+| `GET /a2a/agents/financial-ops/agent.json` | No | FinancialOps agent card |
+| `POST /a2a/agents/financial-ops/tasks` | API Key | Submit simulated financial op |
+
+### Demo
+
+See [docs/A2A_DEMO.md](docs/A2A_DEMO.md) for an end-to-end walkthrough, or run:
+
+```bash
+python3 examples/a2a_demo.py --broker-url http://127.0.0.1:5555
+```
+
+### Architecture Note
+
+> A2A is an adapter surface. SIMP CanonicalIntent remains the routing authority.
+
 ## Status
 
-**v0.1-alpha** - Core protocol working, examples functional, tests passing
+**v0.5.0** - Core protocol + A2A compatibility layer, examples functional, 205+ tests passing
 
 ## License
 
