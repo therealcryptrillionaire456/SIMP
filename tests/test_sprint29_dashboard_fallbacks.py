@@ -122,3 +122,26 @@ def test_dashboard_health_alias_uses_api_health(monkeypatch):
     assert response.status_code == 200
     assert body["status"] == "healthy"
     assert body["broker_reachable"] is True
+
+
+def test_memory_conversations_endpoint_preserves_explicit_broker_capability_gap(monkeypatch):
+    async def fake_broker_get(path):
+        assert path == "/memory/conversations"
+        return {
+            "status": "not_supported",
+            "supported": False,
+            "reason": "Bullbear does not persist conversation transcripts.",
+            "conversations": [],
+            "count": 0,
+        }
+
+    monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+    with TestClient(ds.app) as client:
+        response = client.get("/api/memory/conversations")
+
+    body = response.json()
+    assert response.status_code == 200
+    assert body["status"] == "not_supported"
+    assert body["supported"] is False
+    assert "conversation transcripts" in body["reason"]
