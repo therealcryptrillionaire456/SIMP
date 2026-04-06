@@ -146,3 +146,61 @@ def index():
             return HTMLResponse(f.read())
     except FileNotFoundError:
         return HTMLResponse("<h1>SIMP Dashboard</h1><p>index.html not found.</p>")
+
+
+# ---------------------------------------------------------------------------
+# FinancialOps Dashboard Endpoints (Sprint 45)
+# ---------------------------------------------------------------------------
+
+@app.get("/dashboard/financial-ops/status")
+def financial_ops_status():
+    """Return FinancialOps connector health and policy summary."""
+    from simp.compat.payment_connector import ALLOWED_CONNECTORS, HEALTH_TRACKER, build_connector
+    from simp.compat.ops_policy import get_live_policy_dict
+
+    connector_health = {}
+    for name in ALLOWED_CONNECTORS:
+        try:
+            connector = build_connector(name)
+            health = connector.health_check()
+            HEALTH_TRACKER.record_check(name, health)
+            connector_health[name] = HEALTH_TRACKER.get_status(name)
+        except Exception as exc:
+            connector_health[name] = {"status": "error", "error": str(exc)}
+
+    return JSONResponse({
+        "connectors": connector_health,
+        "policy": get_live_policy_dict(),
+        "gate1_ready": {
+            name: HEALTH_TRACKER.is_gate1_ready(name) for name in ALLOWED_CONNECTORS
+        },
+    })
+
+
+@app.get("/dashboard/financial-ops/proposals")
+def financial_ops_proposals():
+    """Return recent proposals for the dashboard."""
+    from simp.compat.approval_queue import APPROVAL_QUEUE
+    from dataclasses import asdict
+
+    proposals = APPROVAL_QUEUE.get_all_proposals(limit=20)
+    pending = APPROVAL_QUEUE.get_pending_proposals()
+    return JSONResponse({
+        "proposals": [asdict(p) for p in proposals],
+        "pending_count": len(pending),
+        "total_count": len(proposals),
+    })
+
+
+@app.get("/dashboard/financial-ops/ledger")
+def financial_ops_ledger():
+    """Return live ledger summary for the dashboard."""
+    from simp.compat.live_ledger import LIVE_SPEND_LEDGER
+    from simp.compat.ops_policy import SPEND_LEDGER
+
+    live_summary = LIVE_SPEND_LEDGER.get_summary()
+    sim_summary = SPEND_LEDGER.get_ledger_summary()
+    return JSONResponse({
+        "live": live_summary,
+        "simulated": sim_summary,
+    })
