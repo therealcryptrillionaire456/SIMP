@@ -250,7 +250,7 @@ class TestGemma4AgentAdapter:
         from simp.agents.gemma4_agent import Gemma4Agent
         agent = Gemma4Agent()
         assert agent.agent_id == "gemma4_local"
-        assert agent.model_name == "gemma2:2b"
+        assert agent.model_name == "gemma4:e2b"
         assert agent.api_format == "ollama"
         assert agent.max_tokens == 4096
         assert agent.intents_handled == 0

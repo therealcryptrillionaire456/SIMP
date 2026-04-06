@@ -25,7 +25,7 @@ register "gemma4_local (HTTP :5010)" '{
     "agent_id": "gemma4_local",
     "agent_type": "llm",
     "endpoint": "http://127.0.0.1:5010",
-    "metadata": {"model": "gemma2:2b", "capabilities": ["research","planning","summarization"]}
+    "metadata": {"model": "gemma4:e2b", "capabilities": ["research","planning","summarization"]}
 }'
 
 register "bullbear_predictor (file-based)" '{

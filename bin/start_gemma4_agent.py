@@ -9,7 +9,7 @@ Usage:
 
 Environment variables:
     GEMMA4_MODEL_ENDPOINT  — Local model API (default: http://localhost:11434)
-    GEMMA4_MODEL_NAME      — Model name (default: gemma2:2b)
+    GEMMA4_MODEL_NAME      — Model name (default: gemma4:e2b)
     GEMMA4_API_FORMAT      — API format: ollama or openai (default: ollama)
     SIMP_BROKER_URL        — Broker HTTP URL (default: http://127.0.0.1:8080)
     SIMP_API_KEY           — API key for broker auth (optional)
@@ -22,7 +22,7 @@ import os
 import signal
 import sys
 import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -84,14 +84,14 @@ def register_with_broker(broker_url, agent_id, agent_port, api_key=None):
                 "agent_type": "llm",
                 "endpoint": f"http://127.0.0.1:{agent_port}",
                 "metadata": {
-                    "model": os.environ.get("GEMMA4_MODEL_NAME", "gemma2:2b"),
+                    "model": os.environ.get("GEMMA4_MODEL_NAME", "gemma4:e2b"),
                     "capabilities": Gemma4Agent.SUPPORTED_INTENTS,
                 },
             },
             headers=headers,
             timeout=10.0,
         )
-        if resp.status_code == 200:
+        if 200 <= resp.status_code < 300:
             logger.info(f"Registered with broker at {broker_url}")
         else:
             logger.warning(f"Registration returned {resp.status_code}: {resp.text}")
@@ -112,7 +112,7 @@ def main():
     agent = Gemma4Agent(
         agent_id=args.agent_id,
         model_endpoint=os.environ.get("GEMMA4_MODEL_ENDPOINT", "http://localhost:11434"),
-        model_name=os.environ.get("GEMMA4_MODEL_NAME", "gemma2:2b"),
+        model_name=os.environ.get("GEMMA4_MODEL_NAME", "gemma4:e2b"),
         api_format=os.environ.get("GEMMA4_API_FORMAT", "ollama"),
     )
 
@@ -120,7 +120,7 @@ def main():
     AgentHTTPHandler.agent = agent
 
     # Start HTTP server
-    server = HTTPServer(("127.0.0.1", args.port), AgentHTTPHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", args.port), AgentHTTPHandler)
     logger.info(f"Gemma4 agent starting on port {args.port}")
 
     # Register with broker

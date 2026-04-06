@@ -10,6 +10,8 @@ Run:
 """
 
 import asyncio
+import contextlib
+import copy
 import json
 import os
 import re
@@ -37,6 +39,10 @@ PROJECTX_GUARD_URL = os.environ.get("PROJECTX_GUARD_URL", "http://127.0.0.1:8771
 DASHBOARD_HOST = os.environ.get("DASHBOARD_HOST", "0.0.0.0")
 DASHBOARD_PORT = int(os.environ.get("DASHBOARD_PORT", "8050"))
 POLL_INTERVAL = int(os.environ.get("POLL_INTERVAL", "5"))  # seconds
+BROKER_CACHE_TTL = float(os.environ.get("BROKER_CACHE_TTL", str(max(POLL_INTERVAL * 2, 10))))
+BROKER_NEGATIVE_CACHE_TTL = float(os.environ.get("BROKER_NEGATIVE_CACHE_TTL", "30"))
+BROKER_SNAPSHOT_INTENTS = int(os.environ.get("BROKER_SNAPSHOT_INTENTS", "50"))
+BROKER_DASHBOARD_PATH = f"/dashboard?public=1&intents={BROKER_SNAPSHOT_INTENTS}"
 ACTIVITY_BUFFER_SIZE = 100
 ACTIVITY_LOG_PATH = Path(__file__).parent / "activity_log.jsonl"
 OPERATOR_LOG_PATH = Path(__file__).parent / "operator_events.jsonl"
@@ -81,10 +87,32 @@ _STRING_REDACTION_PATTERNS = (
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
+    global _broker_client, _projectx_client
+    http_limits = httpx.Limits(max_connections=8, max_keepalive_connections=4, keepalive_expiry=30.0)
+    _broker_client = httpx.AsyncClient(
+        base_url=BROKER_URL,
+        timeout=httpx.Timeout(5.0),
+        limits=http_limits,
+    )
+    _projectx_client = httpx.AsyncClient(
+        base_url=PROJECTX_GUARD_URL,
+        timeout=httpx.Timeout(30.0),
+        limits=http_limits,
+    )
     _load_persisted_events()
     task = asyncio.create_task(_poll_broker())
-    yield
-    task.cancel()
+    try:
+        yield
+    finally:
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
+        if _broker_client is not None:
+            await _broker_client.aclose()
+        if _projectx_client is not None:
+            await _projectx_client.aclose()
+        _broker_client = None
+        _projectx_client = None
 
 
 app = FastAPI(
@@ -130,7 +158,10 @@ app.add_middleware(
 activity_buffer: deque[dict] = deque(maxlen=ACTIVITY_BUFFER_SIZE)
 _last_snapshot: dict[str, Any] = {}
 _started_at = datetime.now(timezone.utc).isoformat()
-DASHBOARD_VERSION = "1.4.0"  # bumped for Sprint 25 — v0.4.0 release
+DASHBOARD_VERSION = "1.4.1"
+_broker_client: httpx.AsyncClient | None = None
+_projectx_client: httpx.AsyncClient | None = None
+_broker_cache: dict[str, dict[str, Any]] = {}
 
 # Active WebSocket connections
 _ws_clients: Set[WebSocket] = set()
@@ -175,33 +206,93 @@ def _redact(obj: Any) -> Any:
     return obj
 
 
-async def _broker_get(path: str) -> dict | None:
-    """Make a GET request to the broker. Returns None on failure."""
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(f"{BROKER_URL}{path}")
-            resp.raise_for_status()
-            return resp.json()
-    except Exception:
+def _cache_ttl_for_path(path: str) -> float:
+    if path.startswith(("/tasks", "/routing", "/logs")):
+        return BROKER_NEGATIVE_CACHE_TTL
+    return BROKER_CACHE_TTL
+
+
+def _cached_entry_fresh(entry: dict[str, Any] | None, ttl: float) -> bool:
+    if not entry:
+        return False
+    return (time.monotonic() - float(entry.get("timestamp", 0))) < ttl
+
+
+async def _broker_cached_get(
+    path: str,
+    *,
+    ttl: float | None = None,
+    force_refresh: bool = False,
+    allow_stale: bool = True,
+) -> dict | None:
+    ttl = _cache_ttl_for_path(path) if ttl is None else ttl
+    cached = _broker_cache.get(path)
+    if not force_refresh and _cached_entry_fresh(cached, ttl):
+        if cached.get("missing"):
+            return None
+        return copy.deepcopy(cached.get("data"))
+
+    client = _broker_client
+    if client is None:
+        if allow_stale and cached and cached.get("data") is not None:
+            return copy.deepcopy(cached.get("data"))
         return None
+
+    try:
+        resp = await client.get(path)
+        if resp.status_code == 404:
+            _broker_cache[path] = {
+                "timestamp": time.monotonic(),
+                "data": None,
+                "missing": True,
+            }
+            return None
+        resp.raise_for_status()
+        data = resp.json()
+        _broker_cache[path] = {
+            "timestamp": time.monotonic(),
+            "data": data,
+            "missing": False,
+        }
+        return copy.deepcopy(data)
+    except Exception:
+        if allow_stale and cached and cached.get("data") is not None:
+            return copy.deepcopy(cached.get("data"))
+        return None
+
+
+async def _broker_snapshot(*, force_refresh: bool = False) -> dict[str, dict | None]:
+    dashboard_data, health_data = await asyncio.gather(
+        _broker_cached_get(BROKER_DASHBOARD_PATH, force_refresh=force_refresh),
+        _broker_cached_get("/health", force_refresh=force_refresh),
+    )
+    return {"dashboard": dashboard_data, "health": health_data}
+
+
+async def _broker_get(path: str) -> dict | None:
+    return await _broker_cached_get(path)
 
 
 async def _projectx_get(path: str) -> dict | None:
     try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(f"{PROJECTX_GUARD_URL}{path}")
-            resp.raise_for_status()
-            return resp.json()
+        client = _projectx_client
+        if client is None:
+            return None
+        resp = await client.get(path)
+        resp.raise_for_status()
+        return resp.json()
     except Exception:
         return None
 
 
 async def _projectx_post(path: str, payload: dict) -> dict | None:
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(f"{PROJECTX_GUARD_URL}{path}", json=payload)
-            resp.raise_for_status()
-            return resp.json()
+        client = _projectx_client
+        if client is None:
+            return None
+        resp = await client.post(path, json=payload)
+        resp.raise_for_status()
+        return resp.json()
     except Exception:
         return None
 
@@ -311,7 +402,7 @@ def _detect_changes(old_snapshot: dict, new_snapshot: dict) -> list[dict]:
     # Detect delivery status changes from intent records
     old_delivery = old_snapshot.get("delivery_counts", {})
     new_delivery = new_snapshot.get("delivery_counts", {})
-    for status_key in ("queued_no_endpoint", "timeout", "rate_limited"):
+    for status_key in ("queued_no_endpoint", "connection_refused", "timeout", "rate_limited"):
         old_val = old_delivery.get(status_key, 0)
         new_val = new_delivery.get(status_key, 0)
         if new_val > old_val:
@@ -345,23 +436,172 @@ def _detect_changes(old_snapshot: dict, new_snapshot: dict) -> list[dict]:
     return events
 
 
-def _flatten_snapshot(status_data: dict | None, health_data: dict | None) -> dict:
-    """Build a flat snapshot dict from broker /status and /health responses."""
+def _flatten_snapshot(dashboard_data: dict | None, health_data: dict | None) -> dict:
+    """Build a flat snapshot dict from broker dashboard and health responses."""
     snap: dict[str, Any] = {}
+    if dashboard_data:
+        broker = dashboard_data.get("broker", {})
+        snap["agents_online"] = broker.get("agents_online", 0)
+        snap["broker_state"] = broker.get("status", "unknown")
+        snap["intents_routed"] = broker.get("routed", 0)
+        snap["intents_failed"] = broker.get("failed", 0)
+        snap["intents_received"] = broker.get("total_intents", 0)
+        snap["delivery_counts"] = _recent_delivery_counts(
+            broker,
+            _dashboard_recent_intents(dashboard_data, limit=25),
+        )
     if health_data:
         snap["agents_online"] = health_data.get("agents_online", 0)
         snap["broker_state"] = health_data.get("state", "paused" if health_data.get("paused") else "running")
-    if status_data:
-        # Handle both nested {broker:{stats:{...}}} and flat structures
-        broker = status_data.get("broker", status_data)
-        stats = broker.get("stats", broker)
-        snap["intents_routed"] = stats.get("intents_routed", 0)
-        snap["intents_failed"] = stats.get("intents_failed", 0)
-        snap["intents_received"] = stats.get("intents_received", 0)
-        if stats.get("agents_online") is not None:
-            snap["agents_online"] = stats["agents_online"]
-        snap["broker_state"] = broker.get("state", snap.get("broker_state", "unknown"))
     return snap
+
+
+def _dashboard_agents(dashboard_data: dict | None) -> list[dict]:
+    if not dashboard_data:
+        return []
+    agents = dashboard_data.get("agents", [])
+    if isinstance(agents, dict):
+        return list(agents.values())
+    if isinstance(agents, list):
+        return agents
+    return []
+
+
+def _queue_depth(agent_queues: Any) -> int:
+    if not isinstance(agent_queues, dict):
+        return 0
+    return sum(value for value in agent_queues.values() if isinstance(value, int))
+
+
+def _normalize_recent_intent(intent: dict[str, Any], *, generated_at: str | None = None) -> dict[str, Any]:
+    intent_id = str(intent.get("id") or intent.get("intent_id") or "")
+    source_agent = str(intent.get("source_agent") or intent.get("source") or "unknown")
+    target_agent = str(intent.get("target_agent") or intent.get("target") or "unknown")
+    intent_type = str(intent.get("intent_type") or intent.get("event_type") or "intent")
+    delivery_status = str(intent.get("delivery_status") or "unknown")
+    timestamp = intent.get("timestamp") or intent.get("delivered_at") or generated_at
+    intent_ref = intent_id[:12] if intent_id else "unknown"
+
+    return {
+        "intent_id": intent_id,
+        "timestamp": timestamp,
+        "source_agent": source_agent,
+        "target_agent": target_agent,
+        "intent_type": intent_type,
+        "event_type": intent_type,
+        "delivery_status": delivery_status,
+        "delivery_latency_ms": intent.get("delivery_latency_ms"),
+        "retry_count": intent.get("retry_count"),
+        "fallback_agent": intent.get("fallback_agent"),
+        "result": f"{source_agent} -> {target_agent} ({intent_ref})",
+        "redacted": True,
+    }
+
+
+def _dashboard_recent_intents(
+    dashboard_data: dict | None,
+    *,
+    limit: int = 25,
+    newest_first: bool = True,
+) -> list[dict[str, Any]]:
+    if not dashboard_data or limit <= 0:
+        return []
+    raw_intents = dashboard_data.get("recent_intents", [])
+    if not isinstance(raw_intents, list):
+        return []
+
+    trimmed = raw_intents[:limit]
+    if not newest_first:
+        trimmed = list(reversed(trimmed))
+
+    generated_at = dashboard_data.get("generated_at")
+    return [_normalize_recent_intent(intent, generated_at=generated_at) for intent in trimmed]
+
+
+def _recent_delivery_counts(
+    broker_data: dict[str, Any], recent_deliveries: list[dict[str, Any]]
+) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for delivery in recent_deliveries:
+        status = str(delivery.get("delivery_status") or "unknown")
+        counts[status] = counts.get(status, 0) + 1
+
+    counts["delivered"] = int(broker_data.get("routed", counts.get("delivered", 0)) or 0)
+    counts["failed"] = int(broker_data.get("failed", counts.get("failed", 0)) or 0)
+    counts["queued"] = _queue_depth(broker_data.get("agent_queues", {}))
+
+    for status in ("queued_no_endpoint", "connection_refused", "timeout", "rate_limited"):
+        counts.setdefault(status, 0)
+
+    return counts
+
+
+def _dashboard_stats_payload(dashboard_data: dict | None) -> dict | None:
+    if not dashboard_data:
+        return None
+    broker = dashboard_data.get("broker", {})
+    queue_depth = _queue_depth(broker.get("agent_queues", {}))
+    recent_deliveries = _dashboard_recent_intents(dashboard_data, limit=10)
+    delivery_counts = _recent_delivery_counts(broker, recent_deliveries)
+    return {
+        "broker": {
+            "state": broker.get("status", "unknown"),
+            "stats": {
+                "agents_online": broker.get("agents_online", 0),
+                "pending_intents": queue_depth,
+                "intents_received": broker.get("total_intents", 0),
+                "intents_routed": broker.get("routed", 0),
+                "intents_failed": broker.get("failed", 0),
+                "delivery_counts": delivery_counts,
+                "recent_deliveries": recent_deliveries,
+            },
+        },
+        "dashboard_started_at": _started_at,
+    }
+
+
+def _recent_intent_events(dashboard_data: dict | None) -> list[dict]:
+    if not dashboard_data:
+        return []
+    return _dashboard_recent_intents(dashboard_data, limit=25, newest_first=False)
+
+
+async def _broker_intent_detail(intent_id: str) -> tuple[dict | None, str]:
+    path = f"/intents/{intent_id}"
+    cached = _broker_cache.get(path)
+
+    if _cached_entry_fresh(cached, BROKER_CACHE_TTL):
+        if cached.get("missing"):
+            return None, "not_found"
+        return copy.deepcopy(cached.get("data")), "success"
+
+    client = _broker_client
+    if client is None:
+        if cached and cached.get("data") is not None:
+            return copy.deepcopy(cached.get("data")), "stale"
+        return None, "unreachable"
+
+    try:
+        resp = await client.get(path)
+        if resp.status_code == 404:
+            _broker_cache[path] = {
+                "timestamp": time.monotonic(),
+                "data": None,
+                "missing": True,
+            }
+            return None, "not_found"
+        resp.raise_for_status()
+        data = resp.json()
+        _broker_cache[path] = {
+            "timestamp": time.monotonic(),
+            "data": data,
+            "missing": False,
+        }
+        return copy.deepcopy(data), "success"
+    except Exception:
+        if cached and cached.get("data") is not None:
+            return copy.deepcopy(cached.get("data")), "stale"
+        return None, "unreachable"
 
 
 def _persist_events(events: list[dict]) -> None:
@@ -441,9 +681,10 @@ async def _poll_broker() -> None:
     """Periodically poll the broker and record state changes."""
     global _last_snapshot
     while True:
-        status_data = await _broker_get("/status")
-        health_data = await _broker_get("/health")
-        new_snap = _flatten_snapshot(status_data, health_data)
+        snapshot = await _broker_snapshot(force_refresh=True)
+        dashboard_data = snapshot["dashboard"]
+        health_data = snapshot["health"]
+        new_snap = _flatten_snapshot(dashboard_data, health_data)
         if _last_snapshot and new_snap:
             events = _detect_changes(_last_snapshot, new_snap)
             if events:
@@ -451,14 +692,14 @@ async def _poll_broker() -> None:
                 _persist_events(events)
                 # Broadcast changes to WebSocket clients
                 if _ws_clients:
-                    if status_data:
-                        await _broadcast_ws("stats", _redact(status_data))
-                    agents_data = await _broker_get("/agents")
-                    if agents_data:
-                        await _broadcast_ws("agents", _redact(agents_data))
-                    tasks_data = await _broker_get("/tasks")
-                    if tasks_data:
-                        await _broadcast_ws("tasks", _redact(tasks_data))
+                    stats_payload = _dashboard_stats_payload(dashboard_data)
+                    if stats_payload:
+                        await _broadcast_ws("stats", _redact(stats_payload))
+                    if dashboard_data:
+                        await _broadcast_ws("agents", _redact({
+                            "agents": _dashboard_agents(dashboard_data),
+                            "count": len(_dashboard_agents(dashboard_data)),
+                        }))
                     await _broadcast_ws("activity", {
                         "status": "success",
                         "count": len(activity_buffer),
@@ -476,23 +717,35 @@ async def _poll_broker() -> None:
 @app.get("/api/health")
 async def api_health():
     """Health check with real data."""
-    stats = await _broker_get("/stats")
-    broker_up = stats is not None
+    snapshot = await _broker_snapshot()
+    dashboard_data = snapshot["dashboard"]
+    health_data = snapshot["health"]
+    broker_up = dashboard_data is not None or health_data is not None
+    broker_state = "unreachable"
+    agents_registered = 0
+    if dashboard_data:
+        broker = dashboard_data.get("broker", {})
+        broker_state = broker.get("status", broker_state)
+        agents_registered = broker.get("agents_online", 0)
+    if health_data:
+        broker_state = health_data.get("state", "paused" if health_data.get("paused") else broker_state)
+        agents_registered = max(agents_registered, health_data.get("agents_online", 0))
 
     return {
         "status": "healthy" if broker_up else "degraded",
         "broker_reachable": broker_up,
         "dashboard_version": DASHBOARD_VERSION,
-        "broker_state": stats.get("state", "unknown") if stats else "unreachable",
-        "agents_registered": stats.get("agents_registered", 0) if stats else 0,
-        "uptime_seconds": stats.get("uptime_seconds", 0) if stats else 0,
+        "broker_state": broker_state,
+        "agents_registered": agents_registered,
+        "uptime_seconds": 0,
     }
 
 
 @app.get("/api/stats")
 async def api_stats():
     """Broker statistics."""
-    data = await _broker_get("/status")
+    snapshot = await _broker_snapshot()
+    data = _dashboard_stats_payload(snapshot["dashboard"])
     if data is None:
         return {
             "status": "unreachable",
@@ -505,20 +758,29 @@ async def api_stats():
 @app.get("/api/agents")
 async def api_agents():
     """Registered agents list (redacted)."""
-    data = await _broker_get("/agents")
-    if data is None:
+    snapshot = await _broker_snapshot()
+    agents = _dashboard_agents(snapshot["dashboard"])
+    if snapshot["dashboard"] is None:
         return {
             "status": "unreachable",
             "broker_url_reachable": False,
             "agents": {},
             "count": 0,
         }
-    return _redact(data)
+    return _redact({"agents": agents, "count": len(agents)})
 
 
 @app.get("/api/activity")
 async def api_activity():
-    """Recent activity feed from the in-memory ring buffer."""
+    """Recent activity feed from the broker ledger, with local fallback."""
+    snapshot = await _broker_snapshot()
+    events = _recent_intent_events(snapshot["dashboard"])
+    if events:
+        return {
+            "status": "success",
+            "count": len(events),
+            "events": events,
+        }
     return {
         "status": "success",
         "count": len(activity_buffer),
@@ -526,19 +788,53 @@ async def api_activity():
     }
 
 
+@app.get("/api/intents/recent")
+async def api_intents_recent(limit: int = 25):
+    """Read-only recent broker intent tail for dashboard panels and drill-downs."""
+    limit = max(1, min(limit, 100))
+    snapshot = await _broker_snapshot()
+    if snapshot["dashboard"] is None:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "intents": [],
+            "count": 0,
+        }
+
+    intents = _dashboard_recent_intents(snapshot["dashboard"], limit=limit)
+    return {
+        "status": "success",
+        "count": len(intents),
+        "intents": _redact(intents),
+    }
+
+
+@app.get("/api/intents/{intent_id}")
+async def api_intent_detail(intent_id: str):
+    """Proxy broker intent lookups for safe dashboard drill-downs."""
+    data, lookup_status = await _broker_intent_detail(intent_id)
+    if data is None:
+        return {
+            "status": lookup_status,
+            "intent_id": intent_id,
+        }
+    return {
+        "status": lookup_status,
+        "intent": _redact(data),
+    }
+
+
 @app.get("/api/capabilities")
 async def api_capabilities():
     """Capability map: which agents handle which capabilities."""
-    data = await _broker_get("/agents")
-    if data is None:
+    snapshot = await _broker_snapshot()
+    agents = _dashboard_agents(snapshot["dashboard"])
+    if snapshot["dashboard"] is None:
         return {
             "status": "unreachable",
             "broker_url_reachable": False,
             "capabilities": {},
         }
-    agents = data.get("agents", [])
-    if isinstance(agents, dict):
-        agents = list(agents.values())
     cap_map: dict[str, list[str]] = {}
     for agent in agents:
         agent_id = agent.get("agent_id", "unknown")
@@ -555,17 +851,15 @@ async def api_capabilities():
 @app.get("/api/topology")
 async def api_topology():
     """Network topology showing agents and their connection modes."""
-    data = await _broker_get("/agents")
-    if data is None:
+    snapshot = await _broker_snapshot()
+    agents = _dashboard_agents(snapshot["dashboard"])
+    if snapshot["dashboard"] is None:
         return {
             "status": "unreachable",
             "broker_url_reachable": False,
             "nodes": [],
             "edges": [],
         }
-    agents = data.get("agents", [])
-    if isinstance(agents, dict):
-        agents = list(agents.values())
     nodes = [{"id": "broker", "label": "SIMP Broker", "type": "broker"}]
     edges = []
     for agent in agents:
@@ -640,31 +934,33 @@ async def api_routing():
 @app.get("/api/orchestration")
 async def api_orchestration():
     """Orchestration status — real data from broker."""
-    stats = await _broker_get("/stats")
-    if stats is None:
+    snapshot = await _broker_snapshot()
+    dashboard_data = snapshot["dashboard"]
+    if dashboard_data is None:
         return {"status": "unreachable", "orchestration_active": False}
-
-    tasks = await _broker_get("/tasks/queue")
-    task_count = len(tasks) if isinstance(tasks, list) else 0
+    broker = dashboard_data.get("broker", {})
+    agent_queues = broker.get("agent_queues", {})
+    task_count = 0
+    if isinstance(agent_queues, dict):
+        task_count = sum(value for value in agent_queues.values() if isinstance(value, int))
 
     return {
         "status": "success",
-        "orchestration_active": stats.get("state", "") == "RUNNING",
+        "orchestration_active": broker.get("status", "").lower() == "running",
         "queue_depth": task_count,
-        "intents_routed": stats.get("intents_routed", 0),
-        "intents_completed": stats.get("intents_completed", 0),
-        "intents_failed": stats.get("intents_failed", 0),
+        "intents_routed": broker.get("routed", 0),
+        "intents_completed": broker.get("routed", 0),
+        "intents_failed": broker.get("failed", 0),
     }
 
 
 @app.get("/api/computer-use")
 async def api_computer_use():
     """ProjectX computer-use status — dynamic from broker."""
-    stats = await _broker_get("/stats")
-    if stats is None:
+    snapshot = await _broker_snapshot()
+    if snapshot["dashboard"] is None:
         return {"status": "unreachable", "projectx_available": False}
-
-    projectx_info = stats.get("projectx", {})
+    projectx_info = snapshot["dashboard"].get("projectx", {})
 
     return {
         "status": "success",
