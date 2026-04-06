@@ -175,6 +175,99 @@ body {
   gap: 10px;
 }
 
+.system-overview-summary,
+.system-overview-grid,
+.system-overview-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.system-overview-grid,
+.system-overview-actions {
+  margin-top: 14px;
+}
+
+.system-overview-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.system-overview-card,
+.system-overview-summary-card,
+.operator-action-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.system-overview-summary-card {
+  display: grid;
+  gap: 10px;
+}
+
+.system-overview-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.system-overview-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.system-overview-version {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.system-overview-line {
+  color: var(--text-primary);
+}
+
+.system-overview-operator {
+  color: var(--text-secondary);
+}
+
+.system-overview-non-goals {
+  display: grid;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.system-overview-card {
+  display: grid;
+  gap: 8px;
+}
+
+.system-overview-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.system-overview-card-copy {
+  color: var(--text-secondary);
+}
+
+.operator-action-card {
+  display: grid;
+  gap: 6px;
+}
+
+.operator-action-label {
+  font-weight: 700;
+}
+
+.operator-action-intent {
+  color: var(--accent);
+  font-size: 0.78rem;
+}
+
+.operator-action-description {
+  color: var(--text-secondary);
+}
+
 .protocol-summary-row {
   display: flex;
   justify-content: space-between;
