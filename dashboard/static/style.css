@@ -304,6 +304,16 @@ body {
   border-color: var(--border);
 }
 
+.card.interactive,
+.unreachable-banner.interactive {
+  cursor: pointer;
+}
+
+.card.interactive:hover,
+.unreachable-banner.interactive:hover {
+  border-color: var(--accent);
+}
+
 .card-label {
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -428,6 +438,64 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 12px;
+}
+
+.diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.diagnostic-card {
+  padding: 16px;
+}
+
+.diagnostic-breakdown,
+.diagnostic-list,
+.diagnostic-pairs {
+  display: grid;
+  gap: 8px;
+}
+
+.diagnostic-chip,
+.diagnostic-pair,
+.diagnostic-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+}
+
+.diagnostic-chip {
+  cursor: pointer;
+}
+
+.diagnostic-chip:hover {
+  border-color: var(--accent);
+}
+
+.diagnostic-chip-value {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.intent-row-button {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--accent);
+}
+
+.intent-row-button:hover {
+  color: var(--text-primary);
 }
 
 .cap-card {
@@ -632,6 +700,52 @@ body {
   border-radius: 3px;
 }
 
+.intent-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 250;
+}
+
+.intent-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(520px, 100vw);
+  height: 100vh;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border);
+  z-index: 260;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
+}
+
+.intent-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.intent-drawer-title {
+  font-size: 0.95rem;
+}
+
+.intent-drawer-body {
+  padding: 16px 18px 32px;
+  overflow-y: auto;
+  display: grid;
+  gap: 16px;
+}
+
+.intent-drawer-section {
+  display: grid;
+  gap: 8px;
+}
+
 /* ==========================================================================
    Responsive
    ========================================================================== */
@@ -661,6 +775,10 @@ body {
 
   .cap-grid {
     grid-template-columns: 1fr;
+  }
+
+  .intent-drawer {
+    width: 100vw;
   }
 
   .protocol-grid {

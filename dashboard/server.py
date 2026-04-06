@@ -604,6 +604,81 @@ async def _broker_intent_detail(intent_id: str) -> tuple[dict | None, str]:
         return None, "unreachable"
 
 
+async def _broker_failed_intents(limit: int = 50) -> dict[str, Any] | None:
+    limit = max(1, min(limit, 200))
+    return await _broker_get(f"/intents/failed?limit={limit}")
+
+
+def _summarize_failed_intents(intents: list[dict[str, Any]]) -> dict[str, Any]:
+    by_status: dict[str, int] = {}
+    by_target_agent: dict[str, int] = {}
+    latest_failure_at = None
+
+    for intent in intents:
+        status = str(intent.get("delivery_status") or "unknown")
+        target = str(intent.get("target_agent") or "unknown")
+        by_status[status] = by_status.get(status, 0) + 1
+        by_target_agent[target] = by_target_agent.get(target, 0) + 1
+        timestamp = intent.get("delivered_at") or intent.get("timestamp")
+        if timestamp and (latest_failure_at is None or str(timestamp) > str(latest_failure_at)):
+            latest_failure_at = timestamp
+
+    return {
+        "count": len(intents),
+        "latest_failure_at": latest_failure_at,
+        "by_status": by_status,
+        "by_target_agent": by_target_agent,
+    }
+
+
+def _normalize_intent_detail(intent: dict[str, Any] | None, *, lookup_status: str = "success") -> dict[str, Any]:
+    payload = dict(intent or {})
+    intent_id = str(payload.get("id") or payload.get("intent_id") or "")
+    delivery_status = str(payload.get("delivery_status") or "unknown")
+    failure_reason = payload.get("failure_reason")
+    if not failure_reason and delivery_status not in ("delivered", "pending"):
+        failure_reason = delivery_status
+
+    lifecycle = payload.get("lifecycle")
+    if not isinstance(lifecycle, list):
+        lifecycle = []
+    route_attempts = payload.get("route_attempts")
+    if not isinstance(route_attempts, list):
+        route_attempts = []
+    correlation_ids = payload.get("correlation_ids")
+    if not isinstance(correlation_ids, dict):
+        correlation_ids = {}
+    fallback_behavior = payload.get("fallback_behavior")
+    if not isinstance(fallback_behavior, dict):
+        fallback_behavior = {}
+
+    correlation_ids.setdefault("broker_intent_id", intent_id or None)
+    correlation_ids.setdefault("correlation_id", correlation_ids.get("request_id") or intent_id or None)
+    fallback_behavior.setdefault("mode", "unknown" if delivery_status != "delivered" else "none")
+    fallback_behavior.setdefault("queued_for_polling", False)
+    fallback_behavior.setdefault("dlq_eligible", False)
+    fallback_behavior.setdefault("fallback_agent", None)
+
+    return {
+        "intent_id": intent_id,
+        "timestamp": payload.get("timestamp"),
+        "delivered_at": payload.get("delivered_at"),
+        "source_agent": payload.get("source_agent", "unknown"),
+        "target_agent": payload.get("target_agent", "unknown"),
+        "intent_type": payload.get("intent_type", "intent"),
+        "delivery_status": delivery_status,
+        "failure_reason": failure_reason or ("unknown" if delivery_status != "delivered" else None),
+        "delivery_response": payload.get("delivery_response"),
+        "lookup_status": lookup_status,
+        "correlation_ids": correlation_ids,
+        "fallback_behavior": fallback_behavior,
+        "route_attempts": route_attempts,
+        "lifecycle": lifecycle,
+        "summary": f"{payload.get('source_agent', 'unknown')} -> {payload.get('target_agent', 'unknown')}",
+        "raw_intent": payload,
+    }
+
+
 def _persist_events(events: list[dict]) -> None:
     """Append events to the JSONL log file."""
     import json
@@ -809,6 +884,37 @@ async def api_intents_recent(limit: int = 25):
     }
 
 
+@app.get("/api/intents/failed")
+async def api_intents_failed(limit: int = 50):
+    """Failed intent aggregates with recent drill-down rows."""
+    broker_payload = await _broker_failed_intents(limit=limit)
+    if broker_payload is not None:
+        intents = [
+            _normalize_intent_detail(intent, lookup_status="success")
+            for intent in broker_payload.get("intents", [])
+        ]
+        summary = broker_payload.get("summary") or _summarize_failed_intents(intents)
+        return _redact({
+            "status": "success",
+            "summary": summary,
+            "intents": intents,
+            "count": len(intents),
+        })
+
+    snapshot = await _broker_snapshot()
+    intents = [
+        _normalize_intent_detail(intent, lookup_status="snapshot")
+        for intent in _dashboard_recent_intents(snapshot["dashboard"], limit=limit)
+        if str(intent.get("delivery_status") or "unknown") not in ("delivered", "pending")
+    ]
+    return _redact({
+        "status": "success" if intents else "unreachable",
+        "summary": _summarize_failed_intents(intents),
+        "intents": intents,
+        "count": len(intents),
+    })
+
+
 @app.get("/api/intents/{intent_id}")
 async def api_intent_detail(intent_id: str):
     """Proxy broker intent lookups for safe dashboard drill-downs."""
@@ -817,10 +923,12 @@ async def api_intent_detail(intent_id: str):
         return {
             "status": lookup_status,
             "intent_id": intent_id,
+            "detail": _redact(_normalize_intent_detail({"intent_id": intent_id}, lookup_status=lookup_status)),
         }
     return {
         "status": lookup_status,
         "intent": _redact(data),
+        "detail": _redact(_normalize_intent_detail(data, lookup_status=lookup_status)),
     }
 
 
