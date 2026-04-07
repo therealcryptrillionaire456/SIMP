@@ -16,6 +16,7 @@ from threading import Thread
 import time
 
 from simp.server.broker import SimpBroker, BrokerConfig
+from simp.orchestration.orchestration_manager import OrchestrationManager
 
 # A2A compat imports
 from simp.compat.agent_card import AgentCardGenerator
@@ -117,8 +118,12 @@ class SimpHttpServer:
         # A2A card generator
         self._card_gen = AgentCardGenerator()
 
+        # Sprint 54 — orchestration manager
+        self._orchestration = OrchestrationManager(broker=self.broker)
+
         self._setup_routes()
         self._setup_a2a_routes()
+        self._setup_sprint51_55_routes()
         self.logger.info("SIMP HTTP Server initialized")
 
     def _setup_routes(self):
@@ -794,6 +799,78 @@ class SimpHttpServer:
                 return jsonify({"status": "acknowledged", "alert": alert.to_dict()}), 200
             except ValueError as exc:
                 return jsonify({"status": "error", "error": str(exc)}), 400
+
+    # ------------------------------------------------------------------
+    # Sprint 51-55 routes (routing policy, orchestration)
+    # ------------------------------------------------------------------
+
+    def _setup_sprint51_55_routes(self):
+        """Routes added by Sprints 51-55."""
+
+        # --- Routing policy (Sprint 53) ---
+        @self.app.route("/routing-policy", methods=["GET"])
+        @_require_api_key
+        def get_routing_policy():
+            summary = self.broker.routing_engine.get_policy_summary()
+            return jsonify({"status": "success", "routing_policy": summary}), 200
+
+        @self.app.route("/reload-routing-policy", methods=["POST"])
+        @_require_api_key
+        def reload_routing_policy():
+            count = self.broker.routing_engine.reload_policy()
+            return jsonify({
+                "status": "success",
+                "message": f"Reloaded {count} routing rules",
+                "rule_count": count,
+            }), 200
+
+        # --- Orchestration (Sprint 54) ---
+        @self.app.route("/orchestration/plans", methods=["POST"])
+        @_require_api_key
+        def create_orchestration_plan():
+            data = request.get_json(silent=True) or {}
+            name = data.get("name", "Unnamed Plan")
+            description = data.get("description", "")
+            steps = data.get("steps", [])
+            if not steps:
+                return jsonify({"status": "error", "error": "steps required"}), 400
+            plan = self._orchestration.create_plan(name, description, steps)
+            return jsonify({"status": "created", "plan": plan.to_dict()}), 201
+
+        @self.app.route("/orchestration/plans/maintenance", methods=["POST"])
+        @_require_api_key
+        def create_maintenance_plan():
+            plan = self._orchestration.make_maintenance_plan()
+            return jsonify({"status": "created", "plan": plan.to_dict()}), 201
+
+        @self.app.route("/orchestration/plans/demo", methods=["POST"])
+        @_require_api_key
+        def create_demo_plan():
+            plan = self._orchestration.make_full_demo_plan()
+            return jsonify({"status": "created", "plan": plan.to_dict()}), 201
+
+        @self.app.route("/orchestration/plans", methods=["GET"])
+        @_require_api_key
+        def list_orchestration_plans():
+            plans = self._orchestration.list_plans()
+            return jsonify({"status": "success", "plans": plans, "count": len(plans)}), 200
+
+        @self.app.route("/orchestration/plans/<plan_id>", methods=["GET"])
+        @_require_api_key
+        def get_orchestration_plan(plan_id):
+            plan = self._orchestration.get_plan(plan_id)
+            if not plan:
+                return jsonify({"status": "error", "error": "Plan not found"}), 404
+            return jsonify({"status": "success", "plan": plan.to_dict()}), 200
+
+        @self.app.route("/orchestration/plans/<plan_id>/execute", methods=["POST"])
+        @_require_api_key
+        def execute_orchestration_plan(plan_id):
+            plan = self._orchestration.get_plan(plan_id)
+            if not plan:
+                return jsonify({"status": "error", "error": "Plan not found"}), 404
+            result = self._orchestration.execute_plan(plan_id)
+            return jsonify({"status": result.status, "plan": result.to_dict()}), 200
 
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         """
