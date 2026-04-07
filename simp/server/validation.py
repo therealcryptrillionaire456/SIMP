@@ -12,8 +12,9 @@ These complement the request_guards module with structured Pydantic models.
 """
 
 import re
+from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 # ISO 8601 datetime pattern
 _ISO_8601_RE = re.compile(
@@ -61,4 +62,46 @@ class ResponseRecording(BaseModel):
     def valid_timestamp(cls, v):
         if v is not None and not _ISO_8601_RE.match(v):
             raise ValueError("timestamp must be ISO 8601 format")
+        return v
+
+
+class AgentRegistrationRequest(BaseModel):
+    """Pydantic model for POST /agents/register validation (Sprint 69)."""
+    agent_id: str = Field(..., min_length=1, max_length=128)
+    agent_type: str = Field(..., min_length=1, max_length=64)
+    endpoint: str = Field(..., min_length=1, max_length=256)
+    metadata: Optional[Dict[str, Any]] = None
+
+    @field_validator('agent_id')
+    @classmethod
+    def validate_agent_id(cls, v):
+        if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9:._-]*$', v):
+            raise ValueError('agent_id must start with alphanumeric and contain only [a-zA-Z0-9:._-]')
+        return v
+
+    @field_validator('agent_type')
+    @classmethod
+    def validate_agent_type(cls, v):
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError('agent_type must contain only alphanumeric, underscore, hyphen')
+        return v
+
+
+class IntentRouteRequest(BaseModel):
+    """Pydantic model for POST /intents/route validation (Sprint 69)."""
+    target_agent: str = Field(..., min_length=1, max_length=128)
+    source_agent: Optional[str] = Field(default="client", max_length=128)
+    intent_type: Optional[str] = Field(default="unknown", max_length=128)
+    intent_id: Optional[str] = None
+    params: Optional[Dict[str, Any]] = None
+    timestamp: Optional[str] = None
+
+    @field_validator('timestamp')
+    @classmethod
+    def validate_timestamp(cls, v):
+        if v is not None:
+            try:
+                datetime.fromisoformat(v)
+            except (ValueError, TypeError):
+                raise ValueError('timestamp must be a valid ISO 8601 format')
         return v
