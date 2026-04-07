@@ -145,6 +145,37 @@ from simp.compat.budget_monitor import (
     BudgetAlert,
 )
 
+# Sprint 51 — delivery engine
+from simp.server.delivery import (
+    DeliveryStatus,
+    DeliveryResult,
+    DeliveryConfig,
+    IntentDeliveryEngine,
+    DEFAULT_DELIVERY_ENGINE,
+)
+
+# Sprint 52 — task ledger
+from simp.server.task_ledger import (
+    LedgerConfig,
+    TaskLedger,
+    TASK_LEDGER,
+)
+
+# Sprint 53 — routing engine
+from simp.server.routing_engine import (
+    RoutingPolicy,
+    RoutingDecision,
+    RoutingEngine,
+)
+
+# Sprint 54 — orchestration
+from simp.orchestration.orchestration_manager import (
+    OrchestrationStepStatus,
+    OrchestrationStep,
+    OrchestrationPlan,
+    OrchestrationManager,
+)
+
 __all__ = [
     # Sprint 1
     "build_security_schemes",
@@ -238,4 +269,23 @@ __all__ = [
     "BUDGET_MONITOR",
     "AlertSeverity",
     "BudgetAlert",
+    # Sprint 51
+    "DeliveryStatus",
+    "DeliveryResult",
+    "DeliveryConfig",
+    "IntentDeliveryEngine",
+    "DEFAULT_DELIVERY_ENGINE",
+    # Sprint 52
+    "LedgerConfig",
+    "TaskLedger",
+    "TASK_LEDGER",
+    # Sprint 53
+    "RoutingPolicy",
+    "RoutingDecision",
+    "RoutingEngine",
+    # Sprint 54
+    "OrchestrationStepStatus",
+    "OrchestrationStep",
+    "OrchestrationPlan",
+    "OrchestrationManager",
 ]

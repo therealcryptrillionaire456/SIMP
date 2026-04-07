@@ -47,10 +47,14 @@ class IntentRecord:
     target_agent: str
     intent_type: str
     timestamp: str
-    status: str  # pending, executing, completed, failed
+    status: str  # pending, executing, completed, failed, expired
     response: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     execution_time_ms: float = 0.0
+    # Sprint 51 — delivery tracking
+    delivery_status: Optional[str] = None
+    delivery_attempts: int = 0
+    delivery_elapsed_ms: float = 0.0
 
 
 class SimpBroker:
@@ -88,6 +92,33 @@ class SimpBroker:
             "total_route_time_ms": 0.0,
         }
         self.stats_lock = threading.RLock()
+
+        # Sprint 51 — delivery engine
+        from simp.server.delivery import DEFAULT_DELIVERY_ENGINE
+        self.delivery_engine = DEFAULT_DELIVERY_ENGINE
+
+        # Sprint 52 — task ledger
+        from simp.server.task_ledger import TASK_LEDGER
+        self.task_ledger = TASK_LEDGER
+        # Load pending intents from ledger on init
+        try:
+            for rec in self.task_ledger.load_pending():
+                iid = rec.get("intent_id")
+                if iid and iid not in self.intent_records:
+                    self.intent_records[iid] = IntentRecord(
+                        intent_id=iid,
+                        source_agent=rec.get("source_agent", ""),
+                        target_agent=rec.get("target_agent", ""),
+                        intent_type=rec.get("intent_type", ""),
+                        timestamp=rec.get("timestamp", ""),
+                        status="pending",
+                    )
+        except Exception:
+            pass
+
+        # Sprint 53 — routing engine
+        from simp.server.routing_engine import RoutingEngine
+        self.routing_engine = RoutingEngine()
 
         self.logger.info(f"🚀 SIMP Broker initialized (v0.1)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
@@ -202,6 +233,14 @@ class SimpBroker:
         with self.stats_lock:
             self.stats["intents_received"] += 1
 
+        # Sprint 53 — routing engine: resolve target when "auto" or missing
+        if not target_agent or target_agent == "auto":
+            with self.agent_lock:
+                agents_snapshot = dict(self.agents)
+            decision = self.routing_engine.resolve(intent_type, target_agent, agents_snapshot)
+            if decision.target_agent:
+                target_agent = decision.target_agent
+
         # Validate target agent exists
         target = self.get_agent(target_agent)
         if not target:
@@ -222,6 +261,17 @@ class SimpBroker:
 
             with self.stats_lock:
                 self.stats["intents_failed"] += 1
+
+            # Sprint 52 — ledger append on failure
+            self.task_ledger.append({
+                "intent_id": intent_id,
+                "source_agent": source_agent,
+                "target_agent": target_agent or "unknown",
+                "intent_type": intent_type,
+                "status": "failed",
+                "error": error_msg,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
 
             return {
                 "status": "error",
@@ -250,13 +300,33 @@ class SimpBroker:
             f"{source_agent} → {target_agent}"
         )
 
-        # In a real implementation, would send to agent via network
-        # For now, return success to show protocol works
+        # Sprint 51 — deliver the intent to the agent's endpoint
+        endpoint = target.get("endpoint", "")
+        delivery_result = self.delivery_engine.deliver(endpoint, intent_data)
+
+        with self.intent_lock:
+            record.delivery_status = delivery_result.status
+            record.delivery_attempts = delivery_result.attempts
+            record.delivery_elapsed_ms = delivery_result.elapsed_ms
+
+        # Sprint 52 — ledger append after routing
+        self.task_ledger.append({
+            "intent_id": intent_id,
+            "source_agent": source_agent,
+            "target_agent": target_agent,
+            "intent_type": intent_type,
+            "status": "pending",
+            "delivery_status": delivery_result.status,
+            "delivery_attempts": delivery_result.attempts,
+            "timestamp": datetime.utcnow().isoformat(),
+        })
+
         return {
             "status": "routed",
             "intent_id": intent_id,
             "target_agent": target_agent,
             "timestamp": datetime.utcnow().isoformat(),
+            "delivery_status": delivery_result.status,
         }
 
     def record_response(
@@ -285,6 +355,14 @@ class SimpBroker:
                 f"({execution_time_ms:.1f}ms)"
             )
 
+            # Sprint 52 — ledger append on response
+            self.task_ledger.append({
+                "intent_id": intent_id,
+                "status": "completed",
+                "execution_time_ms": execution_time_ms,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
+
             return True
 
     def record_error(
@@ -304,6 +382,16 @@ class SimpBroker:
                 self.stats["intents_failed"] += 1
 
             self.logger.error(f"❌ Intent failed: {intent_id} - {error}")
+
+            # Sprint 52 — ledger append on error
+            self.task_ledger.append({
+                "intent_id": intent_id,
+                "status": "failed",
+                "error": error,
+                "execution_time_ms": execution_time_ms,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
+
             return True
 
     def get_intent_status(self, intent_id: str) -> Optional[Dict[str, Any]]:
@@ -348,6 +436,12 @@ class SimpBroker:
             )
         else:
             stats["avg_route_time_ms"] = 0.0
+
+        # Sprint 52 — task ledger stats
+        try:
+            stats["task_ledger"] = self.task_ledger.get_stats()
+        except Exception:
+            stats["task_ledger"] = {}
 
         return stats
 
