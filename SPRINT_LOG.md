@@ -2019,3 +2019,103 @@ All 25 sprints delivered. SIMP v0.4.0 is production-ready with:
 - Created `tests/test_sprint60_a2a_bridge.py`: 15 comprehensive integration tests covering the entire A2A bridge surface — task creation, type validation, payload size limits, task types list, agent card validity + secret checks, events, security, ProjectX card, FinancialOps simulate-only mode, routing policy, orchestration plans, version verification, health, and dashboard.
 - Merged `feat/a2a-compat-sprint1` into `feat/public-readonly-dashboard` with all routes preserved from both branches.
 - Total: 62 new tests across Sprints 56-60. Version: 0.7.0.
+
+---
+
+## Sprint 61 — Regression Fixes (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- Added `asyncio_mode = "auto"` to `[tool.pytest.ini_options]` in `pyproject.toml`
+- Installed `pytest-asyncio` dependency
+- Renamed `simp/server/task_ledger.py` -> `simp/server/intent_ledger.py` (Sprint 52 module)
+  - Class renamed `TaskLedger` -> `IntentLedger`, singleton `TASK_LEDGER` -> `INTENT_LEDGER`
+  - Old module kept as re-export shim for backward compatibility
+  - Updated imports in `simp/server/broker.py`, `simp/compat/__init__.py`
+- Fixed broker `self.task_ledger` conflict: Sprint 52 intent ledger now stored as `self.intent_ledger`
+  - Original `simp.task_ledger.TaskLedger` (with `create_task`, `claim_task`, etc.) stays as `self.task_ledger`
+  - Sprint 52 ledger (append-only JSONL) stored as `self.intent_ledger`
+- Fixed `self.task_ledger.get_stats()` call to use `self.intent_ledger.get_stats()`
+- Result: 1014 passing (up from 975), 11 pre-existing failures, 0 new regressions
+
+---
+
+## Sprint 62 — Agent Heartbeat System (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- `SimpBroker.register_agent()`: added `last_heartbeat`, `heartbeat_count`, `stale`, `file_based` fields
+- New broker methods:
+  - `record_heartbeat(agent_id)` — updates timestamp, increments count, sets status active
+  - `get_stale_agents(stale_after_seconds=90.0)` — returns stale agent IDs (excludes file-based)
+  - `deregister_stale_agents(deregister_after_seconds=300.0)` — removes stale agents (excludes file-based)
+- New HTTP routes:
+  - `POST /agents/<id>/heartbeat` (no auth) — record heartbeat
+  - `GET /agents/<id>/heartbeat` (auth) — get heartbeat status
+  - `POST /agents/sweep-stale` (auth) — deregister stale agents
+- `GET /agents` response now includes heartbeat and file_based fields
+- `GET /stats` response now includes `stale_agents` and `file_based_agents` counts
+- Updated `simp/server/request_guards.py` to accept `(file-based)` as valid endpoint
+- Tests: `tests/test_sprint62_heartbeat.py` — 17 tests
+
+---
+
+## Sprint 63 — Planner Telemetry Enhancement (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- Added to `IntentRecord`: `planned_at`, `dispatched_at`, `completed_at`, `retry_count`
+- `route_intent()` sets `planned_at` on record creation, `dispatched_at` before delivery
+- `record_response()` and `record_error()` set `completed_at`
+- `get_intent_status()` returns telemetry fields
+- New routes:
+  - `GET /intents/flows` — grouped flows with per-step timing and Gantt data
+  - `GET /intents/flows/<flow_id>` — single flow detail (404 if not found)
+- Flow response includes: `total_elapsed_ms`, `step_count`, `failed_steps`, `retry_total`
+- Step response includes: `planned_to_dispatched_ms`, `dispatched_to_completed_ms`, `total_elapsed_ms`, `gantt`
+- Gantt block: `start_offset_ms`, `duration_ms`, `bar_pct_start`, `bar_pct_width`
+- Tests: `tests/test_sprint63_telemetry.py` — 18 tests
+
+---
+
+## Sprint 64 — Broker Restart Resilience (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- Added `_startup_at`, `_ready`, `_intents_loaded_from_disk` to `SimpBroker.__init__`
+- `start()` sets `_ready = True` after full initialization
+- Intent ledger load on init now counts `_intents_loaded_from_disk`
+- `get_stale_agents()` and `deregister_stale_agents()` return `[]` during first 60s (startup grace)
+- New route: `GET /control/ready` (no auth)
+  - 200 when broker running and ready
+  - 503 when initializing, with `reason` field
+  - Response: `ready`, `broker_state`, `agents_registered`, `intents_loaded_from_disk`, `uptime_seconds`, `startup_grace_remaining_seconds`
+- Tests: `tests/test_sprint64_resilience.py` — 12 tests
+
+---
+
+## Sprint 65 — End-to-End Smoke Automation (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- `tests/test_sprint65_e2e_smoke.py` — 15 E2E flows:
+  1. Full agent lifecycle (register -> GET -> heartbeat -> deregister -> 404)
+  2. File-based agent routing
+  3. Auto-routing with target_agent="auto"
+  4. Record response + check completed status
+  5. Broker readiness (GET /control/ready)
+  6. Stats accuracy (intents_received increments)
+  7. A2A task submission (x-simp in response)
+  8. Orchestration maintenance plan (3 steps)
+  9. Routing policy (covers planning, research)
+  10. Sweep stale (valid JSON response)
+  11. GET /agents includes heartbeat fields
+  12. GET /stats includes stale_agents
+  13. GET /intents/flows returns list
+  14. POST /reload-routing-policy returns rule count
+  15. A2A events list
+
+### Test Results (Sprints 61-65)
+- Total: 1076 passing, 11 pre-existing failures, 0 new regressions
+- 62 new tests added across Sprints 62-65
+- Sprint 61 fixed 39 previously-failing tests

@@ -19,7 +19,7 @@ from flask import Flask, request, jsonify
 from threading import Thread
 import time
 
-from simp.server.broker import SimpBroker, BrokerConfig
+from simp.server.broker import SimpBroker, BrokerConfig, BrokerState
 from simp.server.request_guards import (
     validate_intent_payload,
     validate_registration_payload,
@@ -80,6 +80,11 @@ from simp.compat.budget_monitor import BUDGET_MONITOR
 
 # Max payload for A2A task submissions (64 KB)
 _A2A_MAX_PAYLOAD = 64 * 1024
+
+
+def _utcnow_iso_http() -> str:
+    """Return current UTC time as ISO 8601 string."""
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def require_api_key(f):
@@ -317,6 +322,77 @@ class SimpHttpServer:
                     "status": "error",
                     "error": f"Agent '{agent_id}' not found"
                 }), 404
+
+        # ----- Sprint 64: Readiness Endpoint -----
+
+        @self.app.route("/control/ready", methods=["GET"])
+        def control_ready():
+            """Return 200 when broker is ready, 503 when still initializing."""
+            broker = self.broker
+            uptime = 0.0
+            grace_remaining = 0.0
+            if hasattr(broker, "_startup_at") and broker._startup_at:
+                uptime = (datetime.now(timezone.utc) - broker._startup_at).total_seconds()
+                grace_remaining = max(0.0, 60.0 - uptime)
+
+            ready = (
+                broker.state == BrokerState.RUNNING
+                and getattr(broker, "_ready", False)
+            )
+
+            body = {
+                "ready": ready,
+                "broker_state": broker.state.value,
+                "agents_registered": len(broker.agents),
+                "intents_loaded_from_disk": getattr(broker, "_intents_loaded_from_disk", 0),
+                "uptime_seconds": round(uptime, 1),
+                "startup_grace_remaining_seconds": round(grace_remaining, 1),
+            }
+
+            if not ready:
+                body["reason"] = "broker not running" if broker.state != BrokerState.RUNNING else "initializing"
+
+            return jsonify(body), 200 if ready else 503
+
+        # ----- Sprint 62: Heartbeat Routes -----
+
+        @self.app.route("/agents/<agent_id>/heartbeat", methods=["POST"])
+        def post_heartbeat(agent_id):
+            """Record a heartbeat for an agent (no auth required)."""
+            success = self.broker.record_heartbeat(agent_id)
+            if success:
+                agent = self.broker.get_agent(agent_id)
+                return jsonify({
+                    "agent_id": agent_id,
+                    "heartbeat_at": agent.get("last_heartbeat") if agent else _utcnow_iso_http(),
+                    "count": agent.get("heartbeat_count", 0) if agent else 0,
+                }), 200
+            return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
+
+        @self.app.route("/agents/<agent_id>/heartbeat", methods=["GET"])
+        @require_api_key
+        def get_heartbeat(agent_id):
+            """Get heartbeat status for an agent."""
+            agent = self.broker.get_agent(agent_id)
+            if not agent:
+                return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
+            return jsonify({
+                "agent_id": agent_id,
+                "last_heartbeat": agent.get("last_heartbeat"),
+                "heartbeat_count": agent.get("heartbeat_count", 0),
+                "stale": agent.get("stale", False),
+                "stale_after_seconds": 90,
+            }), 200
+
+        @self.app.route("/agents/sweep-stale", methods=["POST"])
+        @require_api_key
+        def sweep_stale():
+            """Deregister stale agents."""
+            deregistered = self.broker.deregister_stale_agents(300.0)
+            return jsonify({
+                "deregistered": deregistered,
+                "count": len(deregistered),
+            }), 200
 
         @self.app.route("/intents/route", methods=["POST"])
         @require_api_key
@@ -1205,6 +1281,25 @@ class SimpHttpServer:
                 "rule_count": count,
             }), 200
 
+        # ----- Sprint 63: Planner Telemetry / Flows -----
+
+        @self.app.route("/intents/flows", methods=["GET"])
+        @_require_api_key
+        def get_intent_flows():
+            """Return intent records grouped into flows with timing telemetry."""
+            flows = self._build_intent_flows()
+            return jsonify({"status": "success", "flows": flows, "count": len(flows)}), 200
+
+        @self.app.route("/intents/flows/<flow_id>", methods=["GET"])
+        @_require_api_key
+        def get_intent_flow_detail(flow_id):
+            """Return a single flow by ID."""
+            flows = self._build_intent_flows()
+            for flow in flows:
+                if flow.get("flow_id") == flow_id:
+                    return jsonify({"status": "success", "flow": flow}), 200
+            return jsonify({"status": "error", "error": f"Flow '{flow_id}' not found"}), 404
+
         @self.app.route("/orchestration/plans", methods=["POST"])
         @_require_api_key
         def create_orchestration_plan():
@@ -1251,6 +1346,107 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": "Plan not found"}), 404
             result = self._orchestration.execute_plan(plan_id)
             return jsonify({"status": result.status, "plan": result.to_dict()}), 200
+
+    # ------------------------------------------------------------------
+    # Sprint 63: Flow builder helper
+    # ------------------------------------------------------------------
+
+    def _build_intent_flows(self):
+        """Group intent records into flows with timing telemetry."""
+        from datetime import datetime as _dt, timezone as _tz
+
+        def _parse_iso(s):
+            if not s:
+                return None
+            try:
+                return _dt.fromisoformat(s.replace("Z", "+00:00"))
+            except (ValueError, TypeError):
+                return None
+
+        def _ms_diff(a, b):
+            if a and b:
+                return max(0.0, round((b - a).total_seconds() * 1000, 1))
+            return None
+
+        # Snapshot intent records
+        with self.broker.intent_lock:
+            records = list(self.broker.intent_records.values())
+
+        # Group by source_agent (simple flow grouping)
+        flow_map = {}
+        for rec in records:
+            flow_key = rec.source_agent or "unknown"
+            flow_map.setdefault(flow_key, []).append(rec)
+
+        flows = []
+        for flow_id, steps in flow_map.items():
+            steps_sorted = sorted(steps, key=lambda r: r.timestamp or "")
+            step_dicts = []
+            all_planned = []
+            all_completed = []
+
+            for s in steps_sorted:
+                p = _parse_iso(s.planned_at)
+                d = _parse_iso(s.dispatched_at)
+                c = _parse_iso(s.completed_at)
+
+                if p:
+                    all_planned.append(p)
+                if c:
+                    all_completed.append(c)
+
+                p2d = _ms_diff(p, d)
+                d2c = _ms_diff(d, c)
+                total = _ms_diff(p, c)
+
+                step_dicts.append({
+                    "intent_id": s.intent_id,
+                    "intent_type": s.intent_type,
+                    "source_agent": s.source_agent,
+                    "target_agent": s.target_agent,
+                    "status": s.status,
+                    "delivery_status": s.delivery_status,
+                    "planned_at": s.planned_at,
+                    "dispatched_at": s.dispatched_at,
+                    "completed_at": s.completed_at,
+                    "planned_to_dispatched_ms": p2d,
+                    "dispatched_to_completed_ms": d2c,
+                    "total_elapsed_ms": total,
+                    "retry_count": s.retry_count,
+                    "error": s.error,
+                    "gantt": None,
+                })
+
+            # Compute flow-level timing
+            flow_start = min(all_planned) if all_planned else None
+            flow_end = max(all_completed) if all_completed else None
+            flow_total = _ms_diff(flow_start, flow_end)
+
+            # Compute Gantt bars
+            if flow_start and flow_end and flow_total and flow_total > 0:
+                for sd in step_dicts:
+                    sp = _parse_iso(sd["planned_at"])
+                    sc = _parse_iso(sd["completed_at"])
+                    if sp:
+                        offset = _ms_diff(flow_start, sp) or 0.0
+                        duration = sd["total_elapsed_ms"] or 0.0
+                        sd["gantt"] = {
+                            "start_offset_ms": offset,
+                            "duration_ms": duration,
+                            "bar_pct_start": round(offset / flow_total, 4) if flow_total > 0 else 0.0,
+                            "bar_pct_width": round(duration / flow_total, 4) if flow_total > 0 else 0.0,
+                        }
+
+            flows.append({
+                "flow_id": flow_id,
+                "steps": step_dicts,
+                "step_count": len(step_dicts),
+                "total_elapsed_ms": flow_total,
+                "failed_steps": sum(1 for sd in step_dicts if sd["status"] == "failed"),
+                "retry_total": sum(sd["retry_count"] for sd in step_dicts),
+            })
+
+        return flows
 
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         self.broker.start(async_loop=self._async_loop)
