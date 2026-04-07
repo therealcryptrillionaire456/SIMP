@@ -92,10 +92,14 @@ class IntentRecord:
     target_agent: str
     intent_type: str
     timestamp: str
-    status: str  # pending, executing, completed, failed
+    status: str  # pending, executing, completed, failed, expired
     response: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     execution_time_ms: float = 0.0
+    # Sprint 51 — delivery tracking
+    delivery_status: Optional[str] = None
+    delivery_attempts: int = 0
+    delivery_elapsed_ms: float = 0.0
 
 
 class SimpBroker:
@@ -175,6 +179,33 @@ class SimpBroker:
         # Background task tracking for clean cancellation
         self._background_tasks: list = []
         self._async_loop: Optional[asyncio.AbstractEventLoop] = None
+
+        # Sprint 51 — delivery engine
+        from simp.server.delivery import DEFAULT_DELIVERY_ENGINE
+        self.delivery_engine = DEFAULT_DELIVERY_ENGINE
+
+        # Sprint 52 — task ledger
+        from simp.server.task_ledger import TASK_LEDGER
+        self.task_ledger = TASK_LEDGER
+        # Load pending intents from ledger on init
+        try:
+            for rec in self.task_ledger.load_pending():
+                iid = rec.get("intent_id")
+                if iid and iid not in self.intent_records:
+                    self.intent_records[iid] = IntentRecord(
+                        intent_id=iid,
+                        source_agent=rec.get("source_agent", ""),
+                        target_agent=rec.get("target_agent", ""),
+                        intent_type=rec.get("intent_type", ""),
+                        timestamp=rec.get("timestamp", ""),
+                        status="pending",
+                    )
+        except Exception:
+            pass
+
+        # Sprint 53 — routing engine
+        from simp.server.routing_engine import RoutingEngine
+        self.routing_engine = RoutingEngine()
 
         self.logger.info(f"🚀 SIMP Broker initialized (v0.3.0)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
@@ -352,6 +383,14 @@ class SimpBroker:
 
         with self.stats_lock:
             self.stats["intents_received"] += 1
+
+        # Sprint 53 — routing engine: resolve target when "auto" or missing
+        if not target_agent or target_agent == "auto":
+            with self.agent_lock:
+                agents_snapshot = dict(self.agents)
+            decision = self.routing_engine.resolve(intent_type, target_agent, agents_snapshot)
+            if decision.target_agent:
+                target_agent = decision.target_agent
 
         # Log to task ledger — reuse existing task if one was already created
         existing_task_id = intent_data.get("task_id") or intent_data.get("params", {}).get("task_id")
@@ -1033,6 +1072,14 @@ class SimpBroker:
                 except Exception:
                     self.logger.debug("Memory hook on_task_completed failed", exc_info=True)
 
+            # Sprint 52 — ledger append on response
+            self.task_ledger.append({
+                "intent_id": intent_id,
+                "status": "completed",
+                "execution_time_ms": execution_time_ms,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
+
             return True
 
     def record_error(
@@ -1063,6 +1110,16 @@ class SimpBroker:
                 "intent_error", f"Intent {intent_id} failed: {error}",
                 level="error", intent_id=intent_id,
             )
+
+            # Sprint 52 — ledger append on error
+            self.task_ledger.append({
+                "intent_id": intent_id,
+                "status": "failed",
+                "error": error,
+                "execution_time_ms": execution_time_ms,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
+
             return True
 
     def _map_intent_to_task_type(self, intent_type: str) -> str:
@@ -1191,6 +1248,12 @@ class SimpBroker:
             )
         else:
             stats["avg_route_time_ms"] = 0.0
+
+        # Sprint 52 — task ledger stats
+        try:
+            stats["task_ledger"] = self.task_ledger.get_stats()
+        except Exception:
+            stats["task_ledger"] = {}
 
         return stats
 

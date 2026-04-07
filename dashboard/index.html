@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMP Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: monospace; background: #0d1117; color: #c9d1d9; padding: 20px; }
+    h1 { color: #58a6ff; margin-bottom: 16px; }
+    h2 { color: #58a6ff; margin: 16px 0 8px; font-size: 1.1em; }
+    .panel { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+    .panel-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .panel-header h2 { margin: 0; }
+    .panel-body { margin-top: 12px; }
+    .collapsed .panel-body { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #30363d; font-size: 0.9em; }
+    th { color: #8b949e; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; }
+    .badge-enabled { background: #238636; color: #fff; }
+    .badge-planned { background: #6e4009; color: #ffa657; }
+    .badge-active { background: #1f6feb; color: #fff; }
+    .badge-inactive { background: #484f58; color: #8b949e; }
+    #a2a-error { color: #f85149; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>SIMP Dashboard</h1>
+
+  <div class="panel" id="health-panel">
+    <div class="panel-header"><h2>Broker Health</h2><span>-</span></div>
+    <div class="panel-body">
+      <p>Use <code>GET /health</code> to check broker status.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="a2a-panel">
+    <div class="panel-header" onclick="togglePanel('a2a-panel')">
+      <h2>A2A Compatibility</h2>
+      <span id="a2a-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+
+      <h2>Enforcement Status</h2>
+      <table id="enforcement-table">
+        <tr><th>Control</th><th>Status</th></tr>
+      </table>
+
+      <h2>Quota Status</h2>
+      <div id="quota-info"></div>
+
+      <h2>A2A-Capable Agents</h2>
+      <table id="agents-table">
+        <tr><th>Agent ID</th><th>Type</th><th>Security Schemes</th><th>Status</th></tr>
+      </table>
+
+      <div id="a2a-error"></div>
+    </div>
+  </div>
+
+  <!-- FinancialOps Status Panel (Sprint 42) -->
+  <div class="panel" id="finops-panel">
+    <div class="panel-header" onclick="togglePanel('finops-panel')">
+      <h2>FinancialOps Status <span class="badge badge-planned">DRY RUN ONLY</span></h2>
+      <span id="finops-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+      <div id="finops-mode"></div>
+      <h2>Connector Health</h2>
+      <table id="finops-health-table">
+        <tr><th>Connector</th><th>Consecutive OK</th><th>Gate-1 Ready</th></tr>
+      </table>
+      <div id="finops-error"></div>
+    </div>
+  </div>
+
+  <!-- Proposed Payments Panel (Sprint 43) -->
+  <div class="panel" id="proposals-panel">
+    <div class="panel-header" onclick="togglePanel('proposals-panel')">
+      <h2>Proposed Payments</h2>
+      <span id="proposals-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+      <table id="proposals-table">
+        <tr><th>Proposal ID</th><th>Vendor</th><th>Amount</th><th>Status</th><th>Risk Flags</th></tr>
+      </table>
+      <div id="proposals-error"></div>
+    </div>
+  </div>
+
+  <!-- Ledger Panel (Sprint 45) -->
+  <div class="panel" id="ledger-panel">
+    <div class="panel-header" onclick="togglePanel('ledger-panel')">
+      <h2>Financial Ledger</h2>
+      <span id="ledger-toggle">&#9660;</span>
+    </div>
+    <div class="panel-body">
+      <h2>Simulated Spend</h2>
+      <div id="ledger-simulated"></div>
+      <h2>Live Spend</h2>
+      <div id="ledger-live"></div>
+      <div id="ledger-error"></div>
+    </div>
+  </div>
+
+  <script>
+    function escapeHtml(str) {
+      var d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function badgeClass(val) {
+      if (val === 'enabled') return 'badge-enabled';
+      if (val === 'planned') return 'badge-planned';
+      if (val === 'active') return 'badge-active';
+      return 'badge-inactive';
+    }
+
+    function togglePanel(id) {
+      document.getElementById(id).classList.toggle('collapsed');
+    }
+
+    function loadA2AStatus() {
+      fetch('/dashboard/a2a/status')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          // Enforcement
+          var et = document.getElementById('enforcement-table');
+          var es = data.enforcement_status || {};
+          for (var k in es) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + escapeHtml(k.replace(/_/g, ' ')) + '</td>'
+              + '<td><span class="badge ' + badgeClass(es[k]) + '">' + escapeHtml(es[k]) + '</span></td>';
+            et.appendChild(tr);
+          }
+          // Quota
+          var qi = document.getElementById('quota-info');
+          var qs = data.quota_status || {};
+          var html = '<table>';
+          for (var q in qs) {
+            html += '<tr><td>' + escapeHtml(q.replace(/_/g, ' ')) + '</td><td>' + escapeHtml(qs[q]) + '</td></tr>';
+          }
+          html += '</table>';
+          qi.innerHTML = html;
+          // Agents
+          var at = document.getElementById('agents-table');
+          (data.a2a_capable_agents || []).forEach(function(a) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + escapeHtml(a.agent_id) + '</td>'
+              + '<td>' + escapeHtml(a.agent_type) + '</td>'
+              + '<td>' + escapeHtml((a.security_schemes || []).join(', ')) + '</td>'
+              + '<td><span class="badge ' + badgeClass(a.status) + '">' + escapeHtml(a.status) + '</span></td>';
+            at.appendChild(tr);
+          });
+        })
+        .catch(function(err) {
+          document.getElementById('a2a-error').textContent = 'Failed to load A2A status: ' + err;
+        });
+    }
+
+    loadA2AStatus();
+
+    // FinancialOps status (Sprint 42)
+    fetch('/dashboard/financial-ops/status')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var mode = document.getElementById('finops-mode');
+        mode.innerHTML = '<p>Mode: <span class="badge ' + (data.live_payments_enabled ? 'badge-active' : 'badge-planned') + '">'
+          + escapeHtml(data.mode) + '</span></p>';
+        var ht = document.getElementById('finops-health-table');
+        var connectors = (data.health && data.health.connectors) || {};
+        for (var c in connectors) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + escapeHtml(c) + '</td>'
+            + '<td>' + connectors[c].consecutive_ok + '</td>'
+            + '<td><span class="badge ' + (connectors[c].gate1_ready ? 'badge-enabled' : 'badge-planned') + '">'
+            + (connectors[c].gate1_ready ? 'yes' : 'no') + '</span></td>';
+          ht.appendChild(tr);
+        }
+      })
+      .catch(function(err) {
+        document.getElementById('finops-error').textContent = 'Failed to load FinancialOps status: ' + err;
+      });
+
+    // Proposals (Sprint 43)
+    fetch('/dashboard/financial-ops/proposals')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var pt = document.getElementById('proposals-table');
+        (data.proposals || []).forEach(function(p) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + escapeHtml(p.proposal_id.substring(0,8)) + '</td>'
+            + '<td>' + escapeHtml(p.vendor) + '</td>'
+            + '<td>$' + p.amount.toFixed(2) + '</td>'
+            + '<td><span class="badge ' + badgeClass(p.status === 'approved' ? 'enabled' : (p.status === 'pending' ? 'planned' : 'inactive')) + '">'
+            + escapeHtml(p.status) + '</span></td>'
+            + '<td>' + escapeHtml((p.risk_flags || []).join(', ')) + '</td>';
+          pt.appendChild(tr);
+        });
+      })
+      .catch(function(err) {
+        document.getElementById('proposals-error').textContent = 'Failed to load proposals: ' + err;
+      });
+
+    // Ledger (Sprint 45)
+    fetch('/dashboard/financial-ops/ledger')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var sim = data.simulated || {};
+        document.getElementById('ledger-simulated').innerHTML = '<table>'
+          + '<tr><td>Total Would-Spend</td><td>$' + (sim.total_would_spend || 0).toFixed(2) + '</td></tr>'
+          + '<tr><td>Count</td><td>' + (sim.count || 0) + '</td></tr>'
+          + '</table>';
+        var live = data.live || {};
+        document.getElementById('ledger-live').innerHTML = '<table>'
+          + '<tr><td>Total Live Spend</td><td>$' + (live.total_live_spend || 0).toFixed(2) + '</td></tr>'
+          + '<tr><td>Succeeded</td><td>' + (live.succeeded || 0) + '</td></tr>'
+          + '<tr><td>Failed</td><td>' + (live.failed || 0) + '</td></tr>'
+          + '<tr><td>Pending</td><td>' + (live.pending || 0) + '</td></tr>'
+          + '</table>';
+      })
+      .catch(function(err) {
+        document.getElementById('ledger-error').textContent = 'Failed to load ledger: ' + err;
+      });
+  </script>
+</body>
+</html>
