@@ -154,12 +154,15 @@ from simp.server.delivery import (
     DEFAULT_DELIVERY_ENGINE,
 )
 
-# Sprint 52 — task ledger
-from simp.server.task_ledger import (
+# Sprint 52 — intent ledger (renamed from task_ledger in Sprint 61)
+from simp.server.intent_ledger import (
     LedgerConfig,
-    TaskLedger,
-    TASK_LEDGER,
+    IntentLedger,
+    INTENT_LEDGER,
 )
+# Backward-compatible aliases
+TaskLedger = IntentLedger
+TASK_LEDGER = INTENT_LEDGER
 
 # Sprint 53 — routing engine
 from simp.server.routing_engine import (
@@ -275,8 +278,10 @@ __all__ = [
     "DeliveryConfig",
     "IntentDeliveryEngine",
     "DEFAULT_DELIVERY_ENGINE",
-    # Sprint 52
+    # Sprint 52 (renamed in Sprint 61)
     "LedgerConfig",
+    "IntentLedger",
+    "INTENT_LEDGER",
     "TaskLedger",
     "TASK_LEDGER",
     # Sprint 53
