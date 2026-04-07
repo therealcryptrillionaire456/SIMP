@@ -2,6 +2,7 @@
 SIMP HTTP Server
 
 REST API for SIMP broker, making it easy to test and interact with.
+Includes A2A compatibility routes (Sprints 2-6, S1-S9).
 """
 
 import asyncio
@@ -9,8 +10,10 @@ import functools
 import hmac
 import json
 import logging
+import os
 import threading
-from datetime import datetime
+import uuid
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 from flask import Flask, request, jsonify
 from threading import Thread
@@ -31,6 +34,51 @@ from simp.memory.task_memory import TaskMemory
 from simp.memory.knowledge_index import KnowledgeIndex
 from simp.memory.session_bootstrap import SessionBootstrap
 from config.config import SimpConfig
+from simp.orchestration.orchestration_manager import OrchestrationManager
+
+# A2A compat imports
+from simp.compat.agent_card import AgentCardGenerator
+from simp.compat.task_map import (
+    translate_a2a_to_simp,
+    validate_a2a_payload,
+    build_a2a_task_status,
+)
+from simp.compat.projectx_card import (
+    build_projectx_a2a_card,
+    validate_projectx_task,
+)
+from simp.compat.event_stream import build_a2a_event, build_a2a_events_list
+from simp.compat.a2a_security import (
+    build_a2a_security_schemes_block,
+    build_replay_guard_note,
+)
+from simp.compat.ops_policy import SPEND_LEDGER
+from simp.compat.financial_ops import (
+    build_financial_ops_card,
+    validate_financial_op,
+    record_would_spend,
+    execute_approved_payment,
+)
+from simp.compat.payment_connector import (
+    HEALTH_TRACKER,
+    ALLOWED_CONNECTORS,
+    build_connector,
+    validate_payment_request,
+)
+from simp.compat.approval_queue import (
+    APPROVAL_QUEUE,
+    POLICY_CHANGE_QUEUE,
+    PaymentProposalStatus,
+)
+from simp.compat.live_ledger import LIVE_LEDGER
+from simp.compat.reconciliation import run_reconciliation
+from simp.compat.projectx_diagnostics import build_projectx_health_report
+from simp.compat.rollback import ROLLBACK_MANAGER
+from simp.compat.gate_manager import GATE_MANAGER
+from simp.compat.budget_monitor import BUDGET_MONITOR
+
+# Max payload for A2A task submissions (64 KB)
+_A2A_MAX_PAYLOAD = 64 * 1024
 
 
 def require_api_key(f):
@@ -43,14 +91,12 @@ def require_api_key(f):
 
         api_keys_raw = config.API_KEYS
         if not api_keys_raw:
-            # No keys configured = open access (log warning once)
             return f(*args, **kwargs)
 
         valid_keys = {k.strip() for k in api_keys_raw.split(",") if k.strip()}
         if not valid_keys:
             return f(*args, **kwargs)
 
-        # Check Authorization header
         auth_header = request.headers.get("Authorization", "")
         provided_key = ""
         if auth_header.startswith("Bearer "):
@@ -61,12 +107,27 @@ def require_api_key(f):
         if not provided_key:
             return jsonify({"error": "API key required", "hint": "Set Authorization: Bearer <key> or X-API-Key header"}), 401
 
-        # Constant-time comparison against all valid keys
         if not any(hmac.compare_digest(provided_key, k) for k in valid_keys):
             return jsonify({"error": "Invalid API key"}), 403
 
         return f(*args, **kwargs)
     return decorated
+
+
+def _require_api_key(f):
+    """A2A-style API key check (env-var based, used by A2A routes)."""
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        if os.environ.get("SIMP_REQUIRE_API_KEY", "true").lower() in ("false", "0", "no"):
+            return f(*args, **kwargs)
+        key = request.headers.get("X-API-Key", "")
+        expected = os.environ.get("SIMP_API_KEY", "")
+        if not expected:
+            return f(*args, **kwargs)
+        if key != expected:
+            return jsonify({"status": "error", "error": "Invalid or missing API key"}), 401
+        return f(*args, **kwargs)
+    return wrapper
 
 
 class SimpHttpServer:
@@ -79,14 +140,13 @@ class SimpHttpServer:
     - Response handling
     - Status/metrics
     - Memory layer (conversations, tasks, knowledge index, context packs)
+    - A2A compatibility (agent cards, task translation, events, security)
     """
 
     def __init__(self, broker_config: Optional[BrokerConfig] = None, debug: bool = False):
         """Initialize HTTP server"""
         self.app = Flask("SIMP")
-        # Limit request body to 64KB to prevent memory exhaustion
         self.app.config["MAX_CONTENT_LENGTH"] = 64 * 1024  # 64 KB
-        # Rate limiter
         self.limiter = RateLimiter()
 
         # Memory layer components
@@ -120,7 +180,6 @@ class SimpHttpServer:
         )
         self.logger = logging.getLogger("SIMP.HTTP")
 
-        # Setup logging
         if debug:
             self.logger.setLevel(logging.DEBUG)
         else:
@@ -133,25 +192,30 @@ class SimpHttpServer:
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
+        # A2A card generator
+        self._card_gen = AgentCardGenerator()
+
+        # Sprint 54 — orchestration manager
+        self._orchestration = OrchestrationManager(broker=self.broker)
+
         self._setup_routes()
-        self.logger.info("✅ SIMP HTTP Server initialized")
+        self._setup_a2a_routes()
+        self._setup_sprint51_55_routes()
+        self.logger.info("SIMP HTTP Server initialized")
 
     def _setup_routes(self):
         """Setup Flask routes"""
 
         @self.app.route("/health", methods=["GET"])
         def health():
-            """Health check endpoint"""
             return jsonify(self.broker.health_check()), 200
 
         @self.app.route("/agents/register", methods=["POST"])
         @require_api_key
         @self.limiter.limit(10)
         def register_agent():
-            """Register a new agent"""
             data = request.get_json(force=False, silent=True) or {}
 
-            # Validate registration payload
             ok, err = validate_registration_payload(data)
             if not ok:
                 return (
@@ -163,7 +227,6 @@ class SimpHttpServer:
                     400,
                 )
 
-            # Additional Pydantic validation
             try:
                 AgentRegistration(**data)
             except Exception as pyd_err:
@@ -180,7 +243,6 @@ class SimpHttpServer:
             agent_type = data["agent_type"]
             endpoint = data["endpoint"]
             metadata = data.get("metadata", {})
-            # Store public_key in metadata for broker to pick up
             public_key = data.get("public_key")
             if public_key:
                 metadata["public_key"] = public_key
@@ -208,7 +270,6 @@ class SimpHttpServer:
         @self.app.route("/agents", methods=["GET"])
         @require_api_key
         def list_agents():
-            """List all registered agents"""
             agents = self.broker.list_agents()
             return jsonify({
                 "status": "success",
@@ -218,7 +279,6 @@ class SimpHttpServer:
 
         @self.app.route("/agents/<agent_id>", methods=["GET"])
         def get_agent(agent_id):
-            """Get agent details"""
             ok, err = sanitize_agent_id(agent_id)
             if not ok:
                 return jsonify({
@@ -238,7 +298,6 @@ class SimpHttpServer:
         @self.app.route("/agents/<agent_id>", methods=["DELETE"])
         @require_control_auth
         def deregister_agent(agent_id):
-            """Deregister an agent"""
             ok, err = sanitize_agent_id(agent_id)
             if not ok:
                 return jsonify({
@@ -262,10 +321,8 @@ class SimpHttpServer:
         @require_api_key
         @self.limiter.limit(60)
         def route_intent():
-            """Route an intent to a target agent"""
             data = request.get_json(force=False, silent=True) or {}
 
-            # Validate intent payload
             ok, err = validate_intent_payload(data)
             if not ok:
                 return (
@@ -277,7 +334,6 @@ class SimpHttpServer:
                     400,
                 )
 
-            # Route intent via shared event loop
             import asyncio as _asyncio
             future = _asyncio.run_coroutine_threadsafe(
                 self.broker.route_intent(data), self._async_loop
@@ -300,7 +356,6 @@ class SimpHttpServer:
 
         @self.app.route("/intents/<intent_id>", methods=["GET"])
         def get_intent_status(intent_id):
-            """Get status of an intent"""
             status = self.broker.get_intent_status(intent_id)
             if status:
                 return jsonify({"status": "success", "intent": status}), 200
@@ -314,7 +369,6 @@ class SimpHttpServer:
         @require_api_key
         @self.limiter.limit(60)
         def record_response(intent_id):
-            """Record response to an intent"""
             data = request.get_json() or {}
             execution_time = data.get("execution_time_ms", 0.0)
 
@@ -338,7 +392,6 @@ class SimpHttpServer:
         @self.app.route("/intents/<intent_id>/error", methods=["POST"])
         @self.limiter.limit(60)
         def record_error(intent_id):
-            """Record error for an intent"""
             data = request.get_json() or {}
             error_msg = data.get("error", "Unknown error")
             execution_time = data.get("execution_time_ms", 0.0)
@@ -358,7 +411,6 @@ class SimpHttpServer:
 
         @self.app.route("/stats", methods=["GET"])
         def get_stats():
-            """Get broker statistics"""
             return jsonify({
                 "status": "success",
                 "stats": self.broker.get_statistics()
@@ -366,7 +418,6 @@ class SimpHttpServer:
 
         @self.app.route("/status", methods=["GET"])
         def get_status():
-            """Get broker status"""
             return jsonify({
                 "status": "success",
                 "broker": {
@@ -380,7 +431,6 @@ class SimpHttpServer:
         @self.limiter.limit(5)
         @require_control_auth
         def start_broker():
-            """Start the broker"""
             self.broker.start()
             return jsonify({
                 "status": "success",
@@ -391,9 +441,7 @@ class SimpHttpServer:
         @self.limiter.limit(5)
         @require_control_auth
         def stop_broker():
-            """Stop the broker and clean up resources"""
             self.broker.stop()
-            # Stop the shared async event loop
             self._async_loop.call_soon_threadsafe(self._async_loop.stop)
             return jsonify({
                 "status": "success",
@@ -405,7 +453,6 @@ class SimpHttpServer:
         @self.app.route("/tasks", methods=["GET"])
         @require_api_key
         def list_tasks():
-            """List tasks from the ledger with optional filters."""
             status_filter = request.args.get("status")
             agent_filter = request.args.get("agent")
             type_filter = request.args.get("task_type")
@@ -425,7 +472,6 @@ class SimpHttpServer:
         @self.app.route("/tasks/<task_id>", methods=["GET"])
         @require_api_key
         def get_task(task_id):
-            """Get a single task by ID."""
             task = self.broker.task_ledger.get_task(task_id)
             if task:
                 return jsonify({"status": "success", "task": task}), 200
@@ -437,7 +483,6 @@ class SimpHttpServer:
         @self.app.route("/tasks/queue", methods=["GET"])
         @require_api_key
         def get_task_queue():
-            """Get unclaimed tasks ordered by priority."""
             queue = self.broker.task_ledger.get_queue()
             return jsonify({
                 "status": "success",
@@ -448,7 +493,6 @@ class SimpHttpServer:
         @self.app.route("/routing/policy", methods=["GET"])
         @require_api_key
         def get_routing_policy():
-            """Return the current routing policy."""
             if self.broker.builder_pool:
                 policy = self.broker.builder_pool.policy
                 pool_status = self.broker.builder_pool.get_pool_status()
@@ -468,7 +512,6 @@ class SimpHttpServer:
 
         @self.app.route("/logs", methods=["GET"])
         def get_logs():
-            """Get recent structured broker events."""
             try:
                 limit = int(request.args.get("limit", 100))
             except (ValueError, TypeError):
@@ -485,7 +528,6 @@ class SimpHttpServer:
 
         @self.app.route("/memory/conversations", methods=["GET"])
         def list_conversations():
-            """List conversations with optional filters."""
             topic = request.args.get("topic")
             tag = request.args.get("tag")
             participant = request.args.get("participant")
@@ -500,7 +542,6 @@ class SimpHttpServer:
 
         @self.app.route("/memory/conversations/<conv_id>", methods=["GET"])
         def get_conversation(conv_id):
-            """Get a single conversation by ID."""
             conv = self.conversation_archive.get_conversation(conv_id)
             if conv:
                 return jsonify({"status": "success", "conversation": conv}), 200
@@ -513,7 +554,6 @@ class SimpHttpServer:
         @require_api_key
         @self.limiter.limit(30)
         def save_conversation():
-            """Save a new conversation record."""
             data = request.get_json() or {}
             if not data.get("topic"):
                 return jsonify({
@@ -528,7 +568,6 @@ class SimpHttpServer:
 
         @self.app.route("/memory/tasks", methods=["GET"])
         def list_memory_tasks():
-            """List task memory files."""
             tasks = self.task_memory.list_tasks()
             return jsonify({
                 "status": "success",
@@ -538,7 +577,6 @@ class SimpHttpServer:
 
         @self.app.route("/memory/tasks/<slug>", methods=["GET"])
         def get_memory_task(slug):
-            """Get a task memory file by slug."""
             task = self.task_memory.get_task(slug)
             if task:
                 return jsonify({"status": "success", "task": task}), 200
@@ -549,7 +587,6 @@ class SimpHttpServer:
 
         @self.app.route("/memory/index", methods=["GET"])
         def get_knowledge_index():
-            """Get the full knowledge index."""
             return jsonify({
                 "status": "success",
                 "index": self.knowledge_index.get_full_index(),
@@ -557,7 +594,6 @@ class SimpHttpServer:
 
         @self.app.route("/memory/context-pack", methods=["GET"])
         def get_context_pack():
-            """Generate a context pack."""
             task_id = request.args.get("task_id")
             topic = request.args.get("topic")
             agent_id = request.args.get("agent_id")
@@ -571,21 +607,537 @@ class SimpHttpServer:
             )
             return jsonify({"status": "success", "context_pack": pack}), 200
 
-    def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
-        """
-        Run the HTTP server
+    # ------------------------------------------------------------------
+    # A2A compatibility routes
+    # ------------------------------------------------------------------
 
-        Args:
-            host: Host to bind to
-            port: Port to bind to
-            threaded: Run in threaded mode
-        """
+    def _setup_a2a_routes(self):
+        """Setup A2A compatibility routes (Sprints 2-6, S1-S9)."""
+
+        @self.app.route("/.well-known/agent-card.json", methods=["GET"])
+        def well_known_card():
+            card = self._card_gen.build_broker_card(self.broker.agents)
+            return jsonify(card), 200
+
+        @self.app.route("/a2a/tasks", methods=["POST"])
+        @_require_api_key
+        def a2a_submit_task():
+            if request.content_length and request.content_length > _A2A_MAX_PAYLOAD:
+                return jsonify({"status": "error", "error": "Payload exceeds 64KB limit"}), 400
+
+            raw = request.get_data()
+            if len(raw) > _A2A_MAX_PAYLOAD:
+                return jsonify({"status": "error", "error": "Payload exceeds 64KB limit"}), 400
+
+            data = request.get_json(silent=True) or {}
+
+            valid, err = validate_a2a_payload(data)
+            if not valid:
+                return jsonify({"status": "error", "error": err}), 400
+
+            task_type = data["task_type"]
+            simp_type, tr_err = translate_a2a_to_simp(task_type)
+            if tr_err:
+                return jsonify({"status": "error", "error": tr_err}), 400
+
+            task_id = data.get("task_id", str(uuid.uuid4()))
+            status = build_a2a_task_status(task_id, "pending", intent_type=simp_type)
+            return jsonify(status), 200
+
+        @self.app.route("/a2a/tasks/<task_id>", methods=["GET"])
+        @_require_api_key
+        def a2a_get_task(task_id):
+            rec = self.broker.get_intent_status(task_id)
+            if rec:
+                status = build_a2a_task_status(
+                    task_id,
+                    rec.get("status", "unknown"),
+                    intent_type=rec.get("intent_type", ""),
+                )
+                return jsonify(status), 200
+            return jsonify({"status": "error", "error": "Task not found"}), 404
+
+        @self.app.route("/a2a/tasks/types", methods=["GET"])
+        def a2a_task_types():
+            from simp.compat.task_map import A2A_TO_SIMP_INTENT
+            return jsonify({"types": list(A2A_TO_SIMP_INTENT.keys())}), 200
+
+        @self.app.route("/a2a/agents/projectx/agent.json", methods=["GET"])
+        def projectx_card():
+            base = request.url_root.rstrip("/")
+            return jsonify(build_projectx_a2a_card(base)), 200
+
+        @self.app.route("/a2a/agents/projectx/tasks", methods=["POST"])
+        @_require_api_key
+        def projectx_task():
+            data = request.get_json(silent=True) or {}
+            ok, msg_or_skill, intent_type = validate_projectx_task(data)
+            if not ok:
+                return jsonify({"status": "error", "error": msg_or_skill}), 400
+
+            task_id = data.get("task_id", str(uuid.uuid4()))
+            status = build_a2a_task_status(task_id, "pending", intent_type=intent_type)
+            return jsonify(status), 200
+
+        @self.app.route("/a2a/agents/projectx/health", methods=["GET"])
+        def projectx_health():
+            try:
+                report = build_projectx_health_report(self.broker)
+                return jsonify(report), 200
+            except Exception:
+                return jsonify({"status": "error", "message": "diagnostic unavailable"}), 200
+
+        @self.app.route("/a2a/events", methods=["GET"])
+        @_require_api_key
+        def a2a_events():
+            try:
+                limit = min(max(int(request.args.get("limit", 50)), 1), 100)
+            except (ValueError, TypeError):
+                limit = 50
+
+            intent_id_filter = request.args.get("intent_id")
+
+            try:
+                records = []
+                with self.broker.intent_lock:
+                    for iid, rec in self.broker.intent_records.items():
+                        r = {
+                            "intent_id": rec.intent_id,
+                            "status": rec.status,
+                            "intent_type": rec.intent_type,
+                            "source_agent": rec.source_agent,
+                            "target_agent": rec.target_agent,
+                            "timestamp": rec.timestamp,
+                        }
+                        if rec.error:
+                            r["error"] = rec.error
+                        records.append(r)
+
+                if intent_id_filter:
+                    records = [r for r in records if r.get("intent_id") == intent_id_filter]
+
+                result = build_a2a_events_list(records, limit=limit)
+                return jsonify(result), 200
+            except Exception:
+                return jsonify({"events": [], "error": "Failed to retrieve events"}), 200
+
+        @self.app.route("/a2a/events/<intent_id>", methods=["GET"])
+        @_require_api_key
+        def a2a_events_by_intent(intent_id):
+            try:
+                records = []
+                with self.broker.intent_lock:
+                    for iid, rec in self.broker.intent_records.items():
+                        if rec.intent_id == intent_id:
+                            r = {
+                                "intent_id": rec.intent_id,
+                                "status": rec.status,
+                                "intent_type": rec.intent_type,
+                                "timestamp": rec.timestamp,
+                            }
+                            if rec.error:
+                                r["error"] = rec.error
+                            records.append(r)
+
+                if not records:
+                    return jsonify({"status": "error", "error": "Intent not found"}), 404
+
+                result = build_a2a_events_list(records)
+                return jsonify(result), 200
+            except Exception:
+                return jsonify({"events": [], "error": "Failed to retrieve events"}), 200
+
+        @self.app.route("/a2a/security", methods=["GET"])
+        def a2a_security():
+            return jsonify({
+                "securitySchemes": build_a2a_security_schemes_block(),
+                "replayProtection": build_replay_guard_note(),
+                "transportSecurity": {
+                    "tls_required_in_production": True,
+                    "local_http_allowed": True,
+                    "note": "All A2A-facing endpoints must be exposed via HTTPS/TLS in production.",
+                },
+                "x-simp": {"schema_version": "1.0.0"},
+            }), 200
+
+        @self.app.route("/a2a/agents/financial-ops/agent.json", methods=["GET"])
+        def financial_ops_card():
+            base = request.url_root.rstrip("/")
+            return jsonify(build_financial_ops_card(base)), 200
+
+        @self.app.route("/a2a/agents/financial-ops/tasks", methods=["POST"])
+        @_require_api_key
+        def financial_ops_task():
+            data = request.get_json(silent=True) or {}
+            op_type = data.get("op_type", data.get("skill_id", ""))
+            would_spend = float(data.get("would_spend", 0.0))
+            description = data.get("description", "A2A financial op request")
+
+            state, reason = validate_financial_op(op_type, would_spend)
+            record = record_would_spend(
+                agent_id=data.get("agent_id", "a2a_client"),
+                op_type=op_type if op_type else "unknown",
+                would_spend=would_spend,
+                description=description,
+            )
+
+            return jsonify({
+                "status": "pending_approval",
+                "message": (
+                    "Operation recorded as simulated spend. "
+                    "Manual approval required before any real action."
+                ),
+                "record_id": record.get("record_id", ""),
+                "would_spend": would_spend,
+                "x-simp": {"mode": "simulate_only", "approved": False},
+            }), 202
+
+        @self.app.route("/a2a/agents/financial-ops/connector-health", methods=["GET"])
+        def financial_ops_connector_health():
+            return jsonify(HEALTH_TRACKER.get_status()), 200
+
+        @self.app.route("/a2a/agents/financial-ops/proposals", methods=["POST"])
+        @_require_api_key
+        def financial_ops_submit_proposal():
+            data = request.get_json(silent=True) or {}
+            try:
+                proposal = APPROVAL_QUEUE.submit_proposal(
+                    op_type=data.get("op_type", "small_purchase"),
+                    vendor=data.get("vendor", ""),
+                    category=data.get("category", ""),
+                    amount=float(data.get("amount", 0)),
+                    connector_name=data.get("connector_name", "stripe_small_payments"),
+                    description=data.get("description", ""),
+                    submitted_by=data.get("submitted_by", "a2a_client"),
+                )
+                return jsonify({
+                    "status": "pending",
+                    "proposal": proposal.to_dict(),
+                }), 201
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/proposals", methods=["GET"])
+        @_require_api_key
+        def financial_ops_list_proposals():
+            proposals = APPROVAL_QUEUE.get_all_proposals()
+            return jsonify({
+                "proposals": [p.to_dict() for p in proposals],
+                "count": len(proposals),
+            }), 200
+
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>", methods=["GET"])
+        @_require_api_key
+        def financial_ops_get_proposal(proposal_id):
+            proposal = APPROVAL_QUEUE.get_proposal(proposal_id)
+            if proposal is None:
+                return jsonify({"status": "error", "error": "Proposal not found"}), 404
+            return jsonify({"proposal": proposal.to_dict()}), 200
+
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>/approve", methods=["POST"])
+        @_require_api_key
+        def financial_ops_approve_proposal(proposal_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+            try:
+                proposal = APPROVAL_QUEUE.approve_proposal(proposal_id, operator)
+                return jsonify({"status": "approved", "proposal": proposal.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>/reject", methods=["POST"])
+        @_require_api_key
+        def financial_ops_reject_proposal(proposal_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            reason = data.get("reason", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+            try:
+                proposal = APPROVAL_QUEUE.reject_proposal(proposal_id, operator, reason)
+                return jsonify({"status": "rejected", "proposal": proposal.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/policy-changes", methods=["POST"])
+        @_require_api_key
+        def financial_ops_submit_policy_change():
+            data = request.get_json(silent=True) or {}
+            try:
+                change = POLICY_CHANGE_QUEUE.submit_change(
+                    change_type=data.get("change_type", ""),
+                    description=data.get("description", ""),
+                    proposed_by=data.get("proposed_by", ""),
+                )
+                return jsonify({"status": "pending", "change": change.to_dict()}), 201
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/policy-changes/<change_id>/approve", methods=["POST"])
+        @_require_api_key
+        def financial_ops_approve_policy_change(change_id):
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator_subject", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator_subject required"}), 400
+            try:
+                change = POLICY_CHANGE_QUEUE.approve_change(change_id, operator)
+                return jsonify({"status": change.status, "change": change.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/proposals/<proposal_id>/execute", methods=["POST"])
+        @_require_api_key
+        def financial_ops_execute_proposal(proposal_id):
+            live_enabled = os.environ.get("FINANCIAL_OPS_LIVE_ENABLED", "").lower() == "true"
+            if not live_enabled:
+                return jsonify({
+                    "status": "error",
+                    "error": "Live payments are not enabled (FINANCIAL_OPS_LIVE_ENABLED != true)",
+                }), 403
+            try:
+                result = execute_approved_payment(proposal_id)
+                return jsonify(result), 200
+            except (ValueError, RuntimeError) as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/ledger", methods=["GET"])
+        @_require_api_key
+        def financial_ops_ledger():
+            sim = SPEND_LEDGER.get_ledger_summary()
+            live = LIVE_LEDGER.get_summary()
+            return jsonify({
+                "simulated": sim,
+                "live": live,
+                "x-simp": {"pii_minimized": True},
+            }), 200
+
+        @self.app.route("/a2a/agents/financial-ops/reconciliation", methods=["POST"])
+        @_require_api_key
+        def financial_ops_reconciliation():
+            data = request.get_json(silent=True) or {}
+            period_start = data.get("period_start", "2000-01-01T00:00:00+00:00")
+            period_end = data.get("period_end", "2099-12-31T23:59:59+00:00")
+            ref_total = data.get("reference_total")
+            if ref_total is not None:
+                ref_total = float(ref_total)
+            result = run_reconciliation(period_start, period_end, ref_total)
+            return jsonify(result.to_dict()), 200
+
+        @self.app.route("/a2a/agents/financial-ops/export", methods=["GET"])
+        @_require_api_key
+        def financial_ops_export():
+            from simp.compat.approval_queue import APPROVAL_QUEUE as _AQ
+            proposals = _AQ.get_all_proposals()
+            safe = []
+            for p in proposals:
+                safe.append({
+                    "proposal_id": p.proposal_id,
+                    "vendor": p.vendor,
+                    "category": p.category,
+                    "amount": p.amount,
+                    "status": p.status,
+                    "submitted_at": p.submitted_at,
+                })
+            return jsonify({"records": safe, "count": len(safe)}), 200
+
+        @self.app.route("/a2a/agents/financial-ops/rollback", methods=["POST"])
+        @_require_api_key
+        def financial_ops_rollback():
+            data = request.get_json(silent=True) or {}
+            triggered_by = data.get("triggered_by", "operator")
+            reason = data.get("reason", "Manual rollback")
+            record = ROLLBACK_MANAGER.trigger_rollback(triggered_by, reason)
+            return jsonify({"status": "rollback_active", "record": record.to_dict()}), 200
+
+        @self.app.route("/a2a/agents/financial-ops/rollback/status", methods=["GET"])
+        def rollback_status_finops():
+            return jsonify(ROLLBACK_MANAGER.get_rollback_status()), 200
+
+        @self.app.route("/rollback/status", methods=["GET"])
+        def rollback_status():
+            return jsonify(ROLLBACK_MANAGER.get_rollback_status()), 200
+
+        @self.app.route("/rollback/history", methods=["GET"])
+        def rollback_history():
+            return jsonify({"history": ROLLBACK_MANAGER.get_rollback_history()}), 200
+
+        @self.app.route("/gates", methods=["GET"])
+        def gates_status():
+            return jsonify(GATE_MANAGER.get_current_gate_status()), 200
+
+        @self.app.route("/a2a/agents/financial-ops/gates", methods=["GET"])
+        def financial_ops_gates():
+            return jsonify(GATE_MANAGER.get_current_gate_status()), 200
+
+        @self.app.route("/gates/1", methods=["GET"])
+        def gate1_status():
+            return jsonify(GATE_MANAGER.check_gate1().to_dict()), 200
+
+        @self.app.route("/gates/2", methods=["GET"])
+        def gate2_status():
+            return jsonify(GATE_MANAGER.check_gate2().to_dict()), 200
+
+        @self.app.route("/gates/1/sign-off", methods=["POST"])
+        @_require_api_key
+        def gate1_signoff_condition():
+            data = request.get_json(silent=True) or {}
+            condition = data.get("condition", "")
+            operator = data.get("operator", "")
+            if not condition or not operator:
+                return jsonify({"status": "error", "error": "condition and operator required"}), 400
+            try:
+                cond = GATE_MANAGER.sign_off_condition(1, condition, operator)
+                return jsonify({"status": "signed_off", "condition": cond.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/gates/2/sign-off", methods=["POST"])
+        @_require_api_key
+        def gate2_signoff_condition():
+            data = request.get_json(silent=True) or {}
+            condition = data.get("condition", "")
+            operator = data.get("operator", "")
+            if not condition or not operator:
+                return jsonify({"status": "error", "error": "condition and operator required"}), 400
+            try:
+                cond = GATE_MANAGER.sign_off_condition(2, condition, operator)
+                return jsonify({"status": "signed_off", "condition": cond.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/gates/1/promote", methods=["POST"])
+        @_require_api_key
+        def gate1_promote():
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator required"}), 400
+            try:
+                result = GATE_MANAGER.promote_gate(1, operator)
+                return jsonify({"status": "promoted", "gate": result.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/gates/2/promote", methods=["POST"])
+        @_require_api_key
+        def gate2_promote():
+            data = request.get_json(silent=True) or {}
+            operator = data.get("operator", "")
+            if not operator:
+                return jsonify({"status": "error", "error": "operator required"}), 400
+            try:
+                result = GATE_MANAGER.promote_gate(2, operator)
+                return jsonify({"status": "promoted", "gate": result.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+        @self.app.route("/a2a/agents/financial-ops/budget", methods=["GET"])
+        def financial_ops_budget():
+            live_summary = LIVE_LEDGER.get_summary()
+            daily_spend = live_summary.get("total_live_spend", 0.0)
+            summary = BUDGET_MONITOR.get_budget_summary(
+                daily_spend=daily_spend,
+                monthly_spend=daily_spend,
+            )
+            return jsonify(summary), 200
+
+        @self.app.route("/alerts", methods=["GET"])
+        @_require_api_key
+        def budget_alerts():
+            include_ack = request.args.get("include_acknowledged", "false").lower() == "true"
+            alerts = BUDGET_MONITOR.get_alerts(include_acknowledged=include_ack)
+            return jsonify({"alerts": alerts, "count": len(alerts)}), 200
+
+        @self.app.route("/alerts/<alert_id>/acknowledge", methods=["POST"])
+        @_require_api_key
+        def acknowledge_alert(alert_id):
+            data = request.get_json(silent=True) or {}
+            ack_by = data.get("acknowledged_by", "operator")
+            try:
+                alert = BUDGET_MONITOR.acknowledge_alert(alert_id, ack_by)
+                return jsonify({"status": "acknowledged", "alert": alert.to_dict()}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+
+    # ------------------------------------------------------------------
+    # Sprint 51-55 routes (routing policy, orchestration)
+    # ------------------------------------------------------------------
+
+    def _setup_sprint51_55_routes(self):
+        """Routes added by Sprints 51-55."""
+
+        @self.app.route("/routing-policy", methods=["GET"])
+        @_require_api_key
+        def get_routing_policy_v2():
+            summary = self.broker.routing_engine.get_policy_summary()
+            return jsonify({"status": "success", "routing_policy": summary}), 200
+
+        @self.app.route("/reload-routing-policy", methods=["POST"])
+        @_require_api_key
+        def reload_routing_policy():
+            count = self.broker.routing_engine.reload_policy()
+            return jsonify({
+                "status": "success",
+                "message": f"Reloaded {count} routing rules",
+                "rule_count": count,
+            }), 200
+
+        @self.app.route("/orchestration/plans", methods=["POST"])
+        @_require_api_key
+        def create_orchestration_plan():
+            data = request.get_json(silent=True) or {}
+            name = data.get("name", "Unnamed Plan")
+            description = data.get("description", "")
+            steps = data.get("steps", [])
+            if not steps:
+                return jsonify({"status": "error", "error": "steps required"}), 400
+            plan = self._orchestration.create_plan(name, description, steps)
+            return jsonify({"status": "created", "plan": plan.to_dict()}), 201
+
+        @self.app.route("/orchestration/plans/maintenance", methods=["POST"])
+        @_require_api_key
+        def create_maintenance_plan():
+            plan = self._orchestration.make_maintenance_plan()
+            return jsonify({"status": "created", "plan": plan.to_dict()}), 201
+
+        @self.app.route("/orchestration/plans/demo", methods=["POST"])
+        @_require_api_key
+        def create_demo_plan():
+            plan = self._orchestration.make_full_demo_plan()
+            return jsonify({"status": "created", "plan": plan.to_dict()}), 201
+
+        @self.app.route("/orchestration/plans", methods=["GET"])
+        @_require_api_key
+        def list_orchestration_plans():
+            plans = self._orchestration.list_plans()
+            return jsonify({"status": "success", "plans": plans, "count": len(plans)}), 200
+
+        @self.app.route("/orchestration/plans/<plan_id>", methods=["GET"])
+        @_require_api_key
+        def get_orchestration_plan(plan_id):
+            plan = self._orchestration.get_plan(plan_id)
+            if not plan:
+                return jsonify({"status": "error", "error": "Plan not found"}), 404
+            return jsonify({"status": "success", "plan": plan.to_dict()}), 200
+
+        @self.app.route("/orchestration/plans/<plan_id>/execute", methods=["POST"])
+        @_require_api_key
+        def execute_orchestration_plan(plan_id):
+            plan = self._orchestration.get_plan(plan_id)
+            if not plan:
+                return jsonify({"status": "error", "error": "Plan not found"}), 404
+            result = self._orchestration.execute_plan(plan_id)
+            return jsonify({"status": result.status, "plan": result.to_dict()}), 200
+
+    def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         self.broker.start(async_loop=self._async_loop)
-        self.logger.info(f"🚀 SIMP HTTP Server starting on {host}:{port}")
+        self.logger.info(f"SIMP HTTP Server starting on {host}:{port}")
         self.app.run(host=host, port=port, debug=self.debug, threaded=threaded)
 
     def run_in_background(self, host: str = "127.0.0.1", port: int = 5555):
-        """Run server in background thread"""
         thread = Thread(
             target=self.run,
             args=(host, port),
@@ -593,7 +1145,7 @@ class SimpHttpServer:
             name="SIMP-HTTP-Server"
         )
         thread.start()
-        self.logger.info(f"✅ Server started in background thread")
+        self.logger.info("Server started in background thread")
         return thread
 
 
