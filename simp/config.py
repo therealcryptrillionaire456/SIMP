@@ -1,17 +1,13 @@
-import os
+"""Legacy config location — use config.config.SimpConfig instead.
 
-class Config:
-    DEBUG = False
-    TESTING = False
-    DATABASE_URI = os.environ.get('DATABASE_URI')
-
-class ProductionConfig(Config):
-    DATABASE_URI = os.environ.get('PROD_DATABASE_URI')
-
-class DevelopmentConfig(Config):
-    DEBUG = True
-    DATABASE_URI = os.environ.get('DEV_DATABASE_URI')
-
-class TestingConfig(Config):
-    TESTING = True
-    DATABASE_URI = os.environ.get('TEST_DATABASE_URI')
+This module re-exports SimpConfig and legacy aliases so that
+``from simp.config import SimpConfig`` works.
+"""
+from config.config import (  # noqa: F401
+    SimpConfig,
+    Config,
+    ProductionConfig,
+    DevelopmentConfig,
+    TestingConfig,
+    config,
+)

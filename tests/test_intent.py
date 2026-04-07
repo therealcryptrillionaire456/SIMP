@@ -1,5 +1,6 @@
 import sys
 import asyncio
+import pytest
 sys.path.insert(0, '..')
 
 from simp import Intent, SimpResponse, Agent, SimpCrypto, SimpAgent
@@ -46,6 +47,7 @@ def test_response_creation():
     assert response.data["result"] == "ok"
     print("✅ test_response_creation passed")
 
+@pytest.mark.asyncio
 async def test_simp_agent():
     """Test a SIMP agent"""
     class TestAgent(SimpAgent):

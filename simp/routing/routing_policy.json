@@ -1,0 +1,34 @@
+{
+  "builder_pool": {
+    "primary": "claude_cowork",
+    "secondary": "perplexity_research",
+    "support": ["gemma4_local", "kloutbot"]
+  },
+  "task_routing": {
+    "code_task": ["claude_cowork", "perplexity_research", "gemma4_local"],
+    "code_editing": ["claude_cowork", "gemma4_local"],
+    "planning": ["claude_cowork", "perplexity_research", "gemma4_local", "kloutbot"],
+    "research": ["perplexity_research", "gemma4_local"],
+    "market_analysis": ["bullbear_predictor", "perplexity_research"],
+    "trade_execution": ["kashclaw"],
+    "orchestration": ["kloutbot"],
+    "scaffolding": ["claude_cowork", "perplexity_research", "gemma4_local"],
+    "test_harness": ["claude_cowork"],
+    "prediction_signal": ["bullbear_predictor"],
+    "arbitrage": ["quantumarb"],
+    "spec": ["perplexity_research", "claude_cowork", "gemma4_local"],
+    "architecture": ["perplexity_research", "claude_cowork", "gemma4_local"],
+    "docs": ["perplexity_research", "claude_cowork", "gemma4_local"],
+    "code_review": ["claude_cowork", "gemma4_local"],
+    "summarization": ["perplexity_research", "gemma4_local"]
+  },
+  "fallback_rules": {
+    "rate_limited": "next_in_pool",
+    "agent_unavailable": "next_in_pool",
+    "timeout": "retry_then_fallback",
+    "execution_failed": "retry_then_fallback",
+    "schema_invalid": "fail_immediately",
+    "policy_denied": "escalate"
+  },
+  "capacity_check_interval_seconds": 30
+}
