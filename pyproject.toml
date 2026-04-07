@@ -82,6 +82,11 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+    "ignore:Task was destroyed but it is pending:RuntimeWarning",
+]
 
 [tool.mypy]
 python_version = "3.9"

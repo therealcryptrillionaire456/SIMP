@@ -1,9 +1,10 @@
 """
-Kloutbot Agent: Autonomous Strategy Generation
+Kloutbot Agent: Autonomous Strategy Generation + Orchestration
 
 Wraps Q_IntentCompiler as a SIMP-compatible agent.
 Acts as GROK node in the pentagram, receiving market signals and generating
-optimal trading strategies.
+optimal trading strategies.  Also provides orchestration handlers for
+goal decomposition, status checking, and replanning.
 """
 
 import asyncio
@@ -13,7 +14,9 @@ from typing import Dict, Any, Optional, List
 
 from simp.agent import SimpAgent
 from simp.intent import Intent, SimpResponse
-from simp.agents.q_intent_compiler import QIntentCompiler, DecisionTree
+from simp.agents.q_intent_compiler import QIntentCompiler, StrategicOptimizer, DecisionTree
+from simp.memory.knowledge_index import KnowledgeIndex
+from simp.orchestration.task_decomposer import TaskDecomposer
 
 
 class KloutbotAgent(SimpAgent):
@@ -44,16 +47,26 @@ class KloutbotAgent(SimpAgent):
         super().__init__(agent_id, organization)
 
         self.compiler = QIntentCompiler()
+        self._optimizer = StrategicOptimizer()
         self.strategy_history: List[DecisionTree] = []
         self.max_history = 100
 
-        # Register intent handlers
+        # Orchestration state
+        self.task_decomposer = TaskDecomposer()
+        self.goals: Dict[str, Dict[str, Any]] = {}  # goal_id -> goal state
+
+        # Register intent handlers — trading strategy
         self.register_handler("generate_strategy", self.handle_generate_strategy)
         self.register_handler("analyze_signals", self.handle_analyze_signals)
         self.register_handler("optimize_decision", self.handle_optimize_decision)
         self.register_handler("improve_tree", self.handle_improve_tree)
         self.register_handler("get_status", self.handle_get_status)
         self.register_handler("strategy_history", self.handle_strategy_history)
+
+        # Register intent handlers — orchestration
+        self.register_handler("submit_goal", self.handle_submit_goal)
+        self.register_handler("check_status", self.handle_check_status)
+        self.register_handler("replan", self.handle_replan)
 
     async def handle_generate_strategy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -200,34 +213,58 @@ class KloutbotAgent(SimpAgent):
             }
 
     async def handle_improve_tree(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle an improvement request via SIMP intent.
+
+        Accepts: intent_type "improve_tree" with params:
+            - target: which tree/component to improve (default: "decision_tree")
+            - iterations: how many improvement iterations (default: 3)
         """
-        Recursively improve an existing decision tree
+        target = params.get("target", "decision_tree")
+        iterations = min(params.get("iterations", 3), 10)  # Cap at 10
 
-        This handles mutation/memory operations for incremental optimization.
-        """
-        try:
-            tree_data = params.get("tree")
-            iterations = params.get("iterations", 3)
-
-            if not tree_data:
-                return {
-                    "status": "error",
-                    "error_message": "Tree data required"
-                }
-
-            # Note: In production, would reconstruct DecisionTree from data
-            # For now, return analysis
+        if self._optimizer is None:
             return {
-                "status": "success",
-                "message": f"Tree improvement iterations: {iterations}",
-                "estimated_improvement": iterations * 0.15,
-                "timestamp": datetime.utcnow().isoformat()
+                "type": "response",
+                "status": "failed",
+                "error": "StrategicOptimizer not initialized",
             }
 
-        except Exception as e:
+        try:
+            # Build a baseline tree if none provided
+            streams = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "deltas": params.get("deltas", {}),
+                "foresight": params.get("foresight", {"affinity": 0.5, "drift_risk": 0.1}),
+            }
+            current_tree = self._optimizer._build_fractal_tree(streams)
+            current_tree = self._optimizer._apply_minimax(current_tree)
+
+            # Run improvement iterations
+            results = []
+            for i in range(iterations):
+                current_tree = await self._optimizer._recursive_improve(current_tree, iterations=1)
+                results.append({
+                    "iteration": i,
+                    "utility": self._optimizer._calculate_utility(current_tree),
+                })
+
             return {
-                "status": "error",
-                "error_message": str(e)
+                "type": "response",
+                "intent_id": params.get("intent_id", ""),
+                "agent_id": self.agent_id,
+                "status": "completed",
+                "response": {
+                    "target": target,
+                    "iterations_run": len(results),
+                    "results": results,
+                    "improvement_history_size": len(self._optimizer.improvement_history),
+                },
+            }
+        except Exception as exc:
+            return {
+                "type": "response",
+                "status": "failed",
+                "error": str(exc),
             }
 
     async def handle_get_status(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -280,6 +317,172 @@ class KloutbotAgent(SimpAgent):
                 "error_message": str(e)
             }
 
+    # ------------------------------------------------------------------
+    # Orchestration Handlers
+    # ------------------------------------------------------------------
+
+    async def handle_submit_goal(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Accept a high-level goal, decompose into subtasks, and route them.
+
+        Input parameters:
+        {
+            "goal": "Build a new data pipeline",
+            "goal_type": "build",        # optional — auto-inferred if omitted
+            "constraints": {...}          # optional
+        }
+        """
+        try:
+            goal_text = params.get("goal")
+            if not goal_text:
+                return {
+                    "status": "error",
+                    "error_code": "MISSING_GOAL",
+                    "error_message": "A 'goal' parameter is required",
+                }
+
+            goal_type = params.get(
+                "goal_type",
+                self.task_decomposer.infer_goal_type(goal_text),
+            )
+            constraints = params.get("constraints", {})
+
+            subtasks = self.task_decomposer.decompose(goal_text, goal_type, constraints)
+            goal_id = subtasks[0]["goal_id"] if subtasks else str(uuid.uuid4())[:8]
+
+            # Store goal state
+            self.goals[goal_id] = {
+                "goal_id": goal_id,
+                "goal": goal_text,
+                "goal_type": goal_type,
+                "status": "in_progress",
+                "subtasks": subtasks,
+                "constraints": constraints,
+                "created_at": datetime.utcnow().isoformat(),
+            }
+
+            return {
+                "type": "response",
+                "status": "decomposed",
+                "goal_id": goal_id,
+                "goal_type": goal_type,
+                "subtask_count": len(subtasks),
+                "subtasks": [
+                    {"task_type": st["task_type"], "description": st.get("description", ""), "title": st.get("title", "Subtask"), "order": st.get("order", i)}
+                    for i, st in enumerate(subtasks)
+                ],
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "error_code": "GOAL_DECOMPOSITION_FAILED",
+                "error_message": str(e),
+            }
+
+    async def handle_check_status(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Check the status of a goal and its subtasks.
+
+        Input parameters:
+        {
+            "goal_id": "abc12345"
+        }
+        """
+        goal_id = params.get("goal_id")
+        if not goal_id:
+            return {
+                "status": "error",
+                "error_code": "MISSING_GOAL_ID",
+                "error_message": "A 'goal_id' parameter is required",
+            }
+
+        goal_state = self.goals.get(goal_id)
+        if not goal_state:
+            return {
+                "status": "error",
+                "error_code": "GOAL_NOT_FOUND",
+                "error_message": f"No goal found with id: {goal_id}",
+            }
+
+        subtasks = goal_state.get("subtasks", [])
+        completed = sum(1 for s in subtasks if s.get("status") == "completed")
+        failed = sum(1 for s in subtasks if s.get("status") == "failed")
+        total = len(subtasks)
+
+        overall = "completed" if completed == total else "failed" if failed > 0 else "in_progress"
+        goal_state["status"] = overall
+
+        return {
+            "status": "success",
+            "goal_id": goal_id,
+            "goal": goal_state.get("goal"),
+            "goal_status": overall,
+            "progress": {
+                "total": total,
+                "completed": completed,
+                "failed": failed,
+                "remaining": total - completed - failed,
+            },
+            "subtasks": subtasks,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+
+    async def handle_replan(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Re-evaluate and adjust the plan for a goal based on current state.
+
+        Input parameters:
+        {
+            "goal_id": "abc12345",
+            "reason": "optional reason for replanning"
+        }
+        """
+        goal_id = params.get("goal_id")
+        if not goal_id:
+            return {
+                "status": "error",
+                "error_code": "MISSING_GOAL_ID",
+                "error_message": "A 'goal_id' parameter is required",
+            }
+
+        goal_state = self.goals.get(goal_id)
+        if not goal_state:
+            return {
+                "status": "error",
+                "error_code": "GOAL_NOT_FOUND",
+                "error_message": f"No goal found with id: {goal_id}",
+            }
+
+        # Re-decompose from the current point: keep completed, regenerate remaining
+        old_subtasks = goal_state.get("subtasks", [])
+        completed_tasks = [s for s in old_subtasks if s.get("status") == "completed"]
+
+        new_subtasks = self.task_decomposer.decompose(
+            goal_state["goal"],
+            goal_state["goal_type"],
+            goal_state.get("constraints"),
+        )
+
+        # Skip task types that are already completed
+        completed_types = {s["task_type"] for s in completed_tasks}
+        remaining = [s for s in new_subtasks if s["task_type"] not in completed_types]
+
+        goal_state["subtasks"] = completed_tasks + remaining
+        goal_state["status"] = "in_progress"
+        goal_state["replanned_at"] = datetime.utcnow().isoformat()
+
+        return {
+            "status": "success",
+            "goal_id": goal_id,
+            "reason": params.get("reason", "manual replan"),
+            "kept_completed": len(completed_tasks),
+            "new_remaining": len(remaining),
+            "subtasks": goal_state["subtasks"],
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+
     def _add_to_history(self, tree: DecisionTree):
         """Add strategy to history, maintaining max size"""
         self.strategy_history.append(tree)
@@ -301,6 +504,23 @@ class MutationMemory:
         self.max_memories = max_memories
         self.success_count = 0
         self.failure_count = 0
+        self._knowledge_index = KnowledgeIndex()
+        self._load_persisted_mutations()
+
+    def _load_persisted_mutations(self):
+        """Load mutation history from knowledge index."""
+        try:
+            entries = self._knowledge_index.search("mutation_memory")
+            if entries:
+                for entry in entries:
+                    if isinstance(entry, dict):
+                        self.memories.append(entry)
+                        if entry.get("result") == "success" or entry.get("success"):
+                            self.success_count += 1
+                        elif entry.get("result") == "failure":
+                            self.failure_count += 1
+        except Exception:
+            pass
 
     def record_mutation(
         self,
@@ -314,6 +534,7 @@ class MutationMemory:
             "original_utility": self.calculate_utility(original_tree),
             "mutated_utility": self.calculate_utility(mutated_tree),
             "result": result,
+            "success": result == "success",
             "improvement": self.calculate_utility(mutated_tree) - self.calculate_utility(original_tree)
         }
 
@@ -327,6 +548,15 @@ class MutationMemory:
         # Maintain max size
         if len(self.memories) > self.max_memories:
             self.memories = self.memories[-self.max_memories:]
+
+        # Persist to knowledge index
+        try:
+            self._knowledge_index.add_entry(
+                category="mutation_memory",
+                data=memory,
+            )
+        except Exception:
+            pass
 
     def get_success_rate(self) -> float:
         """Calculate mutation success rate"""

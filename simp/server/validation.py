@@ -1,157 +1,64 @@
-from pydantic import BaseModel, field_validator
-from typing import List, Optional, Dict, Any
-from datetime import datetime
+"""
+SIMP Server Validation Models — Pydantic schemas for request validation.
+
+These complement the request_guards module with structured Pydantic models.
+
+- AgentRegistration: Used in http_server.py for registration endpoint validation.
+- ResponseRecording: Used for response recording validation.
+- IntentRequest: Superseded by CanonicalIntent (simp.models.canonical_intent).
+  The canonical schema is the single source of truth for intent structure and types.
+  This model is retained only for reference; all new intent validation should use
+  CanonicalIntent.from_dict() and CanonicalIntent.validate().
+"""
+
 import re
+from pydantic import BaseModel, Field, field_validator
+from typing import Dict, List, Optional
+
+# ISO 8601 datetime pattern
+_ISO_8601_RE = re.compile(
+    r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$"
+)
 
 
 class IntentRequest(BaseModel):
-    user_id: str  # User ID with size limit
-    intent: str   # Intent name with size limit
-    parameters: dict  # Additional parameters for the intent
+    """Pydantic model for validating intent routing requests.
 
-    @field_validator('user_id')
-    @classmethod
-    def validate_user_id(cls, v):
-        if not v or len(v) > 100:
-            raise ValueError('user_id must be 1-100 characters')
-        return v
-
-    @field_validator('intent')
-    @classmethod
-    def validate_intent(cls, v):
-        if not v or len(v) > 100:
-            raise ValueError('intent must be 1-100 characters')
-        return v
+    NOTE: Superseded by CanonicalIntent (simp.models.canonical_intent) as of Sprint 17.
+    Use CanonicalIntent.from_dict() for intent normalization and validation.
+    """
+    user_id: str = Field(default="", min_length=0, max_length=100)
+    intent: str = Field(..., min_length=1, max_length=100)
+    parameters: Dict = Field(default_factory=dict)
 
 
 class AgentRegistration(BaseModel):
-    agent_id: str  # Agent ID with size limit
-    agent_name: str  # Alphanumeric names
-    capabilities: List[str]  # List of capabilities with size limit
+    """Pydantic model for validating agent registration requests."""
+    agent_id: str = Field(..., min_length=1, max_length=64, pattern=r"^[a-zA-Z0-9_\-:.]+$")
+    agent_name: str = Field(default="", max_length=255)
+    agent_type: str = Field(default="generic", max_length=64)
+    capabilities: List[str] = Field(default_factory=list)
+    endpoint: str = Field(default="", max_length=256)
+    public_key: Optional[str] = Field(default=None, max_length=4096)
 
-    @field_validator('agent_id')
+    @field_validator("capabilities")
     @classmethod
-    def validate_agent_id(cls, v):
-        if not v or len(v) > 100:
-            raise ValueError('agent_id must be 1-100 characters')
-        return v
-
-    @field_validator('agent_name')
-    @classmethod
-    def validate_agent_name(cls, v):
-        if not v or len(v) > 255 or not re.match(r'^[a-zA-Z0-9_]+$', v):
-            raise ValueError('agent_name must be 1-255 alphanumeric/underscore characters')
-        return v
-
-    @field_validator('capabilities')
-    @classmethod
-    def validate_capabilities(cls, v):
+    def cap_length(cls, v):
         for cap in v:
             if len(cap) > 50:
-                raise ValueError('each capability must be at most 50 characters')
+                raise ValueError(f"capability '{cap[:20]}...' exceeds 50 chars")
         return v
 
 
 class ResponseRecording(BaseModel):
-    response_id: str  # Response ID with size limit
-    content: str  # Content with size limit
-    timestamp: str  # Timestamp validated with fromisoformat
-
-    @field_validator('response_id')
-    @classmethod
-    def validate_response_id(cls, v):
-        if not v or len(v) > 100:
-            raise ValueError('response_id must be 1-100 characters')
-        return v
-
-    @field_validator('content')
-    @classmethod
-    def validate_content(cls, v):
-        if len(v) > 500:
-            raise ValueError('content must be at most 500 characters')
-        return v
-
-    @field_validator('timestamp')
-    @classmethod
-    def validate_timestamp(cls, v):
-        try:
-            datetime.fromisoformat(v)
-        except (ValueError, TypeError):
-            raise ValueError(
-                'timestamp must be a valid ISO 8601 format (e.g. 2024-01-15 12:30:00 or 2024-01-15T12:30:00)'
-            )
-        return v
-
-
-class AgentRegistrationRequest(BaseModel):
-    """Pydantic model for POST /agents/register validation"""
-    agent_id: str
-    agent_type: str
-    endpoint: str
-    metadata: Optional[Dict[str, Any]] = None
-
-    @field_validator('agent_id')
-    @classmethod
-    def validate_agent_id(cls, v):
-        if not v or len(v) > 128:
-            raise ValueError('agent_id must be 1-128 characters')
-        if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9:._-]*$', v):
-            raise ValueError('agent_id must start with alphanumeric and contain only [a-zA-Z0-9:._-]')
-        return v
-
-    @field_validator('agent_type')
-    @classmethod
-    def validate_agent_type(cls, v):
-        if not v or len(v) > 64:
-            raise ValueError('agent_type must be 1-64 characters')
-        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
-            raise ValueError('agent_type must contain only alphanumeric, underscore, hyphen')
-        return v
-
-    @field_validator('endpoint')
-    @classmethod
-    def validate_endpoint(cls, v):
-        if not v or len(v) > 256:
-            raise ValueError('endpoint must be 1-256 characters')
-        return v
-
-
-class IntentRouteRequest(BaseModel):
-    """Pydantic model for POST /intents/route validation"""
-    target_agent: str
-    source_agent: Optional[str] = "client"
-    intent_type: Optional[str] = "unknown"
-    intent_id: Optional[str] = None
-    params: Optional[Dict[str, Any]] = None
+    """Pydantic model for validating response recording requests."""
+    response_id: str = Field(..., min_length=1, max_length=100)
+    content: str = Field(default="", max_length=10000)
     timestamp: Optional[str] = None
 
-    @field_validator('target_agent')
+    @field_validator("timestamp")
     @classmethod
-    def validate_target_agent(cls, v):
-        if not v or len(v) > 128:
-            raise ValueError('target_agent must be 1-128 characters')
-        return v
-
-    @field_validator('source_agent')
-    @classmethod
-    def validate_source_agent(cls, v):
-        if v is not None and len(v) > 128:
-            raise ValueError('source_agent must be at most 128 characters')
-        return v
-
-    @field_validator('intent_type')
-    @classmethod
-    def validate_intent_type(cls, v):
-        if v is not None and len(v) > 128:
-            raise ValueError('intent_type must be at most 128 characters')
-        return v
-
-    @field_validator('timestamp')
-    @classmethod
-    def validate_timestamp(cls, v):
-        if v is not None:
-            try:
-                datetime.fromisoformat(v)
-            except (ValueError, TypeError):
-                raise ValueError('timestamp must be a valid ISO 8601 format')
+    def valid_timestamp(cls, v):
+        if v is not None and not _ISO_8601_RE.match(v):
+            raise ValueError("timestamp must be ISO 8601 format")
         return v
