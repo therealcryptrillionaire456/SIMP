@@ -154,6 +154,8 @@
     // Failure stats & routing
     failureGrid:     $("#failure-grid"),
     routingGrid:     $("#routing-grid"),
+    smokeTbody:      $("#smoke-tbody"),
+    flowsTbody:      $("#flows-tbody"),
 
     // Memory
     memoryTasksTbody:  $("#memory-tasks-tbody"),
@@ -453,20 +455,74 @@
     const container = document.getElementById("task-queue-tbody");
     if (!container) return;
     if (!data || !data.queue || data.queue.length === 0) {
-      container.innerHTML = '<tr><td colspan="4" class="empty-row">Task queue empty</td></tr>';
+      container.innerHTML = '<tr><td colspan="7" class="empty-row">Task queue empty</td></tr>';
       return;
     }
     container.innerHTML = data.queue.slice(0, 20).map(t => {
       const statusClass = t.status === "completed" ? "online"
                         : t.status === "in_progress" ? "degraded"
+                        : t.status === "queued" ? "unknown"
                         : "offline";
       return `<tr>
         <td class="mono">${escapeHtml(t.task_id || "--")}</td>
+        <td>${escapeHtml(t.title || "--")}</td>
         <td>${escapeHtml(t.task_type || "--")}</td>
+        <td class="mono">${escapeHtml(t.priority || "--")}</td>
         <td><span class="status-badge ${escapeHtml(statusClass)}">${escapeHtml(t.status || "--")}</span></td>
-        <td class="mono">${escapeHtml(t.claimed_by || "unclaimed")}</td>
+        <td class="mono">${escapeHtml(t.assigned_agent || t.claimed_by || "unclaimed")}</td>
+        <td class="mono">${escapeHtml(formatDate(t.created_at))}</td>
       </tr>`;
     }).join("");
+  }
+
+  function renderSmoke(data) {
+    if (!dom.smokeTbody) return;
+    if (!data || !data.results || data.results.length === 0) {
+      dom.smokeTbody.innerHTML = '<tr><td colspan="4" class="empty-row">No smoke probes available</td></tr>';
+      return;
+    }
+    dom.smokeTbody.innerHTML = data.results.slice(0, 20).map(function(row) {
+      var statusClass = row.reachable ? "online" : "offline";
+      return "<tr>"
+        + td(mono(escHtml(row.agent_id || "--")))
+        + td('<span class="status-badge ' + statusClass + '">' + escHtml(row.reachable ? "reachable" : "unreachable") + "</span>")
+        + td(mono(escHtml(row.health_url || "--")))
+        + td(escHtml(row.error || "--"))
+        + "</tr>";
+    }).join("");
+  }
+
+  function renderFlows(data) {
+    if (!dom.flowsTbody) return;
+    var flows = (data && data.flows) || [];
+    if (!flows.length) {
+      dom.flowsTbody.innerHTML = '<tr><td colspan="5" class="empty-row">No linked flows recorded yet</td></tr>';
+      return;
+    }
+    dom.flowsTbody.innerHTML = flows.slice(0, 20).map(function(flow) {
+      var planner = flow.planner_intent || {};
+      var executors = flow.executor_intents || [];
+      var plannerCell = planner.intent_id
+        ? '<button type="button" class="intent-row-button" data-intent-id="' + escHtml(planner.intent_id) + '">' + escHtml((planner.target_agent || "--") + " • " + (planner.intent_type || "--")) + "</button>"
+        : '<span class="text-muted">--</span>';
+      var executorCell = executors.length ? executors.map(function(item) {
+        if (!item.intent_id) return '<span class="text-muted">--</span>';
+        return '<button type="button" class="intent-row-button" data-intent-id="' + escHtml(item.intent_id) + '">' + escHtml((item.target_agent || "--") + " • " + (item.intent_type || "--")) + "</button>";
+      }).join("<br>") : '<span class="text-muted">No executor intents</span>';
+      var statuses = (flow.statuses || []).join(", ") || "--";
+      return "<tr>"
+        + td(mono(escHtml(flow.flow_id || "--")))
+        + td(plannerCell)
+        + td(executorCell)
+        + td(escHtml(statuses))
+        + td(mono(escHtml(formatDate(flow.last_updated))))
+        + "</tr>";
+    }).join("");
+    dom.flowsTbody.querySelectorAll("[data-intent-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openIntentDrawer(button.getAttribute("data-intent-id"));
+      });
+    });
   }
 
   // -----------------------------------------------------------------------
@@ -751,7 +807,7 @@
       dom.intentDrawerActions.querySelectorAll("[data-job]").forEach(function(button) {
         button.addEventListener("click", function() {
           var job = button.getAttribute("data-job");
-          submitProjectXChat({ job: job }, "Run " + job);
+          submitProjectXChat({ job: job, source_intent_id: detail.intent_id }, "Run " + job);
         });
       });
     }
@@ -1305,6 +1361,12 @@
     if (body.matched_faq_id) {
       meta = body.matched_faq_id + " • " + meta;
     }
+    if (response.broker_intent_id) {
+      meta = (meta ? meta + " • " : "") + "broker:" + response.broker_intent_id.substring(0, 8);
+    }
+    if (response.delivery_status) {
+      meta = (meta ? meta + " • " : "") + response.delivery_status;
+    }
     appendChatMessage("assistant", typeof answer === "string" ? answer : JSON.stringify(answer), meta);
     refreshAll();
   }
@@ -1453,7 +1515,7 @@
     setLoading('overview-section', true);
 
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts] = await Promise.all([
+    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -1462,6 +1524,8 @@
       apiFetch("/api/capabilities"),
       apiFetch("/api/tasks"),
       apiFetch("/api/routing"),
+      apiFetch("/api/agents/smoke"),
+      apiFetch("/api/flows"),
       apiFetch("/api/memory/tasks"),
       apiFetch("/api/memory/conversations"),
       apiFetch("/api/logs"),
@@ -1487,6 +1551,8 @@
     renderTasks(tasks);
     renderFailureStats(tasks);
     renderRouting(routing);
+    renderSmoke(smokeData);
+    renderFlows(flowData);
     renderMemoryTasks(memTasks);
     renderMemoryConversations(memConvos);
     renderLogs(logsData);

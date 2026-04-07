@@ -275,6 +275,25 @@
       </div>
     </section>
 
+    <section class="section" id="smoke-section">
+      <h2 class="section-title">Agent Smoke</h2>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Status</th>
+              <th>Probe</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody id="smoke-tbody">
+            <tr><td colspan="4" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Delivery Status -->
     <section class="section" id="delivery-section">
       <h2 class="section-title">Delivery Status</h2>
@@ -308,6 +327,26 @@
         <div id="topology-container" class="topology-grid">
           <p class="empty-row">No topology data</p>
         </div>
+    </section>
+
+    <section class="section" id="flows-section">
+      <h2 class="section-title">Planner / Executor Flows</h2>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Flow</th>
+              <th>Planner</th>
+              <th>Executors</th>
+              <th>Statuses</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="flows-tbody">
+            <tr><td colspan="5" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="section" id="failed-intents-section">
