@@ -10,7 +10,7 @@ from typing import Dict, List, Any, Optional
 from simp.compat.auth_map import build_security_schemes, map_simp_auth_to_a2a
 from simp.compat.capability_map import capabilities_to_skills
 
-_SIMP_VERSION = "0.6.0"
+_SIMP_VERSION = "0.7.0"
 
 # File-based agent endpoints that are NOT HTTP-reachable
 _FILE_BASED_ENDPOINTS = {"(file-based)"}

@@ -1,10 +1,15 @@
 """
-SIMP A2A Event Stream — Sprint S3 (Sprint 33)
+SIMP A2A Event Stream — Sprint S3 (Sprint 33) + Sprint 58 (SSE buffer)
 
 Converts SIMP ledger/log records to A2A-compatible task events
 and provides a list wrapper for event endpoints.
+
+Sprint 58 adds EventStreamBuffer — a thread-safe ring buffer with
+per-subscriber queues for SSE streaming.
 """
 
+import threading
+from collections import deque
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 
@@ -165,3 +170,80 @@ def build_payment_event(
         event["error"] = error[:200] + "..." if len(error) > 200 else error
 
     return event
+
+
+# ---------------------------------------------------------------------------
+# Sprint 58 — SSE Event Stream Buffer
+# ---------------------------------------------------------------------------
+
+class EventStreamBuffer:
+    """Thread-safe ring buffer for SSE event streaming.
+
+    - Fixed-size ring buffer (default 1000 events).
+    - Monotonically increasing sequence numbers.
+    - Per-subscriber queues via subscribe() / get_subscriber_events().
+    - push() broadcasts to all active subscribers.
+    """
+
+    def __init__(self, maxlen: int = 1000):
+        self._lock = threading.Lock()
+        self._buffer: deque = deque(maxlen=maxlen)
+        self._sequence: int = 0
+        self._subscribers: Dict[str, deque] = {}
+
+    @property
+    def sequence(self) -> int:
+        with self._lock:
+            return self._sequence
+
+    def push(self, event_type: str, data: Dict[str, Any]) -> int:
+        """Add an event to the buffer and broadcast to subscribers.
+
+        Returns the assigned sequence number.
+        """
+        with self._lock:
+            self._sequence += 1
+            seq = self._sequence
+            entry = {
+                "sequence": seq,
+                "event_type": event_type,
+                "data": data,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            self._buffer.append(entry)
+            # Broadcast to all subscribers
+            for sub_queue in self._subscribers.values():
+                sub_queue.append(entry)
+            return seq
+
+    def get_recent(self, limit: int = 50, since_sequence: int = 0) -> List[Dict[str, Any]]:
+        """Return recent events, optionally filtered by sequence."""
+        with self._lock:
+            events = [e for e in self._buffer if e["sequence"] > since_sequence]
+            return events[-limit:]
+
+    def subscribe(self, subscriber_id: str) -> str:
+        """Register a new subscriber. Returns the subscriber_id."""
+        with self._lock:
+            self._subscribers[subscriber_id] = deque(maxlen=1000)
+            return subscriber_id
+
+    def unsubscribe(self, subscriber_id: str) -> None:
+        """Remove a subscriber."""
+        with self._lock:
+            self._subscribers.pop(subscriber_id, None)
+
+    def get_subscriber_events(self, subscriber_id: str, max_events: int = 50) -> List[Dict[str, Any]]:
+        """Drain up to max_events from a subscriber's queue."""
+        with self._lock:
+            queue = self._subscribers.get(subscriber_id)
+            if queue is None:
+                return []
+            events = []
+            while queue and len(events) < max_events:
+                events.append(queue.popleft())
+            return events
+
+
+# Module-level singleton
+EVENT_BUFFER = EventStreamBuffer()

@@ -1968,3 +1968,54 @@ All 25 sprints delivered. SIMP v0.4.0 is production-ready with:
 - Updated `simp/compat/__init__.py`: Exported Sprint 46-49 symbols.
 - Bumped _SIMP_VERSION to "0.6.0" in `simp/compat/agent_card.py`.
 - Created `docs/FINANCIAL_OPS.md`: 10-section operator guide.
+
+## Sprint 56 — Unified Dashboard Architecture
+**Started:** 2026-04-07
+**Branch:** feat/public-readonly-dashboard
+
+- Added `_broker_get()` helper in `dashboard/server.py` using stdlib `urllib.request` (no requests/httpx dependency).
+- New dashboard endpoints proxying broker A2A/FinancialOps data:
+  - GET /dashboard/a2a/status — A2A enforcement summary
+  - GET /dashboard/financial-ops/status — FinancialOps mode/policy
+  - GET /dashboard/financial-ops/proposals — proposal list
+  - GET /dashboard/financial-ops/ledger — simulated + live ledger
+  - GET /dashboard/financial-ops/rollback — rollback state
+  - GET /dashboard/financial-ops/budget — budget monitor data
+  - GET /dashboard/financial-ops/gates — gate status
+- Created `tests/test_sprint56_unified_dashboard.py`: 11 tests covering `_broker_get` helper and all dashboard endpoints.
+
+## Sprint 57 — Dashboard UI Serve on Broker Port
+**Started:** 2026-04-07
+**Branch:** feat/public-readonly-dashboard
+
+- Created `simp/server/dashboard_ui.py`: `build_dashboard_html()`, `get_dashboard_js()`, `get_dashboard_css()`.
+- HTML template injects `window.SIMP_BROKER_URL` for client-side API calls.
+- Routes on Flask broker (port 5555): GET /dashboard, GET /dashboard/ui, GET /dashboard/static/app.js, GET /dashboard/static/style.css.
+- Created `tests/test_sprint57_dashboard_serve.py`: 10 tests covering HTML generation, JS/CSS helpers, and all dashboard routes.
+
+## Sprint 58 — SSE Event Stream
+**Started:** 2026-04-07
+**Branch:** feat/public-readonly-dashboard
+
+- Created `EventStreamBuffer` class in `simp/compat/event_stream.py`: thread-safe ring buffer with per-subscriber queues, sequence numbers, configurable maxlen.
+- Methods: `push()`, `get_recent()`, `subscribe()`, `unsubscribe()`, `get_subscriber_events()`.
+- `EVENT_BUFFER` singleton used by broker for response/error event publishing.
+- SSE route: GET /a2a/events/stream — `stream_with_context` generator with clean disconnect handling.
+- Created `tests/test_sprint58_sse.py`: 12 tests covering buffer operations, ring eviction, thread safety (5 threads × 100 pushes), subscriber independence, and SSE route integration.
+
+## Sprint 59 — Gate 1 Simulation + FinancialOps E2E
+**Started:** 2026-04-07
+**Branch:** feat/public-readonly-dashboard
+
+- POST /a2a/agents/financial-ops/gates/simulate-gate1: populates health records + spend ledger entries for gate-1 validation testing.
+- Blocked in production (SIMP_ENV=production → 403).
+- Created `tests/test_sprint59_finops_e2e.py`: 14 tests covering gate-1 simulation, multi-step proposal flows (submit→approve, submit→reject, execute without approval), overspend rejection, disallowed categories, budget/ledger/rollback/connector-health endpoints.
+
+## Sprint 60 — A2A Bridge Integration + v0.7.0
+**Started:** 2026-04-07
+**Branch:** feat/public-readonly-dashboard
+
+- Bumped `_SIMP_VERSION` to `"0.7.0"` in `simp/compat/agent_card.py`.
+- Created `tests/test_sprint60_a2a_bridge.py`: 15 comprehensive integration tests covering the entire A2A bridge surface — task creation, type validation, payload size limits, task types list, agent card validity + secret checks, events, security, ProjectX card, FinancialOps simulate-only mode, routing policy, orchestration plans, version verification, health, and dashboard.
+- Merged `feat/a2a-compat-sprint1` into `feat/public-readonly-dashboard` with all routes preserved from both branches.
+- Total: 62 new tests across Sprints 56-60. Version: 0.7.0.
