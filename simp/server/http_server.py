@@ -35,6 +35,7 @@ from simp.memory.knowledge_index import KnowledgeIndex
 from simp.memory.session_bootstrap import SessionBootstrap
 from config.config import SimpConfig
 from simp.orchestration.orchestration_manager import OrchestrationManager
+from simp.server.dashboard_ui import build_dashboard_html, get_dashboard_js, get_dashboard_css
 
 # A2A compat imports
 from simp.compat.agent_card import AgentCardGenerator
@@ -47,7 +48,7 @@ from simp.compat.projectx_card import (
     build_projectx_a2a_card,
     validate_projectx_task,
 )
-from simp.compat.event_stream import build_a2a_event, build_a2a_events_list
+from simp.compat.event_stream import build_a2a_event, build_a2a_events_list, EVENT_BUFFER
 from simp.compat.a2a_security import (
     build_a2a_security_schemes_block,
     build_replay_guard_note,
@@ -379,6 +380,11 @@ class SimpHttpServer:
             )
 
             if success:
+                # Sprint 58 — push to SSE buffer
+                EVENT_BUFFER.push("response_recorded", {
+                    "intent_id": intent_id,
+                    "execution_time_ms": execution_time,
+                })
                 return jsonify({
                     "status": "success",
                     "message": "Response recorded"
@@ -399,6 +405,12 @@ class SimpHttpServer:
             success = self.broker.record_error(intent_id, error_msg, execution_time)
 
             if success:
+                # Sprint 58 — push to SSE buffer
+                EVENT_BUFFER.push("error_recorded", {
+                    "intent_id": intent_id,
+                    "error": error_msg,
+                    "execution_time_ms": execution_time,
+                })
                 return jsonify({
                     "status": "success",
                     "message": "Error recorded"
@@ -607,6 +619,30 @@ class SimpHttpServer:
             )
             return jsonify({"status": "success", "context_pack": pack}), 200
 
+        # ----- Sprint 57: Dashboard UI served on broker port 5555 -----
+
+        @self.app.route("/dashboard", methods=["GET"])
+        @self.app.route("/dashboard/ui", methods=["GET"])
+        def dashboard_ui():
+            """Serve the full SIMP dashboard HTML (with injected broker URL)."""
+            from flask import Response
+            html = build_dashboard_html(broker_url="http://127.0.0.1:5555")
+            return Response(html, mimetype="text/html")
+
+        @self.app.route("/dashboard/static/app.js", methods=["GET"])
+        def dashboard_js():
+            """Serve dashboard JavaScript."""
+            from flask import Response
+            js = get_dashboard_js()
+            return Response(js, mimetype="application/javascript")
+
+        @self.app.route("/dashboard/static/style.css", methods=["GET"])
+        def dashboard_css():
+            """Serve dashboard stylesheet."""
+            from flask import Response
+            css = get_dashboard_css()
+            return Response(css, mimetype="text/css")
+
     # ------------------------------------------------------------------
     # A2A compatibility routes
     # ------------------------------------------------------------------
@@ -759,6 +795,52 @@ class SimpHttpServer:
                 },
                 "x-simp": {"schema_version": "1.0.0"},
             }), 200
+
+        # --- Sprint 58: SSE Event Stream ---
+        @self.app.route("/a2a/events/stream", methods=["GET"])
+        @_require_api_key
+        def a2a_event_stream():
+            """Server-Sent Events stream for real-time A2A events."""
+            from flask import Response, stream_with_context
+
+            since_seq = request.args.get("since_sequence", 0, type=int)
+            sub_id = str(uuid.uuid4())
+            EVENT_BUFFER.subscribe(sub_id)
+
+            def generate():
+                try:
+                    # Send backfill of events since requested sequence
+                    backfill = EVENT_BUFFER.get_recent(limit=100, since_sequence=since_seq)
+                    for ev in backfill:
+                        yield f"id: {ev['sequence']}\nevent: {ev['event_type']}\ndata: {json.dumps(ev['data'])}\n\n"
+
+                    heartbeat_interval = 15
+                    last_heartbeat = time.time()
+
+                    while True:
+                        events = EVENT_BUFFER.get_subscriber_events(sub_id, max_events=20)
+                        for ev in events:
+                            yield f"id: {ev['sequence']}\nevent: {ev['event_type']}\ndata: {json.dumps(ev['data'])}\n\n"
+
+                        now = time.time()
+                        if now - last_heartbeat >= heartbeat_interval:
+                            yield f": heartbeat {EVENT_BUFFER.sequence}\n\n"
+                            last_heartbeat = now
+
+                        time.sleep(0.5)
+                except GeneratorExit:
+                    pass
+                finally:
+                    EVENT_BUFFER.unsubscribe(sub_id)
+
+            return Response(
+                stream_with_context(generate()),
+                mimetype="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "X-Accel-Buffering": "no",
+                },
+            )
 
         @self.app.route("/a2a/agents/financial-ops/agent.json", methods=["GET"])
         def financial_ops_card():
@@ -971,6 +1053,44 @@ class SimpHttpServer:
         @self.app.route("/a2a/agents/financial-ops/gates", methods=["GET"])
         def financial_ops_gates():
             return jsonify(GATE_MANAGER.get_current_gate_status()), 200
+
+        # --- Sprint 59: Gate 1 Simulation (dev only) ---
+        @self.app.route("/a2a/agents/financial-ops/gates/simulate-gate1", methods=["POST"])
+        @_require_api_key
+        def simulate_gate1():
+            """Populate health and spend records for gate-1 testing.
+
+            Blocked in production (SIMP_ENV=production returns 403).
+            """
+            simp_env = os.environ.get("SIMP_ENV", "development").lower()
+            if simp_env == "production":
+                return jsonify({
+                    "status": "error",
+                    "error": "Gate simulation is disabled in production",
+                }), 403
+
+            # Add 7 consecutive OK health records per connector
+            for connector_name in ALLOWED_CONNECTORS:
+                for _ in range(7):
+                    HEALTH_TRACKER.record_check(connector_name, "ok")
+
+            # Add 20 simulated spend records
+            for i in range(20):
+                SPEND_LEDGER.record_simulated_spend(
+                    agent_id="gate1-sim",
+                    description=f"Simulated payment {i+1}/20 for gate-1 test",
+                    would_spend=round(10.0 + i * 2.5, 2),
+                )
+
+            # Check gate1 result
+            gate1_result = GATE_MANAGER.check_gate1()
+            return jsonify({
+                "status": "simulated",
+                "message": "Gate-1 simulation data populated",
+                "health_records_added": 7 * len(ALLOWED_CONNECTORS),
+                "spend_records_added": 20,
+                "gate1_check": gate1_result.to_dict(),
+            }), 200
 
         @self.app.route("/gates/1", methods=["GET"])
         def gate1_status():
