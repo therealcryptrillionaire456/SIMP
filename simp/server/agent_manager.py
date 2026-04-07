@@ -8,12 +8,35 @@ import multiprocessing as mp
 import subprocess
 import time
 import logging
+import re
+import tempfile
 from dataclasses import dataclass
 from typing import Dict, Optional, Any, List, Callable
 from datetime import datetime
 import json
 import signal
 import os
+import sys
+
+
+# Agent ID validation pattern: alphanumeric, colons, hyphens, underscores, dots
+_AGENT_ID_PATTERN = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9:._-]{0,127}$')
+
+
+def sanitize_agent_id(agent_id: str) -> str:
+    """Validate and return agent_id, or raise ValueError if invalid.
+
+    Rules:
+    - 1-128 characters
+    - Starts with alphanumeric
+    - Contains only alphanumeric, colons, hyphens, underscores, dots
+    """
+    if not isinstance(agent_id, str) or not _AGENT_ID_PATTERN.match(agent_id):
+        raise ValueError(
+            f"Invalid agent_id: must be 1-128 chars, start with alphanumeric, "
+            f"and contain only [a-zA-Z0-9:._-]. Got: {agent_id!r}"
+        )
+    return agent_id
 
 
 @dataclass
@@ -55,7 +78,7 @@ class AgentManager:
         self.base_port = 5001  # Starting port for agents
         self.next_port = self.base_port
 
-        self.logger.info("✅ Agent Manager initialized")
+        self.logger.info("Agent Manager initialized")
 
     def _get_next_port(self) -> int:
         """Get next available port"""
@@ -84,15 +107,22 @@ class AgentManager:
         Returns:
             RemoteAgent instance, or None if spawn failed
         """
+        # Validate agent_id
+        try:
+            sanitize_agent_id(agent_id)
+        except ValueError as e:
+            self.logger.error(f"Invalid agent_id: {e}")
+            return None
+
         if agent_id in self.agents:
-            self.logger.error(f"❌ Agent '{agent_id}' already spawned")
+            self.logger.error(f"Agent '{agent_id}' already spawned")
             return None
 
         port = self._get_next_port()
         args = args or {}
 
         self.logger.info(
-            f"🚀 Spawning agent: {agent_id} ({agent_type}) on port {port}"
+            f"Spawning agent: {agent_id} ({agent_type}) on port {port}"
         )
 
         # Create agent process
@@ -110,10 +140,16 @@ class AgentManager:
                 agent_id, agent_type, agent_class, agent_module, port, args
             )
 
-            # Write script to temp file
-            script_path = f"/tmp/simp_agent_{agent_id}_{port}.py"
-            with open(script_path, "w") as f:
-                f.write(script)
+            # Write script to secure temp file (not predictable path)
+            script_fd = tempfile.NamedTemporaryFile(
+                mode='w',
+                prefix='simp_agent_',
+                suffix='.py',
+                delete=False,
+            )
+            script_path = script_fd.name
+            script_fd.write(script)
+            script_fd.close()
 
             # Spawn process
             process = mp.Process(
@@ -130,7 +166,7 @@ class AgentManager:
             self.agents[agent_id] = remote_agent
 
             self.logger.info(
-                f"✅ Agent spawned: {agent_id} (PID: {process.pid}, Port: {port})"
+                f"Agent spawned: {agent_id} (PID: {process.pid}, Port: {port})"
             )
 
             return remote_agent
@@ -140,7 +176,7 @@ class AgentManager:
             remote_agent.error_message = str(e)
             self.agents[agent_id] = remote_agent
 
-            self.logger.error(f"❌ Failed to spawn agent '{agent_id}': {str(e)}")
+            self.logger.error(f"Failed to spawn agent '{agent_id}': {str(e)}")
             return None
 
     def _generate_agent_script(
@@ -152,13 +188,30 @@ class AgentManager:
         port: int,
         args: Dict[str, Any],
     ) -> str:
-        """Generate Python script for agent process"""
+        """Generate Python script for agent process.
+
+        Uses JSON temp file for args instead of repr() injection.
+        """
+        # Write args to a JSON temp file to avoid repr() injection
+        args_fd = tempfile.NamedTemporaryFile(
+            mode='w',
+            prefix='simp_agent_args_',
+            suffix='.json',
+            delete=False,
+        )
+        json.dump(args, args_fd)
+        args_fd.close()
+        args_json_path = args_fd.name
+
+        class_name = agent_class.split('.')[-1]
+
         script = f'''
 import sys
+import json
 import logging
-sys.path.insert(0, '/sessions/fervent-elegant-johnson/projects/simp')
+import os
 
-from {agent_module} import {agent_class.split('.')[-1]}
+from {agent_module} import {class_name}
 from simp.server.agent_client import SimpAgentClient
 
 # Setup logging
@@ -168,15 +221,22 @@ logging.basicConfig(
 )
 logger = logging.getLogger("Agent.{agent_id}")
 
-logger.info("🚀 Agent {{agent_id}} starting on port {{port}}")
+logger.info("Agent {agent_id} starting on port {port}")
 
 try:
+    # Load args from JSON file (safe deserialization)
+    args_path = {args_json_path!r}
+    with open(args_path, 'r') as f:
+        agent_args = json.load(f)
+    # Clean up args file
+    os.unlink(args_path)
+
     # Create agent instance
-    agent = {agent_class.split('.')[-1]}(
+    agent = {class_name}(
         agent_id="{agent_id}",
-        **{repr(args)}
+        **agent_args
     )
-    logger.info("✅ Agent instance created")
+    logger.info("Agent instance created")
 
     # Create SIMP client
     client = SimpAgentClient(
@@ -187,18 +247,18 @@ try:
         broker_port=5555
     )
 
-    logger.info("✅ SIMP client initialized")
+    logger.info("SIMP client initialized")
 
     # Register with broker
     client.register()
-    logger.info("✅ Registered with SIMP broker")
+    logger.info("Registered with SIMP broker")
 
     # Start listening for intents
-    logger.info("▶️ Agent listening for intents...")
+    logger.info("Agent listening for intents...")
     client.listen(agent)
 
 except Exception as e:
-    logger.error(f"❌ Agent failed: {{e}}", exc_info=True)
+    logger.error(f"Agent failed: {{e}}", exc_info=True)
     sys.exit(1)
 '''
         return script
@@ -212,6 +272,12 @@ except Exception as e:
             subprocess.run([sys.executable, script_path], check=True)
         except Exception as e:
             logging.error(f"Agent {agent_id} error: {e}")
+        finally:
+            # Clean up script file
+            try:
+                os.unlink(script_path)
+            except OSError:
+                pass
 
     def get_agent(self, agent_id: str) -> Optional[RemoteAgent]:
         """Get agent by ID"""
@@ -225,12 +291,12 @@ except Exception as e:
         """Stop an agent"""
         agent = self.get_agent(agent_id)
         if not agent:
-            self.logger.warning(f"⚠️ Agent '{agent_id}' not found")
+            self.logger.warning(f"Agent '{agent_id}' not found")
             return False
 
         if agent.process is None or not agent.process.is_alive():
             agent.status = "stopped"
-            self.logger.info(f"✅ Agent stopped: {agent_id}")
+            self.logger.info(f"Agent stopped: {agent_id}")
             return True
 
         try:
@@ -242,11 +308,11 @@ except Exception as e:
                 agent.process.join()
 
             agent.status = "stopped"
-            self.logger.info(f"✅ Agent terminated: {agent_id}")
+            self.logger.info(f"Agent terminated: {agent_id}")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Error stopping agent '{agent_id}': {e}")
+            self.logger.error(f"Error stopping agent '{agent_id}': {e}")
             return False
 
     def stop_all_agents(self, timeout: int = 5) -> Dict[str, bool]:
@@ -293,12 +359,12 @@ except Exception as e:
         if not agent:
             return None
 
-        self.logger.info(f"🔄 Restarting agent: {agent_id}")
+        self.logger.info(f"Restarting agent: {agent_id}")
         self.stop_agent(agent_id)
         time.sleep(1)
 
         # Note: Full restart would require storing spawn parameters
         self.logger.warning(
-            f"⚠️ Agent restart requires full spawn (parameters not stored)"
+            f"Agent restart requires full spawn (parameters not stored)"
         )
         return None
