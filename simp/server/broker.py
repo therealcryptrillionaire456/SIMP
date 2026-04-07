@@ -8,6 +8,7 @@ Receives intents, routes to appropriate agents, collects responses.
 import asyncio
 import json
 import logging
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Callable
 from datetime import datetime
@@ -26,6 +27,10 @@ class BrokerState(str, Enum):
     STOPPED = "stopped"
 
 
+# Default maximum intent records before LRU eviction
+_MAX_INTENT_RECORDS = 10000
+
+
 @dataclass
 class BrokerConfig:
     """Configuration for SIMP Broker"""
@@ -37,6 +42,7 @@ class BrokerConfig:
     enable_logging: bool = True
     log_level: str = "INFO"
     max_log_lines: int = 10000
+    max_intent_records: int = _MAX_INTENT_RECORDS
 
 
 @dataclass
@@ -71,8 +77,9 @@ class SimpBroker:
         self.agents: Dict[str, Dict[str, Any]] = {}  # agent_id -> agent info
         self.agent_lock = threading.RLock()
 
-        # Intent tracking
-        self.intent_records: Dict[str, IntentRecord] = {}
+        # Intent tracking — bounded OrderedDict with LRU eviction
+        self._max_intent_records = self.config.max_intent_records
+        self.intent_records: OrderedDict[str, IntentRecord] = OrderedDict()
         self.intent_queue: "queue.Queue[Dict[str, Any]]" = queue.Queue(
             maxsize=self.config.max_pending_intents
         )
@@ -89,10 +96,28 @@ class SimpBroker:
         }
         self.stats_lock = threading.RLock()
 
-        self.logger.info(f"🚀 SIMP Broker initialized (v0.1)")
+        self.logger.info(f"SIMP Broker initialized (v0.1)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
         self.logger.info(f"   Intent timeout: {self.config.intent_timeout}s")
+        self.logger.info(f"   Max intent records: {self._max_intent_records}")
+
+    def _add_intent_record(self, intent_id: str, record: IntentRecord) -> None:
+        """Add an intent record with LRU eviction when at capacity.
+
+        Must be called while holding self.intent_lock.
+        """
+        # If already present, move to end (most recently used)
+        if intent_id in self.intent_records:
+            self.intent_records.move_to_end(intent_id)
+            self.intent_records[intent_id] = record
+            return
+
+        # Evict oldest if at capacity
+        while len(self.intent_records) >= self._max_intent_records:
+            self.intent_records.popitem(last=False)
+
+        self.intent_records[intent_id] = record
 
     def _setup_logging(self) -> logging.Logger:
         """Setup logging for broker"""
@@ -133,11 +158,11 @@ class SimpBroker:
         """
         with self.agent_lock:
             if agent_id in self.agents:
-                self.logger.warning(f"❌ Agent '{agent_id}' already registered")
+                self.logger.warning(f"Agent '{agent_id}' already registered")
                 return False
 
             if len(self.agents) >= self.config.max_agents:
-                self.logger.error(f"❌ Max agents ({self.config.max_agents}) reached")
+                self.logger.error(f"Max agents ({self.config.max_agents}) reached")
                 return False
 
             self.agents[agent_id] = {
@@ -155,7 +180,7 @@ class SimpBroker:
                 self.stats["agents_registered"] += 1
 
             self.logger.info(
-                f"✅ Agent registered: {agent_id} ({agent_type}) → {endpoint}"
+                f"Agent registered: {agent_id} ({agent_type}) -> {endpoint}"
             )
             return True
 
@@ -164,7 +189,7 @@ class SimpBroker:
         with self.agent_lock:
             if agent_id in self.agents:
                 del self.agents[agent_id]
-                self.logger.info(f"✅ Agent deregistered: {agent_id}")
+                self.logger.info(f"Agent deregistered: {agent_id}")
                 return True
             return False
 
@@ -206,7 +231,7 @@ class SimpBroker:
         target = self.get_agent(target_agent)
         if not target:
             error_msg = f"Target agent '{target_agent}' not found"
-            self.logger.warning(f"❌ {error_msg}")
+            self.logger.warning(f"{error_msg}")
 
             with self.intent_lock:
                 record = IntentRecord(
@@ -218,7 +243,7 @@ class SimpBroker:
                     status="failed",
                     error=error_msg,
                 )
-                self.intent_records[intent_id] = record
+                self._add_intent_record(intent_id, record)
 
             with self.stats_lock:
                 self.stats["intents_failed"] += 1
@@ -240,14 +265,14 @@ class SimpBroker:
                 timestamp=datetime.utcnow().isoformat(),
                 status="pending",
             )
-            self.intent_records[intent_id] = record
+            self._add_intent_record(intent_id, record)
 
         with self.stats_lock:
             self.stats["intents_routed"] += 1
 
         self.logger.info(
-            f"📤 Routing intent: {intent_id} ({intent_type}) "
-            f"{source_agent} → {target_agent}"
+            f"Routing intent: {intent_id} ({intent_type}) "
+            f"{source_agent} -> {target_agent}"
         )
 
         # In a real implementation, would send to agent via network
@@ -269,19 +294,22 @@ class SimpBroker:
         with self.intent_lock:
             record = self.intent_records.get(intent_id)
             if not record:
-                self.logger.warning(f"⚠️ Response for unknown intent: {intent_id}")
+                self.logger.warning(f"Response for unknown intent: {intent_id}")
                 return False
 
             record.response = response_data
             record.status = "completed"
             record.execution_time_ms = execution_time_ms
 
+            # Move to end (most recently used)
+            self.intent_records.move_to_end(intent_id)
+
             with self.stats_lock:
                 self.stats["intents_completed"] += 1
                 self.stats["total_route_time_ms"] += execution_time_ms
 
             self.logger.info(
-                f"📥 Response recorded: {intent_id} "
+                f"Response recorded: {intent_id} "
                 f"({execution_time_ms:.1f}ms)"
             )
 
@@ -300,10 +328,13 @@ class SimpBroker:
             record.status = "failed"
             record.execution_time_ms = execution_time_ms
 
+            # Move to end (most recently used)
+            self.intent_records.move_to_end(intent_id)
+
             with self.stats_lock:
                 self.stats["intents_failed"] += 1
 
-            self.logger.error(f"❌ Intent failed: {intent_id} - {error}")
+            self.logger.error(f"Intent failed: {intent_id} - {error}")
             return True
 
     def get_intent_status(self, intent_id: str) -> Optional[Dict[str, Any]]:
@@ -312,6 +343,9 @@ class SimpBroker:
             record = self.intent_records.get(intent_id)
             if not record:
                 return None
+
+            # Move to end (most recently accessed)
+            self.intent_records.move_to_end(intent_id)
 
             return {
                 "intent_id": record.intent_id,
@@ -359,24 +393,24 @@ class SimpBroker:
     def start(self) -> None:
         """Start the broker"""
         self.state = BrokerState.RUNNING
-        self.logger.info("✅ SIMP Broker RUNNING")
+        self.logger.info("SIMP Broker RUNNING")
 
     def stop(self) -> None:
         """Stop the broker"""
         self.state = BrokerState.SHUTTING_DOWN
-        self.logger.info("🛑 SIMP Broker shutting down...")
+        self.logger.info("SIMP Broker shutting down...")
         self.state = BrokerState.STOPPED
-        self.logger.info("✅ SIMP Broker stopped")
+        self.logger.info("SIMP Broker stopped")
 
     def pause(self) -> None:
         """Pause the broker"""
         self.state = BrokerState.PAUSED
-        self.logger.info("⏸️ SIMP Broker paused")
+        self.logger.info("SIMP Broker paused")
 
     def resume(self) -> None:
         """Resume the broker"""
         self.state = BrokerState.RUNNING
-        self.logger.info("▶️ SIMP Broker resumed")
+        self.logger.info("SIMP Broker resumed")
 
     def health_check(self) -> Dict[str, Any]:
         """Health check status"""

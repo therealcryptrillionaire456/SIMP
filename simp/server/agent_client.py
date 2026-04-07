@@ -6,6 +6,7 @@ Handles registration, intent receiving, and response sending.
 """
 
 import socket
+import struct
 import json
 import logging
 import time
@@ -13,6 +14,11 @@ import threading
 from typing import Dict, Any, Optional, Callable
 from datetime import datetime
 import queue
+
+# Length-prefix header: 4-byte unsigned big-endian integer
+_HEADER_FORMAT = "!I"
+_HEADER_SIZE = struct.calcsize(_HEADER_FORMAT)
+_MAX_MESSAGE_SIZE = 16 * 1024 * 1024  # 16 MB max message
 
 
 class SimpAgentClient:
@@ -56,25 +62,25 @@ class SimpAgentClient:
         self.responses_sent = 0
 
         self.logger.info(
-            f"✅ SIMP Agent Client initialized: {agent_id} ({agent_type})"
+            f"SIMP Agent Client initialized: {agent_id} ({agent_type})"
         )
 
     def connect_to_broker(self) -> bool:
         """Connect to SIMP broker"""
         try:
             self.logger.info(
-                f"📡 Connecting to broker at {self.broker_host}:{self.broker_port}"
+                f"Connecting to broker at {self.broker_host}:{self.broker_port}"
             )
 
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.broker_host, self.broker_port))
             self.connected = True
 
-            self.logger.info("✅ Connected to broker")
+            self.logger.info("Connected to broker")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Failed to connect to broker: {e}")
+            self.logger.error(f"Failed to connect to broker: {e}")
             self.connected = False
             return False
 
@@ -96,11 +102,11 @@ class SimpAgentClient:
             }
 
             self._send_message(register_msg)
-            self.logger.info(f"✅ Registration message sent")
+            self.logger.info(f"Registration message sent")
             return True
 
         except Exception as e:
-            self.logger.error(f"❌ Registration failed: {e}")
+            self.logger.error(f"Registration failed: {e}")
             return False
 
     def listen(self, agent) -> None:
@@ -111,7 +117,7 @@ class SimpAgentClient:
             agent: SIMP agent instance with handler methods
         """
         self.running = True
-        self.logger.info("▶️ Listening for intents...")
+        self.logger.info("Listening for intents...")
 
         try:
             while self.running:
@@ -123,7 +129,7 @@ class SimpAgentClient:
                     continue
 
                 self.logger.info(
-                    f"📨 Received intent: {intent.get('intent_id')} "
+                    f"Received intent: {intent.get('intent_id')} "
                     f"({intent.get('intent_type')})"
                 )
 
@@ -138,7 +144,7 @@ class SimpAgentClient:
                     self.responses_sent += 1
 
                 except Exception as e:
-                    self.logger.error(f"❌ Error handling intent: {e}")
+                    self.logger.error(f"Error handling intent: {e}")
                     error_response = {
                         "status": "error",
                         "error_code": "HANDLER_ERROR",
@@ -147,7 +153,7 @@ class SimpAgentClient:
                     self._send_response(intent.get("intent_id"), error_response)
 
         except KeyboardInterrupt:
-            self.logger.info("⏹️ Interrupted")
+            self.logger.info("Interrupted")
         finally:
             self.stop()
 
@@ -164,8 +170,11 @@ class SimpAgentClient:
 
             # Handle async handlers
             if asyncio.iscoroutinefunction(handler):
-                loop = asyncio.get_event_loop()
-                result = loop.run_until_complete(handler(params))
+                loop = asyncio.new_event_loop()
+                try:
+                    result = loop.run_until_complete(handler(params))
+                finally:
+                    loop.close()
             else:
                 result = handler(params)
 
@@ -177,32 +186,59 @@ class SimpAgentClient:
                 "error_message": f"No handler for intent type: {intent_type}",
             }
 
+    @staticmethod
+    def _recv_exact(sock: socket.socket, num_bytes: int) -> bytes:
+        """Receive exactly num_bytes from socket, or raise on disconnect."""
+        buf = bytearray()
+        while len(buf) < num_bytes:
+            chunk = sock.recv(num_bytes - len(buf))
+            if not chunk:
+                raise ConnectionError("Connection closed while reading")
+            buf.extend(chunk)
+        return bytes(buf)
+
     def _send_message(self, msg: Dict[str, Any]) -> None:
-        """Send message to broker"""
+        """Send length-prefixed message to broker"""
         if not self.socket:
             raise RuntimeError("Not connected to broker")
 
         msg_json = json.dumps(msg)
-        msg_bytes = msg_json.encode() + b"\n"
-        self.socket.sendall(msg_bytes)
+        msg_bytes = msg_json.encode()
+
+        if len(msg_bytes) > _MAX_MESSAGE_SIZE:
+            raise ValueError(f"Message too large: {len(msg_bytes)} > {_MAX_MESSAGE_SIZE}")
+
+        # Length-prefix header + payload
+        header = struct.pack(_HEADER_FORMAT, len(msg_bytes))
+        self.socket.sendall(header + msg_bytes)
 
     def _receive_message(self) -> Optional[Dict[str, Any]]:
-        """Receive message from broker"""
+        """Receive length-prefixed message from broker"""
         if not self.socket:
             return None
 
         try:
-            # Set non-blocking to avoid hanging
+            # Set timeout to avoid hanging
             self.socket.settimeout(1.0)
-            data = self.socket.recv(4096)
 
-            if not data:
+            # Read length header
+            header = self._recv_exact(self.socket, _HEADER_SIZE)
+            msg_len = struct.unpack(_HEADER_FORMAT, header)[0]
+
+            if msg_len > _MAX_MESSAGE_SIZE:
+                self.logger.error(f"Message too large: {msg_len}")
                 return None
 
+            # Read exact payload
+            data = self._recv_exact(self.socket, msg_len)
             msg = json.loads(data.decode())
             return msg
 
         except socket.timeout:
+            return None
+        except ConnectionError:
+            self.logger.warning("Connection closed by broker")
+            self.connected = False
             return None
         except Exception as e:
             self.logger.error(f"Error receiving message: {e}")
@@ -220,7 +256,7 @@ class SimpAgentClient:
 
         self._send_message(response_msg)
         self.logger.info(
-            f"📤 Response sent for intent: {intent_id} ({response.get('status')})"
+            f"Response sent for intent: {intent_id} ({response.get('status')})"
         )
 
     def send_intent(
@@ -250,7 +286,7 @@ class SimpAgentClient:
         try:
             self._send_message(intent_msg)
             self.logger.info(
-                f"📤 Intent sent: {intent_type} to {target_agent}"
+                f"Intent sent: {intent_type} to {target_agent}"
             )
 
             # Wait for response (simple implementation)
@@ -258,7 +294,7 @@ class SimpAgentClient:
             return response
 
         except Exception as e:
-            self.logger.error(f"❌ Error sending intent: {e}")
+            self.logger.error(f"Error sending intent: {e}")
             return None
 
     def stop(self) -> None:
@@ -272,7 +308,7 @@ class SimpAgentClient:
                 pass
 
         self.connected = False
-        self.logger.info("✅ Client stopped")
+        self.logger.info("Client stopped")
 
     def get_stats(self) -> Dict[str, Any]:
         """Get client statistics"""
