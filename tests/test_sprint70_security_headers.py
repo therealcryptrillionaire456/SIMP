@@ -53,11 +53,8 @@ class TestSecurityHeaders:
         assert "no-store" in cc
         assert "no-cache" in cc
 
-    def test_no_server_header(self, client):
+    def test_no_x_powered_by(self, client):
         resp = client.get("/health")
-        # Server header should be removed or not present
-        server_val = resp.headers.get("Server", "")
-        # Flask test client may still set it; check it's not explicitly set by us
         assert "X-Powered-By" not in resp.headers
 
     def test_security_headers_on_post(self, client):
@@ -159,7 +156,6 @@ class TestAuditLogEndpoint:
         server = SimpHttpServer(config)
         server.broker.start()
         server.app.config["TESTING"] = True
-        # Use temp directory for audit log
         d = tempfile.mkdtemp()
         server.audit_log = SecurityAuditLog(log_dir=d)
         yield server

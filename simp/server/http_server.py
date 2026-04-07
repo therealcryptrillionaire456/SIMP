@@ -20,6 +20,7 @@ from threading import Thread
 import time
 
 from simp.server.broker import SimpBroker, BrokerConfig, BrokerState
+from simp.server.security_audit import SecurityAuditLog, get_audit_log
 from simp.server.request_guards import (
     validate_intent_payload,
     validate_registration_payload,
@@ -198,16 +199,63 @@ class SimpHttpServer:
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
+        # Sprint 70 — security audit log
+        self.audit_log = get_audit_log()
+
         # A2A card generator
         self._card_gen = AgentCardGenerator()
 
         # Sprint 54 — orchestration manager
         self._orchestration = OrchestrationManager(broker=self.broker)
 
+        self._setup_security_hooks()
         self._setup_routes()
         self._setup_a2a_routes()
         self._setup_sprint51_55_routes()
         self.logger.info("SIMP HTTP Server initialized")
+
+    def _setup_security_hooks(self):
+        """Setup Sprint 70 security hooks (before/after request)."""
+
+        @self.app.before_request
+        def check_content_type():
+            """Enforce Content-Type for POST/PUT requests with a body."""
+            if request.method in ("POST", "PUT"):
+                # Only enforce when request has a body
+                has_body = request.content_length and request.content_length > 0
+                if not has_body:
+                    return None
+                content_type = request.content_type or ""
+                if "application/json" not in content_type:
+                    self.audit_log.log_event(
+                        "validation_error",
+                        {
+                            "reason": "invalid_content_type",
+                            "content_type": content_type,
+                            "path": request.path,
+                            "method": request.method,
+                        },
+                        severity="low",
+                    )
+                    return (
+                        jsonify({
+                            "status": "error",
+                            "error": "Content-Type must be application/json"
+                        }),
+                        415,
+                    )
+
+        @self.app.after_request
+        def add_security_headers(response):
+            """Add security headers to all responses."""
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            response.headers["X-Frame-Options"] = "DENY"
+            response.headers["X-XSS-Protection"] = "1; mode=block"
+            response.headers["Content-Security-Policy"] = "default-src 'none'"
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers.pop("Server", None)
+            response.headers.pop("X-Powered-By", None)
+            return response
 
     def _setup_routes(self):
         """Setup Flask routes"""
@@ -256,6 +304,11 @@ class SimpHttpServer:
             success = self.broker.register_agent(agent_id, agent_type, endpoint, metadata)
 
             if success:
+                self.audit_log.log_event(
+                    "agent_registered",
+                    {"agent_id": agent_id, "agent_type": agent_type},
+                    severity="low",
+                )
                 return (
                     jsonify({
                         "status": "success",
@@ -313,6 +366,11 @@ class SimpHttpServer:
                 }), 400
             success = self.broker.deregister_agent(agent_id)
             if success:
+                self.audit_log.log_event(
+                    "agent_deregistered",
+                    {"agent_id": agent_id},
+                    severity="low",
+                )
                 return jsonify({
                     "status": "success",
                     "message": f"Agent '{agent_id}' deregistered"
@@ -718,6 +776,30 @@ class SimpHttpServer:
             from flask import Response
             css = get_dashboard_css()
             return Response(css, mimetype="text/css")
+
+        @self.app.route("/security/audit-log", methods=["GET"])
+        @require_api_key
+        def get_audit_log_endpoint():
+            """Get security audit log entries (Sprint 70).
+
+            Query params:
+            - severity: Filter by severity level
+            - event_type: Filter by event type
+            - limit: Max entries (default 100)
+            """
+            severity = request.args.get("severity")
+            event_type = request.args.get("event_type")
+            limit = request.args.get("limit", 100, type=int)
+            events = self.audit_log.get_events(
+                severity=severity,
+                event_type=event_type,
+                limit=limit,
+            )
+            return jsonify({
+                "status": "success",
+                "count": len(events),
+                "events": events,
+            }), 200
 
     # ------------------------------------------------------------------
     # A2A compatibility routes

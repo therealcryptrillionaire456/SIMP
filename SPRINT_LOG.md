@@ -2119,3 +2119,74 @@ All 25 sprints delivered. SIMP v0.4.0 is production-ready with:
 - Total: 1076 passing, 11 pre-existing failures, 0 new regressions
 - 62 new tests added across Sprints 62-65
 - Sprint 61 fixed 39 previously-failing tests
+
+---
+
+## Sprint 66 — Cryptographic Hardening (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- `sign_intent_v2()`: signs without SHA-256 pre-hash (Ed25519 hashes internally), adds `_sig_nonce` (16-byte hex), `_sig_exp` (now+300s), `_sig_iat` (now), `_sig_kid` (key fingerprint) security metadata
+- `verify_signature_v2()`: verifies v2 signatures, checks expiry
+- `verify_signature_strict()`: full verification with nonce replay detection (`seen_nonces` set), key ID matching via `hmac.compare_digest`
+- `_key_fingerprint()`: SHA-256 fingerprint of public key (first 16 hex chars)
+- Legacy `sign_intent()` and `verify_signature()` preserved unchanged for backward compatibility
+- Tests: `tests/test_sprint66_crypto.py` — 15 tests
+
+---
+
+## Sprint 67 — Key Storage & Agent Manager Hardening (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- `private_key_to_pem()` now uses `BestAvailableEncryption` when `SIMP_KEY_PASSPHRASE` env var is set
+- `load_private_key()` reads passphrase from env var automatically
+- Warning emitted when no passphrase is configured (unencrypted storage)
+- `sanitize_agent_id()` already in `request_guards.py` — validated in tests
+- Agent manager uses env-var based arg passing (remote v0.2 already implements this)
+- Tests: `tests/test_sprint67_key_mgmt.py` — 12 tests
+
+---
+
+## Sprint 68 — Broker & Agent Client Hardening (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- `intent_records` changed from `Dict` to `OrderedDict` with true LRU eviction via `_add_intent_record()`
+- Added `max_intent_records` to `BrokerConfig` (default 10,000)
+- `_add_intent_record()`: move-to-end semantics, evicts oldest when at capacity
+- Agent client: added length-prefixed message framing (4-byte big-endian header via `struct`)
+- Added `_recv_exact()` for reliable socket reads (handles partial reads)
+- `_MAX_MESSAGE_SIZE` = 16 MB limit on incoming messages
+- Tests: `tests/test_sprint68_broker_hardening.py` — 10 tests
+
+---
+
+## Sprint 69 — Input Validation Hardening (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- Timestamp regex already fixed in remote (uses ISO 8601 regex pattern)
+- Added `AgentRegistrationRequest` Pydantic model (field limits, agent_id pattern, agent_type pattern)
+- Added `IntentRouteRequest` Pydantic model (field limits, `datetime.fromisoformat` timestamp validation)
+- Content-Type enforcement: `before_request` hook rejects POST/PUT with body but no `application/json` (415)
+- Tests: `tests/test_sprint69_validation.py` — 16 tests
+
+---
+
+## Sprint 70 — Security Headers & Audit Log (2026-04-07)
+**Agent:** claude_code (implementation)
+
+### Changes
+- `after_request` hook adds security headers: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block`, `Content-Security-Policy: default-src 'none'`, `Cache-Control: no-store, no-cache`
+- Strips `Server` and `X-Powered-By` response headers
+- Created `simp/server/security_audit.py`: `SecurityAuditLog` class with append-only JSONL storage
+- Automatic sensitive field redaction (API keys, passwords, private keys -> `[REDACTED]`)
+- Audit hooks wired into: `agent_registered`, `agent_deregistered`, `validation_error`
+- `GET /security/audit-log` endpoint with severity/event_type filters (requires API key)
+- Created `docs/SECURITY_CHECKLIST.md` documenting full security posture
+- Tests: `tests/test_sprint70_security_headers.py` — 20 tests
+
+### Test Results (Sprints 66-70)
+- Total: 1149 passing, 11 pre-existing failures, 4 pre-existing errors, 0 new regressions
+- 73 new tests added across Sprints 66-70

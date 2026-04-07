@@ -9,7 +9,7 @@ import asyncio
 import json
 import logging
 import os
-from collections import deque
+from collections import deque, OrderedDict
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Callable
 from datetime import datetime, timedelta, timezone
@@ -66,6 +66,7 @@ class BrokerConfig:
     enable_logging: bool = True
     log_level: str = ""
     max_log_lines: int = 10000
+    max_intent_records: int = 10000
 
     def __post_init__(self):
         """Fill in defaults from SimpConfig if not explicitly set."""
@@ -139,8 +140,9 @@ class SimpBroker:
         self.agents: Dict[str, Dict[str, Any]] = {}  # agent_id -> agent info
         self.agent_lock = threading.RLock()
 
-        # Intent tracking
-        self.intent_records: Dict[str, IntentRecord] = {}
+        # Intent tracking — bounded OrderedDict with LRU eviction
+        self._max_intent_records = self.config.max_intent_records
+        self.intent_records: OrderedDict[str, IntentRecord] = OrderedDict()
         self.intent_queue: "queue.Queue[Dict[str, Any]]" = queue.Queue(
             maxsize=self.config.max_pending_intents
         )
@@ -257,6 +259,19 @@ class SimpBroker:
 
         logger.addHandler(handler)
         return logger
+
+    def _add_intent_record(self, intent_id: str, record: IntentRecord) -> None:
+        """Add an intent record with LRU eviction when at capacity.
+
+        Must be called while holding self.intent_lock.
+        """
+        if intent_id in self.intent_records:
+            self.intent_records.move_to_end(intent_id)
+            self.intent_records[intent_id] = record
+            return
+        while len(self.intent_records) >= self._max_intent_records:
+            self.intent_records.popitem(last=False)
+        self.intent_records[intent_id] = record
 
     def register_agent(
         self,
@@ -543,7 +558,7 @@ class SimpBroker:
                         status="failed",
                         error=error_msg,
                     )
-                    self.intent_records[intent_id] = record
+                    self._add_intent_record(intent_id, record)
 
                 with self.stats_lock:
                     self.stats["intents_failed"] += 1
@@ -562,8 +577,6 @@ class SimpBroker:
         # Record intent as pending — Sprint 63: set planned_at
         now_iso = _utcnow_iso()
         with self.intent_lock:
-            if len(self.intent_records) >= self.MAX_INTENT_RECORDS:
-                self._evict_oldest_records(count=1000)
             record = IntentRecord(
                 intent_id=intent_id,
                 source_agent=source_agent,
@@ -573,7 +586,7 @@ class SimpBroker:
                 status="pending",
                 planned_at=now_iso,
             )
-            self.intent_records[intent_id] = record
+            self._add_intent_record(intent_id, record)
 
         self.logger.info(
             f"📤 Routing intent: {intent_id} ({intent_type}) "

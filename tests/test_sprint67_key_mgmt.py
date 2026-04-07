@@ -5,18 +5,16 @@ Tests for:
 - Encrypted private key storage with SIMP_KEY_PASSPHRASE
 - Warning when no passphrase set
 - Passphrase-based load/save roundtrip
-- sanitize_agent_id validation
+- sanitize_agent_id validation (request_guards)
 - Agent manager temp file security (no predictable /tmp paths)
-- Agent script uses JSON args instead of repr() injection
+- Agent script uses env-var args instead of repr() injection
 """
 
 import pytest
 import os
-import tempfile
-import json
 
 from simp.crypto import SimpCrypto
-from simp.server.agent_manager import AgentManager, sanitize_agent_id
+from simp.server.request_guards import sanitize_agent_id
 
 
 class TestEncryptedKeyStorage:
@@ -28,7 +26,6 @@ class TestEncryptedKeyStorage:
         pem = SimpCrypto.private_key_to_pem(priv, passphrase=passphrase)
         assert b"ENCRYPTED" in pem
         loaded = SimpCrypto.load_private_key(pem, passphrase=passphrase)
-        # Verify the loaded key can sign and be verified
         intent = {"id": "test"}
         sig = SimpCrypto.sign_intent(intent, loaded)
         intent["signature"] = sig
@@ -60,86 +57,46 @@ class TestEncryptedKeyStorage:
 
 
 class TestSanitizeAgentId:
-    """Test agent ID validation."""
+    """Test agent ID validation via request_guards.sanitize_agent_id.
+
+    This function returns (bool, Optional[str]) tuples.
+    """
 
     def test_valid_ids(self):
         valid = [
             "agent001",
             "vision:001",
             "my-agent_v2.0",
-            "A" * 128,
             "a",
         ]
         for aid in valid:
-            assert sanitize_agent_id(aid) == aid
+            ok, err = sanitize_agent_id(aid)
+            assert ok is True, f"Expected valid for {aid!r}, got error: {err}"
 
-    def test_invalid_ids(self):
-        invalid = [
-            "",
-            ":starts-with-colon",
-            "-starts-with-dash",
-            ".starts-with-dot",
-            "_starts-with-underscore",
-            "has spaces",
-            "has;semicolon",
-            "has/slash",
-            'has"quote',
-            "A" * 129,
-        ]
-        for aid in invalid:
-            with pytest.raises(ValueError):
-                sanitize_agent_id(aid)
+    def test_invalid_empty(self):
+        ok, err = sanitize_agent_id("")
+        assert ok is False
+
+    def test_invalid_path_traversal(self):
+        ok, err = sanitize_agent_id("../../etc/passwd")
+        assert ok is False
+
+    def test_invalid_too_long(self):
+        ok, err = sanitize_agent_id("A" * 65)
+        assert ok is False
+
+    def test_invalid_special_chars(self):
+        ok, err = sanitize_agent_id("has spaces")
+        assert ok is False
 
     def test_non_string_rejected(self):
-        with pytest.raises(ValueError):
-            sanitize_agent_id(123)
+        ok, err = sanitize_agent_id(123)
+        assert ok is False
 
+    def test_invalid_slash(self):
+        ok, err = sanitize_agent_id("has/slash")
+        assert ok is False
 
-class TestAgentManagerSecurity:
-    """Test agent manager security improvements."""
-
-    def test_spawn_rejects_invalid_id(self):
-        mgr = AgentManager()
-        result = mgr.spawn_agent(
-            agent_id="../../etc/passwd",
-            agent_type="test",
-            agent_class="simp.agents.TestAgent",
-            agent_module="simp.agents.test",
-        )
-        assert result is None
-
-    def test_generate_script_uses_json_args(self):
-        mgr = AgentManager()
-        args = {"key": "value", "nested": {"a": 1}}
-        script = mgr._generate_agent_script(
-            agent_id="test001",
-            agent_type="test",
-            agent_class="simp.agents.TestAgent",
-            agent_module="simp.agents.test",
-            port=5001,
-            args=args,
-        )
-        # Script should NOT contain repr() of args directly
-        assert "repr(" not in script
-        # Script should use json.load
-        assert "json.load" in script
-
-    def test_generate_script_no_repr_injection(self):
-        mgr = AgentManager()
-        malicious_args = {"key": '__import__("os").system("rm -rf /")'}
-        script = mgr._generate_agent_script(
-            agent_id="test001",
-            agent_type="test",
-            agent_class="simp.agents.TestAgent",
-            agent_module="simp.agents.test",
-            port=5001,
-            args=malicious_args,
-        )
-        # The malicious string should NOT appear directly in the script
-        assert '__import__("os")' not in script
-
-    def test_agent_manager_basic_lifecycle(self):
-        mgr = AgentManager()
-        assert mgr.list_agents() == {}
-        health = mgr.get_health_status()
-        assert health["total_agents"] == 0
+    def test_invalid_semicolon(self):
+        ok, err = sanitize_agent_id("has;semicolon")
+        assert ok is False

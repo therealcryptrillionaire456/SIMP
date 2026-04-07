@@ -16,6 +16,7 @@ import os
 import queue
 import socket
 import ssl
+import struct
 import time
 import threading
 from datetime import datetime, timezone
@@ -39,6 +40,11 @@ except Exception:
     _TLS_CERT        = os.environ.get("SIMP_TLS_CERT", "")
     _TLS_KEY         = os.environ.get("SIMP_TLS_KEY",  "")
     _TLS_CA          = os.environ.get("SIMP_TLS_CA",   "")
+
+# Length-prefix header: 4-byte unsigned big-endian integer
+_HEADER_FORMAT = "!I"
+_HEADER_SIZE = struct.calcsize(_HEADER_FORMAT)
+_MAX_MESSAGE_SIZE = 16 * 1024 * 1024  # 16 MB max message
 
 
 class SimpAgentClient:
@@ -245,14 +251,29 @@ class SimpAgentClient:
             self.logger.error("Failed to sign intent: %s", exc, exc_info=True)
             raise
 
-    # ── send / receive ────────────────────────────────────────────────────────
+    # ── send / receive (length-prefixed framing) ────────────────────────────
+
+    @staticmethod
+    def _recv_exact(sock: socket.socket, num_bytes: int) -> bytes:
+        """Receive exactly num_bytes from socket, or raise on disconnect."""
+        buf = bytearray()
+        while len(buf) < num_bytes:
+            chunk = sock.recv(num_bytes - len(buf))
+            if not chunk:
+                raise ConnectionError("Connection closed while reading")
+            buf.extend(chunk)
+        return bytes(buf)
 
     def _send_message(self, msg: Dict[str, Any]) -> None:
+        """Send length-prefixed message to broker."""
         if not self.socket:
             raise RuntimeError("Not connected to broker")
-        msg_bytes = (json.dumps(msg) + "\n").encode()
+        msg_bytes = json.dumps(msg).encode()
+        if len(msg_bytes) > _MAX_MESSAGE_SIZE:
+            raise ValueError(f"Message too large: {len(msg_bytes)} > {_MAX_MESSAGE_SIZE}")
+        header = struct.pack(_HEADER_FORMAT, len(msg_bytes))
         try:
-            self.socket.sendall(msg_bytes)
+            self.socket.sendall(header + msg_bytes)
         except (socket.timeout, ssl.SSLError) as exc:
             self.logger.error("Send timeout/SSL error: %s", exc, exc_info=True)
             raise
@@ -261,15 +282,23 @@ class SimpAgentClient:
             raise
 
     def _receive_message(self) -> Optional[Dict[str, Any]]:
+        """Receive length-prefixed message from broker."""
         if not self.socket:
             return None
         try:
             self.socket.settimeout(1.0)
-            data = self.socket.recv(4096)
-            if not data:
+            header = self._recv_exact(self.socket, _HEADER_SIZE)
+            msg_len = struct.unpack(_HEADER_FORMAT, header)[0]
+            if msg_len > _MAX_MESSAGE_SIZE:
+                self.logger.error("Message too large: %d", msg_len)
                 return None
+            data = self._recv_exact(self.socket, msg_len)
             return json.loads(data.decode())
         except socket.timeout:
+            return None
+        except ConnectionError:
+            self.logger.warning("Connection closed by broker")
+            self.connected = False
             return None
         except (socket.error, OSError) as exc:
             self.logger.error("Receive socket error: %s", exc, exc_info=True)
