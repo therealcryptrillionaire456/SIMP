@@ -273,6 +273,18 @@ async def _broker_get(path: str) -> dict | None:
     return await _broker_cached_get(path)
 
 
+async def _broker_post(path: str, payload: dict[str, Any]) -> dict | None:
+    try:
+        client = _broker_client
+        if client is None:
+            return None
+        resp = await client.post(path, json=payload)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception:
+        return None
+
+
 async def _projectx_get(path: str) -> dict | None:
     try:
         client = _projectx_client
@@ -846,6 +858,86 @@ def _derived_memory_conversations(limit: int = 20) -> dict[str, Any]:
     }
 
 
+def _flow_group_key(intent: dict[str, Any]) -> str | None:
+    correlation = intent.get("correlation_ids") if isinstance(intent.get("correlation_ids"), dict) else {}
+    plan_id = correlation.get("plan_id")
+    source_intent_id = correlation.get("source_intent_id")
+    correlation_id = correlation.get("correlation_id")
+    broker_intent_id = correlation.get("broker_intent_id") or intent.get("id")
+    if plan_id:
+        return f"plan:{plan_id}"
+    if source_intent_id:
+        return f"source:{source_intent_id}"
+    if correlation_id and correlation_id != broker_intent_id:
+        return f"corr:{correlation_id}"
+    return None
+
+
+def _flow_phase(intent: dict[str, Any]) -> str:
+    intent_type = str(intent.get("intent_type") or "").lower()
+    target_agent = str(intent.get("target_agent") or "").lower()
+    if intent_type in {"planning", "research", "architecture", "docs", "spec"}:
+        return "planner"
+    if target_agent in {"gemma4_local", "kashclaw_gemma"}:
+        return "planner"
+    if intent_type.startswith("native_agent_") or target_agent == "projectx_native":
+        return "executor"
+    return "linked"
+
+
+def _flow_intent_view(intent: dict[str, Any]) -> dict[str, Any]:
+    correlation = intent.get("correlation_ids") if isinstance(intent.get("correlation_ids"), dict) else {}
+    return {
+        "intent_id": intent.get("id") or intent.get("intent_id"),
+        "source_agent": intent.get("source_agent"),
+        "target_agent": intent.get("target_agent"),
+        "intent_type": intent.get("intent_type"),
+        "delivery_status": intent.get("delivery_status"),
+        "timestamp": intent.get("timestamp"),
+        "delivered_at": intent.get("delivered_at"),
+        "phase": _flow_phase(intent),
+        "plan_id": correlation.get("plan_id"),
+        "source_intent_id": correlation.get("source_intent_id"),
+        "correlation_id": correlation.get("correlation_id"),
+    }
+
+
+def _derived_flow_payload(intents: list[dict[str, Any]]) -> dict[str, Any]:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for intent in intents:
+        key = _flow_group_key(intent)
+        if not key:
+            continue
+        grouped.setdefault(key, []).append(intent)
+
+    flows: list[dict[str, Any]] = []
+    for flow_id, rows in grouped.items():
+        rows = sorted(rows, key=lambda row: row.get("timestamp") or "")
+        planner = next((row for row in rows if _flow_phase(row) == "planner"), rows[0] if rows else None)
+        executors = [row for row in rows if _flow_phase(row) == "executor"]
+        statuses = sorted({str(row.get("delivery_status") or "unknown") for row in rows})
+        last_updated = max((row.get("delivered_at") or row.get("timestamp") or "") for row in rows)
+        flows.append(
+            {
+                "flow_id": flow_id,
+                "intent_count": len(rows),
+                "last_updated": last_updated,
+                "statuses": statuses,
+                "planner_intent": _flow_intent_view(planner) if planner else None,
+                "executor_intents": [_flow_intent_view(row) for row in executors],
+                "linked_intents": [_flow_intent_view(row) for row in rows],
+            }
+        )
+    flows.sort(key=lambda row: row.get("last_updated") or "", reverse=True)
+    return {
+        "status": "success",
+        "broker_url_reachable": True,
+        "source": "derived_intent_flows",
+        "count": len(flows),
+        "flows": flows,
+    }
+
+
 def _persist_events(events: list[dict]) -> None:
     """Append events to the JSONL log file."""
     import json
@@ -1168,6 +1260,59 @@ async def api_topology():
     }
 
 
+@app.get("/api/agents/smoke")
+async def api_agents_smoke():
+    """Live broker-side reachability sweep for registered HTTP agents."""
+    data = await _broker_get("/agents/smoke")
+    if data is not None:
+        return _redact(data)
+
+    agents = await _broker_registry_agents()
+    if not agents:
+        return {
+            "status": "unreachable",
+            "broker_url_reachable": False,
+            "results": [],
+            "count": 0,
+        }
+    results = []
+    for agent in agents:
+        endpoint = str(agent.get("endpoint") or "")
+        if endpoint not in {"http", "file-based"} and endpoint.startswith("http"):
+            health_url = f"{endpoint.rstrip('/')}/health"
+        elif str(agent.get("connection_mode") or "") == "http":
+            health_url = "registered-http-endpoint"
+        else:
+            continue
+        results.append(
+            {
+                "agent_id": agent.get("agent_id"),
+                "health_url": health_url,
+                "reachable": not bool(agent.get("stale")),
+                "error": None if not agent.get("stale") else "Agent appears stale from registry snapshot",
+            }
+        )
+    return {
+        "status": "success",
+        "broker_url_reachable": True,
+        "source": "derived_registry_health",
+        "results": results,
+        "count": len(results),
+    }
+
+
+@app.get("/api/flows")
+async def api_flows(limit: int = 50):
+    """Planner/executor and correlated broker flow chains."""
+    limit = max(1, min(limit, 200))
+    data = await _broker_get(f"/intents/flows?limit={limit}")
+    if data is not None:
+        return _redact(data)
+
+    intents = await _broker_list_intents(limit=limit)
+    return _redact(_derived_flow_payload(intents))
+
+
 @app.get("/api/tasks")
 async def api_tasks():
     """Task ledger view — lists all tasks with failure stats."""
@@ -1337,6 +1482,8 @@ async def api_projectx_chat(request: Request):
     message = str(body.get("message", "")).strip()
     job = str(body.get("job", "")).strip() or None
     request_id = str(body.get("request_id") or uuid.uuid4())
+    source_intent_id = str(body.get("source_intent_id") or "").strip() or None
+    plan_id = str(body.get("plan_id") or "").strip() or None
     started = time.time()
     if not message and not job:
         return {"status": "error", "error": "message_or_job_required"}
@@ -1351,11 +1498,16 @@ async def api_projectx_chat(request: Request):
         if job not in allowed_jobs:
             return {"status": "error", "error": "job_not_allowed", "job": job}
         payload = {
-            "intent_id": request_id,
             "source_agent": "dashboard_ui",
             "target_agent": "projectx_native",
             "intent_type": allowed_jobs[job]["intent_type"],
-            "params": allowed_jobs[job]["params"],
+            "params": {
+                **allowed_jobs[job]["params"],
+                "request_id": request_id,
+                "source_intent_id": source_intent_id,
+                "plan_id": plan_id,
+                "source_agent": "dashboard_ui",
+            },
         }
         _append_operator_event(
             request_id=request_id,
@@ -1363,9 +1515,20 @@ async def api_projectx_chat(request: Request):
             action_type="dashboard.job_request",
             status="received",
             summary=f"Dashboard requested {job}",
-            details={"job": job},
+            details={"job": job, "source_intent_id": source_intent_id, "plan_id": plan_id},
         )
-        response = await _projectx_post("/intents/handle", payload)
+        broker_response = await _broker_post("/intents/route", payload)
+        routing_mode = "broker" if broker_response is not None else "direct"
+        response = broker_response.get("delivery_response") if broker_response is not None else None
+        if broker_response is None:
+            direct_payload = {
+                "intent_id": request_id,
+                "source_agent": "dashboard_ui",
+                "target_agent": "projectx_native",
+                "intent_type": allowed_jobs[job]["intent_type"],
+                "params": payload["params"],
+            }
+            response = await _projectx_post("/intents/handle", direct_payload)
         latency_ms = (time.time() - started) * 1000
         _append_operator_event(
             request_id=request_id,
@@ -1374,16 +1537,33 @@ async def api_projectx_chat(request: Request):
             status="ok" if response else "error",
             summary=f"Dashboard job completed: {job}",
             latency_ms=latency_ms,
-            details={"response": response or {"status": "unreachable"}},
+            details={
+                "response": response or {"status": "unreachable"},
+                "routing_mode": routing_mode,
+                "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+                "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+            },
         )
-        return {"status": "success" if response else "unreachable", "mode": "job", "response": _redact(response)}
+        return {
+            "status": "success" if response else "unreachable",
+            "mode": "job",
+            "routing_mode": routing_mode,
+            "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+            "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+            "response": _redact(response),
+        }
 
     payload = {
-        "intent_id": request_id,
         "source_agent": "dashboard_ui",
         "target_agent": "projectx_native",
         "intent_type": "projectx_query",
-        "params": {"question": message, "source_agent": "dashboard_ui"},
+        "params": {
+            "question": message,
+            "source_agent": "dashboard_ui",
+            "request_id": request_id,
+            "source_intent_id": source_intent_id,
+            "plan_id": plan_id,
+        },
     }
     _append_operator_event(
         request_id=request_id,
@@ -1391,9 +1571,20 @@ async def api_projectx_chat(request: Request):
         action_type="dashboard.query_received",
         status="received",
         summary=message[:120],
-        details={"message": message[:200]},
+        details={"message": message[:200], "source_intent_id": source_intent_id, "plan_id": plan_id},
     )
-    response = await _projectx_post("/intents/handle", payload)
+    broker_response = await _broker_post("/intents/route", payload)
+    routing_mode = "broker" if broker_response is not None else "direct"
+    response = broker_response.get("delivery_response") if broker_response is not None else None
+    if broker_response is None:
+        direct_payload = {
+            "intent_id": request_id,
+            "source_agent": "dashboard_ui",
+            "target_agent": "projectx_native",
+            "intent_type": "projectx_query",
+            "params": payload["params"],
+        }
+        response = await _projectx_post("/intents/handle", direct_payload)
     latency_ms = (time.time() - started) * 1000
     _append_operator_event(
         request_id=request_id,
@@ -1402,9 +1593,21 @@ async def api_projectx_chat(request: Request):
         status="ok" if response else "error",
         summary=f"Dashboard query completed for request {request_id}",
         latency_ms=latency_ms,
-        details={"response": response or {"status": "unreachable"}},
+        details={
+            "response": response or {"status": "unreachable"},
+            "routing_mode": routing_mode,
+            "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+            "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+        },
     )
-    return {"status": "success" if response else "unreachable", "mode": "query", "response": _redact(response)}
+    return {
+        "status": "success" if response else "unreachable",
+        "mode": "query",
+        "routing_mode": routing_mode,
+        "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+        "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+        "response": _redact(response),
+    }
 
 
 # ---------------------------------------------------------------------------
