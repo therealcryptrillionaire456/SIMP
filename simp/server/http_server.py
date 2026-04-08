@@ -37,6 +37,7 @@ from simp.memory.session_bootstrap import SessionBootstrap
 from config.config import SimpConfig
 from simp.orchestration.orchestration_manager import OrchestrationManager
 from simp.server.dashboard_ui import build_dashboard_html, get_dashboard_js, get_dashboard_css
+from simp.transport.manager import TransportManager
 
 # A2A compat imports
 from simp.compat.agent_card import AgentCardGenerator
@@ -207,6 +208,12 @@ class SimpHttpServer:
 
         # Sprint 54 — orchestration manager
         self._orchestration = OrchestrationManager(broker=self.broker)
+
+        # Transport manager (multi-transport support)
+        self.transport_manager = TransportManager(
+            agent_id="broker",
+            broker=self.broker,
+        )
 
         self._setup_security_hooks()
         self._setup_routes()
@@ -592,6 +599,38 @@ class SimpHttpServer:
             return jsonify({
                 "status": "success",
                 "message": "Broker stopped"
+            }), 200
+
+        # --- Transport endpoints ---
+
+        @self.app.route("/transport/status", methods=["GET"])
+        def transport_status():
+            """Get multi-transport status"""
+            return jsonify({
+                "status": "success",
+                "transport": self.transport_manager.get_status(),
+            }), 200
+
+        @self.app.route("/transport/peers", methods=["GET"])
+        def transport_peers():
+            """Get known mesh peers"""
+            peers = self.transport_manager.get_peers()
+            return jsonify({
+                "status": "success",
+                "count": len(peers),
+                "peers": peers,
+            }), 200
+
+        @self.app.route("/transport/discover", methods=["POST"])
+        def transport_discover():
+            """Broadcast discovery on all transports"""
+            data = request.get_json() or {}
+            agent_type = data.get("agent_type", "")
+            capabilities = data.get("capabilities", [])
+            result = self.transport_manager.discover(agent_type, capabilities)
+            return jsonify({
+                "status": "success",
+                "discovery": result,
             }), 200
 
         # ----- Task Ledger Endpoints (GET-only, read-safe) -----

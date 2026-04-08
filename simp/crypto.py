@@ -1,4 +1,4 @@
-from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives.asymmetric import ed25519, x25519
 from cryptography.hazmat.primitives import serialization, hashes
 import hashlib
 import hmac
@@ -234,3 +234,19 @@ class SimpCrypto:
 
         except Exception as e:
             return False, f"verification_failed: {str(e)}"
+
+    @staticmethod
+    def generate_curve25519_keypair():
+        """Generate a Curve25519 keypair for X25519 key exchange."""
+        private_key = x25519.X25519PrivateKey.generate()
+        public_key = private_key.public_key()
+        return private_key, public_key
+
+    @staticmethod
+    def curve25519_fingerprint(public_key) -> str:
+        """Compute a fingerprint for a Curve25519 public key."""
+        raw_bytes = public_key.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw,
+        )
+        return hashlib.sha256(raw_bytes).hexdigest()[:32]
