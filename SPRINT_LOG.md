@@ -2190,3 +2190,71 @@ All 25 sprints delivered. SIMP v0.4.0 is production-ready with:
 ### Test Results (Sprints 66-70)
 - Total: 1149 passing, 11 pre-existing failures, 4 pre-existing errors, 0 new regressions
 - 73 new tests added across Sprints 66-70
+
+## Sprint 71 — Transport Packet & Bridge (2026-04-08)
+**Files:** `simp/transport/packet.py`, `simp/transport/bridge.py`
+**Tests:** `tests/test_transport_packet.py`, `tests/test_transport_bridge.py`
+
+- SimpPacket dataclass with 13-byte binary header (version, type, TTL, timestamp, flags, payload_len)
+- MessageType IntEnum: INTENT, ACK, HANDSHAKE_INIT/RESP/FIN, HEARTBEAT, DISCOVERY, FRAGMENT_*
+- PacketFlags IntFlag: HAS_RECIPIENT, HAS_SIGNATURE, IS_COMPRESSED
+- encode(packet) -> bytes with PKCS#7 padding to 256/512/1024/2048 block boundaries
+- decode(bytes) -> SimpPacket stripping PKCS#7 padding
+- agent_id_to_peer_id(str) -> 8-byte SHA256 truncated hash
+- intent_to_packet(), packet_to_intent(), build_ack_packet(), build_discovery_packet()
+- select_transport(): HTTP -> BLE -> Nostr -> HTTP fallback chain
+- IntentBloomFilter: 1024-byte bit array, 3 hash functions (MD5/SHA1/SHA256), add/might_contain/clear
+
+## Sprint 72 — Noise Identity & Handshake (2026-04-08)
+**Files:** `simp/transport/noise_identity.py`, `simp/crypto.py` (extended)
+**Tests:** `tests/test_noise_identity.py`
+
+- AgentIdentity dataclass: Curve25519 + Ed25519 dual key pair, fingerprint, peer_id
+- AgentIdentity.generate(), save_keystore(), from_keystore() (encrypted with cryptography lib)
+- NoiseHandshakeState: Noise_XX_25519_ChaChaPoly_SHA256 (3-message XX pattern)
+  - write/read_message_1/2/3 implementing full handshake
+  - X25519 DH + ChaCha20Poly1305 AEAD + SHA256 + HKDF
+- NoiseSession: encrypt/decrypt with incrementing nonces, rekey after 1h/10k messages
+- Extended simp/crypto.py with generate_curve25519_keypair() and curve25519_fingerprint()
+
+## Sprint 73 — Mesh Relay Router (2026-04-08)
+**Files:** `simp/transport/mesh_relay.py`
+**Tests:** `tests/test_mesh_relay.py`
+
+- MeshPeer dataclass: peer_id, agent_id, transport, last_seen, capabilities, noise_session
+- MeshRouter: add_peer/remove_peer, should_relay (Bloom filter check + TTL + self-check)
+- process_incoming: dedup -> check recipient -> decrement TTL -> determine relay targets
+- get_relay_stats() with packet/peer/bloom filter statistics
+
+## Sprint 74 — BLE Transport (2026-04-08)
+**Files:** `simp/transport/ble_transport.py`
+**Tests:** `tests/test_ble_transport.py`
+
+- BleTransport: OPTIONAL bleak-based BLE scanning and delivery
+- Works when bleak is NOT installed (graceful stub with warnings)
+- SIMP_SERVICE_UUID + SIMP_CHAR_UUID constants
+- scan_for_peers(), send_packet(), _fragment()/_reassemble()
+- All 12 tests work without bleak installed
+
+## Sprint 75 — Nostr Transport (2026-04-08)
+**Files:** `simp/transport/nostr_transport.py`
+**Tests:** `tests/test_nostr_transport.py`
+
+- NostrEvent dataclass (NIP-01 compatible): serialize_for_id(), compute_id(), to_dict(), from_dict()
+- NostrTransport: build_agent_card_event(), build_intent_event(), build_discovery_event()
+- event_to_intent() for parsing incoming Nostr events
+- DEFAULT_RELAYS list, KIND constants (AGENT_CARD=30078, INTENT=4, DISCOVERY=30023, ACK=7)
+
+## Sprint 76 — Transport Manager & HTTP Routes (2026-04-08)
+**Files:** `simp/transport/manager.py`, `simp/server/http_server.py` (extended)
+**Tests:** `tests/test_transport_integration.py`
+
+- TransportManager: deliver() with auto-selection (HTTP -> BLE -> Nostr fallback chain)
+- _deliver_http (uses existing SimpBroker), _deliver_ble, _deliver_nostr
+- get_status() showing all three transport layers
+- get_peers(), discover() for mesh operations
+- HTTP routes: GET /transport/status, GET /transport/peers, POST /transport/discover
+
+### Test Results (Sprints 71-76)
+- 149 new transport tests added
+- 0 new regressions on pre-existing test suite
