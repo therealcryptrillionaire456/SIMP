@@ -9,10 +9,11 @@ import functools
 import hmac
 import json
 import logging
+import queue
 import threading
 from datetime import datetime
 from typing import Dict, Any, Optional
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
 from threading import Thread
 import time
 
@@ -217,6 +218,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/agents/<agent_id>", methods=["GET"])
+        @require_api_key
         def get_agent(agent_id):
             """Get agent details"""
             ok, err = sanitize_agent_id(agent_id)
@@ -299,6 +301,7 @@ class SimpHttpServer:
                 }), 500
 
         @self.app.route("/intents/<intent_id>", methods=["GET"])
+        @require_api_key
         def get_intent_status(intent_id):
             """Get status of an intent"""
             status = self.broker.get_intent_status(intent_id)
@@ -336,6 +339,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/intents/<intent_id>/error", methods=["POST"])
+        @require_api_key
         @self.limiter.limit(60)
         def record_error(intent_id):
             """Record error for an intent"""
@@ -467,6 +471,7 @@ class SimpHttpServer:
         # ----- Structured Event Log -----
 
         @self.app.route("/logs", methods=["GET"])
+        @require_api_key
         def get_logs():
             """Get recent structured broker events."""
             try:
@@ -484,6 +489,7 @@ class SimpHttpServer:
         # ----- Memory Layer Endpoints -----
 
         @self.app.route("/memory/conversations", methods=["GET"])
+        @require_api_key
         def list_conversations():
             """List conversations with optional filters."""
             topic = request.args.get("topic")
@@ -499,6 +505,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/memory/conversations/<conv_id>", methods=["GET"])
+        @require_api_key
         def get_conversation(conv_id):
             """Get a single conversation by ID."""
             conv = self.conversation_archive.get_conversation(conv_id)
@@ -527,6 +534,7 @@ class SimpHttpServer:
             }), 201
 
         @self.app.route("/memory/tasks", methods=["GET"])
+        @require_api_key
         def list_memory_tasks():
             """List task memory files."""
             tasks = self.task_memory.list_tasks()
@@ -537,6 +545,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/memory/tasks/<slug>", methods=["GET"])
+        @require_api_key
         def get_memory_task(slug):
             """Get a task memory file by slug."""
             task = self.task_memory.get_task(slug)
@@ -548,6 +557,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/memory/index", methods=["GET"])
+        @require_api_key
         def get_knowledge_index():
             """Get the full knowledge index."""
             return jsonify({
@@ -556,6 +566,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/memory/context-pack", methods=["GET"])
+        @require_api_key
         def get_context_pack():
             """Generate a context pack."""
             task_id = request.args.get("task_id")
@@ -570,6 +581,198 @@ class SimpHttpServer:
                 task_id=task_id, topic=topic, agent_id=agent_id,
             )
             return jsonify({"status": "success", "context_pack": pack}), 200
+
+        # ── Sprint 41: DeerFlow Skills endpoint ──────────────────────────────
+        @self.app.route("/skills", methods=["GET"])
+        def list_skills():
+            """
+            List all skills loaded by the DeerFlow SkillLoader.
+
+            Returns skill name, description, tools, intent_types, and file_path
+            for every entry currently in the SkillRegistry.  No auth required
+            so the dashboard can poll this endpoint freely.
+            """
+            try:
+                from simp.orchestration.orchestration_loop import _get_deerflow_runtime
+                df = _get_deerflow_runtime()
+                if df:
+                    skills = [
+                        {
+                            "name": s.name,
+                            "description": s.description,
+                            "tools": s.tools,
+                            "intent_types": s.intent_types,
+                            "file_path": s.file_path,
+                        }
+                        for s in df.skill_loader.registry.list_all()
+                    ]
+                    return jsonify({
+                        "status": "success",
+                        "count": len(skills),
+                        "skills": skills,
+                    }), 200
+            except Exception as exc:
+                self.logger.debug("GET /skills — DeerFlow unavailable: %s", exc)
+            return jsonify({
+                "status": "success",
+                "count": 0,
+                "skills": [],
+                "message": "DeerFlow upgrades not active",
+            }), 200
+
+        # ── Sprint 41: SSE task-stream endpoint ──────────────────────────────
+        # Global registry: task_id → list[queue.Queue]
+        # Producers (subagent spawner, orchestration loop) push events here;
+        # each connected SSE client drains its own queue.
+        if not hasattr(self, "_sse_subscribers"):
+            self._sse_subscribers: Dict[str, list] = {}
+            self._sse_lock = threading.Lock()
+
+        def _sse_publish(task_id: str, event: dict) -> None:
+            """Publish an event dict to all SSE subscribers for task_id."""
+            with self._sse_lock:
+                queues = self._sse_subscribers.get(task_id, [])
+            payload = "data: " + json.dumps(event) + "\n\n"
+            for q in queues:
+                try:
+                    q.put_nowait(payload)
+                except Exception:
+                    pass
+
+        # Expose the publisher on the server instance so other modules can
+        # import and call it:  server.sse_publish(task_id, event_dict)
+        self.sse_publish = _sse_publish
+
+        # ── Bridge: make the spawner's ws_emitter relay into SSE ─────────────
+        # The spawner emits {type, task_id, ...} dicts; translate them to the
+        # SSE envelope {event, task_id, data, timestamp} and forward via
+        # _sse_publish.  We also try to register this with the DeerFlow runtime
+        # immediately (if already loaded) and expose a method for late binding.
+        def _spawner_to_sse(event: dict) -> None:
+            task_id = event.get("task_id", "")
+            if not task_id:
+                return
+            _sse_publish(task_id, {
+                "event": event.get("type", "task_event"),
+                "task_id": task_id,
+                "data": event,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
+
+        def _try_register_sse_emitter():
+            try:
+                from simp.orchestration.orchestration_loop import _get_deerflow_runtime
+                df = _get_deerflow_runtime()
+                if df:
+                    df.set_ws_emitter(_spawner_to_sse)
+                    self.logger.info("✅ SSE emitter registered with DeerFlow spawner")
+            except Exception as exc:
+                self.logger.debug("SSE emitter registration deferred: %s", exc)
+
+        _try_register_sse_emitter()
+
+        def register_sse_with_runtime():
+            """
+            Call this after the DeerFlow runtime has been initialized to wire
+            the SSE relay into the spawner's ws_emitter.  Safe to call multiple times.
+            """
+            _try_register_sse_emitter()
+
+        self.register_sse_with_runtime = register_sse_with_runtime
+
+        @self.app.route("/tasks/<task_id>/stream", methods=["GET"])
+        def stream_task(task_id: str):
+            """
+            Server-Sent Events stream for a single task.
+
+            Clients connect with:
+                EventSource('/tasks/<task_id>/stream')
+
+            Events have the shape:
+                { "event": "task_started"|"task_running"|"task_completed"|
+                            "task_failed"|"task_timed_out"|"task_cancelled",
+                  "task_id": "...",
+                  "data": { ... },
+                  "timestamp": "<ISO>" }
+
+            The stream closes automatically when a terminal event is received
+            (completed / failed / timed_out / cancelled) or after a 5-minute
+            no-activity timeout.
+            """
+            q: queue.Queue = queue.Queue(maxsize=256)
+            with self._sse_lock:
+                self._sse_subscribers.setdefault(task_id, []).append(q)
+
+            # Also inject any already-known terminal state immediately
+            try:
+                from simp.orchestration.orchestration_loop import _get_deerflow_runtime
+                df = _get_deerflow_runtime()
+                if df:
+                    status = df.spawner.get_status(task_id)
+                    if status and status.get("status") in (
+                        "completed", "failed", "timed_out", "cancelled"
+                    ):
+                        q.put_nowait(
+                            "data: " + json.dumps({
+                                "event": f"task_{status['status']}",
+                                "task_id": task_id,
+                                "data": status,
+                                "timestamp": datetime.utcnow().isoformat(),
+                            }) + "\n\n"
+                        )
+            except Exception:
+                pass
+
+            TERMINAL = {"task_completed", "task_failed", "task_timed_out", "task_cancelled"}
+            TIMEOUT_S = 300  # 5-minute inactivity timeout
+
+            def generate():
+                try:
+                    # Send a heartbeat comment immediately so the client knows
+                    # the connection is live.
+                    yield ": connected\n\n"
+                    deadline = time.time() + TIMEOUT_S
+                    while True:
+                        remaining = deadline - time.time()
+                        if remaining <= 0:
+                            yield "data: " + json.dumps({
+                                "event": "stream_timeout",
+                                "task_id": task_id,
+                                "timestamp": datetime.utcnow().isoformat(),
+                            }) + "\n\n"
+                            break
+                        try:
+                            chunk = q.get(timeout=min(remaining, 15.0))
+                            yield chunk
+                            # Parse to detect terminal event
+                            try:
+                                parsed = json.loads(chunk.split("data: ", 1)[1])
+                                if parsed.get("event") in TERMINAL:
+                                    break
+                            except Exception:
+                                pass
+                            # Reset inactivity deadline on each real event
+                            deadline = time.time() + TIMEOUT_S
+                        except queue.Empty:
+                            # Heartbeat to keep connection alive
+                            yield ": heartbeat\n\n"
+                finally:
+                    with self._sse_lock:
+                        bucket = self._sse_subscribers.get(task_id, [])
+                        if q in bucket:
+                            bucket.remove(q)
+                        if not bucket:
+                            self._sse_subscribers.pop(task_id, None)
+
+            return Response(
+                stream_with_context(generate()),
+                mimetype="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "X-Accel-Buffering": "no",
+                    "Connection": "keep-alive",
+                },
+            )
 
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
         """

@@ -17,6 +17,14 @@ from simp.intent import Intent, SimpResponse
 from simp.agents.q_intent_compiler import QIntentCompiler, StrategicOptimizer, DecisionTree
 from simp.memory.knowledge_index import KnowledgeIndex
 from simp.orchestration.task_decomposer import TaskDecomposer
+from simp.integrations.timesfm_service import (
+    get_timesfm_service,
+    ForecastRequest,
+)
+from simp.integrations.timesfm_policy_engine import (
+    PolicyEngine,
+    make_agent_context_for,
+)
 
 
 class KloutbotAgent(SimpAgent):
@@ -55,6 +63,16 @@ class KloutbotAgent(SimpAgent):
         self.task_decomposer = TaskDecomposer()
         self.goals: Dict[str, Dict[str, Any]] = {}  # goal_id -> goal state
 
+        # TimesFM affinity history buffer (per-agent series)
+        self._affinity_buffer: List[float] = []
+        self._affinity_buffer_cap: int = 256
+
+        # ── Sprint 42: DeerFlow SubagentSpawner ─────────────────────────────
+        # Lazy-loaded on first use via _get_spawner().  Enables Kloutbot to
+        # self-spawn specialised sub-agents (deep-research, code-review, etc.)
+        # without blocking its own event loop.
+        self._spawner = None
+
         # Register intent handlers — trading strategy
         self.register_handler("generate_strategy", self.handle_generate_strategy)
         self.register_handler("analyze_signals", self.handle_analyze_signals)
@@ -67,6 +85,140 @@ class KloutbotAgent(SimpAgent):
         self.register_handler("submit_goal", self.handle_submit_goal)
         self.register_handler("check_status", self.handle_check_status)
         self.register_handler("replan", self.handle_replan)
+
+        # Register intent handlers — self-spawning research
+        self.register_handler("research", self.handle_research)
+        self.register_handler("spawn_research", self.handle_research)
+
+    def _record_affinity(self, affinity: float) -> List[float]:
+        """Append affinity observation to the per-agent history buffer."""
+        self._affinity_buffer.append(affinity)
+        if len(self._affinity_buffer) > self._affinity_buffer_cap:
+            self._affinity_buffer = self._affinity_buffer[-self._affinity_buffer_cap:]
+        return self._affinity_buffer
+
+    def _get_spawner(self):
+        """
+        Lazy-load the ProjectXSubagentSpawner from the DeerFlow runtime.
+
+        Returns None silently if the runtime is not yet active, allowing
+        all handlers to degrade gracefully when the spawner is unavailable.
+        """
+        if self._spawner is not None:
+            return self._spawner
+        try:
+            import sys
+            import pathlib
+            _scaffold = str(
+                pathlib.Path(__file__).resolve().parents[4]
+                / "ProjectX" / "proposals" / "scaffolding"
+            )
+            if _scaffold not in sys.path:
+                sys.path.insert(0, _scaffold)
+            from simp.orchestration.orchestration_loop import _get_deerflow_runtime
+            df = _get_deerflow_runtime()
+            if df and df.spawner:
+                self._spawner = df.spawner
+        except Exception:
+            pass
+        return self._spawner
+
+    async def _get_strategy_horizon_advice(
+        self,
+        affinity: float,
+        drift_risk: float,
+    ) -> Dict[str, Any]:
+        """
+        Call TimesFM to forecast affinity trajectory and recommend a strategy horizon.
+
+        Uses the per-agent affinity history to project how long the current
+        market alignment is expected to persist. Returns horizon recommendation
+        and rationale to be surfaced in the generate_strategy response.
+
+        Safety:
+        - Never raises. Falls back to neutral advice on any error.
+        - Advisory only. Does not change ArbDecision or strategy tree.
+        """
+        result = {
+            "recommended_horizon": "medium",
+            "recommended_horizon_steps": 16,
+            "timesfm_horizon_applied": False,
+            "timesfm_horizon_rationale": "TimesFM horizon advice unavailable",
+        }
+        try:
+            series_id = f"{self.agent_id}:affinity"
+            history = self._record_affinity(affinity)
+
+            if len(history) < 16:
+                result["timesfm_horizon_rationale"] = (
+                    f"TimesFM: insufficient history ({len(history)}/16 observations)"
+                )
+                return result
+
+            svc = await get_timesfm_service()
+            ctx = make_agent_context_for(
+                agent_id=self.agent_id,
+                series_id=series_id,
+                series_length=len(history),
+                requesting_handler="handle_generate_strategy",
+                extra={"drift_risk": drift_risk},
+            )
+            engine = PolicyEngine()
+            decision = engine.evaluate(ctx)
+            if decision.denied:
+                result["timesfm_horizon_rationale"] = (
+                    f"TimesFM policy denied: {decision.reason}"
+                )
+                return result
+
+            req = ForecastRequest(
+                series_id=series_id,
+                values=history,
+                requesting_agent=self.agent_id,
+                horizon=32,
+                context_metadata={"drift_risk": drift_risk},
+            )
+            resp = await svc.forecast(req)
+
+            if not resp.available:
+                result["timesfm_horizon_rationale"] = (
+                    "TimesFM: shadow mode active — horizon unchanged"
+                )
+                return result
+
+            if resp.point_forecast:
+                pf = resp.point_forecast
+                # Estimate persistence: steps until affinity drops below 0.5 threshold
+                persistence_steps = next(
+                    (i for i, v in enumerate(pf) if v < 0.5),
+                    len(pf),
+                )
+
+                if persistence_steps >= 24:
+                    horizon_label = "long"
+                    horizon_steps = 32
+                elif persistence_steps >= 12:
+                    horizon_label = "medium"
+                    horizon_steps = 16
+                else:
+                    horizon_label = "short"
+                    horizon_steps = 8
+
+                result.update({
+                    "recommended_horizon": horizon_label,
+                    "recommended_horizon_steps": horizon_steps,
+                    "timesfm_horizon_applied": True,
+                    "timesfm_horizon_rationale": (
+                        f"TimesFM affinity forecast: {horizon_label} horizon "
+                        f"({horizon_steps} steps). Affinity persists ~{persistence_steps} "
+                        f"steps before dropping below 0.5 threshold."
+                    ),
+                })
+
+        except Exception as exc:
+            result["timesfm_horizon_rationale"] = f"TimesFM horizon advice error: {exc}"
+
+        return result
 
     async def handle_generate_strategy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -115,6 +267,14 @@ class KloutbotAgent(SimpAgent):
             # Store in history
             self._add_to_history(tree)
 
+            # TimesFM: forecast affinity trajectory → recommend strategy horizon
+            affinity = float(foresight.get("affinity", 0.5))
+            drift_risk = float(foresight.get("drift_risk", 0.0))
+            horizon_advice = await self._get_strategy_horizon_advice(
+                affinity=affinity,
+                drift_risk=drift_risk,
+            )
+
             # Convert to actionable parameters
             action_params = self.compiler.get_action_params(tree)
 
@@ -122,7 +282,11 @@ class KloutbotAgent(SimpAgent):
                 "status": "success",
                 "strategy": tree.to_dict(),
                 "action_params": action_params,
-                "timestamp": datetime.utcnow().isoformat()
+                "recommended_horizon": horizon_advice["recommended_horizon"],
+                "recommended_horizon_steps": horizon_advice["recommended_horizon_steps"],
+                "timesfm_horizon_applied": horizon_advice["timesfm_horizon_applied"],
+                "timesfm_horizon_rationale": horizon_advice["timesfm_horizon_rationale"],
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
@@ -269,6 +433,22 @@ class KloutbotAgent(SimpAgent):
 
     async def handle_get_status(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get current status of Kloutbot agent"""
+        spawner = self._get_spawner()
+        spawner_status: Dict[str, Any] = {"active": False}
+        if spawner:
+            try:
+                sr = spawner.get_all_statuses() if hasattr(spawner, "get_all_statuses") else {}
+                spawner_status = {
+                    "active": True,
+                    "tasks": sr,
+                    "active_count": sum(
+                        1 for t in sr.values()
+                        if t.get("status") in ("pending", "running")
+                    ) if isinstance(sr, dict) else 0,
+                }
+            except Exception:
+                spawner_status = {"active": True, "tasks": {}, "active_count": 0}
+
         return {
             "status": "success",
             "agent": {
@@ -283,6 +463,8 @@ class KloutbotAgent(SimpAgent):
                 "max_iterations": self.compiler.max_iterations,
                 "minimax_depth": self.compiler.minimax_depth
             },
+            "spawner": spawner_status,
+            "goals_tracked": len(self.goals),
             "timestamp": datetime.utcnow().isoformat()
         }
 
@@ -359,7 +541,39 @@ class KloutbotAgent(SimpAgent):
                 "subtasks": subtasks,
                 "constraints": constraints,
                 "created_at": datetime.utcnow().isoformat(),
+                "research_task_id": None,
             }
+
+            # Sprint 42: For research/analysis goals, self-spawn a deep-research
+            # sub-agent to gather background context in parallel with decomposition.
+            research_task_id = None
+            spawner = self._get_spawner()
+            if spawner and goal_type in ("research", "analysis", "market_analysis", "planning"):
+                try:
+                    research_task_id = spawner.spawn(
+                        description=f"Research: {goal_text[:60]}",
+                        prompt=(
+                            f"You are a deep research specialist.\n\n"
+                            f"Goal: {goal_text}\n\n"
+                            f"Constraints: {constraints}\n\n"
+                            f"Provide a comprehensive research brief covering:\n"
+                            f"1. Key aspects of the goal\n"
+                            f"2. Relevant market/technical context\n"
+                            f"3. Risks and uncertainties\n"
+                            f"4. Recommended approach\n\n"
+                            f"Return structured output: SUMMARY, KEY_FINDINGS[], RISKS[], RECOMMENDATION"
+                        ),
+                        agent_type="general-purpose",
+                        parent_task_id=goal_id,
+                        spawning_allowed=False,
+                    )
+                    self.goals[goal_id]["research_task_id"] = research_task_id
+                except Exception as spawn_exc:
+                    # Non-fatal — goal decomposition succeeds regardless
+                    self.logger.warning(
+                        "KloutbotAgent: research spawn failed for goal %s: %s",
+                        goal_id, spawn_exc,
+                    ) if hasattr(self, "logger") else None
 
             return {
                 "type": "response",
@@ -371,6 +585,8 @@ class KloutbotAgent(SimpAgent):
                     {"task_type": st["task_type"], "description": st.get("description", ""), "title": st.get("title", "Subtask"), "order": st.get("order", i)}
                     for i, st in enumerate(subtasks)
                 ],
+                "research_task_id": research_task_id,
+                "research_spawned": research_task_id is not None,
                 "timestamp": datetime.utcnow().isoformat(),
             }
 
@@ -482,6 +698,84 @@ class KloutbotAgent(SimpAgent):
             "subtasks": goal_state["subtasks"],
             "timestamp": datetime.utcnow().isoformat(),
         }
+
+    # ------------------------------------------------------------------
+    # Sprint 42: Self-Spawning Research Handler
+    # ------------------------------------------------------------------
+
+    async def handle_research(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Spawn a deep-research subagent for a given topic.
+
+        Input parameters:
+        {
+            "description": "Short label for the task",
+            "prompt": "Full research brief / question",
+            "agent_type": "general-purpose",   # optional
+            "parent_task_id": "goal-abc123",    # optional
+            "await_result": false               # optional — if true, block until done
+        }
+
+        Returns immediately with task_id unless await_result=true.
+        """
+        spawner = self._get_spawner()
+        if spawner is None:
+            return {
+                "status": "error",
+                "error_code": "SPAWNER_UNAVAILABLE",
+                "error_message": (
+                    "DeerFlow spawner not yet active. "
+                    "Start the orchestration loop first."
+                ),
+            }
+
+        description = params.get("description", "Research sub-task")
+        prompt = params.get("prompt", "")
+        if not prompt:
+            return {
+                "status": "error",
+                "error_code": "MISSING_PROMPT",
+                "error_message": "A 'prompt' parameter is required for research tasks",
+            }
+
+        agent_type = params.get("agent_type", "general-purpose")
+        parent_task_id = params.get("parent_task_id")
+        should_await = params.get("await_result", False)
+
+        try:
+            task_id = spawner.spawn(
+                description=description[:80],
+                prompt=prompt,
+                agent_type=agent_type,
+                parent_task_id=parent_task_id,
+                spawning_allowed=False,
+            )
+
+            if should_await:
+                task = await spawner.await_result(task_id)
+                return {
+                    "status": "success",
+                    "task_id": task_id,
+                    "task_status": task.status.value,
+                    "result": task.result,
+                    "error": task.error,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
+
+            return {
+                "status": "success",
+                "task_id": task_id,
+                "task_status": "spawned",
+                "stream_url": f"/tasks/{task_id}/stream",
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+
+        except Exception as exc:
+            return {
+                "status": "error",
+                "error_code": "SPAWN_FAILED",
+                "error_message": str(exc),
+            }
 
     def _add_to_history(self, tree: DecisionTree):
         """Add strategy to history, maintaining max size"""
