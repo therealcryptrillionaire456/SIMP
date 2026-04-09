@@ -15,6 +15,38 @@ from simp.task_ledger import TaskLedger
 from simp.models.failure_taxonomy import FailureHandler
 from simp.routing.builder_pool import BuilderPool
 
+# ── DeerFlow upgrades: lazy-loaded, non-blocking if scaffolding absent ────────
+_deerflow_runtime = None
+
+def _get_deerflow_runtime():
+    """
+    Lazy-load the DeerFlowUpgradeRuntime (LoopGuard + SkillLoader + Spawner).
+    Called once on first use; result cached.  Non-fatal if unavailable.
+    """
+    global _deerflow_runtime
+    if _deerflow_runtime is not None:
+        return _deerflow_runtime
+    try:
+        import sys, pathlib, logging
+        _scaffold = str(pathlib.Path(__file__).resolve().parents[4] /
+                        "ProjectX" / "proposals" / "scaffolding")
+        if _scaffold not in sys.path:
+            sys.path.insert(0, _scaffold)
+        from draft_projectx_deerflow_upgrades_init import initialize_deerflow_upgrades
+        _deerflow_runtime = initialize_deerflow_upgrades(
+            start_skill_hot_reload=True,
+            dry_run_bash=False,
+        )
+        logging.getLogger("SIMP.Orchestration").info(
+            "✅ DeerFlow upgrades loaded: skills=%d",
+            len(_deerflow_runtime.skill_loader.registry),
+        )
+    except Exception as exc:
+        logging.getLogger("SIMP.Orchestration").debug(
+            "DeerFlow upgrades not available (non-critical): %s", exc
+        )
+    return _deerflow_runtime
+
 
 class OrchestrationLoop:
     """
@@ -62,6 +94,14 @@ class OrchestrationLoop:
         if self.builder_pool:
             self.builder_pool.check_reload()
 
+        # Sprint 40: DeerFlow upgrades — skill hot-reload check
+        _df = _get_deerflow_runtime()
+        if _df:
+            try:
+                _df.skill_loader.check_reload()
+            except Exception:
+                pass
+
         # Get unclaimed tasks from the queue (sorted by priority: critical first)
         queue = self.task_ledger.get_queue()
         summary["tasks_checked"] = len(queue)
@@ -108,6 +148,14 @@ class OrchestrationLoop:
             # Sprint 22: Track task assignment in builder pool
             self.builder_pool.report_task_assigned(builder)
 
+            # Sprint 40: DeerFlow upgrades — inject skill context for this task type
+            _skill_context = ""
+            if _df:
+                try:
+                    _skill_context = _df.skill_loader.registry.get_prompt_context(task_type)
+                except Exception:
+                    pass
+
             # Route intent to the builder — forward task_id so broker reuses it
             intent_data = {
                 "intent_id": f"orch:{uuid.uuid4()}",
@@ -120,6 +168,8 @@ class OrchestrationLoop:
                     "title": task.get("title", ""),
                     "description": task.get("description", ""),
                     "priority": priority,
+                    # DeerFlow skill context injected here — agents consume via params
+                    "skill_context": _skill_context,
                 },
                 "timestamp": datetime.utcnow().isoformat(),
             }

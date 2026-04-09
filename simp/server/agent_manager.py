@@ -43,6 +43,28 @@ _SAFE_ID_RE        = re.compile(r'^[A-Za-z0-9_\-]{1,64}$')
 
 logger = logging.getLogger("SIMP.AgentManager")
 
+# ── DeerFlow upgrade: sandbox audit integration ───────────────────────────────
+# Loaded lazily so the module works even without the scaffolding path on sys.path
+_sandbox_audit = None
+
+def _get_sandbox_audit():
+    """Lazy-load SandboxAudit from DeerFlow upgrade scaffolding."""
+    global _sandbox_audit
+    if _sandbox_audit is not None:
+        return _sandbox_audit
+    try:
+        import sys, pathlib
+        _scaffold = str(pathlib.Path(__file__).resolve().parents[4] /
+                        "ProjectX" / "proposals" / "scaffolding")
+        if _scaffold not in sys.path:
+            sys.path.insert(0, _scaffold)
+        from draft_projectx_sandbox_audit import SandboxAudit
+        _sandbox_audit = SandboxAudit()
+        logger.info("✅ SandboxAudit loaded for AgentManager")
+    except Exception as exc:
+        logger.debug("SandboxAudit not available (non-critical): %s", exc)
+    return _sandbox_audit
+
 
 # ── validation helpers ────────────────────────────────────────────────────────
 
@@ -192,6 +214,22 @@ class AgentManager:
         except (TypeError, ValueError) as exc:
             logger.error("❌ Invalid agent args for '%s': %s", agent_id, exc)
             return None
+
+        # ── DeerFlow upgrade: audit any shell-like values in safe_args ────────
+        _audit = _get_sandbox_audit()
+        if _audit:
+            for k, v in safe_args.items():
+                if any(c in v for c in ('|', ';', '&&', '`', '$(')):
+                    cls = _audit.classify(v)
+                    if cls.is_blocked:
+                        logger.error(
+                            "❌ Agent arg '%s' blocked by SandboxAudit: %s", k, cls.reason
+                        )
+                        return None
+                    if cls.is_warned:
+                        logger.warning(
+                            "⚠️  Agent arg '%s' flagged by SandboxAudit: %s", k, cls.reason
+                        )
 
         port = self._get_next_port()
         logger.info("🚀 Spawning agent: %s (%s) on port %s", agent_id, agent_type, port)
