@@ -33,6 +33,11 @@ from simp.integrations.timesfm_policy_engine import (
     PolicyEngine,
     make_agent_context_for,
 )
+from simp.security.brp_models import BRPEvent, BRPEventType, BRPMode, BRPObservation
+from simp.security.brp_bridge import BRPBridge
+
+import logging as _logging
+_brp_logger = _logging.getLogger("SIMP.KashClaw.BRP")
 
 
 class KashClawSimpAgent(SimpAgent):
@@ -55,7 +60,9 @@ class KashClawSimpAgent(SimpAgent):
         self,
         agent_id: str = "kashclaw:agent",
         organization: str = "kashclaw.trading",
-        organs: Optional[Dict[str, TradingOrgan]] = None
+        organs: Optional[Dict[str, TradingOrgan]] = None,
+        brp_bridge: Optional[BRPBridge] = None,
+        brp_mode: str = BRPMode.SHADOW.value,
     ):
         """
         Initialize KashClaw SIMP Agent.
@@ -64,11 +71,15 @@ class KashClawSimpAgent(SimpAgent):
             agent_id: Unique identifier for this agent
             organization: Organization namespace
             organs: Dictionary of organ_id -> TradingOrgan instance
+            brp_bridge: Optional BRP bridge for security evaluation
+            brp_mode: BRP operational mode (default: shadow)
         """
         super().__init__(agent_id, organization)
         self.organs: Dict[str, TradingOrgan] = organs or {}
         self.execution_log: List[Dict[str, Any]] = []
         self._volatility_buffers: Dict[str, List[float]] = {}
+        self.brp_bridge: Optional[BRPBridge] = brp_bridge
+        self.brp_mode: str = brp_mode
 
         # Register intent handlers
         self.register_handler("trade", self.handle_trade)
@@ -304,7 +315,7 @@ class KashClawSimpAgent(SimpAgent):
 
     async def handle_trade(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Execute a trading intent.
+        Execute a trading intent with BRP pre/post evaluation.
 
         Intent parameters:
         {
@@ -317,7 +328,34 @@ class KashClawSimpAgent(SimpAgent):
             "strategy_params": {...}             # Organ-specific params
         }
         """
+        brp_response_dict = None
+        brp_event = None
         try:
+            # --- BRP pre-action event evaluation ---
+            if self.brp_bridge is not None:
+                try:
+                    brp_event = BRPEvent(
+                        source_agent=self.agent_id,
+                        event_type=BRPEventType.TRADE_EXECUTION.value,
+                        action=f"trade_{params.get('side', 'unknown')}".lower(),
+                        params=params,
+                        mode=self.brp_mode,
+                        tags=["kashclaw", params.get("asset_pair", "")],
+                    )
+                    brp_resp = self.brp_bridge.evaluate_event(brp_event)
+                    brp_response_dict = brp_resp.to_dict()
+
+                    # In enforced mode, honour DENY
+                    if self.brp_mode == BRPMode.ENFORCED.value and brp_resp.decision == "DENY":
+                        return {
+                            "status": "denied",
+                            "error_code": "BRP_DENIED",
+                            "error_message": brp_resp.summary,
+                            "brp": brp_response_dict,
+                        }
+                except Exception:
+                    _brp_logger.debug("BRP pre-trade evaluation failed", exc_info=True)
+
             # Extract parameters
             organ_id = params.get("organ_id")
             if not organ_id:
@@ -372,8 +410,24 @@ class KashClawSimpAgent(SimpAgent):
             # Log execution
             await self._log_execution(result)
 
-            # Return standardized result
-            return {
+            # --- BRP post-action observation ---
+            if self.brp_bridge is not None and brp_event is not None:
+                try:
+                    obs = BRPObservation(
+                        source_agent=self.agent_id,
+                        event_id=brp_event.event_id,
+                        action=brp_event.action,
+                        outcome=result.status.value,
+                        result_data=result.to_dict(),
+                        mode=self.brp_mode,
+                        tags=brp_event.tags,
+                    )
+                    self.brp_bridge.ingest_observation(obs)
+                except Exception:
+                    _brp_logger.debug("BRP post-trade observation failed", exc_info=True)
+
+            # Return standardized result with BRP metadata
+            response: Dict[str, Any] = {
                 "status": "success",
                 "execution": result.to_dict(),
                 "timestamp": datetime.utcnow().isoformat(),
@@ -384,8 +438,26 @@ class KashClawSimpAgent(SimpAgent):
                 },
                 "risk_posture": sizing_advice.get("risk_posture", "neutral"),  # Also at top level for A2A
             }
+            if brp_response_dict is not None:
+                response["brp"] = brp_response_dict
+            return response
 
         except Exception as e:
+            # --- BRP observation on failure ---
+            if self.brp_bridge is not None and brp_event is not None:
+                try:
+                    obs = BRPObservation(
+                        source_agent=self.agent_id,
+                        event_id=brp_event.event_id,
+                        action=brp_event.action,
+                        outcome="failure",
+                        result_data={"error": str(e)},
+                        mode=self.brp_mode,
+                        tags=brp_event.tags,
+                    )
+                    self.brp_bridge.ingest_observation(obs)
+                except Exception:
+                    _brp_logger.debug("BRP failure observation failed", exc_info=True)
             return {
                 "status": "error",
                 "error_code": "EXECUTION_FAILED",

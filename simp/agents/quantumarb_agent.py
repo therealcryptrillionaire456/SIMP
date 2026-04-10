@@ -53,6 +53,61 @@ from typing import Any, Dict, List, Optional
 log = logging.getLogger("QuantumArb")
 
 # ---------------------------------------------------------------------------
+# BRP integration (shadow mode — never alters arb decisions)
+# ---------------------------------------------------------------------------
+
+_brp_bridge = None  # Module-level singleton, initialised lazily
+
+def _get_brp_bridge():
+    """Lazily create a BRP bridge for shadow observations."""
+    global _brp_bridge
+    if _brp_bridge is None:
+        try:
+            from simp.security.brp_bridge import BRPBridge
+            _brp_bridge = BRPBridge()
+        except Exception:
+            log.debug("BRP bridge not available — shadow observations disabled")
+    return _brp_bridge
+
+
+def _emit_brp_shadow_observation(
+    action: str,
+    outcome: str,
+    result_data: Dict[str, Any],
+    event_id: str = "",
+    tags: Optional[List[str]] = None,
+) -> None:
+    """Emit a BRP observation in shadow mode. Never raises. Never alters decisions."""
+    try:
+        bridge = _get_brp_bridge()
+        if bridge is None:
+            return
+        from simp.security.brp_models import BRPEvent, BRPEventType, BRPMode, BRPObservation
+
+        brp_event = BRPEvent(
+            source_agent="quantumarb",
+            event_type=BRPEventType.ARBITRAGE.value,
+            action=action,
+            params=result_data,
+            mode=BRPMode.SHADOW.value,
+            tags=tags or ["quantumarb", "shadow"],
+        )
+        bridge.evaluate_event(brp_event)
+
+        obs = BRPObservation(
+            source_agent="quantumarb",
+            event_id=brp_event.event_id,
+            action=action,
+            outcome=outcome,
+            result_data=result_data,
+            mode=BRPMode.SHADOW.value,
+            tags=tags or ["quantumarb", "shadow"],
+        )
+        bridge.ingest_observation(obs)
+    except Exception:
+        log.debug("BRP shadow observation failed", exc_info=True)
+
+# ---------------------------------------------------------------------------
 # TimesFM integration helpers (advisory only — never blocks evaluation)
 # ---------------------------------------------------------------------------
 
@@ -796,6 +851,22 @@ class QuantumArbAgent:
                 # Process
                 signal = ArbitrageSignal.from_intent(intent)
                 opportunity = self.engine.evaluate(signal)
+
+                # BRP shadow observation (never alters decision)
+                _emit_brp_shadow_observation(
+                    action="arb_evaluate",
+                    outcome=opportunity.decision.value,
+                    result_data={
+                        "intent_id": intent.get("intent_id", ""),
+                        "ticker": signal.ticker,
+                        "direction": signal.direction,
+                        "decision": opportunity.decision.value,
+                        "spread_bps": opportunity.estimated_spread_bps,
+                        "dry_run": opportunity.dry_run,
+                    },
+                    tags=["quantumarb", "shadow", signal.ticker or ""],
+                )
+
                 self._write_result(opportunity, intent)
                 self._mark_processed(fpath, intent)
 

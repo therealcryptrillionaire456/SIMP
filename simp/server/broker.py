@@ -37,6 +37,10 @@ except ImportError:
     _HTTPX_AVAILABLE = False
 
 
+from simp.security.brp_models import BRPPlan, BRPMode
+from simp.security.brp_bridge import BRPBridge
+
+
 def _utcnow_iso() -> str:
     """Return current UTC time as ISO 8601 string with Z suffix."""
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
@@ -118,15 +122,18 @@ class SimpBroker:
 
     def __init__(self, config: Optional[BrokerConfig] = None,
                  task_ledger: Optional[TaskLedger] = None,
-                 hooks: Optional[Any] = None):
+                 hooks: Optional[Any] = None,
+                 brp_bridge: Optional[BRPBridge] = None):
         """Initialize SIMP Broker
 
         Args:
             config: Broker configuration.
             task_ledger: Optional TaskLedger instance.
             hooks: Optional MemoryHooks instance for event-driven memory updates.
+            brp_bridge: Optional BRP bridge for plan-level security evaluation.
         """
         self.config = config or BrokerConfig()
+        self.brp_bridge = brp_bridge or BRPBridge()
         self.state = BrokerState.INITIALIZING
         self.hooks = hooks
         self.logger = self._setup_logging()
@@ -425,6 +432,25 @@ class SimpBroker:
         with self.agent_lock:
             return dict(self.agents)
 
+    def evaluate_plan(self, steps, source_agent="mother_goose", mode=BRPMode.SHADOW.value):
+        """Submit a multi-step plan to BRP for review (Mother Goose integration).
+
+        Args:
+            steps: List of plan step dicts, each with at least an "action" key.
+            source_agent: Identifier of the planning agent.
+            mode: BRP evaluation mode (default shadow).
+
+        Returns:
+            BRPResponse as a dict.
+        """
+        plan = BRPPlan(source_agent=source_agent, steps=steps, mode=mode)
+        response = self.brp_bridge.evaluate_plan(plan)
+        self.logger.info(
+            f"BRP plan review: {plan.plan_id} -> {response.decision} "
+            f"(threat={response.threat_score:.2f})"
+        )
+        return response.to_dict()
+
     async def route_intent(
         self, intent_data: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -487,6 +513,19 @@ class SimpBroker:
         target_agent = intent_data.get("target_agent")
         intent_type = intent_data.get("intent_type", "unknown")
         delivery_start = time.monotonic()
+
+        # --- BRP plan-level evaluation for multi-step intents ---
+        brp_plan_response = None
+        steps = intent_data.get("params", {}).get("steps") if isinstance(intent_data.get("params"), dict) else None
+        if steps and isinstance(steps, list):
+            try:
+                brp_plan_response = self.evaluate_plan(
+                    steps=steps,
+                    source_agent=source_agent,
+                    mode=intent_data.get("brp_mode", self.brp_bridge.default_mode),
+                )
+            except Exception:
+                self.logger.debug("BRP plan evaluation failed", exc_info=True)
 
         with self.stats_lock:
             self.stats["intents_received"] += 1
@@ -699,6 +738,8 @@ class SimpBroker:
             "fallback_agent": delivery_result.get("fallback_agent"),
             "timestamp": _utcnow_iso(),
         }
+        if brp_plan_response is not None:
+            route_result["brp_plan_review"] = brp_plan_response
 
         # Fire memory hook after routing
         if self.hooks:
