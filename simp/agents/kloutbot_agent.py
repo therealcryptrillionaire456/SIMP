@@ -26,6 +26,24 @@ from simp.integrations.timesfm_policy_engine import (
     make_agent_context_for,
 )
 
+# ---------------------------------------------------------------------------
+# BRP integration (shadow mode — never blocks strategy generation)
+# ---------------------------------------------------------------------------
+
+_brp_bridge = None  # Module-level singleton, initialised lazily
+
+
+def _get_brp_bridge():
+    """Lazily create a BRP bridge for shadow observations."""
+    global _brp_bridge
+    if _brp_bridge is None:
+        try:
+            from simp.security.brp_bridge import BRPBridge
+            _brp_bridge = BRPBridge()
+        except Exception:
+            pass
+    return _brp_bridge
+
 
 class KloutbotAgent(SimpAgent):
     """
@@ -239,6 +257,35 @@ class KloutbotAgent(SimpAgent):
             "market_data": {...}  # Optional
         }
         """
+        # BRP pre-action event (shadow mode — never blocks)
+        brp_meta = {}
+        brp_event_id = ""
+        try:
+            bridge = _get_brp_bridge()
+            if bridge is not None:
+                from simp.security.brp_models import BRPEvent, BRPEventType, BRPMode
+                brp_event = BRPEvent(
+                    source_agent="kloutbot",
+                    event_type=BRPEventType.STRATEGY_GENERATION.value,
+                    action="generate_strategy",
+                    context={
+                        "foresight": params.get("foresight", {}),
+                        "deltas": params.get("deltas", {}),
+                    },
+                    mode=BRPMode.SHADOW.value,
+                    tags=["kloutbot", "strategy_generation"],
+                )
+                brp_event_id = brp_event.event_id
+                brp_resp = bridge.evaluate_event(brp_event)
+                brp_meta = {
+                    "event_id": brp_event_id,
+                    "decision": brp_resp.decision,
+                    "threat_score": brp_resp.threat_score,
+                    "mode": brp_resp.mode,
+                }
+        except Exception:
+            pass
+
         try:
             # Extract parameters
             foresight = params.get("foresight", {})
@@ -281,7 +328,7 @@ class KloutbotAgent(SimpAgent):
             # Calculate mutation-memory telemetry
             total_strategies = len(self.strategy_history)
             recent_strategies = min(10, total_strategies)
-            
+
             # Calculate average horizon from recent strategies (if we tracked it)
             # For now, just include basic stats
             mutation_telemetry = {
@@ -292,6 +339,24 @@ class KloutbotAgent(SimpAgent):
                 "improvement_history_length": len(self.compiler.improvement_history),
             }
 
+            # BRP post-action observation (success)
+            try:
+                bridge = _get_brp_bridge()
+                if bridge is not None:
+                    from simp.security.brp_models import BRPObservation, BRPMode
+                    obs = BRPObservation(
+                        source_agent="kloutbot",
+                        event_id=brp_event_id,
+                        action="generate_strategy",
+                        outcome="success",
+                        result_data={"strategy_count": total_strategies},
+                        mode=BRPMode.SHADOW.value,
+                        tags=["kloutbot", "strategy_generation"],
+                    )
+                    bridge.ingest_observation(obs)
+            except Exception:
+                pass
+
             return {
                 "status": "success",
                 "strategy": tree.to_dict(),
@@ -301,10 +366,29 @@ class KloutbotAgent(SimpAgent):
                 "timesfm_horizon_applied": horizon_advice["timesfm_horizon_applied"],
                 "timesfm_horizon_rationale": horizon_advice["timesfm_horizon_rationale"],
                 "mutation_telemetry": mutation_telemetry,
+                "brp": brp_meta,
                 "timestamp": datetime.utcnow().isoformat(),
             }
 
         except Exception as e:
+            # BRP post-action observation (failure)
+            try:
+                bridge = _get_brp_bridge()
+                if bridge is not None:
+                    from simp.security.brp_models import BRPObservation, BRPMode
+                    obs = BRPObservation(
+                        source_agent="kloutbot",
+                        event_id=brp_event_id,
+                        action="generate_strategy",
+                        outcome="error",
+                        result_data={"error": str(e)},
+                        mode=BRPMode.SHADOW.value,
+                        tags=["kloutbot", "strategy_generation", "error"],
+                    )
+                    bridge.ingest_observation(obs)
+            except Exception:
+                pass
+
             return {
                 "status": "error",
                 "error_code": "STRATEGY_GENERATION_FAILED",
@@ -554,6 +638,32 @@ class KloutbotAgent(SimpAgent):
             subtasks = self.task_decomposer.decompose(goal_text, goal_type, constraints)
             goal_id = subtasks[0]["goal_id"] if subtasks else str(uuid.uuid4())[:8]
 
+            # BRP plan evaluation (shadow mode — never blocks goal decomposition)
+            brp_plan_meta = {}
+            try:
+                bridge = _get_brp_bridge()
+                if bridge is not None:
+                    from simp.security.brp_models import BRPPlan, BRPMode
+                    brp_plan = BRPPlan(
+                        source_agent="kloutbot",
+                        steps=[
+                            {"action": st.get("task_type", "unknown"), "description": st.get("description", "")}
+                            for st in subtasks
+                        ],
+                        context={"goal": goal_text, "goal_type": goal_type},
+                        mode=BRPMode.SHADOW.value,
+                        tags=["kloutbot", "goal_decomposition"],
+                    )
+                    brp_resp = bridge.evaluate_plan(brp_plan)
+                    brp_plan_meta = {
+                        "plan_id": brp_plan.plan_id,
+                        "decision": brp_resp.decision,
+                        "threat_score": brp_resp.threat_score,
+                        "mode": brp_resp.mode,
+                    }
+            except Exception:
+                pass
+
             # Store goal state
             self.goals[goal_id] = {
                 "goal_id": goal_id,
@@ -564,6 +674,7 @@ class KloutbotAgent(SimpAgent):
                 "constraints": constraints,
                 "created_at": datetime.utcnow().isoformat(),
                 "research_task_id": None,
+                "brp": brp_plan_meta,
             }
 
             # Sprint 42: For research/analysis goals, self-spawn a deep-research
@@ -609,6 +720,7 @@ class KloutbotAgent(SimpAgent):
                 ],
                 "research_task_id": research_task_id,
                 "research_spawned": research_task_id is not None,
+                "brp": brp_plan_meta,
                 "timestamp": datetime.utcnow().isoformat(),
             }
 

@@ -15,6 +15,22 @@ from simp.task_ledger import TaskLedger
 from simp.models.failure_taxonomy import FailureHandler
 from simp.routing.builder_pool import BuilderPool
 
+# ── BRP integration (shadow mode — never blocks task assignment by default) ────
+_brp_bridge = None  # Module-level singleton, initialised lazily
+
+
+def _get_brp_bridge():
+    """Lazily create a BRP bridge for shadow observations."""
+    global _brp_bridge
+    if _brp_bridge is None:
+        try:
+            from simp.security.brp_bridge import BRPBridge
+            _brp_bridge = BRPBridge()
+        except Exception:
+            pass
+    return _brp_bridge
+
+
 # ── DeerFlow upgrades: lazy-loaded, non-blocking if scaffolding absent ────────
 _deerflow_runtime = None
 
@@ -174,8 +190,73 @@ class OrchestrationLoop:
                 "timestamp": datetime.utcnow().isoformat(),
             }
 
+            # BRP pre-action event: evaluate task assignment
+            brp_event_id = ""
+            brp_blocked = False
+            try:
+                bridge = _get_brp_bridge()
+                if bridge is not None:
+                    from simp.security.brp_models import (
+                        BRPEvent, BRPEventType, BRPMode, BRPDecision,
+                    )
+                    brp_event = BRPEvent(
+                        source_agent=builder,
+                        event_type=BRPEventType.TASK_ASSIGNMENT.value,
+                        action=task_type,
+                        context={
+                            "task_id": task_id,
+                            "priority": priority,
+                            "builder": builder,
+                            "title": task.get("title", ""),
+                        },
+                        mode=BRPMode.SHADOW.value,
+                        tags=["orchestration_loop", "task_assignment", task_type],
+                    )
+                    brp_event_id = brp_event.event_id
+                    brp_resp = bridge.evaluate_event(brp_event)
+                    intent_data["brp"] = {
+                        "event_id": brp_event_id,
+                        "decision": brp_resp.decision,
+                        "threat_score": brp_resp.threat_score,
+                    }
+
+                    # In enforced mode, DENY blocks the task assignment
+                    if brp_resp.mode == BRPMode.ENFORCED.value and brp_resp.decision == BRPDecision.DENY.value:
+                        self.logger.warning(
+                            "BRP DENY (enforced) for task %s — marking blocked", task_id,
+                        )
+                        self.task_ledger.update_status(task_id, "blocked")
+                        brp_blocked = True
+            except Exception:
+                pass
+
+            if brp_blocked:
+                continue
+
             result = await self.broker.route_intent(intent_data)
             delivery_status = result.get("delivery_status", "")
+
+            # BRP post-action observation
+            try:
+                bridge = _get_brp_bridge()
+                if bridge is not None:
+                    from simp.security.brp_models import BRPObservation, BRPMode
+                    obs = BRPObservation(
+                        source_agent="orchestration_loop",
+                        event_id=brp_event_id,
+                        action=task_type,
+                        outcome="success" if delivery_status in ("delivered", "queued", "queued_no_endpoint") else "failure",
+                        result_data={
+                            "delivery_status": delivery_status,
+                            "task_id": task_id,
+                            "builder": builder,
+                        },
+                        mode=BRPMode.SHADOW.value,
+                        tags=["orchestration_loop", "task_assignment"],
+                    )
+                    bridge.ingest_observation(obs)
+            except Exception:
+                pass
 
             if delivery_status in ("delivered", "queued", "queued_no_endpoint"):
                 self.tasks_assigned += 1
