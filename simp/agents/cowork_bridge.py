@@ -90,6 +90,25 @@ except Exception as _schema_err:
         pass   # no-op when schema module absent
 
 # ---------------------------------------------------------------------------
+# BRP integration (shadow mode — never blocks peer intents by default)
+# ---------------------------------------------------------------------------
+
+_brp_bridge = None  # Module-level singleton, initialised lazily
+
+
+def _get_brp_bridge():
+    """Lazily create a BRP bridge for shadow observations."""
+    global _brp_bridge
+    if _brp_bridge is None:
+        try:
+            from simp.security.brp_bridge import BRPBridge
+            _brp_bridge = BRPBridge()
+        except Exception:
+            pass
+    return _brp_bridge
+
+
+# ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
 AGENT_ID       = "claude_cowork"
@@ -425,12 +444,87 @@ class CoWorkBridge:
                     "agent_id":    AGENT_ID,
                 }), 422
 
+            # Layer 2.5: BRP gate (shadow mode — logs but doesn't block by default)
+            brp_event_id = ""
+            try:
+                bridge = _get_brp_bridge()
+                if bridge is not None:
+                    from simp.security.brp_models import (
+                        BRPEvent, BRPEventType, BRPMode, BRPDecision,
+                    )
+                    brp_event = BRPEvent(
+                        source_agent=data.get("source_agent", "external"),
+                        event_type=BRPEventType.PEER_INTENT.value,
+                        action=intent_type,
+                        context={
+                            "intent_id": data.get("intent_id", ""),
+                            "target_agent": data.get("target_agent", ""),
+                            "params": data.get("params", {}),
+                        },
+                        mode=BRPMode.SHADOW.value,
+                        tags=["cowork_bridge", "peer_intent", intent_type],
+                    )
+                    brp_event_id = brp_event.event_id
+                    brp_resp = bridge.evaluate_event(brp_event)
+
+                    # In enforced mode, DENY blocks the intent
+                    if brp_resp.mode == BRPMode.ENFORCED.value and brp_resp.decision == BRPDecision.DENY.value:
+                        log.warning(
+                            "BRP DENY (enforced) for peer_intent '%s' from %s",
+                            intent_type, data.get("source_agent", "?"),
+                        )
+                        return jsonify({
+                            "status": "rejected",
+                            "intent_type": intent_type,
+                            "reason": f"BRP denied: {brp_resp.summary}",
+                            "agent_id": AGENT_ID,
+                            "brp": brp_resp.to_dict(),
+                        }), 403
+            except Exception:
+                pass
+
             # Layer 3: sync intents answered immediately
             if intent_type in SYNC_INTENTS:
-                return jsonify(self._handle_sync(intent_type, data))
+                result = self._handle_sync(intent_type, data)
+                # BRP post-action observation
+                try:
+                    bridge = _get_brp_bridge()
+                    if bridge is not None:
+                        from simp.security.brp_models import BRPObservation, BRPMode
+                        obs = BRPObservation(
+                            source_agent="cowork_bridge",
+                            event_id=brp_event_id,
+                            action=intent_type,
+                            outcome="success",
+                            result_data={"sync": True},
+                            mode=BRPMode.SHADOW.value,
+                            tags=["cowork_bridge", "peer_intent"],
+                        )
+                        bridge.ingest_observation(obs)
+                except Exception:
+                    pass
+                return jsonify(result)
 
             # Layer 4: queue for async CoWork processing
-            return jsonify(self._queue_intent(data))
+            queue_result = self._queue_intent(data)
+            # BRP post-action observation
+            try:
+                bridge = _get_brp_bridge()
+                if bridge is not None:
+                    from simp.security.brp_models import BRPObservation, BRPMode
+                    obs = BRPObservation(
+                        source_agent="cowork_bridge",
+                        event_id=brp_event_id,
+                        action=intent_type,
+                        outcome="queued",
+                        result_data={"queue_id": queue_result.get("queue_id", "")},
+                        mode=BRPMode.SHADOW.value,
+                        tags=["cowork_bridge", "peer_intent"],
+                    )
+                    bridge.ingest_observation(obs)
+            except Exception:
+                pass
+            return jsonify(queue_result)
 
         @app.route("/queue/responses", methods=["GET"])
         def queue_responses():

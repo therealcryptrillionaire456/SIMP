@@ -206,6 +206,98 @@ class TestRestrictedActionEscalation:
 # Feature flag checks
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Scenario 5: kloutbot_strategy_generation_shadow
+# ---------------------------------------------------------------------------
+
+class TestKloutbotStrategyGenerationShadow:
+    def test_strategy_generation_event_and_observation(self, bridge, brp_dir):
+        """Kloutbot emits BRP event + observation for strategy generation."""
+        event = BRPEvent(
+            source_agent="kloutbot",
+            event_type=BRPEventType.STRATEGY_GENERATION.value,
+            action="generate_strategy",
+            context={"foresight": {"affinity": 0.85}, "deltas": {"momentum": 0.8}},
+            mode=BRPMode.SHADOW.value,
+            tags=["kloutbot", "strategy_generation"],
+        )
+        resp = bridge.evaluate_event(event)
+        assert resp.decision == BRPDecision.SHADOW_ALLOW.value
+
+        obs = BRPObservation(
+            source_agent="kloutbot",
+            event_id=event.event_id,
+            action="generate_strategy",
+            outcome="success",
+            result_data={"strategy_count": 5},
+            mode=BRPMode.SHADOW.value,
+            tags=["kloutbot", "strategy_generation"],
+        )
+        bridge.ingest_observation(obs)
+
+        obs_log = os.path.join(brp_dir, "observations.jsonl")
+        with open(obs_log) as f:
+            lines = f.readlines()
+        assert len(lines) == 1
+        assert json.loads(lines[0])["source_agent"] == "kloutbot"
+
+
+# ---------------------------------------------------------------------------
+# Scenario 6: cowork_bridge_peer_intent_shadow
+# ---------------------------------------------------------------------------
+
+class TestCoWorkBridgePeerIntentShadow:
+    def test_peer_intent_event_shadow(self, bridge):
+        """CoWork Bridge emits BRP event for peer intent in shadow mode."""
+        event = BRPEvent(
+            source_agent="external_peer",
+            event_type=BRPEventType.PEER_INTENT.value,
+            action="code_task",
+            context={"intent_id": "test-peer-1", "target_agent": "claude_cowork"},
+            mode=BRPMode.SHADOW.value,
+            tags=["cowork_bridge", "peer_intent"],
+        )
+        resp = bridge.evaluate_event(event)
+        assert resp.decision == BRPDecision.SHADOW_ALLOW.value
+        assert resp.threat_score < 0.2
+
+
+# ---------------------------------------------------------------------------
+# Scenario 7: orchestration_loop_task_assignment_shadow
+# ---------------------------------------------------------------------------
+
+class TestOrchestrationLoopTaskAssignmentShadow:
+    def test_task_assignment_event_shadow(self, bridge, brp_dir):
+        """OrchestrationLoop emits BRP event for task assignment."""
+        event = BRPEvent(
+            source_agent="builder_001",
+            event_type=BRPEventType.TASK_ASSIGNMENT.value,
+            action="implementation",
+            context={"task_id": "task-99", "priority": "high", "builder": "builder_001"},
+            mode=BRPMode.SHADOW.value,
+            tags=["orchestration_loop", "task_assignment"],
+        )
+        resp = bridge.evaluate_event(event)
+        assert resp.decision == BRPDecision.SHADOW_ALLOW.value
+
+        obs = BRPObservation(
+            source_agent="orchestration_loop",
+            event_id=event.event_id,
+            action="implementation",
+            outcome="success",
+            result_data={"delivery_status": "delivered"},
+            mode=BRPMode.SHADOW.value,
+            tags=["orchestration_loop", "task_assignment"],
+        )
+        bridge.ingest_observation(obs)
+
+        events_log = os.path.join(brp_dir, "events.jsonl")
+        with open(events_log) as f:
+            event_lines = f.readlines()
+        assert len(event_lines) == 1
+        assert json.loads(event_lines[0])["event_type"] == "task_assignment"
+
+
 class TestFeatureFlags:
     def test_default_mode_is_shadow(self):
         """BRP defaults to shadow mode."""

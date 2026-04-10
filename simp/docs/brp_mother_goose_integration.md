@@ -60,6 +60,38 @@ Before trade execution, emits a `BRPEvent` for evaluation. After execution, emit
 
 Emits `BRPEvent` and `BRPObservation` in shadow mode for every arbitrage detection. Never alters arb decision outcomes.
 
+### 5. Kloutbot Strategy Generation
+
+**File:** `simp/agents/kloutbot_agent.py`
+**Method:** `KloutbotAgent.handle_generate_strategy()`
+**Line:** ~240
+
+Before strategy generation, emits a `BRPEvent` with `event_type="strategy_generation"` and market data context. After generation, emits a `BRPObservation` with outcome (success/error). BRP metadata is attached to the response under `brp`. Default mode: SHADOW.
+
+### 6. Kloutbot Goal Decomposition
+
+**File:** `simp/agents/kloutbot_agent.py`
+**Method:** `KloutbotAgent.handle_submit_goal()`
+**Line:** ~641
+
+Before goal decomposition, calls `evaluate_plan()` with the goal subtasks as a `BRPPlan`. The plan response is stored in the goal state dict under `brp` and attached to the return value. Default mode: SHADOW.
+
+### 7. CoWork Bridge Peer Intent Gate
+
+**File:** `simp/agents/cowork_bridge.py`
+**Method:** `CoWorkBridge._build_app()` → `receive()` endpoint
+**Line:** ~447
+
+After firewall and schema checks, before the intent is queued or handled synchronously, emits a `BRPEvent` with `event_type="peer_intent"`. In SHADOW mode, logs and continues. In ENFORCED mode, DENY returns HTTP 403. After processing, emits a `BRPObservation`. Default mode: SHADOW.
+
+### 8. OrchestrationLoop Task Assignment
+
+**File:** `simp/orchestration/orchestration_loop.py`
+**Method:** `OrchestrationLoop.run_once()`
+**Line:** ~190
+
+Before `broker.route_intent()`, evaluates the task assignment as a `BRPEvent` with `event_type="task_assignment"`. If BRP returns DENY in enforced mode, the task is marked as blocked and skipped. In shadow/advisory mode, BRP metadata is attached to `intent_data` under `brp`. After routing, emits a `BRPObservation` with the delivery outcome. Default mode: SHADOW.
+
 ## Runtime Behavior
 
 | Mode | Behavior |
@@ -82,10 +114,34 @@ Mother Goose (Broker)
   │   ├─ organ.execute()
   │   └─ BRPObservation (post-trade) ──> BRPBridge.ingest_observation()
   │
-  └─ QuantumArb goose
-      ├─ BRPEvent (pre-detect) ──> BRPBridge.evaluate_event()
-      ├─ arb logic (unmodified)
-      └─ BRPObservation ──> BRPBridge.ingest_observation()
+  ├─ QuantumArb goose
+  │   ├─ BRPEvent (pre-detect) ──> BRPBridge.evaluate_event()
+  │   ├─ arb logic (unmodified)
+  │   └─ BRPObservation ──> BRPBridge.ingest_observation()
+  │
+  ├─ Kloutbot goose
+  │   ├─ handle_generate_strategy:
+  │   │   ├─ BRPEvent (strategy_generation) ──> BRPBridge.evaluate_event()
+  │   │   ├─ strategy compilation (unmodified)
+  │   │   └─ BRPObservation (success/error) ──> BRPBridge.ingest_observation()
+  │   └─ handle_submit_goal:
+  │       ├─ BRPPlan (goal_decomposition) ──> BRPBridge.evaluate_plan()
+  │       └─ goal decomposition (unmodified)
+  │
+  ├─ CoWork Bridge
+  │   ├─ receive() endpoint:
+  │   │   ├─ firewall_check + schema_check
+  │   │   ├─ BRPEvent (peer_intent) ──> BRPBridge.evaluate_event()
+  │   │   ├─ [ENFORCED DENY → HTTP 403]
+  │   │   ├─ intent processing (sync/queue)
+  │   │   └─ BRPObservation ──> BRPBridge.ingest_observation()
+  │
+  └─ OrchestrationLoop
+      ├─ run_once():
+      │   ├─ BRPEvent (task_assignment) ──> BRPBridge.evaluate_event()
+      │   ├─ [ENFORCED DENY → task marked blocked]
+      │   ├─ broker.route_intent()
+      │   └─ BRPObservation (delivery outcome) ──> BRPBridge.ingest_observation()
 ```
 
 ## Configuration

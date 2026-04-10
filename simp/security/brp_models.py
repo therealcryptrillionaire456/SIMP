@@ -56,6 +56,10 @@ class BRPEventType(str, Enum):
     ADMIN_ACTION = "admin_action"
     ARBITRAGE = "arbitrage"
     OBSERVATION = "observation"
+    STRATEGY_GENERATION = "strategy_generation"
+    PEER_INTENT = "peer_intent"
+    TASK_ASSIGNMENT = "task_assignment"
+    GOAL_DECOMPOSITION = "goal_decomposition"
     GENERIC = "generic"
 
 
