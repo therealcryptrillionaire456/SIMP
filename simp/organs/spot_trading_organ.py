@@ -192,6 +192,14 @@ class SpotTradingOrgan(TradingOrgan):
             if key not in params:
                 return False
 
+        # Validate asset pair format (should have base/quote format)
+        asset_pair = str(params.get("asset_pair", ""))
+        if "/" not in asset_pair:
+            return False
+        parts = asset_pair.split("/")
+        if len(parts) != 2 or not parts[0] or not parts[1]:
+            return False
+
         side = str(params.get("side", "")).upper()
         if side not in ["BUY", "SELL"]:
             return False
@@ -203,6 +211,14 @@ class SpotTradingOrgan(TradingOrgan):
             price = float(params.get("price", 1))
             if price <= 0:
                 return False
+            
+            # Validate slippage_tolerance if provided
+            slippage_tolerance = params.get("slippage_tolerance")
+            if slippage_tolerance is not None:
+                slippage = float(slippage_tolerance)
+                if slippage < 0:  # Negative slippage not allowed
+                    return False
+                # Very high slippage (>100%) might be questionable but allowed
         except (ValueError, TypeError):
             return False
 

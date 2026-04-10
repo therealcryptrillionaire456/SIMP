@@ -31,6 +31,7 @@ class Gemma4Agent:
     SUPPORTED_INTENTS = [
         "research", "planning", "code_task", "code_review",
         "summarization", "docs", "spec", "architecture",
+        "ping", "status_check",
     ]
 
     def __init__(
@@ -72,6 +73,23 @@ class Gemma4Agent:
         intent_type = intent_data.get("intent_type", "")
         params = intent_data.get("params", {})
         start = time.time()
+
+        if intent_type in {"ping", "status_check"}:
+            self.intents_handled += 1
+            duration_ms = int((time.time() - start) * 1000)
+            return {
+                "type": "response",
+                "intent_id": intent_data.get("intent_id", ""),
+                "agent_id": self.agent_id,
+                "status": "completed",
+                "response": {
+                    "content": "ok",
+                    "model": self.model_name,
+                    "duration_ms": duration_ms,
+                    "intent_type": intent_type,
+                },
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
 
         # Build prompt from intent
         prompt = self._build_prompt(intent_type, params)

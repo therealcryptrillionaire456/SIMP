@@ -12,8 +12,13 @@ from functools import wraps
 from flask import request, jsonify
 
 
-# Read token from environment; empty/missing = auth disabled
-CONTROL_TOKEN = os.environ.get("SIMP_CONTROL_TOKEN", "").strip()
+def get_control_token() -> str:
+    """Read the current control token from the environment."""
+    return os.environ.get("SIMP_CONTROL_TOKEN", "").strip()
+
+
+# Backward-compatible module constant for older tests/imports.
+CONTROL_TOKEN = get_control_token()
 
 
 def require_control_auth(f):
@@ -24,7 +29,8 @@ def require_control_auth(f):
     """
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if not CONTROL_TOKEN:
+        control_token = get_control_token()
+        if not control_token:
             # No token configured — allow all (backward compatible)
             return f(*args, **kwargs)
 
@@ -37,7 +43,7 @@ def require_control_auth(f):
             }), 401
 
         provided_token = auth_header[7:].strip()  # Strip "Bearer "
-        if not hmac.compare_digest(provided_token, CONTROL_TOKEN):
+        if not hmac.compare_digest(provided_token, control_token):
             return jsonify({
                 "status": "error",
                 "error_code": "AUTH_FAILED",

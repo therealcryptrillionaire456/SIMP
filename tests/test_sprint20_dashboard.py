@@ -70,6 +70,12 @@ class TestFrontendWebSocket:
             content = f.read()
         assert "ws-status" in content or "connectionStatus" in content.lower()
 
+    def test_app_js_handles_stale_agent_status(self):
+        path = os.path.join(os.path.dirname(__file__), "..", "dashboard", "static", "app.js")
+        with open(path) as f:
+            content = f.read()
+        assert '"stale"' in content
+
 
 class TestTopologyFix:
     def test_topology_uses_connection_mode(self):

@@ -110,6 +110,7 @@
     systemOverviewSummary: $("#system-overview-summary"),
     systemOverviewCards: $("#system-overview-cards"),
     systemOverviewActions: $("#system-overview-actions"),
+    agentObservabilityCards: $("#agent-observability-cards"),
     projectxChatFeed: $("#projectx-chat-feed"),
     projectxChatForm: $("#projectx-chat-form"),
     projectxChatInput: $("#projectx-chat-input"),
@@ -299,13 +300,16 @@
     for (const a of agents) {
       const mode = detectMode(a.endpoint);
       const caps = a.capabilities || [];
-      const status = a.status || "unknown";
+      const status = a.heartbeat_stale ? "stale" : (a.status || "unknown");
+      const heartbeatHint = a.last_heartbeat
+        ? '<div class="text-muted" style="font-size:0.72rem">heartbeat ' + escHtml(formatDate(a.last_heartbeat)) + "</div>"
+        : "";
 
       html += "<tr>";
       html += td(mono(escHtml(a.agent_id || "--")));
       html += td(escHtml(a.name || a.agent_id || "--"));
       html += td(modeBadge(mode));
-      html += td(statusBadge(status));
+      html += td(statusBadge(status) + heartbeatHint);
       html += td(caps.map(capPill).join(" ") || '<span class="text-muted">none</span>');
       html += td(mono(a.intents_received ?? "--"), "col-num");
       html += td(mono(a.intents_completed ?? "--"), "col-num");
@@ -478,15 +482,20 @@
   function renderSmoke(data) {
     if (!dom.smokeTbody) return;
     if (!data || !data.results || data.results.length === 0) {
-      dom.smokeTbody.innerHTML = '<tr><td colspan="4" class="empty-row">No smoke probes available</td></tr>';
+      dom.smokeTbody.innerHTML = '<tr><td colspan="5" class="empty-row">No smoke probes available</td></tr>';
       return;
     }
     dom.smokeTbody.innerHTML = data.results.slice(0, 20).map(function(row) {
-      var statusClass = row.reachable ? "online" : "offline";
+      var statusClass = deliveryStatusClass(row.status || (row.reachable ? "ok" : "failed"));
+      var probeLabel = row.delivery_path ? String(row.delivery_path) : (row.health_url || row.endpoint || "--");
+      if (row.degraded) {
+        probeLabel += " • degraded";
+      }
       return "<tr>"
         + td(mono(escHtml(row.agent_id || "--")))
-        + td('<span class="status-badge ' + statusClass + '">' + escHtml(row.reachable ? "reachable" : "unreachable") + "</span>")
-        + td(mono(escHtml(row.health_url || "--")))
+        + td('<span class="status-badge ' + statusClass + '">' + escHtml(row.status || (row.reachable ? "reachable" : "unreachable")) + "</span>")
+        + td(mono(escHtml(probeLabel)))
+        + td(mono(escHtml(formatDuration(row.response_ms))))
         + td(escHtml(row.error || "--"))
         + "</tr>";
     }).join("");
@@ -496,12 +505,13 @@
     if (!dom.flowsTbody) return;
     var flows = (data && data.flows) || [];
     if (!flows.length) {
-      dom.flowsTbody.innerHTML = '<tr><td colspan="5" class="empty-row">No linked flows recorded yet</td></tr>';
+      dom.flowsTbody.innerHTML = '<tr><td colspan="6" class="empty-row">No linked flows recorded yet</td></tr>';
       return;
     }
     dom.flowsTbody.innerHTML = flows.slice(0, 20).map(function(flow) {
       var planner = flow.planner_intent || {};
       var executors = flow.executor_intents || [];
+      var timeline = (flow.timeline && flow.timeline.steps) || [];
       var plannerCell = planner.intent_id
         ? '<button type="button" class="intent-row-button" data-intent-id="' + escHtml(planner.intent_id) + '">' + escHtml((planner.target_agent || "--") + " • " + (planner.intent_type || "--")) + "</button>"
         : '<span class="text-muted">--</span>';
@@ -509,11 +519,28 @@
         if (!item.intent_id) return '<span class="text-muted">--</span>';
         return '<button type="button" class="intent-row-button" data-intent-id="' + escHtml(item.intent_id) + '">' + escHtml((item.target_agent || "--") + " • " + (item.intent_type || "--")) + "</button>";
       }).join("<br>") : '<span class="text-muted">No executor intents</span>';
+      var timelineCell = timeline.length ? '<div class="flow-timeline">'
+        + timeline.map(function(step) {
+          var label = (step.phase || "--") + " • " + (step.target_agent || "--");
+          var meta = [];
+          if (step.duration_ms != null) meta.push(formatDuration(step.duration_ms));
+          if (step.retry_count) meta.push("retry " + step.retry_count);
+          if (step.failure_reason) meta.push(step.failure_reason);
+          return '<div class="flow-step">'
+            + '<div class="flow-step-header"><span class="status-badge ' + escHtml(deliveryStatusClass(step.delivery_status || "unknown")) + '">' + escHtml(step.delivery_status || "--") + '</span>'
+            + '<span class="flow-step-label">' + escHtml(label) + '</span></div>'
+            + '<div class="flow-step-meta mono">' + escHtml(meta.join(" • ") || "--") + '</div>'
+            + '</div>';
+        }).join("")
+        + '<div class="flow-timeline-summary mono">total ' + escHtml(formatDuration(flow.timeline.total_duration_ms)) + ' • retries ' + escHtml(String(flow.timeline.total_retry_count || 0)) + '</div>'
+        + '</div>'
+        : '<span class="text-muted">No timing yet</span>';
       var statuses = (flow.statuses || []).join(", ") || "--";
       return "<tr>"
         + td(mono(escHtml(flow.flow_id || "--")))
         + td(plannerCell)
         + td(executorCell)
+        + td(timelineCell)
         + td(escHtml(statuses))
         + td(mono(escHtml(formatDate(flow.last_updated))))
         + "</tr>";
@@ -565,8 +592,8 @@
     if (!status) return "unknown";
     const s = status.toLowerCase();
     if (s === "healthy" || s === "online" || s === "running" || s === "ok" || s === "active") return "healthy";
-    if (s === "degraded" || s === "paused") return "degraded";
-    if (s === "error" || s === "unreachable" || s === "stopped") return "error";
+    if (s === "degraded" || s === "paused" || s === "stale") return "degraded";
+    if (s === "error" || s === "unreachable" || s === "stopped" || s === "offline") return "error";
     return "unknown";
   }
 
@@ -645,6 +672,14 @@
     } catch {
       return "--";
     }
+  }
+
+  function formatDuration(ms) {
+    if (ms == null || ms === "") return "--";
+    var value = Number(ms);
+    if (!isFinite(value)) return "--";
+    if (value < 1000) return value.toFixed(0) + " ms";
+    return (value / 1000).toFixed(value >= 10000 ? 0 : 1) + " s";
   }
 
   function setInteractiveDiagnostic(el, enabled, handler) {
@@ -1290,6 +1325,223 @@
     renderSystemOverview(facts.protocol_docs || null);
   }
 
+  function renderAgentObservability(activityData, agentsData, capabilitiesData, failedIntentsData, smokeData) {
+    if (!activityData || !activityData.events || !agentsData || !agentsData.agents) {
+      dom.agentObservabilityCards.innerHTML =
+        '<div class="empty-state">Agent activity data unavailable.</div>';
+      return;
+    }
+
+    const events = activityData.events || [];
+    
+    // Count intents by source agent
+    const agentCounts = {};
+    const agentStatus = {};
+    const agentFailureCounts = {};
+    
+    // Initialize with all known agents
+    agentsData.agents.forEach(agent => {
+      const agentId = agent.id || agent.agent_id;
+      if (agentId) {
+        agentCounts[agentId] = 0;
+        agentStatus[agentId] = agent.status || "unknown";
+        agentFailureCounts[agentId] = 0;
+      }
+    });
+    
+    // Count recent intents by source agent
+    events.forEach(event => {
+      const sourceAgent = event.source_agent;
+      if (sourceAgent && agentCounts.hasOwnProperty(sourceAgent)) {
+        agentCounts[sourceAgent]++;
+      }
+    });
+    
+    // Count failures by target agent from failed intents data
+    if (failedIntentsData && failedIntentsData.summary && failedIntentsData.summary.by_target_agent) {
+      const byTargetAgent = failedIntentsData.summary.by_target_agent;
+      Object.keys(byTargetAgent).forEach(agentId => {
+        if (agentFailureCounts.hasOwnProperty(agentId)) {
+          agentFailureCounts[agentId] = byTargetAgent[agentId];
+        }
+      });
+    }
+    
+    // Enhance agent status with smoke test data if available
+    if (smokeData && smokeData.results) {
+      smokeData.results.forEach(result => {
+        const agentId = result.agent_id;
+        if (agentId && agentStatus.hasOwnProperty(agentId)) {
+          // Use smoke test reachability to improve status accuracy
+          if (result.reachable === true) {
+            agentStatus[agentId] = "online";
+          } else if (result.reachable === false) {
+            agentStatus[agentId] = "offline";
+          }
+        }
+      });
+    }
+    
+    // Sort agents by count (descending)
+    const sortedAgents = Object.keys(agentCounts)
+      .sort((a, b) => agentCounts[b] - agentCounts[a])
+      .slice(0, 8); // Show top 8 agents
+    
+    if (sortedAgents.length === 0) {
+      dom.agentObservabilityCards.innerHTML =
+        '<div class="empty-state">No agent activity recorded.</div>';
+      return;
+    }
+    
+    let html = "";
+    
+    // Special focus agents
+    const focusAgents = ["quantumarb", "kashclaw", "kloutbot"];
+    
+    // Check for TimesFM availability in capabilities
+    let timesfmAvailable = false;
+    let timesfmAgents = [];
+    // Check for A2A readiness in capabilities
+    let a2aReady = false;
+    let a2aAgents = [];
+    
+    if (capabilitiesData && capabilitiesData.capabilities) {
+      // Check for forecasting-related capabilities
+      const forecastingCaps = ["forecasting", "timeseries_forecast", "timesfm", "prediction"];
+      for (const cap of forecastingCaps) {
+        if (capabilitiesData.capabilities[cap]) {
+          timesfmAvailable = true;
+          timesfmAgents = capabilitiesData.capabilities[cap];
+          break;
+        }
+      }
+      
+      // Check for A2A-related capabilities
+      const a2aCaps = ["a2a", "financial_ops", "payment", "trade_execution", "simulation"];
+      for (const cap of a2aCaps) {
+        if (capabilitiesData.capabilities[cap]) {
+          a2aReady = true;
+          a2aAgents = capabilitiesData.capabilities[cap];
+          break;
+        }
+      }
+    }
+    
+    // Infrastructure readiness cards with tooltips
+    html += '<div class="card" title="Timeseries forecasting engine availability">';
+    html += '<div class="card-label">TimesFM</div>';
+    if (timesfmAvailable) {
+      html += '<div class="card-value">Available</div>';
+      html += '<div class="card-status online">via ' + escHtml(timesfmAgents.join(", ")) + '</div>';
+    } else {
+      html += '<div class="card-value">Not detected</div>';
+      html += '<div class="card-status unknown">no forecast agent</div>';
+    }
+    html += '</div>';
+    
+    html += '<div class="card" title="Agent-to-Agent financial operations layer">';
+    html += '<div class="card-label">A2A Layer</div>';
+    if (a2aReady) {
+      html += '<div class="card-value">Ready</div>';
+      html += '<div class="card-status online">via ' + escHtml(a2aAgents.join(", ")) + '</div>';
+    } else {
+      html += '<div class="card-value">Not detected</div>';
+      html += '<div class="card-status unknown">no A2A agent</div>';
+    }
+    html += '</div>';
+    
+    // Group 1: Infrastructure readiness cards
+    html += '<div class="agent-group">';
+    html += '<div class="group-label">Infrastructure</div>';
+    html += '<div class="group-cards">';
+    
+    // TimesFM card
+    html += '<div class="card" title="Timeseries forecasting engine availability">';
+    html += '<div class="card-label">TimesFM</div>';
+    if (timesfmAvailable) {
+      html += '<div class="card-value">Available</div>';
+      html += '<div class="card-status online">via ' + escHtml(timesfmAgents.join(", ")) + '</div>';
+    } else {
+      html += '<div class="card-value">Not detected</div>';
+      html += '<div class="card-status unknown">no forecast agent</div>';
+    }
+    html += '</div>';
+    
+    // A2A Layer card
+    html += '<div class="card" title="Agent-to-Agent financial operations layer">';
+    html += '<div class="card-label">A2A Layer</div>';
+    if (a2aReady) {
+      html += '<div class="card-value">Ready</div>';
+      html += '<div class="card-status online">via ' + escHtml(a2aAgents.join(", ")) + '</div>';
+    } else {
+      html += '<div class="card-value">Not detected</div>';
+      html += '<div class="card-status unknown">no A2A agent</div>';
+    }
+    html += '</div>';
+    html += '</div></div>'; // Close group-cards and agent-group
+    
+    // Group 2: Focus agents
+    const focusAgentsWithData = focusAgents.filter(agentId => agentCounts[agentId] !== undefined);
+    if (focusAgentsWithData.length > 0) {
+      html += '<div class="agent-group">';
+      html += '<div class="group-label">Focus Agents</div>';
+      html += '<div class="group-cards">';
+      
+      focusAgentsWithData.forEach(agentId => {
+        const count = agentCounts[agentId];
+        const failures = agentFailureCounts[agentId] || 0;
+        const status = agentStatus[agentId] || "unknown";
+        const statusClass = status === "online" ? "online" : 
+                          status === "offline" ? "offline" : "unknown";
+        
+        html += '<div class="card" title="Recent activity for ' + escHtml(agentId) + ' agent">';
+        html += '<div class="card-label">' + escHtml(agentId) + '</div>';
+        html += '<div class="card-value">' + count + ' intents</div>';
+        if (failures > 0) {
+          html += '<div class="card-subvalue" style="color: var(--red);" title="Failed deliveries to this agent">' + failures + ' failed</div>';
+        } else {
+          html += '<div class="card-subvalue" style="color: var(--green);" title="No failed deliveries">0 failed</div>';
+        }
+        html += '<div class="card-status ' + statusClass + '" title="Agent connectivity status">' + escHtml(status) + '</div>';
+        html += '</div>';
+      });
+      html += '</div></div>'; // Close group-cards and agent-group
+    }
+    
+    // Group 3: Other active agents
+    const otherAgents = sortedAgents.filter(agentId => 
+      !focusAgents.includes(agentId) && 
+      agentId !== "timesfm" && 
+      agentCounts[agentId] !== undefined
+    );
+    
+    if (otherAgents.length > 0) {
+      html += '<div class="agent-group">';
+      html += '<div class="group-label">Other Active Agents</div>';
+      html += '<div class="group-cards">';
+      
+      otherAgents.forEach(agentId => {
+        const count = agentCounts[agentId];
+        const failures = agentFailureCounts[agentId] || 0;
+        const status = agentStatus[agentId] || "unknown";
+        const statusClass = status === "online" ? "online" : 
+                          status === "offline" ? "offline" : "unknown";
+        
+        html += '<div class="card" title="Recent activity for ' + escHtml(agentId) + ' agent">';
+        html += '<div class="card-label">' + escHtml(agentId) + '</div>';
+        html += '<div class="card-value">' + count + ' intents</div>';
+        if (failures > 0) {
+          html += '<div class="card-subvalue" style="color: var(--red);" title="Failed deliveries to this agent">' + failures + ' failed</div>';
+        }
+        html += '<div class="card-status ' + statusClass + '" title="Agent connectivity status">' + escHtml(status) + '</div>';
+        html += '</div>';
+      });
+      html += '</div></div>'; // Close group-cards and agent-group
+    }
+    
+    dom.agentObservabilityCards.innerHTML = html;
+  }
+
   function renderSystemOverview(docs) {
     if (!dom.systemOverviewSummary || !dom.systemOverviewCards || !dom.systemOverviewActions) return;
     if (!docs || !docs.system_identity) {
@@ -1350,7 +1602,19 @@
 
   async function submitProjectXChat(payload, previewText) {
     appendChatMessage("user", previewText, null);
-    const response = await apiPost("/api/projectx/chat", payload);
+    
+    // Build query string from payload
+    const params = new URLSearchParams();
+    if (payload.message) params.set("message", payload.message);
+    if (payload.job) params.set("job", payload.job);
+    if (payload.request_id) params.set("request_id", payload.request_id);
+    if (payload.source_intent_id) params.set("source_intent_id", payload.source_intent_id);
+    if (payload.plan_id) params.set("plan_id", payload.plan_id);
+    
+    const queryString = params.toString();
+    const url = "/api/projectx/chat" + (queryString ? "?" + queryString : "");
+    
+    const response = await apiFetch(url);
     if (!response || !response.response) {
       appendChatMessage("assistant", "ProjectX guard unreachable.", "dashboard proxy error");
       return;
@@ -1564,6 +1828,9 @@
     renderProjectXProcesses(projectxProcesses);
     renderProjectXActions(projectxActions);
     renderProjectXProtocolFacts(projectxProtocolFacts);
+    
+    // Agent observability - show intent counts by agent
+    renderAgentObservability(activity, agents, capabilities, failedIntents, smokeData);
 
     // Sprint 21 — update charts
     if (stats) {
@@ -1619,7 +1886,11 @@
   var wsRetryCount = 0;
   var MAX_WS_RETRIES = 10;
   var WS_RETRY_DELAY = 3000;
+  var MAX_RETRY_DELAY = 30000; // 30 seconds max
   var wsPingInterval = null;
+  var wsConnectionStartTime = null;
+  var wsMessageCount = 0;
+  var wsLastPongTime = null;
 
   function connectWebSocket() {
     var protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -1630,7 +1901,9 @@
 
       ws.onopen = function() {
         wsRetryCount = 0;
-        updateConnectionStatus('connected');
+        wsConnectionStartTime = Date.now();
+        wsMessageCount = 0;
+        updateConnectionStatus('connected', 'WebSocket connection established');
         if (wsPingInterval) clearInterval(wsPingInterval);
         wsPingInterval = setInterval(function() {
           if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1642,25 +1915,46 @@
       ws.onmessage = function(event) {
         try {
           var msg = JSON.parse(event.data);
-          handleWsMessage(msg);
+          // Validate message structure
+          if (msg && typeof msg === 'object' && msg.type) {
+            wsMessageCount++;
+            
+            // Handle pong response for latency measurement
+            if (msg.type === 'pong') {
+              wsLastPongTime = Date.now();
+              updateConnectionQuality();
+            } else {
+              handleWsMessage(msg);
+            }
+          } else {
+            console.warn('Invalid WebSocket message format:', msg);
+          }
         } catch (e) {
-          // ignore parse errors
+          console.warn('Failed to parse WebSocket message:', e, 'Data:', event.data);
         }
       };
 
-      ws.onclose = function() {
+      ws.onclose = function(event) {
         updateConnectionStatus('disconnected');
         if (wsPingInterval) clearInterval(wsPingInterval);
+        
         if (wsRetryCount < MAX_WS_RETRIES) {
           wsRetryCount++;
-          setTimeout(connectWebSocket, WS_RETRY_DELAY);
+          // Exponential backoff with jitter
+          var delay = Math.min(WS_RETRY_DELAY * Math.pow(1.5, wsRetryCount - 1), MAX_RETRY_DELAY);
+          // Add jitter (±20%) to prevent thundering herd
+          delay = delay * (0.8 + Math.random() * 0.4);
+          console.log('WebSocket closed. Reconnecting in ' + Math.round(delay) + 'ms (attempt ' + wsRetryCount + ')');
+          setTimeout(connectWebSocket, Math.round(delay));
         } else {
+          console.log('WebSocket max retries reached. Switching to polling fallback.');
           startPollingFallback();
         }
       };
 
-      ws.onerror = function() {
-        updateConnectionStatus('error');
+      ws.onerror = function(error) {
+        updateConnectionStatus('error', 'WebSocket error occurred');
+        console.error('WebSocket error:', error);
       };
     } catch (e) {
       startPollingFallback();
@@ -1694,11 +1988,58 @@
     }
   }
 
-  function updateConnectionStatus(status) {
+  function updateConnectionStatus(status, details) {
     var el = document.getElementById('ws-status');
     if (!el) return;
     el.className = 'ws-status ' + status;
-    el.textContent = status === 'connected' ? 'Live' : status === 'disconnected' ? 'Reconnecting...' : 'Polling';
+    
+    var statusText = '';
+    switch(status) {
+      case 'connected':
+        statusText = 'Live WebSocket';
+        break;
+      case 'disconnected':
+        statusText = 'Reconnecting' + (wsRetryCount > 0 ? ' (' + wsRetryCount + ')' : '') + '...';
+        break;
+      case 'error':
+        statusText = 'Polling Fallback';
+        break;
+      default:
+        statusText = status;
+    }
+    
+    el.textContent = statusText;
+    
+    // Add connection quality info to tooltip
+    var tooltip = details || statusText;
+    if (status === 'connected' && wsConnectionStartTime) {
+      var uptime = Math.floor((Date.now() - wsConnectionStartTime) / 1000);
+      tooltip += '\\nUptime: ' + formatDuration(uptime);
+      tooltip += '\\nMessages: ' + wsMessageCount;
+      if (wsLastPongTime) {
+        var latency = Date.now() - wsLastPongTime;
+        tooltip += '\\nLatency: ' + latency + 'ms';
+      }
+    }
+    
+    el.title = tooltip;
+  }
+  
+  function updateConnectionQuality() {
+    // Update connection status with current quality info
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      updateConnectionStatus('connected', 'WebSocket connection active');
+    }
+  }
+  
+  function formatDuration(seconds) {
+    if (seconds < 60) return seconds + 's';
+    var minutes = Math.floor(seconds / 60);
+    var remainingSeconds = seconds % 60;
+    if (minutes < 60) return minutes + 'm ' + remainingSeconds + 's';
+    var hours = Math.floor(minutes / 60);
+    var remainingMinutes = minutes % 60;
+    return hours + 'h ' + remainingMinutes + 'm';
   }
 
   function startPollingFallback() {

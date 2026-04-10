@@ -37,7 +37,7 @@ class TestProtocolVersioning:
         path = os.path.join(os.path.dirname(__file__), "..", "dashboard", "server.py")
         with open(path) as f:
             content = f.read()
-        assert '1.4.0' in content
+        assert '1.4.1' in content
 
     def test_agent_registration_stores_simp_versions(self):
         from simp.server.broker import SimpBroker, BrokerConfig

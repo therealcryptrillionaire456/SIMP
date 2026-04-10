@@ -372,7 +372,14 @@ body {
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.section-description {
+  font-size: 0.8rem;
+  color: var(--text-muted);
   margin-bottom: 16px;
+  line-height: 1.4;
 }
 
 /* ==========================================================================
@@ -473,6 +480,36 @@ body {
   text-align: right;
 }
 
+.flow-timeline {
+  display: grid;
+  gap: 8px;
+  min-width: 240px;
+}
+
+.flow-step {
+  border-left: 2px solid var(--border);
+  padding-left: 10px;
+}
+
+.flow-step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 3px;
+}
+
+.flow-step-label {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.flow-step-meta,
+.flow-timeline-summary {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
 .empty-row {
   text-align: center;
   color: var(--text-muted);
@@ -508,6 +545,60 @@ body {
 .status-badge.offline   { background: var(--red-dim); color: var(--red); }
 .status-badge.degraded  { background: var(--amber-dim); color: var(--amber); }
 .status-badge.unknown   { background: var(--gray-dim); color: var(--gray); }
+
+.card-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.75rem;
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+.card-status.online {
+  background: var(--green-dim);
+  color: var(--green);
+}
+.card-status.offline {
+  background: var(--red-dim);
+  color: var(--red);
+}
+.card-status.unknown {
+  background: var(--gray-dim);
+  color: var(--gray);
+}
+
+.card-subvalue {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 0.125rem;
+  opacity: 0.9;
+}
+
+/* Agent grouping for observability section */
+.agent-group {
+  margin-bottom: 1.5rem;
+}
+
+.agent-group:last-child {
+  margin-bottom: 0;
+}
+
+.group-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--gray-dim);
+}
+
+.group-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
 
 /* Capability pill */
 .cap-pill {
