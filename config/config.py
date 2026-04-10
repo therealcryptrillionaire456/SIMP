@@ -56,7 +56,7 @@ class SimpConfig(BaseSettings):
     TLS_CA_BUNDLE: str = Field(default="", validation_alias="SIMP_TLS_CA")
 
     REQUIRE_SIGNATURES: bool = Field(default=True, validation_alias="SIMP_REQUIRE_SIGNATURES")
-    REQUIRE_API_KEY: bool = Field(default=True, validation_alias="SIMP_REQUIRE_API_KEY")
+    REQUIRE_API_KEY: bool = Field(default=False, validation_alias="SIMP_REQUIRE_API_KEY")
     API_KEYS: str = Field(default="", validation_alias="SIMP_API_KEYS")
 
     RATE_LIMIT_ROUTE: str = Field(default="60 per minute", validation_alias="SIMP_RATE_LIMIT_ROUTE")

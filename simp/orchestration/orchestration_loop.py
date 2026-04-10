@@ -297,9 +297,24 @@ class OrchestrationLoop:
 
                 self.tasks_failed += 1
                 summary["tasks_failed"] += 1
-                self.logger.warning(
-                    f"Failed to assign task {task_id} [{priority}]: {delivery_status}"
+
+                # Track assignment failures — expire task after max retries
+                retry_count = task.get("retry_count", 0) + 1
+                max_retries = task.get("max_retries", 3)
+                self.task_ledger.fail_task(
+                    task_id,
+                    error={"reason": f"Assignment failed: {delivery_status}"},
+                    failure_class="agent_unavailable",
                 )
+                if retry_count >= max_retries:
+                    self.logger.warning(
+                        f"Task {task_id} [{priority}] permanently failed after {retry_count} retries"
+                    )
+                else:
+                    self.logger.warning(
+                        f"Failed to assign task {task_id} [{priority}]: {delivery_status} "
+                        f"(attempt {retry_count}/{max_retries})"
+                    )
 
         return summary
 
