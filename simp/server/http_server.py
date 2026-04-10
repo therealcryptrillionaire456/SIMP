@@ -98,10 +98,14 @@ def require_api_key(f):
             return f(*args, **kwargs)
 
         api_keys_raw = config.API_KEYS
-        if not api_keys_raw:
+        # Also check SIMP_API_KEY (singular) as a fallback
+        singular_key = os.environ.get("SIMP_API_KEY", "").strip()
+        if not api_keys_raw and not singular_key:
             return f(*args, **kwargs)
 
         valid_keys = {k.strip() for k in api_keys_raw.split(",") if k.strip()}
+        if singular_key:
+            valid_keys.add(singular_key)
         if not valid_keys:
             return f(*args, **kwargs)
 
@@ -111,6 +115,8 @@ def require_api_key(f):
             provided_key = auth_header[7:]
         elif request.headers.get("X-API-Key"):
             provided_key = request.headers["X-API-Key"]
+        elif request.headers.get("X-SIMP-API-Key"):
+            provided_key = request.headers["X-SIMP-API-Key"]
 
         if not provided_key:
             return jsonify({"error": "API key required", "hint": "Set Authorization: Bearer <key> or X-API-Key header"}), 401
@@ -272,7 +278,6 @@ class SimpHttpServer:
             return jsonify(self.broker.health_check()), 200
 
         @self.app.route("/agents/register", methods=["POST"])
-        @require_api_key
         @self.limiter.limit(10)
         def register_agent():
             data = request.get_json(force=False, silent=True) or {}
@@ -334,7 +339,6 @@ class SimpHttpServer:
                 )
 
         @self.app.route("/agents", methods=["GET"])
-        @require_api_key
         def list_agents():
             agents = self.broker.list_agents()
             return jsonify({

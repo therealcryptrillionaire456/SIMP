@@ -148,9 +148,9 @@ def _resolve_dir(env_var: str, default: str) -> Path:
     p.mkdir(parents=True, exist_ok=True)
     return p
 
-BULLBEAR_ROOT = Path(os.environ.get("BULLBEAR_ROOT", "~/bullbear")).expanduser()
-INBOX_DIR     = _resolve_dir("COWORK_INBOX",  str(BULLBEAR_ROOT / "signals" / "cowork_inbox"))
-OUTBOX_DIR    = _resolve_dir("COWORK_OUTBOX", str(BULLBEAR_ROOT / "signals" / "cowork_outbox"))
+_REPO_ROOT    = Path(__file__).resolve().parents[2]
+INBOX_DIR     = _resolve_dir("COWORK_INBOX",  str(_REPO_ROOT / "data" / "inboxes" / "claude_cowork"))
+OUTBOX_DIR    = _resolve_dir("COWORK_OUTBOX", str(_REPO_ROOT / "data" / "outboxes" / "claude_cowork"))
 
 # ---------------------------------------------------------------------------
 # CoWork Bridge

@@ -37,10 +37,12 @@ echo "Type: status_check (safe, no side effects)"
 echo ""
 
 echo "1. Sending to broker at $BROKER..."
-RESULT=$(curl -sf -X POST "$BROKER/intents/route" \
-    -H "Content-Type: application/json" \
-    ${API_KEY:+-H "Authorization: Bearer $API_KEY"} \
-    -d "$PAYLOAD" 2>&1)
+CURL_ARGS=(-sf -X POST "$BROKER/intents/route" -H "Content-Type: application/json")
+if [ -n "$API_KEY" ]; then
+    CURL_ARGS+=(-H "Authorization: Bearer $API_KEY" -H "X-SIMP-API-Key: $API_KEY")
+fi
+CURL_ARGS+=(-d "$PAYLOAD")
+RESULT=$( curl "${CURL_ARGS[@]}" 2>&1 )
 
 if [ $? -eq 0 ]; then
     echo "   ✓ Broker accepted intent"
