@@ -54,6 +54,7 @@ INTENT_TYPE_REGISTRY = {
     "arbitrage_check": {"task_type": "analysis", "description": "Arbitrage opportunity check"},
     "orchestration_command": {"task_type": "architecture", "description": "Orchestration command"},
     "check_status": {"task_type": "research", "description": "Status check request"},
+    "status_check": {"task_type": "research", "description": "Diagnostic status check"},
     "replan": {"task_type": "architecture", "description": "Replanning request"},
 }
 

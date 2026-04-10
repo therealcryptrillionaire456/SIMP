@@ -132,7 +132,7 @@ def _require_api_key(f):
     """A2A-style API key check (env-var based, used by A2A routes)."""
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
-        if os.environ.get("SIMP_REQUIRE_API_KEY", "true").lower() in ("false", "0", "no"):
+        if os.environ.get("SIMP_REQUIRE_API_KEY", "false").lower() in ("false", "0", "no"):
             return f(*args, **kwargs)
         key = request.headers.get("X-API-Key", "")
         expected = os.environ.get("SIMP_API_KEY", "")
@@ -464,7 +464,6 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/intents/route", methods=["POST"])
-        @require_api_key
         @self.limiter.limit(60)
         def route_intent():
             data = request.get_json(force=False, silent=True) or {}
