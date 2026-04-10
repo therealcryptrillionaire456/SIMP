@@ -1,0 +1,34 @@
+{
+  "sources": [
+    {
+      "type": "file",
+      "path": "sample_logs/syslog.log",
+      "format": "syslog",
+      "enabled": true
+    },
+    {
+      "type": "file",
+      "path": "sample_logs/apache_access.log",
+      "format": "apache",
+      "enabled": true
+    },
+    {
+      "type": "syslog",
+      "host": "127.0.0.1",
+      "port": 1514,
+      "enabled": true
+    }
+  ],
+  "processing": {
+    "batch_size": 100,
+    "flush_interval_seconds": 5,
+    "output_directory": "data/processed_logs",
+    "retention_days": 30
+  },
+  "integration": {
+    "with_bill_russel": "Processed logs feed into threat detection",
+    "with_secbert": "Logs classified by ML model",
+    "with_mistral": "Complex patterns analyzed by LLM",
+    "alerts": "Suspicious logs trigger Telegram alerts"
+  }
+}

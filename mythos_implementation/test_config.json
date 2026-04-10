@@ -1,0 +1,17 @@
+{
+  "batch_size": 2,
+  "gradient_accumulation_steps": 2,
+  "learning_rate": 0.0005,
+  "weight_decay": 0.01,
+  "num_train_epochs": 1,
+  "warmup_steps": 100,
+  "max_grad_norm": 1.0,
+  "logging_steps": 10,
+  "save_steps": 100,
+  "eval_steps": 50,
+  "output_dir": "outputs",
+  "checkpoint_dir": "checkpoints",
+  "log_dir": "logs",
+  "use_mixed_precision": true,
+  "device": "auto"
+}

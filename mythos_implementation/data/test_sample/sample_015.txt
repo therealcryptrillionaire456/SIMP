@@ -1,0 +1,1 @@
+Computer vision allows AI to interpret and understand visual information from the world.
