@@ -461,6 +461,42 @@ python3 examples/a2a_demo.py --broker-url http://127.0.0.1:5555
 
 > A2A is an adapter surface. SIMP CanonicalIntent remains the routing authority.
 
+## Bill Russell Protocol (BRP)
+
+SIMP includes the Bill Russell Protocol — a defensive security subsystem named after the greatest defensive basketball player ever. BRP provides autonomous threat detection and response capabilities specifically designed to counter advanced AI-level threats.
+
+### BRP Features
+
+- **Pattern Recognition at Depth** — Detects attack signatures before completion (PCAP + Sysmon)
+- **Autonomous Reasoning Chains** — Threat assessment without human review
+- **Memory Across Time** — Correlates security events weeks apart
+- **Sigma Rule Engine** — Custom detection rules for known threat patterns
+- **ML Pipeline** — SecBERT fine-tuning for security event classification
+- **Telegram Alerts** — Real-time threat notifications
+
+### BRP Architecture
+
+```
+simp/security/brp/           # Core protocol (pattern recognition, reasoning, memory)
+simp/security/brp_bridge.py  # Bridge to SIMP broker (Mother Goose integration)
+simp/security/brp_models.py  # Typed event schemas
+simp/agents/brp_agent.py     # BRP agent for SIMP broker
+simp/integrations/brp/       # Log ingestion, alerts, sigma rules, ML pipeline
+config/brp/                  # BRP configuration
+```
+
+### BRP Quick Start
+
+```bash
+# Run BRP tests
+python3 -m pytest tests/test_brp_bridge.py tests/test_brp_end_to_end_smoke.py -v
+
+# Run BRP integration tests
+python3 -m pytest tests/security/brp/ -v
+```
+
+See [docs/brp/README.md](docs/brp/README.md) for full documentation.
+
 ## License
 
 MIT
