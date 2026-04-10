@@ -22,10 +22,13 @@ logger = logging.getLogger("SIMP.IntentLedger")
 # Configuration
 # ---------------------------------------------------------------------------
 
+_REPO_ROOT = str(Path(__file__).resolve().parent.parent.parent)
+
+
 @dataclass
 class LedgerConfig:
     """Tuning knobs for the intent ledger."""
-    path: str = "data/task_ledger.jsonl"
+    path: str = os.path.join(_REPO_ROOT, "data", "task_ledger.jsonl")
     max_size_mb: float = 100.0
     expire_after_hours: float = 168.0  # 7 days
 
