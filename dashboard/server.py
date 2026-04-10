@@ -1646,6 +1646,111 @@ async def index():
     return FileResponse(STATIC_DIR / "index.html")
 
 
+# ---------------------------------------------------------------------------
+# Sprint 56 — _broker_get helper (stdlib urllib, no requests dependency)
+# ---------------------------------------------------------------------------
+
+def _broker_get(path: str, default=None, timeout: float = 3.0):
+    """Fetch JSON from the SIMP broker via stdlib urllib.
+
+    Returns parsed JSON on success, *default* on any error.
+    Uses only stdlib — no ``requests`` or ``httpx`` dependency.
+    """
+    import urllib.request
+    import urllib.error
+
+    url = f"{BROKER_URL.rstrip('/')}{path}"
+    req = urllib.request.Request(url, method="GET")
+    req.add_header("Accept", "application/json")
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = resp.read()
+            return json.loads(body) if body else default
+    except Exception:
+        return default
+
+
+# ---------------------------------------------------------------------------
+# Sprint 56 — Unified A2A / FinancialOps dashboard endpoints
+# ---------------------------------------------------------------------------
+
+@app.get("/dashboard/a2a/status")
+async def dashboard_a2a_status():
+    """A2A compatibility status for the dashboard."""
+    agents_data = _broker_get("/agents", default={"agents": []})
+    agents_list = agents_data.get("agents", []) if isinstance(agents_data, dict) else []
+
+    return {
+        "a2a_capable_agents": agents_list,
+        "quota_status": {
+            "a2a_route_limit": "30 req/min",
+            "payload_limit": "64KB",
+        },
+        "enforcement_status": {
+            "schema_validation": "enabled",
+            "rate_limiting": "enabled",
+            "payload_limits": "enabled",
+            "replay_protection": "planned",
+        },
+    }
+
+
+@app.get("/dashboard/financial-ops/status")
+async def dashboard_financial_ops_status():
+    """FinancialOps connector health and mode status."""
+    health = _broker_get("/a2a/agents/financial-ops/connector-health", default={})
+    return {
+        "mode": "dry_run",
+        "live_payments_enabled": False,
+        "health": health,
+    }
+
+
+@app.get("/dashboard/financial-ops/proposals")
+async def dashboard_financial_ops_proposals():
+    """Proposals for dashboard display."""
+    data = _broker_get("/a2a/agents/financial-ops/proposals", default={"proposals": [], "count": 0})
+    if not isinstance(data, dict):
+        data = {"proposals": [], "count": 0}
+    return data
+
+
+@app.get("/dashboard/financial-ops/ledger")
+async def dashboard_financial_ops_ledger():
+    """Combined ledger for dashboard display."""
+    data = _broker_get("/a2a/agents/financial-ops/ledger", default={"simulated": {}, "live": {}})
+    if not isinstance(data, dict):
+        data = {"simulated": {}, "live": {}}
+    return data
+
+
+@app.get("/dashboard/financial-ops/rollback")
+async def dashboard_financial_ops_rollback():
+    """Rollback status for dashboard display."""
+    data = _broker_get("/a2a/agents/financial-ops/rollback/status", default={"state": "unknown"})
+    if not isinstance(data, dict):
+        data = {"state": "unknown"}
+    return data
+
+
+@app.get("/dashboard/financial-ops/budget")
+async def dashboard_financial_ops_budget():
+    """Budget summary for dashboard display."""
+    data = _broker_get("/a2a/agents/financial-ops/budget", default={})
+    if not isinstance(data, dict):
+        data = {}
+    return data
+
+
+@app.get("/dashboard/financial-ops/gates")
+async def dashboard_financial_ops_gates():
+    """Gate status for dashboard display."""
+    data = _broker_get("/a2a/agents/financial-ops/gates", default={})
+    if not isinstance(data, dict):
+        data = {}
+    return data
+
+
 # Mount static files AFTER explicit routes so /api/* is not shadowed
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 

@@ -9,7 +9,7 @@ import asyncio
 import json
 import logging
 import os
-from collections import deque
+from collections import deque, OrderedDict
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any, Callable
 from datetime import datetime, timedelta, timezone
@@ -66,6 +66,7 @@ class BrokerConfig:
     enable_logging: bool = True
     log_level: str = ""
     max_log_lines: int = 10000
+    max_intent_records: int = 10000
 
     def __post_init__(self):
         """Fill in defaults from SimpConfig if not explicitly set."""
@@ -92,10 +93,19 @@ class IntentRecord:
     target_agent: str
     intent_type: str
     timestamp: str
-    status: str  # pending, executing, completed, failed
+    status: str  # pending, executing, completed, failed, expired
     response: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     execution_time_ms: float = 0.0
+    # Sprint 51 — delivery tracking
+    delivery_status: Optional[str] = None
+    delivery_attempts: int = 0
+    delivery_elapsed_ms: float = 0.0
+    # Sprint 63 — planner telemetry
+    planned_at: Optional[str] = None
+    dispatched_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    retry_count: int = 0
 
 
 class SimpBroker:
@@ -121,12 +131,18 @@ class SimpBroker:
         self.hooks = hooks
         self.logger = self._setup_logging()
 
+        # Sprint 64 — restart resilience
+        self._startup_at: datetime = datetime.now(timezone.utc)
+        self._ready: bool = False
+        self._intents_loaded_from_disk: int = 0
+
         # Agent registry
         self.agents: Dict[str, Dict[str, Any]] = {}  # agent_id -> agent info
         self.agent_lock = threading.RLock()
 
-        # Intent tracking
-        self.intent_records: Dict[str, IntentRecord] = {}
+        # Intent tracking — bounded OrderedDict with LRU eviction
+        self._max_intent_records = self.config.max_intent_records
+        self.intent_records: OrderedDict[str, IntentRecord] = OrderedDict()
         self.intent_queue: "queue.Queue[Dict[str, Any]]" = queue.Queue(
             maxsize=self.config.max_pending_intents
         )
@@ -176,6 +192,34 @@ class SimpBroker:
         self._background_tasks: list = []
         self._async_loop: Optional[asyncio.AbstractEventLoop] = None
 
+        # Sprint 51 — delivery engine
+        from simp.server.delivery import DEFAULT_DELIVERY_ENGINE
+        self.delivery_engine = DEFAULT_DELIVERY_ENGINE
+
+        # Sprint 52 — intent ledger (renamed from task_ledger in Sprint 61)
+        from simp.server.intent_ledger import INTENT_LEDGER
+        self.intent_ledger = INTENT_LEDGER
+        # Load pending intents from intent ledger on init (Sprint 64: count loaded)
+        try:
+            for rec in self.intent_ledger.load_pending():
+                iid = rec.get("intent_id")
+                if iid and iid not in self.intent_records:
+                    self.intent_records[iid] = IntentRecord(
+                        intent_id=iid,
+                        source_agent=rec.get("source_agent", ""),
+                        target_agent=rec.get("target_agent", ""),
+                        intent_type=rec.get("intent_type", ""),
+                        timestamp=rec.get("timestamp", ""),
+                        status="pending",
+                    )
+                    self._intents_loaded_from_disk += 1
+        except Exception:
+            pass
+
+        # Sprint 53 — routing engine
+        from simp.server.routing_engine import RoutingEngine
+        self.routing_engine = RoutingEngine()
+
         self.logger.info(f"🚀 SIMP Broker initialized (v0.3.0)")
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
@@ -216,6 +260,19 @@ class SimpBroker:
         logger.addHandler(handler)
         return logger
 
+    def _add_intent_record(self, intent_id: str, record: IntentRecord) -> None:
+        """Add an intent record with LRU eviction when at capacity.
+
+        Must be called while holding self.intent_lock.
+        """
+        if intent_id in self.intent_records:
+            self.intent_records.move_to_end(intent_id)
+            self.intent_records[intent_id] = record
+            return
+        while len(self.intent_records) >= self._max_intent_records:
+            self.intent_records.popitem(last=False)
+        self.intent_records[intent_id] = record
+
     def register_agent(
         self,
         agent_id: str,
@@ -244,6 +301,8 @@ class SimpBroker:
                 self.logger.error(f"❌ Max agents ({self.config.max_agents}) reached")
                 return False
 
+            now = _utcnow_iso()
+            is_file_based = "(file-based)" in (endpoint or "")
             self.agents[agent_id] = {
                 "agent_id": agent_id,
                 "agent_type": agent_type,
@@ -251,11 +310,16 @@ class SimpBroker:
                 "metadata": metadata or {},
                 "public_key": (metadata or {}).get("public_key"),
                 "simp_versions": (metadata or {}).get("simp_versions", ["1.0"]),
-                "registered_at": _utcnow_iso(),
+                "registered_at": now,
                 "intents_received": 0,
                 "intents_completed": 0,
                 "status": "online",
                 "health_check_failures": 0,
+                # Sprint 62 — heartbeat tracking
+                "last_heartbeat": now,
+                "heartbeat_count": 0,
+                "stale": False,
+                "file_based": is_file_based,
             }
 
             with self.stats_lock:
@@ -276,6 +340,80 @@ class SimpBroker:
                 self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
                 return True
             return False
+
+    # ------------------------------------------------------------------
+    # Sprint 62: Heartbeat System
+    # ------------------------------------------------------------------
+
+    def record_heartbeat(self, agent_id: str) -> bool:
+        """Update heartbeat timestamp for an agent. Returns True if found."""
+        with self.agent_lock:
+            agent = self.agents.get(agent_id)
+            if not agent:
+                return False
+            agent["last_heartbeat"] = _utcnow_iso()
+            agent["heartbeat_count"] = agent.get("heartbeat_count", 0) + 1
+            agent["status"] = "active"
+            agent["stale"] = False
+            return True
+
+    def get_stale_agents(self, stale_after_seconds: float = 90.0) -> list:
+        """Return agent_ids whose last_heartbeat exceeds the threshold.
+        Excludes file-based agents. Returns [] during startup grace period."""
+        # Sprint 64 — startup grace period
+        if hasattr(self, "_startup_at") and self._startup_at:
+            uptime = (datetime.now(timezone.utc) - self._startup_at).total_seconds()
+            if uptime < 60.0:
+                return []
+
+        now = datetime.now(timezone.utc)
+        stale = []
+        with self.agent_lock:
+            for aid, info in self.agents.items():
+                if info.get("file_based"):
+                    continue
+                hb = info.get("last_heartbeat", "")
+                if not hb:
+                    continue
+                try:
+                    hb_dt = datetime.fromisoformat(hb.replace("Z", "+00:00"))
+                    if (now - hb_dt).total_seconds() > stale_after_seconds:
+                        stale.append(aid)
+                        info["stale"] = True
+                except (ValueError, TypeError):
+                    pass
+        return stale
+
+    def deregister_stale_agents(self, deregister_after_seconds: float = 300.0) -> list:
+        """Deregister agents whose heartbeat exceeds the threshold.
+        Excludes file-based agents. Returns list of deregistered ids.
+        Returns [] during startup grace period."""
+        # Sprint 64 — startup grace period
+        if hasattr(self, "_startup_at") and self._startup_at:
+            uptime = (datetime.now(timezone.utc) - self._startup_at).total_seconds()
+            if uptime < 60.0:
+                return []
+
+        now = datetime.now(timezone.utc)
+        to_deregister = []
+        with self.agent_lock:
+            for aid, info in list(self.agents.items()):
+                if info.get("file_based"):
+                    continue
+                hb = info.get("last_heartbeat", "")
+                if not hb:
+                    continue
+                try:
+                    hb_dt = datetime.fromisoformat(hb.replace("Z", "+00:00"))
+                    if (now - hb_dt).total_seconds() > deregister_after_seconds:
+                        to_deregister.append(aid)
+                except (ValueError, TypeError):
+                    pass
+            for aid in to_deregister:
+                del self.agents[aid]
+                self.logger.info(f"Deregistered stale agent: {aid}")
+                self._log_event("agent_stale_deregistered", f"Stale agent {aid} deregistered", agent_id=aid)
+        return to_deregister
 
     def get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
         """Get agent information"""
@@ -353,6 +491,14 @@ class SimpBroker:
         with self.stats_lock:
             self.stats["intents_received"] += 1
 
+        # Sprint 53 — routing engine: resolve target when "auto" or missing
+        if not target_agent or target_agent == "auto":
+            with self.agent_lock:
+                agents_snapshot = dict(self.agents)
+            decision = self.routing_engine.resolve(intent_type, target_agent, agents_snapshot)
+            if decision.target_agent:
+                target_agent = decision.target_agent
+
         # Log to task ledger — reuse existing task if one was already created
         existing_task_id = intent_data.get("task_id") or intent_data.get("params", {}).get("task_id")
         existing_task = self.task_ledger.get_task(existing_task_id) if existing_task_id else None
@@ -412,7 +558,7 @@ class SimpBroker:
                         status="failed",
                         error=error_msg,
                     )
-                    self.intent_records[intent_id] = record
+                    self._add_intent_record(intent_id, record)
 
                 with self.stats_lock:
                     self.stats["intents_failed"] += 1
@@ -428,19 +574,19 @@ class SimpBroker:
         self.task_ledger.claim_task(task_id, target_agent)
         self.task_ledger.update_status(task_id, "in_progress")
 
-        # Record intent as pending
+        # Record intent as pending — Sprint 63: set planned_at
+        now_iso = _utcnow_iso()
         with self.intent_lock:
-            if len(self.intent_records) >= self.MAX_INTENT_RECORDS:
-                self._evict_oldest_records(count=1000)
             record = IntentRecord(
                 intent_id=intent_id,
                 source_agent=source_agent,
                 target_agent=target_agent,
                 intent_type=intent_type,
-                timestamp=_utcnow_iso(),
+                timestamp=now_iso,
                 status="pending",
+                planned_at=now_iso,
             )
-            self.intent_records[intent_id] = record
+            self._add_intent_record(intent_id, record)
 
         self.logger.info(
             f"📤 Routing intent: {intent_id} ({intent_type}) "
@@ -450,6 +596,11 @@ class SimpBroker:
             "intent_routed", f"Intent {intent_id} ({intent_type}) {source_agent} → {target_agent}",
             agent_id=target_agent, intent_id=intent_id,
         )
+
+        # Sprint 63: set dispatched_at just before delivery
+        with self.intent_lock:
+            if intent_id in self.intent_records:
+                self.intent_records[intent_id].dispatched_at = _utcnow_iso()
 
         # Actually deliver the intent to the target agent
         target_endpoint = target.get("endpoint", "")
@@ -997,6 +1148,8 @@ class SimpBroker:
             record.response = response_data
             record.status = "completed"
             record.execution_time_ms = execution_time_ms
+            # Sprint 63 — set completed_at
+            record.completed_at = _utcnow_iso()
 
             with self.stats_lock:
                 self.stats["intents_completed"] += 1
@@ -1033,6 +1186,14 @@ class SimpBroker:
                 except Exception:
                     self.logger.debug("Memory hook on_task_completed failed", exc_info=True)
 
+            # Sprint 52 — ledger append on response
+            self.intent_ledger.append({
+                "intent_id": intent_id,
+                "status": "completed",
+                "execution_time_ms": execution_time_ms,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
+
             return True
 
     def record_error(
@@ -1047,6 +1208,8 @@ class SimpBroker:
             record.error = error
             record.status = "failed"
             record.execution_time_ms = execution_time_ms
+            # Sprint 63 — set completed_at
+            record.completed_at = _utcnow_iso()
 
             with self.stats_lock:
                 self.stats["intents_failed"] += 1
@@ -1063,6 +1226,16 @@ class SimpBroker:
                 "intent_error", f"Intent {intent_id} failed: {error}",
                 level="error", intent_id=intent_id,
             )
+
+            # Sprint 52 — ledger append on error
+            self.intent_ledger.append({
+                "intent_id": intent_id,
+                "status": "failed",
+                "error": error,
+                "execution_time_ms": execution_time_ms,
+                "timestamp": datetime.utcnow().isoformat(),
+            })
+
             return True
 
     def _map_intent_to_task_type(self, intent_type: str) -> str:
@@ -1159,6 +1332,11 @@ class SimpBroker:
                 "execution_time_ms": record.execution_time_ms,
                 "response": record.response,
                 "error": record.error,
+                # Sprint 63 — telemetry fields
+                "planned_at": record.planned_at,
+                "dispatched_at": record.dispatched_at,
+                "completed_at": record.completed_at,
+                "retry_count": record.retry_count,
             }
 
     def get_statistics(self) -> Dict[str, Any]:
@@ -1191,6 +1369,23 @@ class SimpBroker:
             )
         else:
             stats["avg_route_time_ms"] = 0.0
+
+        # Sprint 52 — intent ledger stats
+        try:
+            stats["task_ledger"] = self.intent_ledger.get_stats()
+        except Exception:
+            stats["task_ledger"] = {}
+
+        # Sprint 62 — heartbeat stats
+        with self.agent_lock:
+            stats["stale_agents"] = sum(
+                1 for a in self.agents.values()
+                if a.get("stale") and not a.get("file_based")
+            )
+            stats["file_based_agents"] = sum(
+                1 for a in self.agents.values()
+                if a.get("file_based")
+            )
 
         return stats
 
@@ -1264,6 +1459,12 @@ class SimpBroker:
                 self._background_tasks.append(fut)
         self.logger.info(f"📬 Intent queue workers started ({worker_count})")
 
+        # Sprint 64 — mark ready
+        self._ready = True
+        self.logger.info(
+            f"✅ Broker ready — {len(self.agents)} agents, "
+            f"{self._intents_loaded_from_disk} intents loaded"
+        )
         self.logger.info("✅ SIMP Broker RUNNING")
 
     async def _intent_queue_worker(self) -> None:

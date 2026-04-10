@@ -53,7 +53,7 @@ def validate_endpoint(endpoint: Any) -> Tuple[bool, Optional[str]]:
     if len(endpoint) > 256:
         return False, "endpoint too long (max 256 chars)"
     # Must be http(s) URL, localhost reference, or empty (file-based)
-    if endpoint == "":
+    if endpoint == "" or endpoint == "(file-based)":
         return True, None  # file-based agent
     if endpoint.startswith(("http://", "https://")):
         return True, None
