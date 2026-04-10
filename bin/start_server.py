@@ -89,6 +89,15 @@ Examples:
 
     logger = logging.getLogger("SIMP")
 
+    # BRP startup check
+    try:
+        from simp.security.brp_bridge import BRPBridge
+        _brp = BRPBridge()
+        print(f"[BRP] Bill Russell Protocol initialized in shadow mode (data: {_brp.data_dir})")
+        del _brp
+    except Exception as brp_err:
+        print(f"[BRP] Bill Russell Protocol not available (import failed: {brp_err})")
+
     print("\n🎯 Available Endpoints:")
     print(f"   GET    http://{args.host}:{args.port}/health")
     print(f"   GET    http://{args.host}:{args.port}/status")
