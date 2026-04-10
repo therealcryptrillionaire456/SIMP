@@ -3,7 +3,7 @@
 # Verifies: broker routing → file inbox delivery → BRP logging
 # Usage: bash bin/send_diagnostic_intent.sh
 
-BROKER="${SIMP_BROKER:-http://127.0.0.1:5555}"
+BROKER="${SIMP_BROKER:-http://127.0.0.1:8080}"
 API_KEY="${SIMP_API_KEY:-}"
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -37,19 +37,23 @@ echo "Type: status_check (safe, no side effects)"
 echo ""
 
 echo "1. Sending to broker at $BROKER..."
-CURL_ARGS=(-sf -X POST "$BROKER/intents/route" -H "Content-Type: application/json")
+CURL_ARGS=(-s -w "\n%{http_code}" -X POST "$BROKER/intents/route" -H "Content-Type: application/json")
 if [ -n "$API_KEY" ]; then
     CURL_ARGS+=(-H "Authorization: Bearer $API_KEY" -H "X-SIMP-API-Key: $API_KEY")
 fi
 CURL_ARGS+=(-d "$PAYLOAD")
-RESULT=$( curl "${CURL_ARGS[@]}" 2>&1 )
+RAW=$( curl "${CURL_ARGS[@]}" 2>&1 )
 
-if [ $? -eq 0 ]; then
-    echo "   ✓ Broker accepted intent"
+HTTP_CODE=$(echo "$RAW" | tail -1)
+RESULT=$(echo "$RAW" | sed '$d')
+
+if [ "$HTTP_CODE" = "200" ]; then
+    echo "   ✓ Broker accepted intent (HTTP $HTTP_CODE)"
     echo "$RESULT" | python3 -m json.tool 2>/dev/null || echo "$RESULT"
 else
-    echo "   ✗ Broker rejected intent or is not running"
-    echo "$RESULT"
+    echo "   ✗ Broker rejected intent (HTTP $HTTP_CODE)"
+    echo "   Response body:"
+    echo "$RESULT" | python3 -m json.tool 2>/dev/null || echo "   $RESULT"
     echo ""
     echo "   Check: curl $BROKER/health"
     exit 1

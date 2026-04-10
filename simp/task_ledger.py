@@ -322,6 +322,38 @@ class TaskLedger:
             self._append(parent)
             return new_ids
 
+    def expire_stale_on_startup(self, max_age_seconds: float = 3600.0) -> int:
+        """Expire queued/claimed tasks older than max_age_seconds.
+
+        Called at broker startup to clear stale tasks from previous sessions.
+        Returns the number of tasks expired.
+        """
+        from datetime import datetime, timezone
+        import time as _time
+
+        now = _time.time()
+        expired = 0
+        with self._lock:
+            for task in list(self._tasks.values()):
+                if task["status"] not in ("queued", "claimed", "in_progress"):
+                    continue
+                created = task.get("created_at", "")
+                if not created:
+                    continue
+                try:
+                    dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+                    age = now - dt.timestamp()
+                except (ValueError, TypeError):
+                    continue
+                if age > max_age_seconds:
+                    task["status"] = "failed"
+                    task["error"] = {"reason": "Expired on startup — stale from previous session"}
+                    task["failure_class"] = "timeout"
+                    task["updated_at"] = _now_iso()
+                    self._append(task)
+                    expired += 1
+        return expired
+
     def get_failure_stats(self) -> Dict[str, int]:
         """Return counts of each failure_class across all tasks."""
         stats: Dict[str, int] = {}

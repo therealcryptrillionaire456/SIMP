@@ -1513,6 +1513,15 @@ class SimpBroker:
         self._background_tasks = []
         self._async_loop = async_loop
 
+        # Expire stale tasks from previous sessions (>1 hour old)
+        try:
+            expired = self.task_ledger.expire_stale_on_startup(max_age_seconds=3600.0)
+            if expired:
+                self.logger.info(f"♻️ Expired {expired} stale tasks from previous session")
+                self._log_event("stale_tasks_expired", f"Expired {expired} stale tasks on startup")
+        except Exception as exc:
+            self.logger.warning(f"⚠️ Stale task cleanup failed: {exc}")
+
         # Initialize shared HTTP connection pool
         if _HTTPX_AVAILABLE and self._http_pool is None:
             self._http_pool = httpx.AsyncClient(
