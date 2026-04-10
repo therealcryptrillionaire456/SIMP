@@ -39,10 +39,13 @@ def _ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
 
 
+_jsonl_lock = threading.Lock()
+
+
 def _append_jsonl(filepath: Path, record: Dict[str, Any]) -> None:
     """Thread-safe append of a single JSON object to a JSONL file."""
     line = json.dumps(record, default=str) + "\n"
-    with threading.Lock():
+    with _jsonl_lock:
         with open(filepath, "a") as f:
             f.write(line)
 
@@ -63,13 +66,20 @@ class BRPBridge:
         bridge.ingest_observation(observation)
     """
 
+    # Resolve default data_dir relative to the repo root (two levels up from
+    # this file: simp/security/brp_bridge.py → repo root).
+    _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+
     def __init__(
         self,
         data_dir: Optional[str] = None,
         default_mode: str = BRPMode.SHADOW.value,
     ):
         self.default_mode = default_mode
-        self.data_dir = Path(data_dir) if data_dir else Path("data/brp")
+        if data_dir:
+            self.data_dir = Path(data_dir)
+        else:
+            self.data_dir = self._REPO_ROOT / "data" / "brp"
         _ensure_dir(self.data_dir)
 
         # JSONL log files

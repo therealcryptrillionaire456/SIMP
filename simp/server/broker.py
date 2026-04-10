@@ -55,6 +55,9 @@ class BrokerState(str, Enum):
     STOPPED = "stopped"
 
 
+_REPO_ROOT = str(Path(__file__).resolve().parent.parent.parent)
+
+
 @dataclass
 class BrokerConfig:
     """Broker configuration — reads defaults from SimpConfig."""
@@ -66,7 +69,7 @@ class BrokerConfig:
     delivery_timeout: float = 30.0  # seconds — HTTP delivery timeout
     health_check_interval: float = 0.0  # seconds — agent health check interval
     health_check_timeout: float = 0.0  # seconds — per-agent health check timeout
-    inbox_base_dir: str = "data/inboxes"
+    inbox_base_dir: str = os.path.join(_REPO_ROOT, "data", "inboxes")
     enable_logging: bool = True
     log_level: str = ""
     max_log_lines: int = 10000
@@ -661,6 +664,7 @@ class SimpBroker:
                 fc = self.failure_handler.classify_failure(error_resp)
                 policy = self.failure_handler.get_retry_policy(fc)
 
+                fallback_succeeded = False
                 if policy.get("should_retry") and self.builder_pool:
                     fallback = self.failure_handler.get_fallback_agent(
                         fc, intent_type, self.builder_pool, exclude=[target_agent]
@@ -682,6 +686,18 @@ class SimpBroker:
                                     fallback, intent_data, intent_id
                                 )
                             delivery_result["fallback_agent"] = fallback
+                            fallback_succeeded = delivery_result.get("delivery_status") != "failed"
+
+                # If HTTP delivery and fallback both failed, write to file
+                # inbox so the agent's file poller can pick it up
+                if not fallback_succeeded and delivery_result.get("delivery_status") == "failed":
+                    self.logger.info(
+                        f"📂 HTTP delivery failed for '{target_agent}', "
+                        f"falling back to file-based inbox delivery"
+                    )
+                    delivery_result = self._deliver_file_based(
+                        target_agent, intent_data, intent_id
+                    )
         else:
             # File-based agent — write to their inbox
             delivery_result = self._deliver_file_based(

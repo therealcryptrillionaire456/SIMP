@@ -85,6 +85,26 @@ python -m pytest tests/test_brp_end_to_end_smoke.py -v      # 12/12 PASS
 | `simp/integrations/kashclaw_shim.py` | Added BRP imports, `brp_bridge`/`brp_mode` to constructor, pre-trade BRP event, post-trade BRP observation in `handle_trade()`, BRP metadata in response |
 | `simp/agents/quantumarb_agent.py` | Added `_get_brp_bridge()`, `_emit_brp_shadow_observation()` helper, BRP shadow observation call in `_process_inbox()` after arb evaluation |
 
+## Flock Bringup Fixes (2026-04-10)
+
+### BRP JSONL Path Resolution
+- **Issue:** `BRPBridge.__init__` used `Path("data/brp")` which resolved relative to CWD
+- **Fix:** Changed to resolve relative to repo root via `Path(__file__).resolve().parent.parent.parent / "data" / "brp"`
+- **Impact:** BRP logs now write consistently regardless of which directory the broker is started from
+
+### BRP Lock Bug
+- **Issue:** `_append_jsonl()` created a new `threading.Lock()` on every call — the lock was never
+  actually shared between threads, defeating its purpose
+- **Fix:** Replaced with module-level `_jsonl_lock = threading.Lock()` shared across all calls
+
+### Intent Ledger Path Resolution
+- **Issue:** `LedgerConfig.path` defaulted to `"data/task_ledger.jsonl"` (relative)
+- **Fix:** Changed to resolve relative to repo root via `os.path.join(_REPO_ROOT, "data", "task_ledger.jsonl")`
+
+### Broker Inbox Base Dir
+- **Issue:** `BrokerConfig.inbox_base_dir` defaulted to `"data/inboxes"` (relative)
+- **Fix:** Changed to resolve relative to repo root
+
 ## Remaining Gaps / Deferred Items
 
 1. **Additional geese:** Kloutbot, A2A safety layer, and Cowork bridge are not yet wired.
