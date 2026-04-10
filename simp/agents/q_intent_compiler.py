@@ -513,8 +513,15 @@ class StrategicOptimizer:
         }
 
 
-# For backward compatibility
-QIntentCompiler = StrategicOptimizer  # Alias for existing code
+class QIntentCompiler(StrategicOptimizer):
+    """QIntentCompiler - Legacy name for StrategicOptimizer
+    
+    Maintains backward compatibility with existing code that expects QIntentCompiler class.
+    """
+    
+    def __init__(self, *args, **kwargs):
+        """Initialize QIntentCompiler, passing all arguments to parent class."""
+        super().__init__(*args, **kwargs)
 
 def create_compiler() -> StrategicOptimizer:
     """Factory function to create StrategicOptimizer instance"""

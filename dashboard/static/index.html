@@ -44,9 +44,10 @@
 
   <main class="main">
 
-    <!-- Overview Cards -->
+    <!-- System Overview -->
     <section class="section" id="overview-section">
-      <h2 class="section-title">Overview</h2>
+      <h2 class="section-title">System Overview</h2>
+      <p class="section-description">Core system health and performance metrics</p>
       <div class="cards-grid" id="overview-cards">
         <div class="card" id="card-broker-status">
           <div class="card-label">Broker Status</div>
@@ -99,8 +100,10 @@
       </div>
     </section>
 
+    <!-- ProjectX Kernel -->
     <section class="section" id="projectx-process-section">
-      <h2 class="section-title">Processes</h2>
+      <h2 class="section-title">ProjectX Kernel</h2>
+      <p class="section-description">Native SIMP maintenance kernel monitoring</p>
       <div class="table-wrap">
         <table class="agents-table">
           <thead>
@@ -126,13 +129,15 @@
 
     <section class="section" id="projectx-actions-section">
       <h2 class="section-title">Recent Actions</h2>
+      <p class="section-description">ProjectX maintenance and audit activities</p>
       <div class="activity-feed" id="projectx-actions-feed">
         <div class="empty-state">No ProjectX actions recorded yet.</div>
       </div>
     </section>
 
     <section class="section" id="system-overview-section">
-      <h2 class="section-title">System Overview</h2>
+      <h2 class="section-title">Protocol Documentation</h2>
+      <p class="section-description">SIMP protocol facts and component summaries</p>
       <div class="system-overview-summary" id="system-overview-summary">
         <div class="empty-state">Protocol docs not loaded.</div>
       </div>
@@ -144,8 +149,18 @@
       </div>
     </section>
 
+    <!-- Agent Observability -->
+    <section class="section" id="agent-observability-section">
+      <h2 class="section-title">Agent Observability</h2>
+      <p class="section-description">Agent activity, status, and delivery health</p>
+      <div class="cards-grid" id="agent-observability-cards">
+        <div class="empty-state">Agent activity data loading...</div>
+      </div>
+    </section>
+
     <section class="section" id="projectx-protocol-section">
       <h2 class="section-title">Protocol Facts</h2>
+      <p class="section-description">SIMP protocol version and definition counts</p>
       <div class="cards-grid" id="projectx-protocol-cards">
         <div class="card"><div class="card-label">Protocol Version</div><div class="card-value mono" id="val-projectx-protocol-version">--</div></div>
         <div class="card"><div class="card-label">Intent Definitions</div><div class="card-value mono" id="val-projectx-intent-count">--</div></div>
@@ -159,6 +174,7 @@
 
     <section class="section" id="projectx-chat-section">
       <h2 class="section-title">ProjectX Chat</h2>
+      <p class="section-description">Interactive query interface with allowlisted audit jobs</p>
       <div class="chat-controls">
         <button class="refresh-btn projectx-job-btn" data-job="native_agent_health_check">Health Check</button>
         <button class="refresh-btn projectx-job-btn" data-job="native_agent_repo_scan">Repo Scan</button>
@@ -177,6 +193,7 @@
     <!-- Registered Agents Table -->
     <section class="section" id="agents-section">
       <h2 class="section-title">Registered Agents</h2>
+      <p class="section-description">All agents with capabilities, status, and activity metrics</p>
       <div class="table-wrap">
         <table class="agents-table" id="agents-table">
           <thead>
@@ -201,6 +218,7 @@
     <!-- Capability Map -->
     <section class="section" id="capabilities-section">
       <h2 class="section-title">Capability Map</h2>
+      <p class="section-description">Visual mapping of capabilities to available agents</p>
       <div class="cap-grid" id="cap-grid">
         <div class="empty-state">Loading...</div>
       </div>
@@ -209,6 +227,7 @@
     <!-- Task Queue -->
     <section class="section" id="task-queue-section">
       <h2 class="section-title">Task Queue</h2>
+      <p class="section-description">Task execution status and queue management</p>
       <div class="cards-grid" id="task-status-cards">
         <div class="card"><div class="card-label">Queued</div><div class="card-value mono" id="val-tasks-queued">--</div></div>
         <div class="card"><div class="card-label">Claimed</div><div class="card-value mono" id="val-tasks-claimed">--</div></div>
@@ -284,11 +303,12 @@
               <th>Agent</th>
               <th>Status</th>
               <th>Probe</th>
+              <th>Latency</th>
               <th>Error</th>
             </tr>
           </thead>
           <tbody id="smoke-tbody">
-            <tr><td colspan="4" class="empty-row">Loading...</td></tr>
+            <tr><td colspan="5" class="empty-row">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -338,12 +358,13 @@
               <th>Flow</th>
               <th>Planner</th>
               <th>Executors</th>
+              <th>Timeline</th>
               <th>Statuses</th>
               <th>Updated</th>
             </tr>
           </thead>
           <tbody id="flows-tbody">
-            <tr><td colspan="5" class="empty-row">Loading...</td></tr>
+            <tr><td colspan="6" class="empty-row">Loading...</td></tr>
           </tbody>
         </table>
       </div>

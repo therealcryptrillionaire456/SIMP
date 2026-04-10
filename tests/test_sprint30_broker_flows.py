@@ -108,9 +108,9 @@ def test_projectx_job_prefers_broker_routing(monkeypatch):
     monkeypatch.setattr(ds, "_append_operator_event", lambda **kwargs: events.append(kwargs))
 
     with TestClient(ds.app) as client:
-        response = client.post(
+        response = client.get(
             "/api/projectx/chat",
-            json={"job": "native_agent_health_check", "source_intent_id": "intent-root-1"},
+            params={"job": "native_agent_health_check", "source_intent_id": "intent-root-1"},
         )
 
     body = response.json()
@@ -137,7 +137,7 @@ def test_projectx_query_falls_back_to_direct_guard_when_broker_unavailable(monke
     monkeypatch.setattr(ds, "_append_operator_event", lambda **kwargs: events.append(kwargs))
 
     with TestClient(ds.app) as client:
-        response = client.post("/api/projectx/chat", json={"message": "what is simp"})
+        response = client.get("/api/projectx/chat", params={"message": "what is simp"})
 
     body = response.json()
     assert response.status_code == 200
@@ -145,3 +145,14 @@ def test_projectx_query_falls_back_to_direct_guard_when_broker_unavailable(monke
     assert body["broker_intent_id"] is None
     assert body["response"]["response"]["answer"] == "fallback answer"
     assert len(events) == 2
+
+
+def test_flow_ui_sources_render_timeline_markup() -> None:
+    root = os.path.join(os.path.dirname(__file__), "..", "dashboard", "static")
+    with open(os.path.join(root, "app.js")) as f:
+        app_js = f.read()
+    with open(os.path.join(root, "index.html")) as f:
+        index_html = f.read()
+
+    assert "flow-timeline" in app_js
+    assert "Timeline" in index_html

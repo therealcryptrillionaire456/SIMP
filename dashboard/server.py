@@ -13,6 +13,7 @@ import asyncio
 import contextlib
 import copy
 import json
+import logging
 import os
 import re
 import time
@@ -28,6 +29,9 @@ from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+
+# Configure logging
+logger = logging.getLogger(__name__)
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # ---------------------------------------------------------------------------
@@ -988,23 +992,37 @@ async def websocket_endpoint(websocket: WebSocket):
             except asyncio.TimeoutError:
                 await websocket.send_text(json.dumps({"type": "heartbeat"}))
     except WebSocketDisconnect:
-        pass
-    except Exception:
-        pass
+        logger.debug(f"WebSocket client disconnected: {websocket.client}")
+    except asyncio.CancelledError:
+        logger.debug(f"WebSocket task cancelled: {websocket.client}")
+    except Exception as e:
+        logger.error(f"WebSocket error for client {websocket.client}: {e}", exc_info=True)
     finally:
         _ws_clients.discard(websocket)
+        logger.debug(f"WebSocket client removed: {websocket.client}. Active clients: {len(_ws_clients)}")
 
 
 async def _broadcast_ws(event_type: str, data: dict):
     """Broadcast an event to all connected WebSocket clients."""
+    if not _ws_clients:
+        return
+    
     message = json.dumps({"type": event_type, "data": data})
     disconnected = set()
+    
     for ws in _ws_clients:
         try:
             await ws.send_text(message)
-        except Exception:
+        except WebSocketDisconnect:
             disconnected.add(ws)
-    _ws_clients -= disconnected
+            logger.debug(f"WebSocket client disconnected during broadcast: {ws.client}")
+        except Exception as e:
+            logger.warning(f"Failed to send WebSocket message to {ws.client}: {e}")
+            disconnected.add(ws)
+    
+    if disconnected:
+        _ws_clients -= disconnected
+        logger.debug(f"Removed {len(disconnected)} disconnected WebSocket clients. Active: {len(_ws_clients)}")
 
 
 # ---------------------------------------------------------------------------
@@ -1476,15 +1494,21 @@ async def api_projectx_chat_history():
     return {"status": "success", "events": _tail_operator_events(limit=20)}
 
 
-@app.post("/api/projectx/chat")
-async def api_projectx_chat(request: Request):
-    body = await request.json()
-    message = str(body.get("message", "")).strip()
-    job = str(body.get("job", "")).strip() or None
-    request_id = str(body.get("request_id") or uuid.uuid4())
-    source_intent_id = str(body.get("source_intent_id") or "").strip() or None
-    plan_id = str(body.get("plan_id") or "").strip() or None
+@app.get("/api/projectx/chat")
+async def api_projectx_chat(
+    message: str = "",
+    job: str = "",
+    request_id: str = "",
+    source_intent_id: str = "",
+    plan_id: str = ""
+):
+    message = message.strip()
+    job = job.strip() or None
+    request_id = request_id.strip() or str(uuid.uuid4())
+    source_intent_id = source_intent_id.strip() or None
+    plan_id = plan_id.strip() or None
     started = time.time()
+    
     if not message and not job:
         return {"status": "error", "error": "message_or_job_required"}
 

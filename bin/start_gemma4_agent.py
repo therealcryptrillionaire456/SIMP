@@ -22,6 +22,7 @@ import os
 import signal
 import sys
 import threading
+import time
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -45,7 +46,7 @@ class AgentHTTPHandler(BaseHTTPRequestHandler):
             self._respond(404, {"error": "Not found"})
 
     def do_POST(self):
-        if self.path == "/intents/handle":
+        if self.path in {"/intents/handle", "/intents/receive", "/intent"}:
             content_length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_length)
             try:
@@ -100,6 +101,45 @@ def register_with_broker(broker_url, agent_id, agent_port, api_key=None):
         logger.info("Agent will run standalone — register manually or wait for broker")
 
 
+def send_heartbeat(broker_url, agent_id, api_key=None):
+    """Best-effort heartbeat to the broker with a legacy fallback path."""
+    import httpx
+
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+
+    with httpx.Client(timeout=5.0) as client:
+        response = client.post(
+            f"{broker_url.rstrip('/')}/agents/{agent_id}/heartbeat",
+            headers=headers,
+        )
+        if response.status_code == 404:
+            response = client.post(
+                f"{broker_url.rstrip('/')}/agents/heartbeat",
+                json={"agent_id": agent_id},
+                headers=headers,
+            )
+        response.raise_for_status()
+        return response.json()
+
+
+def start_heartbeat_loop(broker_url, agent_id, api_key, stop_event, interval_s=30):
+    """Send broker heartbeats on a background thread."""
+
+    def _loop():
+        while not stop_event.is_set():
+            try:
+                send_heartbeat(broker_url, agent_id, api_key)
+            except Exception as exc:
+                logger.warning(f"Heartbeat failed: {exc}")
+            stop_event.wait(interval_s)
+
+    thread = threading.Thread(target=_loop, daemon=True, name=f"{agent_id}-heartbeat")
+    thread.start()
+    return thread
+
+
 def main():
     parser = argparse.ArgumentParser(description="Gemma4 SIMP Agent")
     parser.add_argument("--port", type=int, default=int(os.environ.get("GEMMA4_AGENT_PORT", 5010)))
@@ -124,15 +164,21 @@ def main():
     logger.info(f"Gemma4 agent starting on port {args.port}")
 
     # Register with broker
+    stop_event = threading.Event()
+    heartbeat_thread = None
     if not args.no_register:
         api_key = os.environ.get("SIMP_API_KEY", "")
         register_with_broker(args.broker, args.agent_id, args.port, api_key)
+        heartbeat_thread = start_heartbeat_loop(args.broker, args.agent_id, api_key, stop_event)
 
     # Graceful shutdown
     def shutdown(signum, frame):
         logger.info("Shutting down...")
+        stop_event.set()
         agent.close()
         server.shutdown()
+        if heartbeat_thread and heartbeat_thread.is_alive():
+            heartbeat_thread.join(timeout=2)
 
     signal.signal(signal.SIGINT, shutdown)
     signal.signal(signal.SIGTERM, shutdown)

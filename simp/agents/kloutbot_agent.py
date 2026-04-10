@@ -143,7 +143,7 @@ class KloutbotAgent(SimpAgent):
             "recommended_horizon": "medium",
             "recommended_horizon_steps": 16,
             "timesfm_horizon_applied": False,
-            "timesfm_horizon_rationale": "TimesFM horizon advice unavailable",
+            "timesfm_horizon_rationale": "TimesFM unavailable: using default medium horizon (16 steps)",
         }
         try:
             series_id = f"{self.agent_id}:affinity"
@@ -151,7 +151,7 @@ class KloutbotAgent(SimpAgent):
 
             if len(history) < 16:
                 result["timesfm_horizon_rationale"] = (
-                    f"TimesFM: insufficient history ({len(history)}/16 observations)"
+                    f"TimesFM insufficient history: {len(history)}/16 observations, using default medium horizon (16 steps)"
                 )
                 return result
 
@@ -167,7 +167,7 @@ class KloutbotAgent(SimpAgent):
             decision = engine.evaluate(ctx)
             if decision.denied:
                 result["timesfm_horizon_rationale"] = (
-                    f"TimesFM policy denied: {decision.reason}"
+                    f"TimesFM policy denied: {decision.reason}, using default medium horizon (16 steps)"
                 )
                 return result
 
@@ -182,7 +182,7 @@ class KloutbotAgent(SimpAgent):
 
             if not resp.available:
                 result["timesfm_horizon_rationale"] = (
-                    "TimesFM: shadow mode active — horizon unchanged"
+                    "TimesFM shadow mode: service available=False, using default medium horizon (16 steps)"
                 )
                 return result
 
@@ -209,9 +209,9 @@ class KloutbotAgent(SimpAgent):
                     "recommended_horizon_steps": horizon_steps,
                     "timesfm_horizon_applied": True,
                     "timesfm_horizon_rationale": (
-                        f"TimesFM affinity forecast: {horizon_label} horizon "
-                        f"({horizon_steps} steps). Affinity persists ~{persistence_steps} "
-                        f"steps before dropping below 0.5 threshold."
+                        f"TimesFM forecast: affinity persists {persistence_steps} steps > 0.5 threshold. "
+                        f"Using {horizon_label} horizon ({horizon_steps} steps) for "
+                        f"{'strategic positioning' if horizon_label == 'long' else 'near-term planning' if horizon_label == 'medium' else 'immediate execution'}."
                     ),
                 })
 
@@ -278,6 +278,20 @@ class KloutbotAgent(SimpAgent):
             # Convert to actionable parameters
             action_params = self.compiler.get_action_params(tree)
 
+            # Calculate mutation-memory telemetry
+            total_strategies = len(self.strategy_history)
+            recent_strategies = min(10, total_strategies)
+            
+            # Calculate average horizon from recent strategies (if we tracked it)
+            # For now, just include basic stats
+            mutation_telemetry = {
+                "total_strategies_generated": total_strategies,
+                "recent_strategies_count": recent_strategies,
+                "strategy_history_capacity": self.max_history,
+                "compiler_iterations": self.compiler.iteration_count,
+                "improvement_history_length": len(self.compiler.improvement_history),
+            }
+
             return {
                 "status": "success",
                 "strategy": tree.to_dict(),
@@ -286,6 +300,7 @@ class KloutbotAgent(SimpAgent):
                 "recommended_horizon_steps": horizon_advice["recommended_horizon_steps"],
                 "timesfm_horizon_applied": horizon_advice["timesfm_horizon_applied"],
                 "timesfm_horizon_rationale": horizon_advice["timesfm_horizon_rationale"],
+                "mutation_telemetry": mutation_telemetry,
                 "timestamp": datetime.utcnow().isoformat(),
             }
 
@@ -309,6 +324,7 @@ class KloutbotAgent(SimpAgent):
             if not foresight or not deltas:
                 return {
                     "status": "error",
+                    "error_code": "INVALID_INPUT",
                     "error_message": "Foresight and deltas required"
                 }
 
@@ -317,8 +333,11 @@ class KloutbotAgent(SimpAgent):
             confidence = foresight.get("affinity", 0.5)
             risk = foresight.get("drift_risk", 0.1)
 
-            # Signal quality score
-            quality = (signal_strength * confidence) / (1 + risk)
+            # Signal quality score - ensure denominator is not zero
+            denominator = 1 + risk
+            if denominator == 0:
+                denominator = 1e-10  # Small epsilon to avoid division by zero
+            quality = (signal_strength * confidence) / denominator
 
             return {
                 "status": "success",
@@ -335,6 +354,7 @@ class KloutbotAgent(SimpAgent):
         except Exception as e:
             return {
                 "status": "error",
+                "error_code": "ANALYSIS_FAILED",
                 "error_message": str(e)
             }
 
@@ -351,6 +371,7 @@ class KloutbotAgent(SimpAgent):
             if not foresight or not deltas:
                 return {
                     "status": "error",
+                    "error_code": "INVALID_INPUT",
                     "error_message": "Foresight and deltas required"
                 }
 
@@ -373,6 +394,7 @@ class KloutbotAgent(SimpAgent):
         except Exception as e:
             return {
                 "status": "error",
+                "error_code": "OPTIMIZATION_FAILED",
                 "error_message": str(e)
             }
 

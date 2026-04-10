@@ -16,7 +16,6 @@ import os
 import queue
 import socket
 import ssl
-import struct
 import time
 import threading
 from datetime import datetime, timezone
@@ -40,11 +39,6 @@ except Exception:
     _TLS_CERT        = os.environ.get("SIMP_TLS_CERT", "")
     _TLS_KEY         = os.environ.get("SIMP_TLS_KEY",  "")
     _TLS_CA          = os.environ.get("SIMP_TLS_CA",   "")
-
-# Length-prefix header: 4-byte unsigned big-endian integer
-_HEADER_FORMAT = "!I"
-_HEADER_SIZE = struct.calcsize(_HEADER_FORMAT)
-_MAX_MESSAGE_SIZE = 16 * 1024 * 1024  # 16 MB max message
 
 
 class SimpAgentClient:
@@ -85,6 +79,7 @@ class SimpAgentClient:
         self.socket:    Optional[socket.socket] = None
         self.connected: bool = False
         self.running:   bool = False
+        self._recv_buffer = b""
 
         self.intent_queue: "queue.Queue[Dict[str, Any]]" = queue.Queue()
         self.intents_received = 0
@@ -251,29 +246,14 @@ class SimpAgentClient:
             self.logger.error("Failed to sign intent: %s", exc, exc_info=True)
             raise
 
-    # ── send / receive (length-prefixed framing) ────────────────────────────
-
-    @staticmethod
-    def _recv_exact(sock: socket.socket, num_bytes: int) -> bytes:
-        """Receive exactly num_bytes from socket, or raise on disconnect."""
-        buf = bytearray()
-        while len(buf) < num_bytes:
-            chunk = sock.recv(num_bytes - len(buf))
-            if not chunk:
-                raise ConnectionError("Connection closed while reading")
-            buf.extend(chunk)
-        return bytes(buf)
+    # ── send / receive ────────────────────────────────────────────────────────
 
     def _send_message(self, msg: Dict[str, Any]) -> None:
-        """Send length-prefixed message to broker."""
         if not self.socket:
             raise RuntimeError("Not connected to broker")
-        msg_bytes = json.dumps(msg).encode()
-        if len(msg_bytes) > _MAX_MESSAGE_SIZE:
-            raise ValueError(f"Message too large: {len(msg_bytes)} > {_MAX_MESSAGE_SIZE}")
-        header = struct.pack(_HEADER_FORMAT, len(msg_bytes))
+        msg_bytes = (json.dumps(msg) + "\n").encode()
         try:
-            self.socket.sendall(header + msg_bytes)
+            self.socket.sendall(msg_bytes)
         except (socket.timeout, ssl.SSLError) as exc:
             self.logger.error("Send timeout/SSL error: %s", exc, exc_info=True)
             raise
@@ -282,23 +262,25 @@ class SimpAgentClient:
             raise
 
     def _receive_message(self) -> Optional[Dict[str, Any]]:
-        """Receive length-prefixed message from broker."""
         if not self.socket:
             return None
+
+        message = self._pop_framed_message()
+        if message is not None:
+            return message
+
         try:
             self.socket.settimeout(1.0)
-            header = self._recv_exact(self.socket, _HEADER_SIZE)
-            msg_len = struct.unpack(_HEADER_FORMAT, header)[0]
-            if msg_len > _MAX_MESSAGE_SIZE:
-                self.logger.error("Message too large: %d", msg_len)
+            data = self.socket.recv(4096)
+            if not data:
                 return None
-            data = self._recv_exact(self.socket, msg_len)
-            return json.loads(data.decode())
+            self._recv_buffer += data
+            if len(self._recv_buffer) > 64 * 1024:
+                self.logger.warning("Receive buffer exceeded 64KB; dropping buffered data")
+                self._recv_buffer = b""
+                return None
+            return self._pop_framed_message()
         except socket.timeout:
-            return None
-        except ConnectionError:
-            self.logger.warning("Connection closed by broker")
-            self.connected = False
             return None
         except (socket.error, OSError) as exc:
             self.logger.error("Receive socket error: %s", exc, exc_info=True)
@@ -309,6 +291,20 @@ class SimpAgentClient:
         except Exception as exc:
             self.logger.error("Unexpected receive error: %s", exc, exc_info=True)
             return None
+
+    def _pop_framed_message(self) -> Optional[Dict[str, Any]]:
+        """Read one newline-delimited JSON message from the receive buffer."""
+        while b"\n" in self._recv_buffer:
+            line, remainder = self._recv_buffer.split(b"\n", 1)
+            self._recv_buffer = remainder
+            if not line.strip():
+                continue
+            try:
+                return json.loads(line.decode())
+            except json.JSONDecodeError as exc:
+                self.logger.warning("Received malformed JSON frame: %s", exc)
+                continue
+        return None
 
     def _send_response(self, intent_id: str, response: Dict[str, Any]) -> None:
         msg = {
