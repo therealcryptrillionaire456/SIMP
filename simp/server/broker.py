@@ -37,7 +37,7 @@ except ImportError:
     _HTTPX_AVAILABLE = False
 
 
-from simp.security.brp_models import BRPPlan, BRPMode
+from simp.security.brp_models import BRPPlan, BRPMode, BRPEvent, BRPEventType, BRPObservation
 from simp.security.brp_bridge import BRPBridge
 
 
@@ -136,10 +136,21 @@ class SimpBroker:
             brp_bridge: Optional BRP bridge for plan-level security evaluation.
         """
         self.config = config or BrokerConfig()
-        self.brp_bridge = brp_bridge or BRPBridge()
+        try:
+            self.brp_bridge = brp_bridge or BRPBridge()
+        except Exception as brp_err:
+            # Fallback: create a best-effort bridge; log the error visibly.
+            import traceback
+            print(f"[BRP] WARNING: BRP bridge init failed: {brp_err}")
+            traceback.print_exc()
+            self.brp_bridge = BRPBridge(data_dir="/tmp/simp_brp_fallback")
         self.state = BrokerState.INITIALIZING
         self.hooks = hooks
         self.logger = self._setup_logging()
+        self.logger.info(
+            "[BRP] Bill Russell Protocol active — mode=%s, data_dir=%s",
+            self.brp_bridge.default_mode, self.brp_bridge.data_dir,
+        )
 
         # Sprint 64 — restart resilience
         self._startup_at: datetime = datetime.now(timezone.utc)
@@ -517,8 +528,29 @@ class SimpBroker:
         intent_type = intent_data.get("intent_type", "unknown")
         delivery_start = time.monotonic()
 
-        # --- BRP plan-level evaluation for multi-step intents ---
+        # --- BRP event-level evaluation for every routed intent ---
         brp_plan_response = None
+        brp_event_id = ""
+        try:
+            brp_mode = intent_data.get("brp_mode", self.brp_bridge.default_mode)
+            brp_event = BRPEvent(
+                source_agent=source_agent,
+                event_type=BRPEventType.PEER_INTENT.value,
+                action=intent_type,
+                context={
+                    "intent_id": intent_id,
+                    "target_agent": intent_data.get("target_agent", ""),
+                    "params": intent_data.get("params", {}),
+                },
+                mode=brp_mode,
+                tags=["broker", "route_intent", intent_type],
+            )
+            brp_event_id = brp_event.event_id
+            self.brp_bridge.evaluate_event(brp_event)
+        except Exception:
+            self.logger.warning("BRP event evaluation failed for intent %s", intent_id, exc_info=True)
+
+        # --- BRP plan-level evaluation for multi-step intents ---
         steps = intent_data.get("params", {}).get("steps") if isinstance(intent_data.get("params"), dict) else None
         if steps and isinstance(steps, list):
             try:
@@ -528,7 +560,7 @@ class SimpBroker:
                     mode=intent_data.get("brp_mode", self.brp_bridge.default_mode),
                 )
             except Exception:
-                self.logger.debug("BRP plan evaluation failed", exc_info=True)
+                self.logger.warning("BRP plan evaluation failed for intent %s", intent_id, exc_info=True)
 
         with self.stats_lock:
             self.stats["intents_received"] += 1
@@ -756,6 +788,22 @@ class SimpBroker:
         }
         if brp_plan_response is not None:
             route_result["brp_plan_review"] = brp_plan_response
+
+        # --- BRP post-routing observation ---
+        if brp_event_id:
+            try:
+                obs = BRPObservation(
+                    source_agent="simp_broker",
+                    event_id=brp_event_id,
+                    action=intent_type,
+                    outcome=delivery_status,
+                    result_data={"target_agent": target_agent, "task_id": task_id},
+                    mode=self.brp_bridge.default_mode,
+                    tags=["broker", "route_intent", "post_route"],
+                )
+                self.brp_bridge.ingest_observation(obs)
+            except Exception:
+                self.logger.warning("BRP post-route observation failed", exc_info=True)
 
         # Fire memory hook after routing
         if self.hooks:

@@ -280,16 +280,32 @@ class CoWorkBridge:
         "delegate":            "coordination",
     }
 
+    # Agents the broker may forward on behalf of; map to nearest peer alias.
+    _SOURCE_AGENT_MAP: Dict[str, str] = {
+        "claude_code":        "claude_cowork",
+        "simp_broker":        "simp_router",
+        "diagnostic_runner":  "simp_router",
+        "mother_goose":       "simp_router",
+        "projectx":           "simp_router",
+        "client":             "simp_router",
+    }
+
     def _normalize_for_schema(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Normalise a broker-originated intent dict to pass peer schema validation."""
         import copy
+        from simp.models.peer_intent_schema import PEER_AGENTS
         d = copy.deepcopy(data)
 
-        # 1. Agent-name alias: broker registers us as "claude_code"; schema
-        #    requires "claude_cowork".
+        # 1. Agent-name alias: map non-peer agent names to their peer equivalent.
+        #    broker registers us as "claude_code"; schema requires "claude_cowork".
+        #    Other broker-forwarded sources (diagnostic_runner, etc.) → simp_router.
         for role in ("source_agent", "target_agent"):
-            if d.get(role) == "claude_code":
-                d[role] = "claude_cowork"
+            val = d.get(role, "")
+            if val in self._SOURCE_AGENT_MAP:
+                d[role] = self._SOURCE_AGENT_MAP[val]
+            elif val and val not in PEER_AGENTS:
+                # Unknown non-peer agent: treat as broker-routed → simp_router
+                d[role] = "simp_router"
 
         # 2. Intent-type translation: map broker shorthand → allowed type.
         it = d.get("intent_type", "")
@@ -300,7 +316,7 @@ class CoWorkBridge:
         params = d.get("params") or {}
         if not d.get("task_id") and not params.get("task_id"):
             # Derive from broker-assigned intent id so it stays traceable.
-            derived = f"broker-{d.get('id', '')[:12]}" if d.get("id") else f"broker-auto-{id(d)}"
+            derived = f"broker-{d.get('intent_id', '')[:12]}" if d.get("intent_id") else f"broker-auto-{id(d)}"
             if isinstance(params, dict):
                 params = {**params, "task_id": derived}
                 d["params"] = params
@@ -409,6 +425,7 @@ class CoWorkBridge:
             return jsonify({**self._stats, "agent_id": AGENT_ID, "version": AGENT_VERSION})
 
         @app.route("/intent", methods=["POST"])
+        @app.route("/intents/handle", methods=["POST"])
         @app.route("/intents/receive", methods=["POST"])
         def receive():
             try:
