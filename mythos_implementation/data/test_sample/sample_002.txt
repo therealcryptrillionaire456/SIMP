@@ -1,0 +1,1 @@
+Transformer architecture with self-attention mechanisms has revolutionized natural language processing.
