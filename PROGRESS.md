@@ -454,6 +454,105 @@ Day 10-14: ███████████████████████
 
 ---
 
-**For Kasey. For the Horsemen. For the dreams that keep you pushing forward.** 🐴✨
+---
+
+## Sprint 41 (April 6, 2026) - Payment Connector Abstraction
+
+### Status: COMPLETE
+
+- simp/compat/payment_connector.py: PaymentConnectorConfig, PaymentResult, PaymentConnector ABC, StubPaymentConnector
+- ALLOWED_CONNECTORS registry (stripe_small_payments, internal_corp_card_proxy)
+- ALLOWED_VENDOR_CATEGORIES, DISALLOWED_PAYMENT_TYPES frozensets
+- build_connector() with FINANCIAL_OPS_LIVE_ENABLED env var gating
+- validate_payment_request() with full policy guardrails
+- Extended OpsPolicy: live_payments_allowed, allowed_vendor_categories, disallowed_payment_types, pilot limits
+- Extended financial_ops card: livePaymentPolicy block in x-simp
+- Tests: tests/test_financial_ops_connector.py (36 tests)
+
+---
+
+## Sprint 42 (April 6, 2026) - Connector Health Tracking
+
+### Status: COMPLETE
+
+- ConnectorHealthTracker: records health checks, consecutive_ok_days, is_gate1_ready()
+- HEALTH_TRACKER singleton
+- Extended SpendRecord: dry_run_result, connector_used, dry_run_reference_id
+- Added record_with_dry_run() to SimulatedSpendLedger
+- Route: GET /a2a/agents/financial-ops/connector-health (unauthenticated)
+- Route: GET /dashboard/financial-ops/status
+- FinancialOps Status panel in dashboard with DRY RUN ONLY label
+- Tests: tests/test_financial_ops_dry_run.py (14 tests)
+
+---
+
+## Sprint 43 (April 6, 2026) - Approval Queue
+
+### Status: COMPLETE
+
+- simp/compat/approval_queue.py: JSONL-backed, append-only, event-sourced
+- PaymentProposalStatus constants, PaymentProposal dataclass with risk_flags, expires_at (24h)
+- ApprovalQueue: submit_proposal, approve_proposal, reject_proposal, get_proposal, get_pending/all
+- PolicyChangeQueue: dual control (two distinct operators required)
+- APPROVAL_QUEUE, POLICY_CHANGE_QUEUE singletons
+- Extended validate_financial_op() to 3-state return (rejected/pending_approval/approved_for_execution)
+- Routes: POST/GET proposals, POST approve/reject, POST policy-changes, POST policy-change approve
+- Dashboard: Proposed Payments tab
+- Tests: tests/test_financial_ops_approval.py (25 tests)
+
+---
+
+## Sprint 44 (April 6, 2026) - Live Ledger and Execution
+
+### Status: COMPLETE
+
+- simp/compat/live_ledger.py: JSONL-backed, append-only live payment ledger
+- LivePaymentRecord: abbreviated provider_reference only
+- LiveSpendLedger: record_attempt, record_outcome, is_already_executed (idempotency), get_summary
+- execute_approved_payment() in financial_ops.py: 5-step execution flow
+  - Env var gate, proposal verification, policy re-validation, idempotency check, connector execution
+- Route: POST /proposals/<id>/execute (403 if live not enabled)
+- Tests: tests/test_financial_ops_live.py (25 tests, ALL stub connector, NO real API)
+
+---
+
+## Sprint 45 (April 6, 2026) - Reconciliation and Observability
+
+### Status: COMPLETE
+
+- simp/compat/reconciliation.py: read-only reconciliation engine
+- ReconciliationResult: matched/discrepancy/reference_unavailable status
+- build_payment_event() in event_stream.py: proposal_created, approval_granted, execution_started/succeeded/failed
+- Route: GET /a2a/agents/financial-ops/ledger (simulated + live, PII-minimized)
+- Route: POST /a2a/agents/financial-ops/reconciliation
+- Route: GET /a2a/agents/financial-ops/export (safe fields only)
+- Dashboard: Financial Ledger panel (Simulated/Live tabs, reconciliation status)
+- Tests: tests/test_financial_ops_observability.py (20 tests)
+
+---
+
+### FinancialOps Graduation Summary
+
+| Sprint | New Tests | Key Deliverable |
+|--------|-----------|-----------------|
+| 41 | 36 | Payment connector abstraction |
+| 42 | 14 | Connector health tracking |
+| 43 | 25 | JSONL approval queue |
+| 44 | 25 | Live ledger + execution |
+| 45 | 20 | Reconciliation + observability |
+| **Total** | **125** | **Complete payment flow** |
+
+- Total passing: 330 (205 original + 125 new)
+- Pre-existing failures: 32 (unchanged)
+- New regressions: 0
+- All financial operations SIMULATED by default
+- Live execution feature-flagged OFF (FINANCIAL_OPS_LIVE_ENABLED)
+- No payment credentials in code, logs, or tests
+- Approval queue is append-only, JSONL-backed
+- Idempotency enforced via LIVE_LEDGER
+
+---
+
+**For Kasey. For the Horsemen. For the dreams that keep you pushing forward.**
 
 *One day done. 13 days to change everything.*
