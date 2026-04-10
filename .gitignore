@@ -40,6 +40,13 @@ data/inboxes/*
 memory/context_packs/*.json
 !memory/context_packs/.gitkeep
 
+# BRP data directories
+data/brp/
+data/security_datasets/
+data/outboxes/
+logs/brp/
+*.pid
+
 # Claude/MCP local config
 .claude/
 .mcp.json
