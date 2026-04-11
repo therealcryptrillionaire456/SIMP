@@ -87,8 +87,11 @@ class TestBrokerBehaviorConformance(unittest.TestCase):
         assert hasattr(rec, "delivery_elapsed_ms")
 
     def test_route_intent_unknown_agent_returns_error(self):
+        self.broker.start()
         result = _run(self.broker.route_intent({
             "intent_id": "i1",
+            "source_agent": "test",
+            "intent_type": "ping",
             "target_agent": "nonexistent",
         }))
         assert result["status"] == "error"
