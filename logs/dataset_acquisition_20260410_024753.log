@@ -1,0 +1,23 @@
+2026-04-10 02:47:53,499 - INFO - Dataset Acquirer initialized
+2026-04-10 02:47:53,500 - INFO - Data directory: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/security_datasets
+2026-04-10 02:47:53,500 - INFO - ================================================================================
+2026-04-10 02:47:53,500 - INFO - BILL RUSSELL PROTOCOL - DATASET ACQUISITION
+2026-04-10 02:47:53,500 - INFO - ================================================================================
+2026-04-10 02:47:53,500 - INFO - Phase 2: Acquiring real security datasets
+2026-04-10 02:47:53,500 - INFO - Defending against: Anthropic, Meta, OpenAI, Enterprise threats
+2026-04-10 02:47:53,500 - INFO - ================================================================================
+2026-04-10 02:47:53,500 - INFO - 
+Acquiring: UNSW-NB15
+2026-04-10 02:47:53,500 - INFO - ----------------------------------------
+2026-04-10 02:47:53,500 - INFO - 
+============================================================
+2026-04-10 02:47:53,500 - INFO - ACQUIRING UNSW-NB15 DATASET
+2026-04-10 02:47:53,500 - INFO - ============================================================
+2026-04-10 02:47:53,500 - INFO - Available sources:
+2026-04-10 02:47:53,500 - INFO -   • UNSW Official (Partial): https://www.unsw.adfa.edu.au/unsw-canberra-cyber/cybersecurity/ADFA-NB15-Datasets/UNSW-NB15_1.csv
+2026-04-10 02:47:53,500 - INFO -   • Kaggle Dataset: https://www.kaggle.com/datasets/mrwellsdavid/unsw-nb15
+2026-04-10 02:47:53,500 - INFO -     Note: Requires Kaggle API - using alternative
+2026-04-10 02:47:53,500 - INFO -   • ResearchGate: https://www.researchgate.net/publication/283349393_UNSW-NB15_Data_Set
+2026-04-10 02:47:53,500 - INFO -     Note: Academic source - using simulated data for now
+2026-04-10 02:47:53,500 - INFO - 
+Creating simulated UNSW-NB15 dataset for development...

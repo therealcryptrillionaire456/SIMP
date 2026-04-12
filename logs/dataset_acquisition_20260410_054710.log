@@ -1,0 +1,79 @@
+2026-04-10 05:47:10,030 - INFO - Dataset Acquirer initialized
+2026-04-10 05:47:10,030 - INFO - Data directory: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/security_datasets
+2026-04-10 05:47:10,030 - INFO - ================================================================================
+2026-04-10 05:47:10,030 - INFO - BILL RUSSELL PROTOCOL - DATASET ACQUISITION
+2026-04-10 05:47:10,030 - INFO - ================================================================================
+2026-04-10 05:47:10,030 - INFO - Phase 2: Acquiring real security datasets
+2026-04-10 05:47:10,030 - INFO - Defending against: Anthropic, Meta, OpenAI, Enterprise threats
+2026-04-10 05:47:10,030 - INFO - ================================================================================
+2026-04-10 05:47:10,030 - INFO - 
+Acquiring: UNSW-NB15
+2026-04-10 05:47:10,030 - INFO - ----------------------------------------
+2026-04-10 05:47:10,030 - INFO - 
+============================================================
+2026-04-10 05:47:10,031 - INFO - ACQUIRING UNSW-NB15 DATASET
+2026-04-10 05:47:10,031 - INFO - ============================================================
+2026-04-10 05:47:10,031 - INFO - Available sources:
+2026-04-10 05:47:10,031 - INFO -   • UNSW Official (Partial): https://www.unsw.adfa.edu.au/unsw-canberra-cyber/cybersecurity/ADFA-NB15-Datasets/UNSW-NB15_1.csv
+2026-04-10 05:47:10,031 - INFO -   • Kaggle Dataset: https://www.kaggle.com/datasets/mrwellsdavid/unsw-nb15
+2026-04-10 05:47:10,031 - INFO -     Note: Requires Kaggle API - using alternative
+2026-04-10 05:47:10,031 - INFO -   • ResearchGate: https://www.researchgate.net/publication/283349393_UNSW-NB15_Data_Set
+2026-04-10 05:47:10,031 - INFO -     Note: Academic source - using simulated data for now
+2026-04-10 05:47:10,031 - INFO - 
+Creating simulated UNSW-NB15 dataset for development...
+2026-04-10 05:47:10,134 - INFO - ✓ Created simulated UNSW-NB15 dataset: 10,000 records
+2026-04-10 05:47:10,134 - INFO -   File: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/security_datasets/raw/unsw_nb15/unsw_nb15_simulated.csv
+2026-04-10 05:47:10,134 - INFO -   Size: 1.31 MB
+2026-04-10 05:47:10,135 - INFO - ✓ UNSW-NB15 acquisition successful
+2026-04-10 05:47:10,135 - INFO - 
+Acquiring: CIC-DDoS 2019
+2026-04-10 05:47:10,135 - INFO - ----------------------------------------
+2026-04-10 05:47:10,135 - INFO - 
+============================================================
+2026-04-10 05:47:10,135 - INFO - ACQUIRING CIC-DDoS 2019 DATASET
+2026-04-10 05:47:10,135 - INFO - ============================================================
+2026-04-10 05:47:10,135 - INFO - Available sources:
+2026-04-10 05:47:10,135 - INFO -   • University of New Brunswick: https://www.unb.ca/cic/datasets/ddos-2019.html
+2026-04-10 05:47:10,135 - INFO -     Note: Requires academic request form
+2026-04-10 05:47:10,135 - INFO -   • Kaggle Dataset: https://www.kaggle.com/datasets/ramyavidiyala/cicddos2019-dataset
+2026-04-10 05:47:10,135 - INFO -     Note: Kaggle API required
+2026-04-10 05:47:10,135 - INFO -   • Google Drive Mirror: https://drive.google.com/drive/folders/1VaR1p1H5GcLq7qQnSg6Mh0MlOZJQwKzT
+2026-04-10 05:47:10,135 - INFO -     Note: May require access request
+2026-04-10 05:47:10,135 - INFO - 
+Creating simulated CIC-DDoS 2019 dataset for development...
+2026-04-10 05:47:10,247 - INFO - ✓ Created simulated CIC-DDoS 2019 dataset: 8,000 records
+2026-04-10 05:47:10,247 - INFO - ✓ CIC-DDoS 2019 acquisition successful
+2026-04-10 05:47:10,247 - INFO - 
+Acquiring: LANL Authentication
+2026-04-10 05:47:10,247 - INFO - ----------------------------------------
+2026-04-10 05:47:10,247 - INFO - 
+============================================================
+2026-04-10 05:47:10,247 - INFO - ACQUIRING LANL AUTHENTICATION DATASET
+2026-04-10 05:47:10,247 - INFO - ============================================================
+2026-04-10 05:47:10,247 - INFO - Available sources:
+2026-04-10 05:47:10,247 - INFO -   • Los Alamos National Laboratory: https://csr.lanl.gov/data/cyber1/
+2026-04-10 05:47:10,247 - INFO -     Note: Restricted access - requires LANL credentials
+2026-04-10 05:47:10,247 - INFO -   • IEEE Dataport: https://ieee-dataport.org/documents/lanl-cyber-security-incidents-dataset
+2026-04-10 05:47:10,247 - INFO -     Note: May require academic access
+2026-04-10 05:47:10,247 - INFO - 
+Creating simulated authentication dataset for development...
+2026-04-10 05:47:10,271 - INFO - ✓ Created simulated authentication dataset: 5,000 records
+2026-04-10 05:47:10,271 - INFO - ✓ LANL Authentication acquisition successful
+2026-04-10 05:47:10,271 - INFO - 
+Acquiring: IoT-23
+2026-04-10 05:47:10,271 - INFO - ----------------------------------------
+2026-04-10 05:47:10,271 - INFO - 
+============================================================
+2026-04-10 05:47:10,271 - INFO - ACQUIRING IoT-23 DATASET
+2026-04-10 05:47:10,271 - INFO - ============================================================
+2026-04-10 05:47:10,271 - INFO - Available sources:
+2026-04-10 05:47:10,271 - INFO -   • Stratosphere IPS: https://www.stratosphereips.org/datasets-iot23
+2026-04-10 05:47:10,271 - INFO -     Note: Direct download available
+2026-04-10 05:47:10,271 - INFO -   • MCFP CTU: https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/
+2026-04-10 05:47:10,271 - INFO -     Note: Academic source with PCAP files
+2026-04-10 05:47:10,271 - INFO -   • Kaggle: https://www.kaggle.com/datasets/ymirsky/iot-network-intrusion-dataset
+2026-04-10 05:47:10,271 - INFO -     Note: Processed version available
+2026-04-10 05:47:10,271 - INFO - 
+Attempting to download IoT-23 dataset...
+2026-04-10 05:47:10,271 - INFO - Downloading: https://mcfp.felk.cvut.cz/publicDatasets/IoT-23-Dataset/iot_23_datasets_small.tar.gz
+2026-04-10 05:47:10,271 - INFO - Destination: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/security_datasets/raw/iot_23/iot_23_small.tar.gz

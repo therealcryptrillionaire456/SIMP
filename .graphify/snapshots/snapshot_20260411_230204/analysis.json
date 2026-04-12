@@ -1,0 +1,297 @@
+{
+  "central_nodes": [
+    {
+      "node": "base_command",
+      "centrality": 0.11684719981562572
+    },
+    {
+      "node": "tool_functiontool",
+      "centrality": 0.04401935929937773
+    },
+    {
+      "node": "exceptions_usererror",
+      "centrality": 0.03618345240838903
+    },
+    {
+      "node": "exceptions_agentsexception",
+      "centrality": 0.034800645309979256
+    },
+    {
+      "node": "agent_agent",
+      "centrality": 0.03203503111315971
+    },
+    {
+      "node": "parallel_parallelconfig",
+      "centrality": 0.029038949066605205
+    },
+    {
+      "node": "base_module_offensivemodule",
+      "centrality": 0.028578013367135283
+    },
+    {
+      "node": "run_context_runcontextwrapper",
+      "centrality": 0.027425674118460475
+    },
+    {
+      "node": "exceptions_modelbehaviorerror",
+      "centrality": 0.02696473841899055
+    },
+    {
+      "node": "openai_chatcompletions_openaichatcompletionsmodel",
+      "centrality": 0.02696473841899055
+    },
+    {
+      "node": "base_module_intelligencemodule",
+      "centrality": 0.02581239917031574
+    },
+    {
+      "node": "usage_usage",
+      "centrality": 0.025581931320580776
+    },
+    {
+      "node": "handoffs_handoff",
+      "centrality": 0.02466005992164093
+    },
+    {
+      "node": "agent_output_agentoutputschema",
+      "centrality": 0.02373818852270108
+    },
+    {
+      "node": "spans_span",
+      "centrality": 0.02373818852270108
+    },
+    {
+      "node": "items_modelresponse",
+      "centrality": 0.023046784973496198
+    },
+    {
+      "node": "model_settings_modelsettings",
+      "centrality": 0.02212491357455635
+    },
+    {
+      "node": "base_module_defensivemodule",
+      "centrality": 0.020511638626411616
+    },
+    {
+      "node": "util",
+      "centrality": 0.018437427978796956
+    },
+    {
+      "node": "interface_modeltracing",
+      "centrality": 0.01774602442959207
+    },
+    {
+      "node": "items_itemhelpers",
+      "centrality": 0.01751555657985711
+    },
+    {
+      "node": "interface_model",
+      "centrality": 0.017054620880387186
+    },
+    {
+      "node": "exceptions_pricelimitexceeded",
+      "centrality": 0.015671813781977413
+    },
+    {
+      "node": "simple_agent_manager_simpleagentmanager",
+      "centrality": 0.014980410232772528
+    },
+    {
+      "node": "traces_trace",
+      "centrality": 0.014749942383037565
+    },
+    {
+      "node": "span_data_generationspandata",
+      "centrality": 0.014519474533302603
+    },
+    {
+      "node": "sigma_engine_sigmaengine",
+      "centrality": 0.013828070984097718
+    },
+    {
+      "node": "init",
+      "centrality": 0.013828070984097718
+    },
+    {
+      "node": "run_runner",
+      "centrality": 0.013597603134362755
+    },
+    {
+      "node": "items_toolcalloutputitem",
+      "centrality": 0.013367135284627794
+    },
+    {
+      "node": "guardrail_inputguardrailresult",
+      "centrality": 0.013136667434892831
+    },
+    {
+      "node": "guardrail_outputguardrailresult",
+      "centrality": 0.013136667434892831
+    },
+    {
+      "node": "run_runconfig",
+      "centrality": 0.012214796035952984
+    },
+    {
+      "node": "processor_interface_tracingprocessor",
+      "centrality": 0.011984328186218023
+    },
+    {
+      "node": "web_scraper_securitydatasetscraper",
+      "centrality": 0.01175386033648306
+    },
+    {
+      "node": "init_rationale_121",
+      "centrality": 0.011523392486748099
+    },
+    {
+      "node": "init_rationale_134",
+      "centrality": 0.011523392486748099
+    },
+    {
+      "node": "init_rationale_141",
+      "centrality": 0.011523392486748099
+    },
+    {
+      "node": "agent_agentcommand",
+      "centrality": 0.011292924637013136
+    },
+    {
+      "node": "run_impl",
+      "centrality": 0.011292924637013136
+    },
+    {
+      "node": "json",
+      "centrality": 0.011292924637013136
+    },
+    {
+      "node": "training_pipeline_mltrainingpipeline",
+      "centrality": 0.010831988937543212
+    },
+    {
+      "node": "run_impl_queuecompletesentinel",
+      "centrality": 0.010831988937543212
+    },
+    {
+      "node": "config_configcommand",
+      "centrality": 0.010371053238073288
+    },
+    {
+      "node": "parallel_parallelcommand",
+      "centrality": 0.010371053238073288
+    },
+    {
+      "node": "run_impl_tracectxmanager",
+      "centrality": 0.010371053238073288
+    },
+    {
+      "node": "pentagi_module_pentagimodule",
+      "centrality": 0.010140585388338326
+    },
+    {
+      "node": "flush_flushcommand",
+      "centrality": 0.010140585388338326
+    },
+    {
+      "node": "dataset_processor_securitydatasetprocessor",
+      "centrality": 0.009910117538603365
+    },
+    {
+      "node": "local_python_executor",
+      "centrality": 0.009910117538603365
+    }
+  ],
+  "graph_stats": {
+    "nodes": 4340,
+    "edges": 10373,
+    "density": 0.0011016788042860649,
+    "connected_components": 107
+  },
+  "top_modules": [
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/repl/commands",
+      714
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents",
+      485
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/integration/modules",
+      420
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/tests/commands",
+      306
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents/tracing",
+      243
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/tests/agents",
+      160
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai",
+      152
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents/models",
+      135
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/agents",
+      130
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents/voice",
+      109
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/bill_russel_data_acquisition",
+      86
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/tests/cli",
+      86
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/agents/patterns",
+      79
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/agents/meta",
+      68
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/bill_russel_sigma_rules",
+      66
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/bill_russel_integration",
+      63
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents/mcp",
+      63
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/tools/reconnaissance",
+      58
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/integration",
+      57
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/repl/ui",
+      56
+    ]
+  ],
+  "file_types": {
+    "code": 2606,
+    "rationale": 1734
+  },
+  "timestamp": "2026-04-11T23:02:07.884947"
+}

@@ -1,0 +1,77 @@
+{
+  "query": "Anthropic Mythos LLM technical specifications",
+  "timestamp": "20260409_144508",
+  "response": {
+    "status": "completed",
+    "search_results_count": 2,
+    "extracted_content_count": 2,
+    "successful_extractions": 2,
+    "failed_extractions": 0,
+    "search_results": [
+      {
+        "title": "Claude Mythos Preview System Card - anthropic.com",
+        "url": "https://www.anthropic.com/claude-mythos-preview-system-card",
+        "snippet": "This System Card describes Claude Mythos Preview, a large language model from Anthropic. Claude Mythos Preview is our most capable frontier model to date, and shows a striking leap in scores on many e...",
+        "source": "duckduckgo"
+      },
+      {
+        "title": "Claude Mythos Preview: Benchmarks, Pricing & Project Glasswing",
+        "url": "https://llm-stats.com/blog/research/claude-mythos-preview-launch",
+        "snippet": "Anthropic's unreleased Claude Mythos Preview scores 93.9% on SWE-bench Verified, 94.6% on GPQA Diamond, and found thousands of zero-day vulnerabilities across every major OS and browser.",
+        "source": "duckduckgo"
+      }
+    ],
+    "extracted_content": [
+      {
+        "title": "Claude Mythos Preview: Benchmarks, Pricing & Project Glasswing",
+        "url": "https://llm-stats.com/blog/research/claude-mythos-preview-launch",
+        "status": "success",
+        "text_preview": "BackModel Release\u00b7Technical Deep DiveClaude Mythos Preview: Benchmarks, Pricing & Project GlasswingAnthropic's unreleased Claude Mythos Preview scores 93.9% on SWE-bench Verified, 94.6% on GPQA Diamond, and found thousands of zero-day vulnerabilities across every major OS and browser.Jonathan ChavezCo-Founder @ LLM Stats\u00b7Apr 7, 2026\u00b712minKey FactsProject GlasswingCybersecurity CapabilitiesBenchmarksPricing & AvailabilityOpen Source InvestmentOutlookKey Numbers0.0%SWE-bench Verified0.0%GPQA Diamo",
+        "metadata": {
+          "fetcher": "simple",
+          "status_code": 200,
+          "parser": "beautifulsoup",
+          "is_real_data": true,
+          "content_length": 5003,
+          "position": 2,
+          "relevance_score": 0.9,
+          "technical_analysis": {
+            "has_source_code": true,
+            "has_technical_specs": true,
+            "has_api_docs": false,
+            "technical_score": 0.23568,
+            "github_repos": [],
+            "arxiv_papers": [],
+            "code_snippet_count": 1
+          },
+          "score": 0.070704
+        }
+      },
+      {
+        "title": "No title",
+        "url": "https://www.anthropic.com/claude-mythos-preview-system-card",
+        "status": "success",
+        "text_preview": "%PDF-1.4 % 1 0 obj <> endobj 3 0 obj <> endobj 8 0 obj <> endobj 10 0 obj <> stream xJ`\u0014\u0502(\u000e 28hmRpi#\u0016V!S IHS\u0002tspu+.\u0780e(\b\u000e%| :t @V GzM<$*x\u00d0!Kc\u0019z\u0007\u0010G\u0002 \u0012>\u0013&|)4\u000ec\u0182 \u065bbw0\u0012o\u03a0?\u04bbYM\u0002\u05a9\u0013\u0010\u0423O> stream xr8\u007f'1eWY\u0014U$\u0001\u0002 %9go>\u0001UA\u04b8\u83f2)H'Vt\u0000\b.\u0000 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00000\u0011cL]g\u0019km\u00dfL?P\u0007\u0012m6dYVU\u07ea\u02b2\u0001\u0000\u0000\u00002 ^p/zu4= t__\u0019$ \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000#(\u02f2l#8_BqM,KcpN,G\u0000\u0000\u0000_h}e\u07de\u02df\u0000\u0016es< Z\u034c*$=\u000f\u000f\u000f\u07fe}[4(\u02627Mc\u0004 v43\u2793%# mY D\u03b9iS@ 0uk\u06d6: I*\u0014jI3XksJ<\u001aq1/X*\u0011]8:1\u0001\u0005\u0018\u0011G\u017a|*\u000e,b\u0006\u038bi~W\u0003$M\u01e3fIYZWHbAQJ\u0761U|L}`\u0322\u007f \u001aaaP '=\u0018\u01b6-qXku\u140c\u02ed#\b\u0018\u0013ax\u0007h9\u0017\u0015Eq.,\u01f2.\u000e {\u07574\u007fz\u05f8z*k^\u007fD)#H ~C\u05e6\u0012@\u001aMk\u0006s6:\u0226\u0000 u [5:NkY\u001a8NbM \u007f _\u000f\u000e\u0248",
+        "metadata": {
+          "fetcher": "simple",
+          "status_code": 200,
+          "parser": "beautifulsoup",
+          "is_real_data": true,
+          "content_length": 5003,
+          "position": 1,
+          "relevance_score": 1.0,
+          "technical_analysis": {
+            "has_source_code": false,
+            "has_technical_specs": false,
+            "has_api_docs": false,
+            "technical_score": 0.0,
+            "github_repos": [],
+            "arxiv_papers": [],
+            "code_snippet_count": 0
+          },
+          "score": 0.0
+        }
+      }
+    ]
+  }
+}

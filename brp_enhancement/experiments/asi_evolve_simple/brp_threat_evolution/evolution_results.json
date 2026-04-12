@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "experiment_name": "brp_threat_evolution",
+  "rounds_completed": 3,
+  "final_best_score": 0.6812071872326287,
+  "improvement_percent": 36.24143744652575,
+  "improvement_history": [
+    {
+      "round": 1,
+      "best_score": 0.6793411530878258,
+      "population_avg": 0.6332337760424261,
+      "population_size": 3
+    },
+    {
+      "round": 2,
+      "best_score": 0.6812071872326287,
+      "population_avg": 0.678244386660355,
+      "population_size": 3
+    },
+    {
+      "round": 3,
+      "best_score": 0.6812071872326287,
+      "population_avg": 0.6577663866427296,
+      "population_size": 3
+    }
+  ],
+  "best_candidate": {
+    "score": 0.6812071872326287,
+    "code_hash": "5752facd",
+    "generation": 3
+  },
+  "timestamp": "2026-04-12T04:03:29.429859Z"
+}

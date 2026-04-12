@@ -16,6 +16,7 @@ import os
 import queue
 import socket
 import ssl
+import struct
 import time
 import threading
 from datetime import datetime, timezone
@@ -39,6 +40,11 @@ except Exception:
     _TLS_CERT        = os.environ.get("SIMP_TLS_CERT", "")
     _TLS_KEY         = os.environ.get("SIMP_TLS_KEY",  "")
     _TLS_CA          = os.environ.get("SIMP_TLS_CA",   "")
+
+# Length-prefixed framing constants
+_HEADER_FORMAT = "!I"  # 4-byte unsigned integer, network byte order
+_HEADER_SIZE = 4       # bytes
+_MAX_MESSAGE_SIZE = 16 * 1024 * 1024  # 16 MB
 
 
 class SimpAgentClient:
@@ -248,12 +254,45 @@ class SimpAgentClient:
 
     # ── send / receive ────────────────────────────────────────────────────────
 
+    @staticmethod
+    def _recv_exact(sock: socket.socket, nbytes: int) -> bytes:
+        """
+        Receive exactly nbytes from socket, blocking until all data arrives.
+        
+        Raises:
+            socket.timeout: If timeout occurs before receiving all bytes
+            ConnectionError: If socket is closed or connection breaks
+        """
+        data = b""
+        while len(data) < nbytes:
+            try:
+                chunk = sock.recv(nbytes - len(data))
+                if not chunk:
+                    raise ConnectionError("Socket closed before receiving all data")
+                data += chunk
+            except socket.timeout:
+                raise
+            except (socket.error, OSError) as exc:
+                raise ConnectionError(f"Socket error: {exc}") from exc
+        return data
+
     def _send_message(self, msg: Dict[str, Any]) -> None:
         if not self.socket:
             raise RuntimeError("Not connected to broker")
-        msg_bytes = (json.dumps(msg) + "\n").encode()
+        
+        # Serialize message to JSON
+        payload = json.dumps(msg).encode()
+        
+        # Check message size limit
+        if len(payload) > _MAX_MESSAGE_SIZE:
+            raise ValueError(f"Message size {len(payload)} exceeds maximum {_MAX_MESSAGE_SIZE}")
+        
+        # Create length-prefixed frame: 4-byte header + payload
+        header = struct.pack(_HEADER_FORMAT, len(payload))
+        frame = header + payload
+        
         try:
-            self.socket.sendall(msg_bytes)
+            self.socket.sendall(frame)
         except (socket.timeout, ssl.SSLError) as exc:
             self.logger.error("Send timeout/SSL error: %s", exc, exc_info=True)
             raise

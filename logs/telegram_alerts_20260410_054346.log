@@ -1,0 +1,67 @@
+2026-04-10 05:43:46,350 - INFO - ================================================================================
+2026-04-10 05:43:46,350 - INFO - BILL RUSSELL PROTOCOL - PHASE 6: INTEGRATE TELEGRAM ALERTS
+2026-04-10 05:43:46,350 - INFO - ================================================================================
+2026-04-10 05:43:46,350 - INFO - Create Telegram bot for threat notifications
+2026-04-10 05:43:46,350 - INFO - ================================================================================
+2026-04-10 05:43:46,350 - INFO - 
+Step 1: Creating Telegram bot configuration
+2026-04-10 05:43:46,350 - INFO - ----------------------------------------
+2026-04-10 05:43:46,351 - INFO - Sample bot configuration saved to: config/telegram_bot_config.json
+2026-04-10 05:43:46,351 - WARNING - Using placeholder bot token - set TELEGRAM_BOT_TOKEN environment variable
+2026-04-10 05:43:46,351 - INFO - To create a real bot:
+2026-04-10 05:43:46,351 - INFO -   1. Message @BotFather on Telegram
+2026-04-10 05:43:46,351 - INFO -   2. Use /newbot command
+2026-04-10 05:43:46,351 - INFO -   3. Get your bot token
+2026-04-10 05:43:46,351 - INFO -   4. Set TELEGRAM_BOT_TOKEN environment variable
+2026-04-10 05:43:46,351 - INFO - 
+Step 2: Initializing Telegram bot
+2026-04-10 05:43:46,351 - INFO - ----------------------------------------
+2026-04-10 05:43:46,682 - ERROR - Connection test failed: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+2026-04-10 05:43:46,686 - WARNING - Telegram bot connection test failed
+2026-04-10 05:43:46,686 - INFO - 
+Step 3: Testing alert delivery
+2026-04-10 05:43:46,686 - INFO - ----------------------------------------
+2026-04-10 05:43:46,686 - INFO - Sending test alert...
+2026-04-10 05:43:47,026 - ERROR - Failed to send alert: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+2026-04-10 05:43:47,029 - WARNING - ⚠️ Test alert failed (expected with placeholder token)
+2026-04-10 05:43:47,030 - INFO -    Error: HTTP 404
+2026-04-10 05:43:47,030 - INFO -    This is expected with placeholder credentials
+2026-04-10 05:43:47,030 - INFO - 
+Step 4: Creating Alert Manager
+2026-04-10 05:43:47,030 - INFO - ----------------------------------------
+2026-04-10 05:43:47,030 - INFO - Alert Manager initialized
+2026-04-10 05:43:47,030 - INFO - Alert Manager started
+2026-04-10 05:43:47,030 - INFO - Alert Manager started with queue processing
+2026-04-10 05:43:47,030 - INFO - 
+Step 5: Creating sample threat alerts
+2026-04-10 05:43:47,030 - INFO - ----------------------------------------
+2026-04-10 05:43:47,030 - INFO - Creating sample threat alerts...
+2026-04-10 05:43:47,030 - INFO -   Queued: Mythos Pattern Detected (HIGH)
+2026-04-10 05:43:47,030 - INFO -   Queued: Multiple Failed Authentication Attempts (MEDIUM)
+2026-04-10 05:43:47,030 - INFO -   Queued: Potential Zero-Day Exploit Attempt (CRITICAL)
+2026-04-10 05:43:47,030 - INFO - 
+Processing alerts for 5 seconds...
+2026-04-10 05:43:48,043 - ERROR - Failed to send alert: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+2026-04-10 05:43:48,045 - WARNING - Alert failed: HTTP 404
+2026-04-10 05:43:49,146 - ERROR - Failed to send alert: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+2026-04-10 05:43:49,149 - WARNING - Alert failed: HTTP 404
+2026-04-10 05:43:50,052 - ERROR - Failed to send alert: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+2026-04-10 05:43:50,054 - WARNING - Alert failed: HTTP 404
+2026-04-10 05:43:52,040 - INFO - 
+Step 6: Getting alert statistics
+2026-04-10 05:43:52,041 - INFO - ----------------------------------------
+2026-04-10 05:43:52,041 - INFO - Total alerts: 4
+2026-04-10 05:43:52,042 - INFO - Successful deliveries: 0
+2026-04-10 05:43:52,042 - INFO - Failed deliveries: 4
+2026-04-10 05:43:52,042 - INFO - Success rate: 0.0%
+2026-04-10 05:43:52,042 - INFO - Alerts by severity:
+2026-04-10 05:43:52,042 - INFO -   MEDIUM: 2
+2026-04-10 05:43:52,042 - INFO -   HIGH: 1
+2026-04-10 05:43:52,043 - INFO -   CRITICAL: 1
+2026-04-10 05:43:52,043 - INFO - 
+Step 7: Creating integration bridge
+2026-04-10 05:43:52,043 - INFO - ----------------------------------------
+2026-04-10 05:43:52,045 - INFO - Integration bridge saved to: data/telegram_integration_bridge.json
+2026-04-10 05:43:52,045 - INFO - 
+Step 8: Creating Phase 6 completion report
+2026-04-10 05:43:52,045 - INFO - ----------------------------------------

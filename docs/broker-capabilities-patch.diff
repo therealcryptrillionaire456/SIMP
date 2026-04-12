@@ -1,0 +1,134 @@
+diff for: simp/server/broker.py
+Enhancement C: Additive capabilities field in agent registration
+Branch: feature/coordination-layer
+Status: static_review ✅ | Requires local line-number verification before applying
+CoWork artifact | 2026-04-04
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+IMPORTANT: This is a contextual diff, not a line-number diff.
+Before applying, search for the anchor strings in YOUR local broker.py.
+All changes are additive. The existing register_agent() signature is unchanged.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGE 1: In register_agent() — add capabilities to the agent info dict
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ANCHOR (find this block in broker.py):
+
+    agent_info = {
+        "agent_id": agent_id,
+        "agent_type": agent_type,
+        "endpoint": endpoint,
+        "registered_at": datetime.utcnow().isoformat(),
+        "metadata": metadata or {}
+    }
+
+CHANGE TO (add the capabilities line):
+
+    agent_info = {
+        "agent_id": agent_id,
+        "agent_type": agent_type,
+        "endpoint": endpoint,
+        "registered_at": datetime.utcnow().isoformat(),
+        "metadata": metadata or {},
+        "capabilities": (metadata or {}).get("capabilities", []),  # Enhancement C
+    }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGE 2: In /agents/register POST handler — pass capabilities through metadata
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+No code change required. Capabilities are already passed via the existing
+`metadata` dict in the POST body. Change 1 above is the only code change.
+
+Registering with capabilities now works by including them in metadata:
+
+    POST /agents/register
+    {
+        "agent_id": "bullbear_predictor",
+        "agent_type": "predictor",
+        "endpoint": "file:///signals/output/",
+        "metadata": {
+            "capabilities": ["prediction_signal", "market_analysis", "no_trade_gate"],
+            "description": "BullBear adversarial macro predictor",
+            "dry_run_safe": true
+        }
+    }
+
+The GET /agents response will then include "capabilities" in each agent entry.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BACKWARD COMPATIBILITY ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Existing registrations without capabilities field: Not affected.
+   (metadata or {}).get("capabilities", []) returns [] when absent.
+
+✅ Existing /agents GET consumers: Not affected.
+   New "capabilities" key is additive. Existing consumers ignore unknown keys.
+
+✅ BullBear send_intent_to_simp.py: Not affected.
+   That script routes intents, not agent registrations.
+
+✅ KashClaw shim: Not affected.
+   Does not inspect agent registration payloads.
+
+✅ All existing tests: Not affected.
+   register_agent() signature is unchanged.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VERIFICATION STEPS (run after applying)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 — Existing tests still pass:
+    python bin/test_protocol.py
+    Expected: 17/17 pass (or whatever the current count is)
+
+Step 2 — Register with capabilities and retrieve:
+    curl -X POST http://127.0.0.1:5555/agents/register \
+      -H "Content-Type: application/json" \
+      -H "X-SIMP-API-Key: $SIMP_API_KEY" \
+      -d '{
+        "agent_id": "test_caps_agent",
+        "agent_type": "test",
+        "endpoint": "file:///tmp/test",
+        "metadata": {
+          "capabilities": ["test_cap_a", "test_cap_b"]
+        }
+      }'
+
+    Expected response: {"status": "registered", "agent_id": "test_caps_agent"}
+
+Step 3 — Verify capabilities appear in /agents:
+    curl http://127.0.0.1:5555/agents \
+      -H "X-SIMP-API-Key: $SIMP_API_KEY"
+
+    Expected: test_caps_agent entry includes "capabilities": ["test_cap_a", "test_cap_b"]
+
+Step 4 — Verify existing agents with no capabilities show empty list:
+    Check bullbear_predictor, kashclaw, etc. entries.
+    Expected: "capabilities": []
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GIT COMMIT MESSAGE (after human verification)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+feat(broker): add additive capabilities field to agent registration
+
+Adds optional `capabilities` list to agent_info dict in register_agent().
+Capabilities are passed via the existing `metadata` dict — no signature
+change. Defaults to [] when absent, preserving full backward compatibility.
+
+Enables programmatic capability discovery via GET /agents. Required by
+coordination layer Enhancement C and Day 4 multi-agent orchestration.
+
+Verification: existing 17 protocol tests pass + manual curl verification.
+Coordination ref: coord-cowork-session-002 | Branch: feature/coordination-layer
+
+Co-authored-by: Claude CoWork <noreply@anthropic.com>

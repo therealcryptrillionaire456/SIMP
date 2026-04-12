@@ -1,0 +1,4552 @@
+{
+  "version": "1.0",
+  "created_at": "2026-04-11T14:45:40.745225",
+  "updated_at": "2026-04-11T14:45:49.768570",
+  "legal_requirements": {
+    "pentagram_legal/BUILD_EXECUTION_PLAN.md": {
+      "file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+      "requirements": [
+        {
+          "id": "req_0001",
+          "text": "1. **Recursive Alignment**: Each build (6-20) must align with and enhance builds 1-5",
+          "context": "\n### Core Principles:\n1. **Recursive Alignment**: Each build (6-20) must align with and enhance builds 1-5\n2. **Self-Validation**: Automatic checkpoints every 5 builds\n3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "other",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 13,
+          "extracted_at": "2026-04-11T14:45:40.778026"
+        },
+        {
+          "id": "req_0002",
+          "text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "context": "1. **Recursive Alignment**: Each build (6-20) must align with and enhance builds 1-5\n2. **Self-Validation**: Automatic checkpoints every 5 builds\n3. **Hardening Layers**: Each build adds security/compliance hardening\n4. **Stress Testing**: Full testing before any commit\n5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 15,
+          "extracted_at": "2026-04-11T14:45:40.778039"
+        },
+        {
+          "id": "req_0003",
+          "text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "context": "3. **Hardening Layers**: Each build adds security/compliance hardening\n4. **Stress Testing**: Full testing before any commit\n5. **ISO Compliance**: Extensive logging for audit trails\n\n### Build Categories:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 17,
+          "extracted_at": "2026-04-11T14:45:40.778046"
+        },
+        {
+          "id": "req_0004",
+          "text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "context": "- **Specialization (6-10)**: Practice-specific agents and systems\n- **Integration (11-15)**: External systems and workflow orchestration\n- **Hardening (16-20)**: Security, compliance, and optimization\n\n---",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 23,
+          "extracted_at": "2026-04-11T14:45:40.778055"
+        },
+        {
+          "id": "req_0005",
+          "text": "8. **Build 8**: Regulatory Compliance Agent",
+          "context": "6. **Build 6**: M&A Transaction Agent\n7. **Build 7**: Intellectual Property Agent\n8. **Build 8**: Regulatory Compliance Agent\n9. **Build 9**: Litigation & Dispute Agent\n10. **Build 10**: Corporate Governance Agent",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 39,
+          "extracted_at": "2026-04-11T14:45:40.778089"
+        },
+        {
+          "id": "req_0006",
+          "text": "16. **Build 16**: Compliance Monitoring System",
+          "context": "\n### **BUILDS 16-20 (HARDENING)**\n16. **Build 16**: Compliance Monitoring System\n17. **Build 17**: Quality Assurance & Validation\n18. **Build 18**: Performance Optimization Layer",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 51,
+          "extracted_at": "2026-04-11T14:45:40.778108"
+        },
+        {
+          "id": "req_0007",
+          "text": "20. **Build 20**: ISO Compliance & Audit System",
+          "context": "18. **Build 18**: Performance Optimization Layer\n19. **Build 19**: Disaster Recovery & Backup\n20. **Build 20**: ISO Compliance & Audit System\n\n---",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 55,
+          "extracted_at": "2026-04-11T14:45:40.778116"
+        },
+        {
+          "id": "req_0008",
+          "text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "context": "| **6** | Build 2 (Base Agent) | M&A specialization | Transaction security |\n| **7** | Build 2 (Base Agent) | IP specialization | IP protection |\n| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |\n| **9** | Build 3 (Directory) | Litigation workflows | Evidence chain |\n| **10**| Build 5 (Handlers) | Governance protocols | Board compliance |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 67,
+          "extracted_at": "2026-04-11T14:45:40.778134"
+        },
+        {
+          "id": "req_0009",
+          "text": "| **10**| Build 5 (Handlers) | Governance protocols | Board compliance |",
+          "context": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |\n| **9** | Build 3 (Directory) | Litigation workflows | Evidence chain |\n| **10**| Build 5 (Handlers) | Governance protocols | Board compliance |\n| **11**| Build 1 (Architecture) | Knowledge foundation | Data integrity |\n| **12**| Build 2 (Agent) | Document processing | Content validation |",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 69,
+          "extracted_at": "2026-04-11T14:45:40.778142"
+        },
+        {
+          "id": "req_0010",
+          "text": "| **16**| All 1-5 | Compliance monitoring | Real-time checks |",
+          "context": "| **14**| Build 4 (Models) | External integration | API security |\n| **15**| Build 5 (Handlers) | Security framework | Encryption layer |\n| **16**| All 1-5 | Compliance monitoring | Real-time checks |\n| **17**| All 1-5 | Quality validation | Error prevention |\n| **18**| All 1-5 | Performance optimization | Speed hardening |",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 75,
+          "extracted_at": "2026-04-11T14:45:40.778157"
+        },
+        {
+          "id": "req_0011",
+          "text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "context": "| **18**| All 1-5 | Performance optimization | Speed hardening |\n| **19**| All 1-5 | Disaster recovery | Resilience layer |\n| **20**| All 1-5 | ISO compliance | Audit trail system |\n\n---",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 79,
+          "extracted_at": "2026-04-11T14:45:40.778173"
+        },
+        {
+          "id": "req_0012",
+          "text": "- \u2705 ISO compliance documentation",
+          "context": "### **Checkpoint 3: After Build 20**\n- \u2705 Full system hardening complete\n- \u2705 ISO compliance documentation\n- \u2705 Disaster recovery operational\n- \u2705 Performance optimization complete",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 99,
+          "extracted_at": "2026-04-11T14:45:40.778208"
+        },
+        {
+          "id": "req_0013",
+          "text": "2. **Compliance Validation**: Regulatory compliance checks",
+          "context": "### Each Build Adds:\n1. **Security Hardening**: Additional security measures\n2. **Compliance Validation**: Regulatory compliance checks\n3. **Error Handling**: Robust error detection and recovery\n4. **Performance Monitoring**: Metrics and optimization",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 109,
+          "extracted_at": "2026-04-11T14:45:40.778227"
+        },
+        {
+          "id": "req_0014",
+          "text": "5. **Compliance Tests**: Regulatory validation",
+          "context": "3. **Security Tests**: Vulnerability scanning\n4. **Performance Tests**: Load and stress testing\n5. **Compliance Tests**: Regulatory validation\n\n### Test Categories:",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 128,
+          "extracted_at": "2026-04-11T14:45:40.778254"
+        },
+        {
+          "id": "req_0015",
+          "text": "- **Compliance**: Is it legal?",
+          "context": "- **Security**: Is it secure?\n- **Performance**: Does it scale?\n- **Compliance**: Is it legal?\n- **Integration**: Does it connect?\n",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 134,
+          "extracted_at": "2026-04-11T14:45:40.778265"
+        },
+        {
+          "id": "req_0016",
+          "text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "context": "---\n\n## \ud83d\udcca LOGGING & ISO COMPLIANCE\n\n### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 139,
+          "extracted_at": "2026-04-11T14:45:40.778276"
+        },
+        {
+          "id": "req_0017",
+          "text": "### Logging Requirements:",
+          "context": "## \ud83d\udcca LOGGING & ISO COMPLIANCE\n\n### Logging Requirements:\n- **Activity Logs**: All agent actions\n- **Security Logs**: Access and authentication",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 141,
+          "extracted_at": "2026-04-11T14:45:40.778281"
+        },
+        {
+          "id": "req_0018",
+          "text": "- **Compliance Logs**: Regulatory checks",
+          "context": "- **Activity Logs**: All agent actions\n- **Security Logs**: Access and authentication\n- **Compliance Logs**: Regulatory checks\n- **Performance Logs**: System metrics\n- **Error Logs**: Failures and recoveries",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 144,
+          "extracted_at": "2026-04-11T14:45:40.778289"
+        },
+        {
+          "id": "req_0019",
+          "text": "- **A.18 Compliance**",
+          "context": "- **A.16 Information Security Incident Management**\n- **A.17 Information Security Aspects of Business Continuity**\n- **A.18 Compliance**\n\n---",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 162,
+          "extracted_at": "2026-04-11T14:45:40.778314"
+        },
+        {
+          "id": "req_0020",
+          "text": "- **Code Quality**: PEP8 compliance, type hints, documentation",
+          "context": "\n### Quality Gates:\n- **Code Quality**: PEP8 compliance, type hints, documentation\n- **Test Coverage**: >90% for new code\n- **Security Scan**: Zero critical vulnerabilities",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 180,
+          "extracted_at": "2026-04-11T14:45:40.778339"
+        },
+        {
+          "id": "req_0021",
+          "text": "- **Performance**: Meets SLA requirements",
+          "context": "- **Test Coverage**: >90% for new code\n- **Security Scan**: Zero critical vulnerabilities\n- **Performance**: Meets SLA requirements\n- **Compliance**: Passes all regulatory checks\n",
+          "category": "other",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 183,
+          "extracted_at": "2026-04-11T14:45:40.778347"
+        },
+        {
+          "id": "req_0022",
+          "text": "- **Compliance**: Passes all regulatory checks",
+          "context": "- **Security Scan**: Zero critical vulnerabilities\n- **Performance**: Meets SLA requirements\n- **Compliance**: Passes all regulatory checks\n\n---",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 184,
+          "extracted_at": "2026-04-11T14:45:40.778352"
+        },
+        {
+          "id": "req_0023",
+          "text": "4. **Compliance Gaps**: Automated compliance checking",
+          "context": "2. **Security Vulnerabilities**: Multiple security scans\n3. **Performance Degradation**: Load testing at each stage\n4. **Compliance Gaps**: Automated compliance checking\n5. **System Disruption**: Gradual rollout with rollback\n",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 194,
+          "extracted_at": "2026-04-11T14:45:40.778368"
+        },
+        {
+          "id": "req_0024",
+          "text": "- \u2705 ISO compliance documentation",
+          "context": "### Build 20 Success:\n- \u2705 Full system hardening complete\n- \u2705 ISO compliance documentation\n- \u2705 Disaster recovery operational\n- \u2705 Checkpoint 3 validation passed",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "line_number": 222,
+          "extracted_at": "2026-04-11T14:45:40.778412"
+        }
+      ],
+      "scan_time": "2026-04-11T14:45:40.778451"
+    },
+    "pentagram_legal/ARCHITECTURE_OVERVIEW.md": {
+      "file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+      "requirements": [
+        {
+          "id": "req_0001",
+          "text": "The Pentagram Legal Department is a **fully autonomous agentic AI legal system** built on the SIMP (Standardized Inter-Agent Message Protocol) infrastructure. This system transforms legal operations from human-intensive processes into scalable, precise, and autonomous AI-driven workflows.",
+          "context": "## \ud83c\udfdb\ufe0f SYSTEM OVERVIEW\n\nThe Pentagram Legal Department is a **fully autonomous agentic AI legal system** built on the SIMP (Standardized Inter-Agent Message Protocol) infrastructure. This system transforms legal operations from human-intensive processes into scalable, precise, and autonomous AI-driven workflows.\n\n### Core Philosophy:",
+          "category": "other",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 12,
+          "extracted_at": "2026-04-11T14:45:40.778548"
+        },
+        {
+          "id": "req_0002",
+          "text": "- **Legal Precision**: Superhuman accuracy in legal analysis and compliance",
+          "context": "### Core Philosophy:\n- **Autonomy First**: Design for full autonomy with human oversight points\n- **Legal Precision**: Superhuman accuracy in legal analysis and compliance\n- **Scalability**: Handle unlimited simultaneous legal matters\n- **Security**: Military-grade confidentiality and privilege protection",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 16,
+          "extracted_at": "2026-04-11T14:45:40.778559"
+        },
+        {
+          "id": "req_0003",
+          "text": "\u251c\u2500\u2500 Statutes & Regulations (50+ jurisdictions)",
+          "context": "```\nLegal Knowledge Graph\n\u251c\u2500\u2500 Statutes & Regulations (50+ jurisdictions)\n\u251c\u2500\u2500 Case Law Database (10M+ cases)\n\u251c\u2500\u2500 Contract Templates & Clauses",
+          "category": "regulatory",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 38,
+          "extracted_at": "2026-04-11T14:45:40.778592"
+        },
+        {
+          "id": "req_0004",
+          "text": "\u251c\u2500\u2500 Regulatory Compliance",
+          "context": "\u251c\u2500\u2500 M&A Transactions\n\u251c\u2500\u2500 Intellectual Property\n\u251c\u2500\u2500 Regulatory Compliance\n\u251c\u2500\u2500 Litigation & Disputes\n\u251c\u2500\u2500 Corporate Governance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 57,
+          "extracted_at": "2026-04-11T14:45:40.778628"
+        },
+        {
+          "id": "req_0005",
+          "text": "\u251c\u2500\u2500 Compliance Checking",
+          "context": "\u251c\u2500\u2500 Entity Recognition\n\u251c\u2500\u2500 Risk Analysis\n\u251c\u2500\u2500 Compliance Checking\n\u2514\u2500\u2500 Generation & Drafting\n```",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 72,
+          "extracted_at": "2026-04-11T14:45:40.778655"
+        },
+        {
+          "id": "req_0006",
+          "text": "### Layer 6: Security & Compliance",
+          "context": "```\n\n### Layer 6: Security & Compliance\n```\nSecurity Framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 87,
+          "extracted_at": "2026-04-11T14:45:40.778677"
+        },
+        {
+          "id": "req_0007",
+          "text": "\u251c\u2500\u2500 Compliance Monitoring",
+          "context": "\u251c\u2500\u2500 End-to-End Encryption\n\u251c\u2500\u2500 Audit Logging\n\u251c\u2500\u2500 Compliance Monitoring\n\u2514\u2500\u2500 Disaster Recovery\n```",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 94,
+          "extracted_at": "2026-04-11T14:45:40.778692"
+        },
+        {
+          "id": "req_0008",
+          "text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "context": "- **M&A Agents**: Due diligence, deal structuring, integration planning\n- **IP Agents**: Patent filing, trademark management, licensing\n- **Compliance Agents**: Regulatory tracking, filings, audit preparation\n- **Litigation Agents**: Case strategy, discovery, settlement analysis\n- **Governance Agents**: Board matters, shareholder relations, ESG",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 112,
+          "extracted_at": "2026-04-11T14:45:40.778718"
+        },
+        {
+          "id": "req_0009",
+          "text": "- **Monitoring Agents**: Regulatory changes, compliance deadlines",
+          "context": "- **Review Agents**: Document analysis, risk assessment\n- **Negotiation Agents**: Term sheets, contract terms, settlements\n- **Monitoring Agents**: Regulatory changes, compliance deadlines\n\n#### **4. Support Agents**",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 121,
+          "extracted_at": "2026-04-11T14:45:40.778735"
+        },
+        {
+          "id": "req_0010",
+          "text": "- **Analysis**: Risk scoring, compliance checking, clause analysis",
+          "context": "- **Classification**: BERT-based legal document classification\n- **NER**: Custom entity recognition for legal terms\n- **Analysis**: Risk scoring, compliance checking, clause analysis\n- **Generation**: Template-based + LLM-assisted drafting\n",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 145,
+          "extracted_at": "2026-04-11T14:45:40.778769"
+        },
+        {
+          "id": "req_0011",
+          "text": "- **Process Templates**: Standard legal workflows (M&A, IP, Compliance)",
+          "context": "\n### 4. Workflow Engine (`workflows/`)\n- **Process Templates**: Standard legal workflows (M&A, IP, Compliance)\n- **Task Orchestration**: Multi-agent coordination\n- **Deadline Management**: Automated tracking and alerts",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 156,
+          "extracted_at": "2026-04-11T14:45:40.778787"
+        },
+        {
+          "id": "req_0012",
+          "text": "- **Compliance**: Automated regulatory compliance checking",
+          "context": "- **Access Control**: RBAC with legal privilege levels\n- **Audit Logging**: Immutable record of all actions\n- **Compliance**: Automated regulatory compliance checking\n- **Backup**: Geographic redundancy, disaster recovery\n",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 173,
+          "extracted_at": "2026-04-11T14:45:40.778814"
+        },
+        {
+          "id": "req_0013",
+          "text": "4. Compliance Agents check regulatory requirements",
+          "context": "2. M&A Agent creates due diligence checklist\n3. Document Agents collect and process target documents\n4. Compliance Agents check regulatory requirements\n5. Risk Agents identify legal risks and liabilities\n6. Drafting Agents prepare acquisition agreement",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 185,
+          "extracted_at": "2026-04-11T14:45:40.778831"
+        },
+        {
+          "id": "req_0014",
+          "text": "### Example 3: Regulatory Compliance",
+          "context": "```\n\n### Example 3: Regulatory Compliance\n```\n1. Monitoring Agent detects regulatory change",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 208,
+          "extracted_at": "2026-04-11T14:45:40.778861"
+        },
+        {
+          "id": "req_0015",
+          "text": "4. Drafting Agent prepares compliance documents",
+          "context": "2. Analysis Agent assesses impact on portfolio companies\n3. Notification Agent alerts affected companies\n4. Drafting Agent prepares compliance documents\n5. Review Agent validates compliance approach\n6. Filing Agent submits required filings",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 213,
+          "extracted_at": "2026-04-11T14:45:40.778871"
+        },
+        {
+          "id": "req_0016",
+          "text": "5. Review Agent validates compliance approach",
+          "context": "3. Notification Agent alerts affected companies\n4. Drafting Agent prepares compliance documents\n5. Review Agent validates compliance approach\n6. Filing Agent submits required filings\n7. Confirmation Agent verifies acceptance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 214,
+          "extracted_at": "2026-04-11T14:45:40.778876"
+        },
+        {
+          "id": "req_0017",
+          "text": "6. Filing Agent submits required filings",
+          "context": "4. Drafting Agent prepares compliance documents\n5. Review Agent validates compliance approach\n6. Filing Agent submits required filings\n7. Confirmation Agent verifies acceptance\n8. Audit Agent prepares for regulatory audits",
+          "category": "other",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 215,
+          "extracted_at": "2026-04-11T14:45:40.778881"
+        },
+        {
+          "id": "req_0018",
+          "text": "9. Training Agent updates compliance training",
+          "context": "7. Confirmation Agent verifies acceptance\n8. Audit Agent prepares for regulatory audits\n9. Training Agent updates compliance training\n10. Reporting Agent documents compliance status\n```",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 218,
+          "extracted_at": "2026-04-11T14:45:40.778889"
+        },
+        {
+          "id": "req_0019",
+          "text": "10. Reporting Agent documents compliance status",
+          "context": "8. Audit Agent prepares for regulatory audits\n9. Training Agent updates compliance training\n10. Reporting Agent documents compliance status\n```\n",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 219,
+          "extracted_at": "2026-04-11T14:45:40.778895"
+        },
+        {
+          "id": "req_0020",
+          "text": "- **Compliance**: Real-time monitoring and updates",
+          "context": "- **Error Rate**: <0.1% (vs. human 5-10%)\n- **Consistency**: 100% across all documents\n- **Compliance**: Real-time monitoring and updates\n- **Completeness**: No missed deadlines or filings\n- **Accuracy**: 99.9% legal analysis accuracy",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 236,
+          "extracted_at": "2026-04-11T14:45:40.778918"
+        },
+        {
+          "id": "req_0021",
+          "text": "- **Week 7-8**: Security and compliance framework",
+          "context": "- **Week 3-4**: Document processing pipeline\n- **Week 5-6**: SIMP agent integration\n- **Week 7-8**: Security and compliance framework\n\n### Phase 2: Core Capabilities (Months 2-3)",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 255,
+          "extracted_at": "2026-04-11T14:45:40.778942"
+        },
+        {
+          "id": "req_0022",
+          "text": "- **Month 3**: Regulatory compliance monitoring",
+          "context": "### Phase 2: Core Capabilities (Months 2-3)\n- **Month 2**: Contract drafting and review\n- **Month 3**: Regulatory compliance monitoring\n- **Month 4**: Due diligence automation\n- **Month 5**: Litigation support tools",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 259,
+          "extracted_at": "2026-04-11T14:45:40.778950"
+        },
+        {
+          "id": "req_0023",
+          "text": "- **Compliance**: Real-time regulatory monitoring",
+          "context": "- **Malpractice**: Extensive validation systems\n- **Confidentiality**: Military-grade encryption\n- **Compliance**: Real-time regulatory monitoring\n\n### Technical Risks:",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 288,
+          "extracted_at": "2026-04-11T14:45:40.778988"
+        },
+        {
+          "id": "req_0024",
+          "text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "context": "---\n\n## \ud83d\udd10 SECURITY & COMPLIANCE\n\n### Security Measures:",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 304,
+          "extracted_at": "2026-04-11T14:45:40.779007"
+        },
+        {
+          "id": "req_0025",
+          "text": "### Compliance Framework:",
+          "context": "- **Data Protection**: Jurisdiction-specific handling\n\n### Compliance Framework:\n- **ABA Rules**: Model Rules of Professional Conduct\n- **State Regulations**: All 50 states + DC",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 313,
+          "extracted_at": "2026-04-11T14:45:40.779021"
+        },
+        {
+          "id": "req_0026",
+          "text": "- **State Regulations**: All 50 states + DC",
+          "context": "### Compliance Framework:\n- **ABA Rules**: Model Rules of Professional Conduct\n- **State Regulations**: All 50 states + DC\n- **Data Privacy**: GDPR, CCPA, HIPAA\n- **Court Rules**: Federal and state procedural rules",
+          "category": "regulatory",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 315,
+          "extracted_at": "2026-04-11T14:45:40.779028"
+        },
+        {
+          "id": "req_0027",
+          "text": "- **Daily**: Automated compliance checks",
+          "context": "\n### Audit Procedures:\n- **Daily**: Automated compliance checks\n- **Weekly**: Human review of critical decisions\n- **Monthly**: Comprehensive risk assessment",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 321,
+          "extracted_at": "2026-04-11T14:45:40.779038"
+        },
+        {
+          "id": "req_0028",
+          "text": "- **Risk Reduction**: Proactive compliance and litigation prevention",
+          "context": "- **Elite Legal Support**: Access to world-class AI legal team\n- **Cost Efficiency**: Fractional cost of traditional counsel\n- **Risk Reduction**: Proactive compliance and litigation prevention\n- **Strategic Insights**: Legal intelligence for business decisions\n- **Operational Efficiency**: Streamlined legal processes",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 340,
+          "extracted_at": "2026-04-11T14:45:40.779066"
+        },
+        {
+          "id": "req_0029",
+          "text": "- \u2705 Real-time regulatory compliance",
+          "context": "### Phase 2 Success (Month 6):\n- \u2705 Full M&A due diligence automation\n- \u2705 Real-time regulatory compliance\n- \u2705 Court filing capability\n- \u2705 Portfolio company integration",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 363,
+          "extracted_at": "2026-04-11T14:45:40.779103"
+        },
+        {
+          "id": "req_0030",
+          "text": "3. **99.9% accuracy** in legal analysis and compliance",
+          "context": "1. **10x faster** legal processes and deal execution\n2. **90% cost reduction** in legal operations\n3. **99.9% accuracy** in legal analysis and compliance\n4. **24/7 operation** across all jurisdictions\n5. **Predictive intelligence** that anticipates legal challenges",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "line_number": 388,
+          "extracted_at": "2026-04-11T14:45:40.779149"
+        }
+      ],
+      "scan_time": "2026-04-11T14:45:40.779177"
+    }
+  },
+  "module_mappings": {
+    "data_acquisition": {
+      "module_info": {
+        "file_count": 2,
+        "class_count": 0,
+        "function_count": 38,
+        "files": [
+          "dataset_processor.py",
+          "web_scraper.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338949"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338959"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338962"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338966"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.1,
+          "mapped_at": "2026-04-11T14:45:45.338969"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338973"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338985"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338987"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.338990"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339008"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339011"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339023"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339027"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "bill_russel_integration": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 0,
+        "function_count": 29,
+        "files": [
+          "integration_system.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339037"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339040"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339051"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339057"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339059"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339064"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339071"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339073"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339075"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339090"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339093"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339106"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339110"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "bill_russel_ml_pipeline": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 2,
+        "function_count": 23,
+        "files": [
+          "training_pipeline.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339120"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339123"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339125"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339130"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339132"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339137"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339144"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339146"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339148"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339164"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339167"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339184"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339193"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "bill_russel_sigma_rules": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 0,
+        "function_count": 31,
+        "files": [
+          "sigma_engine.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339203"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339205"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339208"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339213"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339215"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339219"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339226"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339229"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339231"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339247"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339250"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339264"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339269"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "agents": {
+      "module_info": {
+        "file_count": 11,
+        "class_count": 0,
+        "function_count": 213,
+        "files": [
+          "cowork_bridge.py",
+          "bill_russel_agent.py",
+          "bill_russel_agent_enhanced.py",
+          "brp_agent.py",
+          "brp_agent_legacy.py",
+          "cowork_processor.py",
+          "gemma4_agent.py",
+          "kloutbot_agent.py",
+          "q_intent_compiler.py",
+          "quantumarb_agent.py",
+          "quantumarb_agent_enhanced.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339278"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339280"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339283"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339286"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339288"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339291"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339297"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339299"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339301"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339312"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.339317"
+        },
+        {
+          "requirement_id": "req_0009",
+          "requirement_text": "- **Monitoring Agents**: Regulatory changes, compliance deadlines",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.339319"
+        },
+        {
+          "requirement_id": "req_0013",
+          "requirement_text": "4. Compliance Agents check regulatory requirements",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.339323"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339330"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339334"
+        }
+      ],
+      "total_requirements": 15
+    },
+    "bin": {
+      "module_info": {
+        "file_count": 4,
+        "class_count": 0,
+        "function_count": 31,
+        "files": [
+          "start_gemma4_agent.py",
+          "start_production.py",
+          "start_server.py",
+          "test_protocol.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339341"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339343"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339350"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339354"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339356"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339359"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339364"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339366"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339368"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339379"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339381"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339391"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339394"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "tests": {
+      "module_info": {
+        "file_count": 93,
+        "class_count": 13,
+        "function_count": 1466,
+        "files": [
+          "__init__.py",
+          "conftest.py",
+          "mock_exchange_connector.py",
+          "test_agent.py",
+          "test_complete.py",
+          "test_core.py",
+          "test_integration.py",
+          "test_agent_manager_security.py",
+          "test_audit_logger.py",
+          "test_http_server_security.py",
+          "test_intent_schema.py",
+          "test_log_utils.py",
+          "test_rate_limiter.py",
+          "test_a2a_compat.py",
+          "test_a2a_dashboard.py",
+          "test_a2a_demo.py",
+          "test_a2a_events.py",
+          "test_a2a_financial_ops.py",
+          "test_a2a_ops_policy.py",
+          "test_a2a_policy_cards.py",
+          "test_a2a_projectx.py",
+          "test_a2a_projectx_diagnostics.py",
+          "test_a2a_security.py",
+          "test_a2a_sprints2_6.py",
+          "test_arb_detector.py",
+          "test_ble_transport.py",
+          "test_broker_delivery.py",
+          "test_brp_bridge.py",
+          "test_brp_end_to_end_smoke.py",
+          "test_brp_flock_integration.py",
+          "test_coordination_schema.py",
+          "test_cowork_bridge.py",
+          "test_dashboard_endpoints.py",
+          "test_dashboard_observability.py",
+          "test_dashboard_websocket.py",
+          "test_e2e_task_flow.py",
+          "test_financial_a2a_aggregator.py",
+          "test_financial_a2a_edge_cases.py",
+          "test_financial_a2a_integration.py",
+          "test_financial_a2a_pipeline.py",
+          "test_financial_a2a_safety.py",
+          "test_financial_a2a_schema.py",
+          "test_financial_a2a_simulator.py",
+          "test_financial_ops_approval.py",
+          "test_financial_ops_connector.py",
+          "test_financial_ops_contracts.py",
+          "test_financial_ops_dry_run.py",
+          "test_financial_ops_gates.py",
+          "test_financial_ops_live.py",
+          "test_financial_ops_monitoring.py",
+          "test_financial_ops_observability.py",
+          "test_financial_ops_rollback.py",
+          "test_integration_quantumarb_kashclaw.py",
+          "test_intent.py",
+          "test_kashclaw_a2a_hooks.py",
+          "test_kashclaw_execution_mapping.py",
+          "test_kashclaw_hardening_round2.py",
+          "test_kashclaw_integration.py",
+          "test_kashclaw_posture_fields.py",
+          "test_kashclaw_timesfm_edge_cases.py",
+          "test_kashclaw_timesfm_sizing.py",
+          "test_kloutbot_horizon_hardening.py",
+          "test_kloutbot_horizon_integration.py",
+          "test_kloutbot_timesfm_horizon.py",
+          "test_mesh_relay.py",
+          "test_noise_identity.py",
+          "test_nostr_transport.py",
+          "test_orchestration.py",
+          "test_protocol_conformance.py",
+          "test_protocol_validation.py",
+          "test_quantumarb_a2a_summary.py",
+          "test_quantumarb_agent_timesfm.py",
+          "test_quantumarb_decision_summary.py",
+          "test_quantumarb_edge_cases.py",
+          "test_quantumarb_edge_observability.py",
+          "test_quantumarb_executor.py",
+          "test_quantumarb_integration_contract.py",
+          "test_quantumarb_integration_scenarios.py",
+          "test_quantumarb_logging_hardening.py",
+          "test_quantumarb_structured_logging.py",
+          "test_quantumarb_timesfm_edge_cases.py",
+          "test_quantumarb_timesfm_hardening.py",
+          "test_request_guards.py",
+          "test_routing_engine.py",
+          "test_scrapling_query_app.py",
+          "test_spot_trading_organ_hardening.py",
+          "test_sprint10_final.py",
+          "test_sprint11_projectx.py",
+          "test_sprint12_actions.py",
+          "test_sprint13_safety.py",
+          "test_sprint14_integration.py",
+          "test_sprint15_final.py",
+          "test_sprint16_auth.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339402"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339404"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339406"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339410"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339412"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339415"
+        },
+        {
+          "requirement_id": "req_0014",
+          "requirement_text": "5. **Compliance Tests**: Regulatory validation",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.339419"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339422"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339424"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339426"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339436"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339439"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339449"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339452"
+        }
+      ],
+      "total_requirements": 14
+    },
+    "config": {
+      "module_info": {
+        "file_count": 0,
+        "class_count": 0,
+        "function_count": 4,
+        "files": []
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339459"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339461"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339464"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339467"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339469"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339472"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339477"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339479"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339481"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339491"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339494"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339504"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339507"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "dashboard": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 0,
+        "function_count": 79,
+        "files": [
+          "server.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339515"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339517"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339519"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339522"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339524"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339528"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339533"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339535"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339537"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339550"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339553"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339562"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339565"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "scripts": {
+      "module_info": {
+        "file_count": 6,
+        "class_count": 0,
+        "function_count": 36,
+        "files": [
+          "deploy_mistral7b.py",
+          "fine_tune_secbert.py",
+          "fine_tune_secbert_simplified.py",
+          "install_ml_dependencies.py",
+          "quick_secbert_train.py",
+          "mistral_colab.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339577"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339581"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339583"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339586"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339588"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339592"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339597"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339599"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339601"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339612"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339614"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339624"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339628"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "examples": {
+      "module_info": {
+        "file_count": 7,
+        "class_count": 1,
+        "function_count": 65,
+        "files": [
+          "a2a_demo.py",
+          "integration_demo.py",
+          "legacy_demo.py",
+          "threat_detection_demo.py",
+          "kashclaw_trading_agent.py",
+          "kloutbot_autonomous_agent.py",
+          "simple_agent.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339635"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339637"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339639"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339642"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339644"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339648"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339653"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339655"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339657"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339667"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339670"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339680"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339683"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "models": {
+      "module_info": {
+        "file_count": 6,
+        "class_count": 4,
+        "function_count": 31,
+        "files": [
+          "classifier_demo.py",
+          "canonical_intent.py",
+          "coordination_schema.py",
+          "failure_taxonomy.py",
+          "intent_schema.py",
+          "peer_intent_schema.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339691"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339693"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339695"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339698"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.339704"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339708"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339713"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339715"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339717"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339727"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339730"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339739"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339743"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "mythos_implementation": {
+      "module_info": {
+        "file_count": 14,
+        "class_count": 0,
+        "function_count": 127,
+        "files": [
+          "FINAL_DEMONSTRATION.py",
+          "bill_russel_protocol_enhanced.py",
+          "model_config.py",
+          "demo_bill_russel.py",
+          "data_utils.py",
+          "modeling_mythos.py",
+          "rotary_embedding.py",
+          "tokenizer.py",
+          "training.py",
+          "test_agent_import.py",
+          "test_bill_russel_simple.py",
+          "test_enhanced_simple.py",
+          "test_model.py",
+          "test_training.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339751"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339753"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339756"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339760"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339762"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339766"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339772"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339774"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339777"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339789"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339793"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339804"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339808"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "security": {
+      "module_info": {
+        "file_count": 9,
+        "class_count": 0,
+        "function_count": 112,
+        "files": [
+          "alert_orchestrator.py",
+          "memory_system.py",
+          "pattern_recognition.py",
+          "reasoning_engine.py",
+          "threat_database.py",
+          "protocol_core.py",
+          "brp_bridge.py",
+          "brp_models.py",
+          "log_utils.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.7999999999999999,
+          "mapped_at": "2026-04-11T14:45:45.339821"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339823"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.7999999999999999,
+          "mapped_at": "2026-04-11T14:45:45.339826"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339831"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339833"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339836"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339841"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339843"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339845"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.7999999999999999,
+          "mapped_at": "2026-04-11T14:45:45.339856"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339859"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.7999999999999999,
+          "mapped_at": "2026-04-11T14:45:45.339868"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.7999999999999999,
+          "mapped_at": "2026-04-11T14:45:45.339872"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "patches": {
+      "module_info": {
+        "file_count": 4,
+        "class_count": 0,
+        "function_count": 0,
+        "files": [
+          "agent_client_patch.py",
+          "agent_manager_patch.py",
+          "broker_patch.py",
+          "http_server_patch.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339879"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339881"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339883"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339887"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339889"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339892"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339897"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339899"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339901"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339916"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339919"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339928"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339932"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "pentagram_legal": {
+      "module_info": {
+        "file_count": 3,
+        "class_count": 0,
+        "function_count": 70,
+        "files": [
+          "base_legal_agent.py",
+          "ma_transaction_agent.py",
+          "ma_transaction_agent_hardening.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339940"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339942"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339944"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339948"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339951"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339954"
+        },
+        {
+          "requirement_id": "req_0015",
+          "requirement_text": "- **Compliance**: Is it legal?",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.1,
+          "mapped_at": "2026-04-11T14:45:45.339959"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339962"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339964"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339966"
+        },
+        {
+          "requirement_id": "req_0001",
+          "requirement_text": "The Pentagram Legal Department is a **fully autonomous agentic AI legal system** built on the SIMP (Standardized Inter-Agent Message Protocol) infrastructure. This system transforms legal operations from human-intensive processes into scalable, precise, and autonomous AI-driven workflows.",
+          "category": "other",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.2,
+          "mapped_at": "2026-04-11T14:45:45.339974"
+        },
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "- **Legal Precision**: Superhuman accuracy in legal analysis and compliance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.1,
+          "mapped_at": "2026-04-11T14:45:45.339976"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339981"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339984"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "- **Process Templates**: Standard legal workflows (M&A, IP, Compliance)",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.1,
+          "mapped_at": "2026-04-11T14:45:45.339988"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.339997"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340001"
+        },
+        {
+          "requirement_id": "req_0030",
+          "requirement_text": "3. **99.9% accuracy** in legal analysis and compliance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.1,
+          "mapped_at": "2026-04-11T14:45:45.340007"
+        }
+      ],
+      "total_requirements": 18
+    },
+    "audit": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 0,
+        "function_count": 12,
+        "files": [
+          "audit_logger.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340011"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.340013"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340015"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.340018"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340020"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.340024"
+        },
+        {
+          "requirement_id": "req_0012",
+          "requirement_text": "- \u2705 ISO compliance documentation",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340026"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340030"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340032"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340033"
+        },
+        {
+          "requirement_id": "req_0020",
+          "requirement_text": "- **Code Quality**: PEP8 compliance, type hints, documentation",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340036"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "- \u2705 ISO compliance documentation",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340040"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340048"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.5,
+          "mapped_at": "2026-04-11T14:45:45.340051"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340060"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340064"
+        }
+      ],
+      "total_requirements": 16
+    },
+    "compat": {
+      "module_info": {
+        "file_count": 22,
+        "class_count": 1,
+        "function_count": 186,
+        "files": [
+          "a2a_security.py",
+          "agent_card.py",
+          "approval_queue.py",
+          "auth_map.py",
+          "budget_monitor.py",
+          "capability_map.py",
+          "capability_schema.py",
+          "discovery_cache.py",
+          "event_stream.py",
+          "financial_ops.py",
+          "gate_manager.py",
+          "lifecycle_map.py",
+          "live_ledger.py",
+          "ops_policy.py",
+          "payment_connector.py",
+          "policy_map.py",
+          "projectx_card.py",
+          "projectx_diagnostics.py",
+          "reconciliation.py",
+          "rollback.py",
+          "stripe_connector.py",
+          "task_map.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340071"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340073"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340076"
+        },
+        {
+          "requirement_id": "req_0005",
+          "requirement_text": "8. **Build 8**: Regulatory Compliance Agent",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340078"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "16. **Build 16**: Compliance Monitoring System",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340080"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340082"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340084"
+        },
+        {
+          "requirement_id": "req_0009",
+          "requirement_text": "| **10**| Build 5 (Handlers) | Governance protocols | Board compliance |",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340086"
+        },
+        {
+          "requirement_id": "req_0010",
+          "requirement_text": "| **16**| All 1-5 | Compliance monitoring | Real-time checks |",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340088"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340090"
+        },
+        {
+          "requirement_id": "req_0012",
+          "requirement_text": "- \u2705 ISO compliance documentation",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340093"
+        },
+        {
+          "requirement_id": "req_0013",
+          "requirement_text": "2. **Compliance Validation**: Regulatory compliance checks",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340095"
+        },
+        {
+          "requirement_id": "req_0014",
+          "requirement_text": "5. **Compliance Tests**: Regulatory validation",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340097"
+        },
+        {
+          "requirement_id": "req_0015",
+          "requirement_text": "- **Compliance**: Is it legal?",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340099"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340101"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340103"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340105"
+        },
+        {
+          "requirement_id": "req_0019",
+          "requirement_text": "- **A.18 Compliance**",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340107"
+        },
+        {
+          "requirement_id": "req_0020",
+          "requirement_text": "- **Code Quality**: PEP8 compliance, type hints, documentation",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340110"
+        },
+        {
+          "requirement_id": "req_0022",
+          "requirement_text": "- **Compliance**: Passes all regulatory checks",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340112"
+        },
+        {
+          "requirement_id": "req_0023",
+          "requirement_text": "4. **Compliance Gaps**: Automated compliance checking",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340114"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "- \u2705 ISO compliance documentation",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340117"
+        },
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "- **Legal Precision**: Superhuman accuracy in legal analysis and compliance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340120"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "\u251c\u2500\u2500 Regulatory Compliance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340123"
+        },
+        {
+          "requirement_id": "req_0005",
+          "requirement_text": "\u251c\u2500\u2500 Compliance Checking",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340125"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340128"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "\u251c\u2500\u2500 Compliance Monitoring",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340130"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340132"
+        },
+        {
+          "requirement_id": "req_0009",
+          "requirement_text": "- **Monitoring Agents**: Regulatory changes, compliance deadlines",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340134"
+        },
+        {
+          "requirement_id": "req_0010",
+          "requirement_text": "- **Analysis**: Risk scoring, compliance checking, clause analysis",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340136"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "- **Process Templates**: Standard legal workflows (M&A, IP, Compliance)",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340138"
+        },
+        {
+          "requirement_id": "req_0012",
+          "requirement_text": "- **Compliance**: Automated regulatory compliance checking",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340140"
+        },
+        {
+          "requirement_id": "req_0013",
+          "requirement_text": "4. Compliance Agents check regulatory requirements",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340142"
+        },
+        {
+          "requirement_id": "req_0014",
+          "requirement_text": "### Example 3: Regulatory Compliance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340144"
+        },
+        {
+          "requirement_id": "req_0015",
+          "requirement_text": "4. Drafting Agent prepares compliance documents",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340146"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "5. Review Agent validates compliance approach",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340148"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "9. Training Agent updates compliance training",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340151"
+        },
+        {
+          "requirement_id": "req_0019",
+          "requirement_text": "10. Reporting Agent documents compliance status",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340153"
+        },
+        {
+          "requirement_id": "req_0020",
+          "requirement_text": "- **Compliance**: Real-time monitoring and updates",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340155"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340157"
+        },
+        {
+          "requirement_id": "req_0022",
+          "requirement_text": "- **Month 3**: Regulatory compliance monitoring",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340160"
+        },
+        {
+          "requirement_id": "req_0023",
+          "requirement_text": "- **Compliance**: Real-time regulatory monitoring",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340162"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340164"
+        },
+        {
+          "requirement_id": "req_0025",
+          "requirement_text": "### Compliance Framework:",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340166"
+        },
+        {
+          "requirement_id": "req_0027",
+          "requirement_text": "- **Daily**: Automated compliance checks",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340169"
+        },
+        {
+          "requirement_id": "req_0028",
+          "requirement_text": "- **Risk Reduction**: Proactive compliance and litigation prevention",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340171"
+        },
+        {
+          "requirement_id": "req_0029",
+          "requirement_text": "- \u2705 Real-time regulatory compliance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340173"
+        },
+        {
+          "requirement_id": "req_0030",
+          "requirement_text": "3. **99.9% accuracy** in legal analysis and compliance",
+          "category": "general_compliance",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340175"
+        }
+      ],
+      "total_requirements": 48
+    },
+    "financial": {
+      "module_info": {
+        "file_count": 4,
+        "class_count": 1,
+        "function_count": 36,
+        "files": [
+          "a2a_aggregator.py",
+          "a2a_safety.py",
+          "a2a_schema.py",
+          "a2a_simulator.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340179"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340182"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340184"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340187"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340189"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340193"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340198"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340200"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340202"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340213"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340216"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340225"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340229"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "integrations": {
+      "module_info": {
+        "file_count": 9,
+        "class_count": 4,
+        "function_count": 159,
+        "files": [
+          "log_ingestion.py",
+          "ml_pipeline.py",
+          "sigma_rules.py",
+          "telegram_alerts.py",
+          "kashclaw_execution_mapping.py",
+          "kashclaw_shim.py",
+          "timesfm_policy_engine.py",
+          "timesfm_service.py",
+          "trading_organ.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340237"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340239"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340241"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340245"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340247"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340250"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340255"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340257"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340259"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340270"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340272"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340282"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340286"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "memory": {
+      "module_info": {
+        "file_count": 5,
+        "class_count": 0,
+        "function_count": 38,
+        "files": [
+          "conversation_archive.py",
+          "hooks.py",
+          "knowledge_index.py",
+          "session_bootstrap.py",
+          "task_memory.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340293"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340295"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340297"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340300"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340302"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340305"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340310"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340312"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340314"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340325"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340328"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340337"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340341"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "orchestration": {
+      "module_info": {
+        "file_count": 4,
+        "class_count": 0,
+        "function_count": 51,
+        "files": [
+          "brp_integration.py",
+          "orchestration_loop.py",
+          "orchestration_manager.py",
+          "task_decomposer.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340348"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340350"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340352"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340356"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340358"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340361"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340366"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340368"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340370"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340381"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340384"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340393"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340397"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "organs": {
+      "module_info": {
+        "file_count": 5,
+        "class_count": 0,
+        "function_count": 88,
+        "files": [
+          "arb_detector.py",
+          "exchange_connector.py",
+          "executor.py",
+          "pnl_ledger.py",
+          "spot_trading_organ.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340405"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340407"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340411"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340414"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340416"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340419"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340424"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340426"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340428"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340439"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340442"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340451"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340455"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "projectx": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 0,
+        "function_count": 22,
+        "files": [
+          "computer.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340462"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340465"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340468"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340471"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340473"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340476"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340481"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340483"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340485"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340500"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340503"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340513"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340516"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "routing": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 0,
+        "function_count": 13,
+        "files": [
+          "builder_pool.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340523"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340525"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340527"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340531"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340533"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340536"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340541"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340543"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340545"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340556"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340559"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340569"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340572"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "server": {
+      "module_info": {
+        "file_count": 15,
+        "class_count": 0,
+        "function_count": 144,
+        "files": [
+          "agent_client.py",
+          "agent_http_client.py",
+          "agent_manager.py",
+          "agent_server.py",
+          "broker.py",
+          "control_auth.py",
+          "dashboard_ui.py",
+          "delivery.py",
+          "http_server.py",
+          "intent_ledger.py",
+          "rate_limit.py",
+          "request_guards.py",
+          "routing_engine.py",
+          "security_audit.py",
+          "validation.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340579"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340581"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340583"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340587"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340589"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340592"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340597"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340599"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340601"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340612"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340614"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340624"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340627"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "transport": {
+      "module_info": {
+        "file_count": 7,
+        "class_count": 0,
+        "function_count": 85,
+        "files": [
+          "ble_transport.py",
+          "bridge.py",
+          "manager.py",
+          "mesh_relay.py",
+          "noise_identity.py",
+          "nostr_transport.py",
+          "packet.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340635"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340637"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340639"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340643"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340645"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340649"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340654"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340656"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340658"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340669"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340672"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340681"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340685"
+        }
+      ],
+      "total_requirements": 13
+    },
+    "simp_brain": {
+      "module_info": {
+        "file_count": 1,
+        "class_count": 0,
+        "function_count": 5,
+        "files": [
+          "protocol_updater.py"
+        ]
+      },
+      "requirements": [
+        {
+          "requirement_id": "req_0002",
+          "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340692"
+        },
+        {
+          "requirement_id": "req_0003",
+          "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340694"
+        },
+        {
+          "requirement_id": "req_0004",
+          "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+          "category": "security",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340697"
+        },
+        {
+          "requirement_id": "req_0007",
+          "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340701"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+          "category": "data_management",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340703"
+        },
+        {
+          "requirement_id": "req_0011",
+          "requirement_text": "| **20**| All 1-5 | ISO compliance | Audit trail system |",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340707"
+        },
+        {
+          "requirement_id": "req_0016",
+          "requirement_text": "## \ud83d\udcca LOGGING & ISO COMPLIANCE",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340738"
+        },
+        {
+          "requirement_id": "req_0017",
+          "requirement_text": "### Logging Requirements:",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340744"
+        },
+        {
+          "requirement_id": "req_0018",
+          "requirement_text": "- **Compliance Logs**: Regulatory checks",
+          "category": "audit",
+          "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340747"
+        },
+        {
+          "requirement_id": "req_0001",
+          "requirement_text": "The Pentagram Legal Department is a **fully autonomous agentic AI legal system** built on the SIMP (Standardized Inter-Agent Message Protocol) infrastructure. This system transforms legal operations from human-intensive processes into scalable, precise, and autonomous AI-driven workflows.",
+          "category": "other",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.1,
+          "mapped_at": "2026-04-11T14:45:45.340757"
+        },
+        {
+          "requirement_id": "req_0006",
+          "requirement_text": "### Layer 6: Security & Compliance",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340766"
+        },
+        {
+          "requirement_id": "req_0008",
+          "requirement_text": "- **Compliance Agents**: Regulatory tracking, filings, audit preparation",
+          "category": "audit",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340769"
+        },
+        {
+          "requirement_id": "req_0021",
+          "requirement_text": "- **Week 7-8**: Security and compliance framework",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340781"
+        },
+        {
+          "requirement_id": "req_0024",
+          "requirement_text": "## \ud83d\udd10 SECURITY & COMPLIANCE",
+          "category": "security",
+          "source_file": "pentagram_legal/ARCHITECTURE_OVERVIEW.md",
+          "confidence": 0.0,
+          "mapped_at": "2026-04-11T14:45:45.340786"
+        }
+      ],
+      "total_requirements": 14
+    }
+  },
+  "compliance_status": {
+    "data_acquisition": {
+      "requirement_count": 13,
+      "average_confidence": 0.007692307692307693,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768494"
+    },
+    "bill_russel_integration": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768502"
+    },
+    "bill_russel_ml_pipeline": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768504"
+    },
+    "bill_russel_sigma_rules": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768506"
+    },
+    "agents": {
+      "requirement_count": 15,
+      "average_confidence": 0.1,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768507"
+    },
+    "bin": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768509"
+    },
+    "tests": {
+      "requirement_count": 14,
+      "average_confidence": 0.03571428571428571,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768511"
+    },
+    "config": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768512"
+    },
+    "dashboard": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768514"
+    },
+    "scripts": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768516"
+    },
+    "examples": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768517"
+    },
+    "models": {
+      "requirement_count": 13,
+      "average_confidence": 0.038461538461538464,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768519"
+    },
+    "mythos_implementation": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768521"
+    },
+    "security": {
+      "requirement_count": 13,
+      "average_confidence": 0.30769230769230765,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768522"
+    },
+    "patches": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768524"
+    },
+    "pentagram_legal": {
+      "requirement_count": 18,
+      "average_confidence": 0.03333333333333333,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768525"
+    },
+    "audit": {
+      "requirement_count": 16,
+      "average_confidence": 0.125,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768527"
+    },
+    "compat": {
+      "requirement_count": 48,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768530"
+    },
+    "financial": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768531"
+    },
+    "integrations": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768533"
+    },
+    "memory": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768535"
+    },
+    "orchestration": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768536"
+    },
+    "organs": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768538"
+    },
+    "projectx": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768540"
+    },
+    "routing": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768541"
+    },
+    "server": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768543"
+    },
+    "transport": {
+      "requirement_count": 13,
+      "average_confidence": 0.0,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768544"
+    },
+    "simp_brain": {
+      "requirement_count": 14,
+      "average_confidence": 0.0071428571428571435,
+      "status": "low_priority",
+      "last_updated": "2026-04-11T14:45:49.768546"
+    }
+  },
+  "audit_log": [
+    {
+      "timestamp": "2026-04-11T14:45:49.768566",
+      "action": "generate_compliance_report",
+      "report_summary": {
+        "total_modules_mapped": 28,
+        "total_requirements": 411,
+        "categories": 5,
+        "high_priority_modules": 0,
+        "medium_priority_modules": 0,
+        "low_priority_modules": 28
+      }
+    }
+  ]
+}

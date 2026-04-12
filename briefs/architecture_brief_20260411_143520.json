@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-04-11T14:35:20.946715",
+  "graph_version": "unknown",
+  "summary": {
+    "total_files": 0,
+    "total_modules": 0,
+    "total_classes": 0,
+    "total_functions": 0,
+    "total_edges": 19179,
+    "most_central_modules": [],
+    "graph_density": 0.00039688885820669063
+  },
+  "modules": {},
+  "agents": {},
+  "tests": {
+    "total_test_files": 0,
+    "test_files_by_module": {},
+    "test_coverage": {
+      "total_modules": 0,
+      "tested_modules": 0,
+      "coverage_percent": 0,
+      "untested_modules": 0
+    }
+  },
+  "dependencies": {
+    "dependency_graph": {},
+    "most_dependent_modules": [],
+    "total_dependencies": 0,
+    "average_dependencies": 0
+  },
+  "recommendations": [],
+  "quick_start": {
+    "setup": [
+      "1. Clone repository",
+      "2. Install dependencies: pip install -r requirements.txt",
+      "3. Set environment variables (see .env.example)",
+      "4. Start broker: python -m simp.server.broker",
+      "5. Access dashboard: http://localhost:8050"
+    ],
+    "common_commands": [
+      "Run tests: python -m pytest tests/ -v",
+      "Generate brief: python tools/system_brief_generator.py",
+      "Analyze impact: python tools/change_impact_analyzer.py <files>",
+      "Select tests: python tools/test_selection_helper.py <files>"
+    ],
+    "key_files": [
+      "simp/server/broker.py - Main broker",
+      "simp/compat/ - A2A compatibility layer",
+      "dashboard/server.py - Dashboard",
+      "tests/ - Test suite"
+    ],
+    "troubleshooting": [
+      "Broker not starting: Check port 5555 is free",
+      "Tests failing: Run with SIMP_REQUIRE_API_KEY=false",
+      "Import errors: Check Python version (3.10 required)"
+    ]
+  }
+}

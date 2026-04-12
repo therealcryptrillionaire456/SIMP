@@ -1,0 +1,70 @@
+{
+  "baseline": {
+    "avg_cpu_percent": 20.0,
+    "max_cpu_percent": 20.3,
+    "avg_memory_percent": 63.1,
+    "samples_collected": 3,
+    "metrics": [
+      {
+        "timestamp": "2026-04-12T04:16:42.602324",
+        "cpu_percent": 20.3,
+        "memory_percent": 63.1,
+        "memory_used_gb": 14.444534301757812,
+        "disk_read_mb": 1684412.78515625,
+        "disk_write_mb": 416597.05859375
+      },
+      {
+        "timestamp": "2026-04-12T04:16:43.608021",
+        "cpu_percent": 19.4,
+        "memory_percent": 63.1,
+        "memory_used_gb": 14.436630249023438,
+        "disk_read_mb": 1684471.48046875,
+        "disk_write_mb": 416622.88671875
+      },
+      {
+        "timestamp": "2026-04-12T04:16:44.613488",
+        "cpu_percent": 20.3,
+        "memory_percent": 63.1,
+        "memory_used_gb": 14.44183349609375,
+        "disk_read_mb": 1684532.5234375,
+        "disk_write_mb": 416648.78125
+      }
+    ]
+  },
+  "post_test": {
+    "avg_cpu_percent": 21.166666666666668,
+    "max_cpu_percent": 22.8,
+    "avg_memory_percent": 63.1,
+    "samples_collected": 3,
+    "metrics": [
+      {
+        "timestamp": "2026-04-12T04:16:45.637407",
+        "cpu_percent": 21.9,
+        "memory_percent": 63.1,
+        "memory_used_gb": 14.445831298828125,
+        "disk_read_mb": 1684593.7109375,
+        "disk_write_mb": 416671.65625
+      },
+      {
+        "timestamp": "2026-04-12T04:16:46.641892",
+        "cpu_percent": 22.8,
+        "memory_percent": 63.1,
+        "memory_used_gb": 14.44140625,
+        "disk_read_mb": 1684654.01953125,
+        "disk_write_mb": 416688.92578125
+      },
+      {
+        "timestamp": "2026-04-12T04:16:47.645798",
+        "cpu_percent": 18.8,
+        "memory_percent": 63.1,
+        "memory_used_gb": 14.424484252929688,
+        "disk_read_mb": 1684714.55859375,
+        "disk_write_mb": 416710.98046875
+      }
+    ]
+  },
+  "test_config": {
+    "requests": 10,
+    "concurrent_workers": 1
+  }
+}

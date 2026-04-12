@@ -1,0 +1,134 @@
+# KEEPTHECHANGE.com Docker Compose Configuration
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ktc-postgres
+    environment:
+      POSTGRES_DB: keepthechange
+      POSTGRES_USER: ktcuser
+      POSTGRES_PASSWORD: ktcpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ktcuser -d keepthechange"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and queues
+  redis:
+    image: redis:7-alpine
+    container_name: ktc-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # KEEPTHECHANGE Backend API
+  backend:
+    build: .
+    container_name: ktc-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql+asyncpg://ktcuser:ktcpassword@postgres:5432/keepthechange
+      - REDIS_URL=redis://redis:6379/0
+      - HOST=0.0.0.0
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+      - .:/app
+    command: >
+      sh -c "alembic upgrade head &&
+             python -c '
+             import asyncio
+             import sys
+             sys.path.append(\".\")
+             from app.core.database import init_db
+             from app.models.user import User
+             from app.core.security import get_password_hash
+             from sqlalchemy.ext.asyncio import AsyncSession
+             from sqlalchemy.future import select
+             
+             async def setup():
+                 async with AsyncSession(init_db.engine) as session:
+                     result = await session.execute(select(User).where(User.email == \"admin@keepthechange.com\"))
+                     admin = result.scalar_one_or_none()
+                     if not admin:
+                         admin = User(
+                             email=\"admin@keepthechange.com\",
+                             password_hash=get_password_hash(\"Admin123!\"),
+                             first_name=\"Admin\",
+                             last_name=\"User\",
+                             subscription_tier=\"elite\",
+                             email_verified=True
+                         )
+                         session.add(admin)
+                         await session.commit()
+                         print(\"Admin user created\")
+             
+             asyncio.run(setup())
+             ' &&
+             uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+        - action: rebuild
+          path: requirements.txt
+
+  # SIMP Broker Integration
+  simp-broker:
+    image: simp-broker:latest
+    container_name: ktc-simp-broker
+    depends_on:
+      - backend
+    environment:
+      - SIMP_BROKER_PORT=5555
+      - SIMP_API_KEY=ktc_integration_key
+    ports:
+      - "5555:5555"
+    volumes:
+      - ../simp:/simp
+    command: python /simp/bin/start_server.py --host 0.0.0.0 --port 5555
+
+  # Adminer for database management (optional)
+  adminer:
+    image: adminer:latest
+    container_name: ktc-adminer
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+
+  # pgAdmin for database management (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ktc-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@keepthechange.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -192,24 +192,51 @@ if [ "$dashboard_api_agents" = "UNREACHABLE" ]; then
     ISSUES+=("Dashboard API agents endpoint unreachable")
 else
     if $USE_JQ; then
-        status=$(echo "$dashboard_api_agents" | jq -r '.status // "unknown"' 2>/dev/null || echo "INVALID_JSON")
-        broker_url_reachable=$(echo "$dashboard_api_agents" | jq -r '.broker_url_reachable // false' 2>/dev/null || echo "false")
+        # Check for new API response structure: {'agents': [...], 'count': N}
+        has_agents=$(echo "$dashboard_api_agents" | jq -r 'has("agents")' 2>/dev/null || echo "false")
+        has_count=$(echo "$dashboard_api_agents" | jq -r 'has("count")' 2>/dev/null || echo "false")
         
-        if [ "$status" = "success" ] || [ "$broker_url_reachable" = "true" ]; then
-            print_status "OK" "Dashboard API agents endpoint working"
-        else
-            print_status "ERROR" "Dashboard API agents shows: status=$status, broker_reachable=$broker_url_reachable"
-            ISSUES+=("Dashboard data fetching issue: status=$status, broker_reachable=$broker_url_reachable")
+        if [ "$has_agents" = "true" ] && [ "$has_count" = "true" ]; then
+            agent_count=$(echo "$dashboard_api_agents" | jq -r '.count // 0' 2>/dev/null || echo "0")
+            agents_array_length=$(echo "$dashboard_api_agents" | jq -r '.agents | length' 2>/dev/null || echo "0")
             
-            # Provide diagnostic info
-            echo "  Diagnostic info:"
-            echo "    - Dashboard URL: $DASHBOARD_URL"
-            echo "    - Broker URL from dashboard perspective: $BROKER_URL"
-            echo "    - Check if dashboard can reach broker internally"
+            if [ "$agent_count" -eq "$agents_array_length" ]; then
+                print_status "OK" "Dashboard API agents endpoint working ($agent_count agent(s))"
+                
+                # List agents if count is small
+                if [ "$agent_count" -gt 0 ] && [ "$agent_count" -le 5 ]; then
+                    echo "  Agents from dashboard:"
+                    echo "$dashboard_api_agents" | jq -r '.agents[] | "    - \(.agent_id): \(.status) (\(.agent_type))"' 2>/dev/null || echo "    (Unable to parse agent details)"
+                fi
+            else
+                print_status "WARN" "Dashboard API count mismatch: count=$agent_count, actual agents=$agents_array_length"
+                ISSUES+=("Dashboard API count mismatch: count=$agent_count, actual agents=$agents_array_length")
+            fi
+        else
+            # Fallback: check for old structure or other indicators
+            status=$(echo "$dashboard_api_agents" | jq -r '.status // "unknown"' 2>/dev/null || echo "INVALID_JSON")
+            broker_url_reachable=$(echo "$dashboard_api_agents" | jq -r '.broker_url_reachable // false' 2>/dev/null || echo "false")
+            
+            if [ "$status" = "success" ] || [ "$broker_url_reachable" = "true" ]; then
+                print_status "OK" "Dashboard API agents endpoint working (legacy format)"
+            else
+                print_status "ERROR" "Dashboard API agents shows invalid format or data fetching issue"
+                ISSUES+=("Dashboard API agents invalid format or data fetching issue")
+                
+                # Provide diagnostic info
+                echo "  Diagnostic info:"
+                echo "    - Dashboard URL: $DASHBOARD_URL"
+                echo "    - Broker URL from dashboard perspective: $BROKER_URL"
+                echo "    - Response format: missing 'agents' or 'count' fields"
+                echo "    - Check dashboard server logs for data fetching errors"
+            fi
         fi
     else
-        if echo "$dashboard_api_agents" | grep -q "success\|reachable"; then
-            print_status "OK" "Dashboard API agents endpoint responding"
+        # Basic check without jq
+        if echo "$dashboard_api_agents" | grep -q "\"agents\"" && echo "$dashboard_api_agents" | grep -q "\"count\""; then
+            print_status "OK" "Dashboard API agents endpoint responding (has agents and count fields)"
+        elif echo "$dashboard_api_agents" | grep -q "success\|reachable"; then
+            print_status "OK" "Dashboard API agents endpoint responding (legacy format)"
         else
             print_status "WARN" "Dashboard API agents may have data fetching issue"
             ISSUES+=("Dashboard API agents may have data fetching issue")
@@ -350,11 +377,12 @@ else
     echo -e "${CYAN}Recommended actions:${NC}"
     
     # Check for specific common issues
-    if printf '%s\n' "${ISSUES[@]}" | grep -q "Dashboard cannot reach broker\|Dashboard data fetching issue"; then
+    if printf '%s\n' "${ISSUES[@]}" | grep -q "Dashboard cannot reach broker\|Dashboard data fetching issue\|Dashboard API agents invalid format\|Dashboard API count mismatch"; then
         echo "  1. Check dashboard server logs for connection errors"
         echo "  2. Verify dashboard can reach $BROKER_URL internally"
         echo "  3. Check if broker requires API key for dashboard access"
         echo "  4. Restart dashboard: cd $(pwd) && python3.10 dashboard/server.py"
+        echo "  5. Verify dashboard API endpoint /api/agents returns {'agents': [...], 'count': N} format"
     fi
     
     if printf '%s\n' "${ISSUES[@]}" | grep -q "Broker not reachable\|Broker process not running"; then

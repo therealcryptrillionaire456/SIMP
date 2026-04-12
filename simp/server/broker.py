@@ -1492,6 +1492,13 @@ class SimpBroker:
                 if a.get("file_based")
             )
 
+        # TimesFM service metrics
+        try:
+            from simp.integrations.timesfm_service import get_timesfm_service_sync
+            stats["timesfm"] = get_timesfm_service_sync().health()
+        except Exception:
+            stats["timesfm"] = {"status": "unavailable"}
+
         return stats
 
     def get_logs(self, limit: int = 100) -> list:
