@@ -1,0 +1,275 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "SIMP canonical intent routing policy matrix. One primary target, one fallback per intent type. kloutbot uses this when deciding where to forward intents.",
+  "last_updated": "2026-04-05",
+  "authors": ["perplexity_research (design)", "claude_cowork (implementation)"],
+
+  "agents": {
+    "bullbear_predictor": {
+      "transport": "file",
+      "endpoint": "",
+      "capabilities": ["prediction_signal", "market_analysis", "no_trade_gate"]
+    },
+    "kashclaw": {
+      "transport": "file",
+      "endpoint": "",
+      "capabilities": ["trade_execution", "dry_run", "position_sizing"]
+    },
+    "kloutbot": {
+      "transport": "http",
+      "endpoint": "http://127.0.0.1:8765",
+      "capabilities": ["orchestration", "coordination", "mcp_bridge"]
+    },
+    "perplexity_research": {
+      "transport": "http",
+      "endpoint": "http://127.0.0.1:8766",
+      "capabilities": ["research", "web_search", "market_intelligence"]
+    },
+    "quantumarb": {
+      "transport": "http",
+      "endpoint": "http://127.0.0.1:5556",
+      "capabilities": ["arbitrage", "cross_venue", "latency_arbitrage"]
+    },
+    "claude_cowork": {
+      "transport": "http",
+      "endpoint": "http://127.0.0.1:8767",
+      "capabilities": ["code_task", "planning", "coordination", "code_editing",
+                       "status_check", "capability_query", "scaffolding", "test_harness"]
+    },
+    "simp_router": {
+      "transport": "http",
+      "endpoint": "http://127.0.0.1:5555",
+      "capabilities": ["intent_routing", "agent_registry", "broadcast"]
+    }
+  },
+
+  "routing_rules": [
+
+    {
+      "intent_type": "prediction_signal",
+      "description": "BullBear macro prediction output; triggers downstream trade gate",
+      "primary":  "kashclaw",
+      "fallback": "kloutbot",
+      "never":    ["claude_cowork", "perplexity_research"],
+      "notes": "kashclaw gates on trust+confidence; only forwards to quantumarb if approved"
+    },
+
+    {
+      "intent_type": "market_analysis",
+      "description": "Request for macro market read",
+      "primary":  "bullbear_predictor",
+      "fallback": "perplexity_research",
+      "never":    ["kashclaw", "claude_cowork"],
+      "notes": "bullbear_predictor preferred; perplexity_research fallback for web-sourced analysis"
+    },
+
+    {
+      "intent_type": "trade_signal",
+      "description": "Directional signal from analysis layer to execution layer",
+      "primary":  "kashclaw",
+      "fallback": "kloutbot",
+      "never":    ["claude_cowork", "perplexity_research", "simp_router"],
+      "notes": "Must pass kashclaw risk gate before any downstream routing"
+    },
+
+    {
+      "intent_type": "validate_trade",
+      "description": "Pre-execution risk validation",
+      "primary":  "kashclaw",
+      "fallback": "kloutbot",
+      "never":    ["claude_cowork", "perplexity_research"],
+      "notes": "kashclaw owns all pre-trade validation; kloutbot is override reviewer only"
+    },
+
+    {
+      "intent_type": "arbitrage_check",
+      "description": "Cross-venue spread scan request",
+      "primary":  "quantumarb",
+      "fallback": "kloutbot",
+      "never":    ["claude_cowork", "kashclaw"],
+      "notes": "quantumarb is the canonical arb scanner; results always route to kloutbot for review"
+    },
+
+    {
+      "intent_type": "arbitrage_opportunity",
+      "description": "quantumarb finding that requires human-review gate",
+      "primary":  "kloutbot",
+      "fallback": "perplexity_research",
+      "never":    ["kashclaw", "claude_cowork"],
+      "notes": "kloutbot reviews all arb findings before any position recommendation"
+    },
+
+    {
+      "intent_type": "arbitrage_decision",
+      "description": "kloutbot-approved arb recommendation",
+      "primary":  "kloutbot",
+      "fallback": "simp_router",
+      "never":    ["claude_cowork"],
+      "notes": "Decision stays in orchestration layer; kashclaw receives only if approved with dry_run=true"
+    },
+
+    {
+      "intent_type": "research_request",
+      "description": "Web search or market intelligence request",
+      "primary":  "perplexity_research",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "quantumarb"],
+      "notes": "perplexity_research is the sole web-search-capable agent"
+    },
+
+    {
+      "intent_type": "market_intelligence",
+      "description": "Processed research output for use in analysis",
+      "primary":  "bullbear_predictor",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "claude_cowork"],
+      "notes": "Intelligence feeds bullbear_predictor's graph engine"
+    },
+
+    {
+      "intent_type": "code_task",
+      "description": "Code scaffolding, implementation, or editing request",
+      "primary":  "claude_cowork",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "bullbear_predictor", "quantumarb"],
+      "notes": "Must include task_id, topic, prompt. schema_version=1.0.0 required"
+    },
+
+    {
+      "intent_type": "code_task_result",
+      "description": "CoWork response to a code_task",
+      "primary":  "perplexity_research",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "bullbear_predictor", "quantumarb"],
+      "notes": "Results always go back to the requester (perplexity_research or kloutbot)"
+    },
+
+    {
+      "intent_type": "planning",
+      "description": "Sprint planning, architecture design, roadmap sequencing",
+      "primary":  "claude_cowork",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "bullbear_predictor", "quantumarb"],
+      "notes": "CoWork owns planning tasks; kloutbot can accept overflow as coordinator"
+    },
+
+    {
+      "intent_type": "planning_result",
+      "description": "CoWork response to a planning request",
+      "primary":  "perplexity_research",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "bullbear_predictor", "quantumarb"],
+      "notes": "Mirrors code_task_result routing"
+    },
+
+    {
+      "intent_type": "coordination",
+      "description": "Meta-work coordination between peer agents",
+      "primary":  "claude_cowork",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "bullbear_predictor", "quantumarb"],
+      "notes": "Peer intents (perplexity↔cowork). Must match peer_intent_schema v1.0.0"
+    },
+
+    {
+      "intent_type": "coordination_result",
+      "description": "CoWork response to a coordination intent",
+      "primary":  "perplexity_research",
+      "fallback": "kloutbot",
+      "never":    ["kashclaw", "bullbear_predictor", "quantumarb"],
+      "notes": "Mirrors code_task_result routing"
+    },
+
+    {
+      "intent_type": "orchestration_command",
+      "description": "System-level directive from kloutbot to agents",
+      "primary":  "kloutbot",
+      "fallback": "simp_router",
+      "never":    ["kashclaw"],
+      "notes": "kloutbot is the sole orchestration emitter; never routes trading commands to cowork"
+    },
+
+    {
+      "intent_type": "organ_status",
+      "description": "Trading organ status query",
+      "primary":  "kashclaw",
+      "fallback": "kloutbot",
+      "never":    ["claude_cowork", "perplexity_research"],
+      "notes": "Organ status is execution-layer only"
+    },
+
+    {
+      "intent_type": "status_check",
+      "description": "Agent health/status query",
+      "primary":  "simp_router",
+      "fallback": "kloutbot",
+      "never":    [],
+      "notes": "Broadcast to all agents; each responds to its own health endpoint"
+    },
+
+    {
+      "intent_type": "capability_query",
+      "description": "What can this agent do?",
+      "primary":  "simp_router",
+      "fallback": "kloutbot",
+      "never":    [],
+      "notes": "Resolved by broker registry; individual agents may also respond if pinged directly"
+    },
+
+    {
+      "intent_type": "generate_strategy",
+      "description": "Generate a trading or positioning strategy",
+      "primary":  "kloutbot",
+      "fallback": "perplexity_research",
+      "never":    ["kashclaw", "claude_cowork"],
+      "notes": "Strategy generation is orchestration; execution only after kloutbot review"
+    },
+
+    {
+      "intent_type": "no_trade_gate",
+      "description": "Explicit block signal from bullbear_predictor",
+      "primary":  "kashclaw",
+      "fallback": "kloutbot",
+      "never":    ["claude_cowork", "perplexity_research", "quantumarb"],
+      "notes": "no_trade=True must propagate to kashclaw to block position sizing"
+    },
+
+    {
+      "intent_type": "ping",
+      "description": "Liveness check",
+      "primary":  "simp_router",
+      "fallback": null,
+      "never":    [],
+      "notes": "Handled synchronously by any agent. No queuing."
+    }
+  ],
+
+  "global_firewall": {
+    "description": "Intent types that may NEVER route to these agents regardless of sender",
+    "claude_cowork": [
+      "execute_trade", "position_sizing", "dry_run_trade", "place_order",
+      "cancel_order", "trade_signal", "prediction_signal", "validate_trade",
+      "organ_status", "arbitrage_execute", "kashclaw_execute",
+      "market_order", "limit_order", "stop_loss", "take_profit", "close_position"
+    ],
+    "perplexity_research": [
+      "execute_trade", "position_sizing", "dry_run_trade", "place_order",
+      "cancel_order", "arbitrage_execute", "kashclaw_execute",
+      "market_order", "limit_order", "stop_loss", "take_profit", "close_position"
+    ],
+    "bullbear_predictor": [
+      "execute_trade", "position_sizing", "place_order", "cancel_order",
+      "arbitrage_execute", "code_task", "planning", "coordination"
+    ]
+  },
+
+  "schema_requirements": {
+    "code_task":        {"schema": "peer_intent_schema v1.0.0", "required_fields": ["task_id", "topic", "prompt"]},
+    "planning":         {"schema": "peer_intent_schema v1.0.0", "required_fields": ["task_id", "topic", "prompt"]},
+    "coordination":     {"schema": "peer_intent_schema v1.0.0", "required_fields": ["task_id", "topic", "prompt"]},
+    "code_task_result": {"schema": "peer_intent_schema v1.0.0", "required_fields": ["task_id", "status"]},
+    "trade_signal":     {"schema": "simp_intent v0.2",          "required_fields": ["source_agent", "target_agent", "params"]},
+    "prediction_signal":{"schema": "simp_intent v0.2",          "required_fields": ["source_agent", "target_agent", "params"]}
+  }
+}

@@ -1,0 +1,37 @@
+{
+    "deployment": {
+        "timestamp": "2026-04-11T15:15:15-04:00",
+        "version": "2.0.0",
+        "framework": "Enhanced Bill Russell Protocol",
+        "description": "Defensive specialist with offensive scoring capabilities"
+    },
+    "modules": {
+        "cai": {
+            "type": "defensive",
+            "capabilities": ["ai_security_evaluation", "prompt_injection_defense"]
+        },
+        "hexstrike": {
+            "type": "hybrid", 
+            "capabilities": ["binary_analysis", "malware_detection", "exploit_development"]
+        },
+        "pentagi": {
+            "type": "offensive",
+            "capabilities": ["penetration_testing", "vulnerability_assessment"]
+        },
+        "openshell": {
+            "type": "hybrid",
+            "capabilities": ["command_execution", "system_administration"]
+        },
+        "strix": {
+            "type": "hybrid",
+            "capabilities": ["monitoring", "threat_detection", "security_analytics"]
+        }
+    },
+    "modes": ["defensive", "offensive", "hybrid", "intelligence"],
+    "settings": {
+        "default_mode": "defensive",
+        "log_level": "INFO",
+        "max_events_per_second": 1000,
+        "enable_auto_response": true
+    }
+}

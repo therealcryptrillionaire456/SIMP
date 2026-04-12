@@ -1,0 +1,42 @@
+# BRP Enhancement Git Ignore
+
+# Repository subdirectories (these are external dependencies)
+/repos/
+
+# Log files
+/logs/*.log
+/logs/*.json
+!/logs/.gitkeep
+
+# Test output
+/test_output/
+/test_results/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Database files (if any)
+*.db
+*.sqlite
+*.sqlite3

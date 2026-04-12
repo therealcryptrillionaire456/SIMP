@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "broker_url": "http://127.0.0.1:5555",
+    "target_agent": "test_agent_1",
+    "test_timestamp": "2026-04-12T04:16:44.633919",
+    "test_duration_seconds": 0.020227909088134766,
+    "concurrent_workers": 1
+  },
+  "summary": {
+    "total_requests": 10,
+    "successful_requests": 0,
+    "failed_requests": 10,
+    "success_rate": 0.0,
+    "avg_response_time_ms": 0.0,
+    "min_response_time_ms": 0.0,
+    "max_response_time_ms": 0.0,
+    "p50_response_time_ms": 0.0,
+    "p95_response_time_ms": 0.0,
+    "p99_response_time_ms": 0.0,
+    "requests_per_second": 494.366469437307
+  },
+  "detailed_results": [
+    {
+      "intent_id": "stress_0_1775967404",
+      "success": false,
+      "response_time_ms": 2.840757369995117,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.616977"
+    },
+    {
+      "intent_id": "stress_1_1775967404",
+      "success": false,
+      "response_time_ms": 2.0668506622314453,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.619090"
+    },
+    {
+      "intent_id": "stress_2_1775967404",
+      "success": false,
+      "response_time_ms": 1.768350601196289,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.620901"
+    },
+    {
+      "intent_id": "stress_3_1775967404",
+      "success": false,
+      "response_time_ms": 1.8198490142822266,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.622759"
+    },
+    {
+      "intent_id": "stress_4_1775967404",
+      "success": false,
+      "response_time_ms": 1.7170906066894531,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.624541"
+    },
+    {
+      "intent_id": "stress_5_1775967404",
+      "success": false,
+      "response_time_ms": 1.6591548919677734,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.626235"
+    },
+    {
+      "intent_id": "stress_6_1775967404",
+      "success": false,
+      "response_time_ms": 1.8310546875,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.628103"
+    },
+    {
+      "intent_id": "stress_7_1775967404",
+      "success": false,
+      "response_time_ms": 1.789093017578125,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.629929"
+    },
+    {
+      "intent_id": "stress_8_1775967404",
+      "success": false,
+      "response_time_ms": 1.8291473388671875,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.631798"
+    },
+    {
+      "intent_id": "stress_9_1775967404",
+      "success": false,
+      "response_time_ms": 1.9571781158447266,
+      "status_code": 400,
+      "error_message": "HTTP 400: {\"error\":\"Unknown intent_type: 'ping'\",\"error_code\":\"VALIDATION_FAILED\",\"status\":\"error\"}\n",
+      "timestamp": "2026-04-12T04:16:44.633794"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "phase": 3,
+  "name": "SecBERT Fine-tuning",
+  "status": "DEMONSTRATION_COMPLETE",
+  "timestamp": "2026-04-10T05:47:40.025555Z",
+  "artifacts": {
+    "model_dir": "models/secbert_demo",
+    "training_data": "models/secbert_demo/training_data.csv",
+    "metadata": "models/secbert_demo/metadata.json",
+    "demo_script": "models/secbert_demo/classifier_demo.py"
+  },
+  "note": "Demonstration model created. For production:",
+  "production_steps": [
+    "1. Process real IoT-23 Zeek logs from downloaded dataset",
+    "2. Fine-tune actual SecBERT model (jackaduma/SecBERT)",
+    "3. Train for 3-5 epochs with proper validation",
+    "4. Deploy model with ONNX/TensorRT for performance",
+    "5. Integrate into Bill Russell Protocol pipeline"
+  ],
+  "real_dataset_available": true,
+  "real_dataset_path": "data/security_datasets/raw/iot_23/",
+  "real_dataset_size": "8.9 GB (actual IoT network traffic)"
+}

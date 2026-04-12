@@ -1,0 +1,1684 @@
+{
+  "generated_at": "2026-04-11T14:38:41.457968",
+  "graph_version": "unknown",
+  "summary": {
+    "total_files": 261,
+    "total_modules": 28,
+    "total_classes": 28,
+    "total_functions": 3380,
+    "total_edges": 19179,
+    "most_important_modules": [
+      {
+        "name": "tests",
+        "importance": 343.59999999999997,
+        "file_count": 93,
+        "class_count": 13,
+        "function_count": 1466
+      },
+      {
+        "name": "compat",
+        "importance": 48.5,
+        "file_count": 22,
+        "class_count": 1,
+        "function_count": 186
+      },
+      {
+        "name": "agents",
+        "importance": 48.1,
+        "file_count": 11,
+        "class_count": 0,
+        "function_count": 213
+      },
+      {
+        "name": "integrations",
+        "importance": 37.5,
+        "file_count": 9,
+        "class_count": 4,
+        "function_count": 159
+      },
+      {
+        "name": "server",
+        "importance": 36.3,
+        "file_count": 15,
+        "class_count": 0,
+        "function_count": 144
+      },
+      {
+        "name": "mythos_implementation",
+        "importance": 32.400000000000006,
+        "file_count": 14,
+        "class_count": 0,
+        "function_count": 127
+      },
+      {
+        "name": "security",
+        "importance": 26.900000000000002,
+        "file_count": 9,
+        "class_count": 0,
+        "function_count": 112
+      },
+      {
+        "name": "transport",
+        "importance": 20.5,
+        "file_count": 7,
+        "class_count": 0,
+        "function_count": 85
+      },
+      {
+        "name": "organs",
+        "importance": 20.1,
+        "file_count": 5,
+        "class_count": 0,
+        "function_count": 88
+      },
+      {
+        "name": "examples",
+        "importance": 16.8,
+        "file_count": 7,
+        "class_count": 1,
+        "function_count": 65
+      }
+    ],
+    "graph_density": 0.00039688885820669063,
+    "node_types": {
+      "code_files": 261,
+      "classes": 28,
+      "functions": 3380,
+      "total_nodes": 6952
+    }
+  },
+  "modules": {
+    "data_acquisition": {
+      "file_count": 2,
+      "class_count": 0,
+      "function_count": 38,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 8.600000000000001,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.007692307692307693,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.338949"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.338959"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.338962"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.338966"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.1,
+            "mapped_at": "2026-04-11T14:45:45.338969"
+          }
+        ]
+      }
+    },
+    "bill_russel_integration": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 29,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 6.300000000000001,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339037"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339040"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339051"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339057"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339059"
+          }
+        ]
+      }
+    },
+    "bill_russel_ml_pipeline": {
+      "file_count": 1,
+      "class_count": 2,
+      "function_count": 23,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 5.700000000000001,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339120"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339123"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339125"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339130"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339132"
+          }
+        ]
+      }
+    },
+    "bill_russel_sigma_rules": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 31,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 6.7,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339203"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339205"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339208"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339213"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339215"
+          }
+        ]
+      }
+    },
+    "agents": {
+      "file_count": 11,
+      "class_count": 0,
+      "function_count": 213,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 48.1,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 15,
+        "average_confidence": 0.1,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339278"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339280"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339283"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339286"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339288"
+          }
+        ]
+      }
+    },
+    "bin": {
+      "file_count": 4,
+      "class_count": 0,
+      "function_count": 31,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 8.2,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339341"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339343"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339350"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339354"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339356"
+          }
+        ]
+      }
+    },
+    "tests": {
+      "file_count": 93,
+      "class_count": 13,
+      "function_count": 1466,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 343.59999999999997,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 14,
+        "average_confidence": 0.03571428571428571,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339402"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339404"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339406"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339410"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339412"
+          }
+        ]
+      }
+    },
+    "config": {
+      "file_count": 0,
+      "class_count": 0,
+      "function_count": 4,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 0.8,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339459"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339461"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339464"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339467"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339469"
+          }
+        ]
+      }
+    },
+    "dashboard": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 79,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 16.3,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339515"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339517"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339519"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339522"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339524"
+          }
+        ]
+      }
+    },
+    "scripts": {
+      "file_count": 6,
+      "class_count": 0,
+      "function_count": 36,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 10.2,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339577"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339581"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339583"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339586"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339588"
+          }
+        ]
+      }
+    },
+    "examples": {
+      "file_count": 7,
+      "class_count": 1,
+      "function_count": 65,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 16.8,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339635"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339637"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339639"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339642"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339644"
+          }
+        ]
+      }
+    },
+    "models": {
+      "file_count": 6,
+      "class_count": 4,
+      "function_count": 31,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 10.4,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.038461538461538464,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339691"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339693"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339695"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339698"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.5,
+            "mapped_at": "2026-04-11T14:45:45.339704"
+          }
+        ]
+      }
+    },
+    "mythos_implementation": {
+      "file_count": 14,
+      "class_count": 0,
+      "function_count": 127,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 32.400000000000006,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339751"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339753"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339756"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339760"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339762"
+          }
+        ]
+      }
+    },
+    "security": {
+      "file_count": 9,
+      "class_count": 0,
+      "function_count": 112,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 26.900000000000002,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.30769230769230765,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.7999999999999999,
+            "mapped_at": "2026-04-11T14:45:45.339821"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339823"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.7999999999999999,
+            "mapped_at": "2026-04-11T14:45:45.339826"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339831"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339833"
+          }
+        ]
+      }
+    },
+    "patches": {
+      "file_count": 4,
+      "class_count": 0,
+      "function_count": 0,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 2.0,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339879"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339881"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339883"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339887"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339889"
+          }
+        ]
+      }
+    },
+    "pentagram_legal": {
+      "file_count": 3,
+      "class_count": 0,
+      "function_count": 70,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 15.5,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 18,
+        "average_confidence": 0.03333333333333333,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339940"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339942"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339944"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339948"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.339951"
+          }
+        ]
+      }
+    },
+    "audit": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 12,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 2.9000000000000004,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 16,
+        "average_confidence": 0.125,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340011"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.5,
+            "mapped_at": "2026-04-11T14:45:45.340013"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340015"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.5,
+            "mapped_at": "2026-04-11T14:45:45.340018"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340020"
+          }
+        ]
+      }
+    },
+    "compat": {
+      "file_count": 22,
+      "class_count": 1,
+      "function_count": 186,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 48.5,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 48,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340071"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340073"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340076"
+          },
+          {
+            "requirement_id": "req_0005",
+            "requirement_text": "8. **Build 8**: Regulatory Compliance Agent",
+            "category": "general_compliance",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340078"
+          },
+          {
+            "requirement_id": "req_0006",
+            "requirement_text": "16. **Build 16**: Compliance Monitoring System",
+            "category": "general_compliance",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340080"
+          }
+        ]
+      }
+    },
+    "financial": {
+      "file_count": 4,
+      "class_count": 1,
+      "function_count": 36,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 9.5,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340179"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340182"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340184"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340187"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340189"
+          }
+        ]
+      }
+    },
+    "integrations": {
+      "file_count": 9,
+      "class_count": 4,
+      "function_count": 159,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 37.5,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340237"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340239"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340241"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340245"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340247"
+          }
+        ]
+      }
+    },
+    "memory": {
+      "file_count": 5,
+      "class_count": 0,
+      "function_count": 38,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 10.100000000000001,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340293"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340295"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340297"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340300"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340302"
+          }
+        ]
+      }
+    },
+    "orchestration": {
+      "file_count": 4,
+      "class_count": 0,
+      "function_count": 51,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 12.200000000000001,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340348"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340350"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340352"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340356"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340358"
+          }
+        ]
+      }
+    },
+    "organs": {
+      "file_count": 5,
+      "class_count": 0,
+      "function_count": 88,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 20.1,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340405"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340407"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340411"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340414"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340416"
+          }
+        ]
+      }
+    },
+    "projectx": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 22,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 4.9,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340462"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340465"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340468"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340471"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340473"
+          }
+        ]
+      }
+    },
+    "routing": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 13,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 3.1,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340523"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340525"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340527"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340531"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340533"
+          }
+        ]
+      }
+    },
+    "server": {
+      "file_count": 15,
+      "class_count": 0,
+      "function_count": 144,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 36.3,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340579"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340581"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340583"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340587"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340589"
+          }
+        ]
+      }
+    },
+    "transport": {
+      "file_count": 7,
+      "class_count": 0,
+      "function_count": 85,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 20.5,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 13,
+        "average_confidence": 0.0,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340635"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340637"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340639"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340643"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340645"
+          }
+        ]
+      }
+    },
+    "simp_brain": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 5,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 1.5,
+      "compliance": {
+        "status": "low_priority",
+        "requirement_count": 14,
+        "average_confidence": 0.0071428571428571435,
+        "requirements": [
+          {
+            "requirement_id": "req_0002",
+            "requirement_text": "3. **Hardening Layers**: Each build adds security/compliance hardening",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340692"
+          },
+          {
+            "requirement_id": "req_0003",
+            "requirement_text": "5. **ISO Compliance**: Extensive logging for audit trails",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340694"
+          },
+          {
+            "requirement_id": "req_0004",
+            "requirement_text": "- **Hardening (16-20)**: Security, compliance, and optimization",
+            "category": "security",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340697"
+          },
+          {
+            "requirement_id": "req_0007",
+            "requirement_text": "20. **Build 20**: ISO Compliance & Audit System",
+            "category": "audit",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340701"
+          },
+          {
+            "requirement_id": "req_0008",
+            "requirement_text": "| **8** | Build 4 (Data Models) | Compliance tracking | Regulatory hardening |",
+            "category": "data_management",
+            "source_file": "pentagram_legal/BUILD_EXECUTION_PLAN.md",
+            "confidence": 0.0,
+            "mapped_at": "2026-04-11T14:45:45.340703"
+          }
+        ]
+      }
+    }
+  },
+  "agents": {},
+  "tests": {
+    "total_test_files": 0,
+    "test_files_by_module": {},
+    "test_coverage": {
+      "total_modules": 0,
+      "tested_modules": 0,
+      "coverage_percent": 0,
+      "untested_modules": 0
+    }
+  },
+  "dependencies": {
+    "dependency_graph": {},
+    "most_dependent_modules": [],
+    "total_dependencies": 0,
+    "average_dependencies": 0
+  },
+  "recommendations": [],
+  "quick_start": {
+    "setup": [
+      "1. Clone repository",
+      "2. Install dependencies: pip install -r requirements.txt",
+      "3. Set environment variables (see .env.example)",
+      "4. Start broker: python -m simp.server.broker",
+      "5. Access dashboard: http://localhost:8050"
+    ],
+    "common_commands": [
+      "Run tests: python -m pytest tests/ -v",
+      "Generate brief: python tools/system_brief_generator.py",
+      "Analyze impact: python tools/change_impact_analyzer.py <files>",
+      "Select tests: python tools/test_selection_helper.py <files>"
+    ],
+    "key_files": [
+      "simp/server/broker.py - Main broker",
+      "simp/compat/ - A2A compatibility layer",
+      "dashboard/server.py - Dashboard",
+      "tests/ - Test suite"
+    ],
+    "troubleshooting": [
+      "Broker not starting: Check port 5555 is free",
+      "Tests failing: Run with SIMP_REQUIRE_API_KEY=false",
+      "Import errors: Check Python version (3.10 required)"
+    ]
+  },
+  "compliance_summary": {
+    "total_modules_mapped": 28,
+    "high_priority": 0,
+    "medium_priority": 0,
+    "low_priority": 28,
+    "total_requirements": 411
+  },
+  "enhanced_at": "2026-04-11T14:46:00.468931"
+}

@@ -1,0 +1,96 @@
+{
+  "query": "Anthropic Mythos LLM",
+  "timestamp": "20260409_144743",
+  "response": {
+    "status": "completed",
+    "search_results_count": 3,
+    "extracted_content_count": 3,
+    "successful_extractions": 2,
+    "failed_extractions": 1,
+    "search_results": [
+      {
+        "title": "Claude Mythos Preview System Card - anthropic.com",
+        "url": "https://www.anthropic.com/claude-mythos-preview-system-card",
+        "snippet": "This System Card describes Claude Mythos Preview, a large language model from Anthropic. Claude Mythos Preview is our most capable frontier model to date, and shows a striking leap in scores on many e...",
+        "source": "duckduckgo"
+      },
+      {
+        "title": "What Is Claude Mythos\u2014And Why Anthropic Won't Let Anyone Use It",
+        "url": "https://www.forbes.com/sites/jonmarkman/2026/04/08/what-is-claude-mythos-and-why-anthropic-wont-let-anyone-use-it/",
+        "snippet": "Anthropic Built an AI So Good That It Won't Let Anyone Use It. Here's Everything You Need to Know About Claude Mythos.",
+        "source": "duckduckgo"
+      },
+      {
+        "title": "Anthropic limits rollout of Mythos AI model over cyberattack fears - CNBC",
+        "url": "https://www.cnbc.com/2026/04/07/anthropic-claude-mythos-ai-hackers-cyberattacks.html",
+        "snippet": "Anthropic announced Claude Mythos Preview, which it said is an advanced AI model that excels at identifying weaknesses and security flaws within software. Microsoft, Amazon, Apple, CrowdStrike ...",
+        "source": "duckduckgo"
+      }
+    ],
+    "extracted_content": [
+      {
+        "title": "Anthropic limits rollout of Mythos AI model over cyberattack fears",
+        "url": "https://www.cnbc.com/2026/04/07/anthropic-claude-mythos-ai-hackers-cyberattacks.html",
+        "status": "success",
+        "text_preview": "AI EffectAI at WorkAI InsightsAI EventsAI AgeAnthropic limits Mythos AI rollout over fears hackers could use model for cyberattacksPublished Tue, Apr 7 20262:00 PM EDTUpdated Tue, Apr 7 20263:52 PM EDTAshley Capoot@/in/ashley-capoot/WATCH LIVEKey PointsAnthropic announced Claude Mythos Preview, which it said is an advanced AI model that excels at identifying weaknesses and security flaws within software.Microsoft, Amazon, Apple, CrowdStrike, Palo Alto Networks and roughly 40 other companies will",
+        "metadata": {
+          "fetcher": "simple",
+          "status_code": 200,
+          "parser": "beautifulsoup",
+          "is_real_data": true,
+          "content_length": 5003,
+          "position": 3,
+          "relevance_score": 0.8,
+          "technical_analysis": {
+            "has_source_code": true,
+            "has_technical_specs": true,
+            "has_api_docs": false,
+            "technical_score": 0.35818666666666665,
+            "github_repos": [],
+            "arxiv_papers": [],
+            "code_snippet_count": 3
+          },
+          "score": 0.107456
+        }
+      },
+      {
+        "title": "No title",
+        "url": "https://www.anthropic.com/claude-mythos-preview-system-card",
+        "status": "success",
+        "text_preview": "%PDF-1.4 % 1 0 obj <> endobj 3 0 obj <> endobj 8 0 obj <> endobj 10 0 obj <> stream xJ`\u0014\u0502(\u000e 28hmRpi#\u0016V!S IHS\u0002tspu+.\u0780e(\b\u000e%| :t @V GzM<$*x\u00d0!Kc\u0019z\u0007\u0010G\u0002 \u0012>\u0013&|)4\u000ec\u0182 \u065bbw0\u0012o\u03a0?\u04bbYM\u0002\u05a9\u0013\u0010\u0423O> stream xr8\u007f'1eWY\u0014U$\u0001\u0002 %9go>\u0001UA\u04b8\u83f2)H'Vt\u0000\b.\u0000 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u00000\u0011cL]g\u0019km\u00dfL?P\u0007\u0012m6dYVU\u07ea\u02b2\u0001\u0000\u0000\u00002 ^p/zu4= t__\u0019$ \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000#(\u02f2l#8_BqM,KcpN,G\u0000\u0000\u0000_h}e\u07de\u02df\u0000\u0016es< Z\u034c*$=\u000f\u000f\u000f\u07fe}[4(\u02627Mc\u0004 v43\u2793%# mY D\u03b9iS@ 0uk\u06d6: I*\u0014jI3XksJ<\u001aq1/X*\u0011]8:1\u0001\u0005\u0018\u0011G\u017a|*\u000e,b\u0006\u038bi~W\u0003$M\u01e3fIYZWHbAQJ\u0761U|L}`\u0322\u007f \u001aaaP '=\u0018\u01b6-qXku\u140c\u02ed#\b\u0018\u0013ax\u0007h9\u0017\u0015Eq.,\u01f2.\u000e {\u07574\u007fz\u05f8z*k^\u007fD)#H ~C\u05e6\u0012@\u001aMk\u0006s6:\u0226\u0000 u [5:NkY\u001a8NbM \u007f _\u000f\u000e\u0248",
+        "metadata": {
+          "fetcher": "simple",
+          "status_code": 200,
+          "parser": "beautifulsoup",
+          "is_real_data": true,
+          "content_length": 5003,
+          "position": 1,
+          "relevance_score": 1.0,
+          "technical_analysis": {
+            "has_source_code": false,
+            "has_technical_specs": false,
+            "has_api_docs": false,
+            "technical_score": 0.0,
+            "github_repos": [],
+            "arxiv_papers": [],
+            "code_snippet_count": 0
+          },
+          "score": 0.0
+        }
+      },
+      {
+        "title": "Error extracting content",
+        "url": "https://www.forbes.com/sites/jonmarkman/2026/04/08/what-is-claude-mythos-and-why-anthropic-wont-let-anyone-use-it/",
+        "status": "failed",
+        "text_preview": "Failed to extract content: HTTP 403: Forbidden",
+        "metadata": {
+          "fetcher": "simple",
+          "is_real_data": false,
+          "error": true,
+          "position": 2,
+          "relevance_score": 0.9
+        }
+      }
+    ]
+  }
+}

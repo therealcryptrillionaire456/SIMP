@@ -1,0 +1,255 @@
+2026-04-10 00:23:05,670 - simp.agents.bill_russel_agent - ERROR - Failed to initialize Bill Russel Protocol: __init__() got an unexpected keyword argument 'db_path'
+2026-04-10 00:23:56,446 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:23:56,446 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:23:56,454 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:23:56,463 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:23:56,463 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:23:56,463 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:23:56,463 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:23:56,463 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:23:56,463 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:23:56,463 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:23:56,463 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:23:56,463 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:23:56,464 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:23:56,464 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:23:56,464 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:23:56,464 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:23:56,464 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:23:56,464 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:23:56,464 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:23:56,464 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:24:16,267 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:24:16,268 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:24:16,270 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:24:16,270 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:24:16,270 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:24:16,270 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:24:16,270 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:24:16,270 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:24:16,270 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:24:16,270 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:24:16,271 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:24:16,271 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:24:16,271 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:24:16,271 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:24:16,271 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:24:16,271 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:24:16,271 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:24:16,271 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:24:16,272 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:24:16,272 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:24:16,273 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:25:40,817 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:25:40,818 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:25:40,820 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:25:40,821 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:25:40,821 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:25:40,821 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:25:40,821 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:25:40,821 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:25:40,821 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:25:40,821 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:25:40,822 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:25:40,822 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:25:40,822 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:25:40,822 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:25:40,822 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:25:40,822 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:25:40,822 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:25:40,822 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:25:40,822 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:25:40,822 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:25:40,824 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:26:34,745 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:26:34,746 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:26:34,748 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:34,749 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:26:34,749 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:26:34,749 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:26:34,749 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:26:34,749 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:26:34,749 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:26:34,749 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:34,749 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:26:34,749 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:26:34,750 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:34,750 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:26:34,750 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:26:34,750 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:26:34,750 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:26:34,750 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:26:34,750 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:26:34,750 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:34,752 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:26:34,752 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Correlation sweep completed: 0 correlations found
+2026-04-10 00:26:34,752 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:26:34,752 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:26:34,753 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:34,753 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:26:34,753 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:26:34,753 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:26:34,753 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:26:34,753 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:26:34,753 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:26:34,753 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,152 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:26:45,152 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:26:45,154 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,154 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:26:45,154 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:26:45,154 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:26:45,154 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:26:45,154 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:26:45,154 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:26:45,154 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,155 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:26:45,155 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:26:45,155 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,156 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:26:45,156 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:26:45,156 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:26:45,156 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:26:45,156 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:26:45,156 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:26:45,156 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,157 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:26:45,158 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Correlation sweep completed: 0 correlations found
+2026-04-10 00:26:45,158 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:26:45,159 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:26:45,159 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,159 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:26:45,159 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:26:45,159 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:26:45,159 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:26:45,159 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:26:45,159 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:26:45,159 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,172 - simp.agents.bill_russel_agent - WARNING - Could not register with SIMP: HTTP Error 400: BAD REQUEST
+2026-04-10 00:26:45,172 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:26:45,172 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:26:45,173 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:26:45,173 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:26:45,173 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:26:45,173 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:26:45,173 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:26:45,173 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:26:45,173 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:26:45,173 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:29:09,509 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:29:09,510 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:29:09,511 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:29:09,512 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:29:09,512 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:29:09,512 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:29:09,512 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:29:09,512 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:29:09,512 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:29:09,512 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:29:35,506 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:29:35,506 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:29:35,508 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:29:35,508 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:29:35,508 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:29:35,508 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:29:35,508 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:29:35,508 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:29:35,508 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:29:35,508 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:29:35,515 - simp.agents.bill_russel_agent - WARNING - Could not register with SIMP: HTTP Error 400: BAD REQUEST
+2026-04-10 00:29:35,517 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:30:02,762 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:30:02,763 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:30:02,764 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:30:02,764 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:30:02,764 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:30:02,764 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:30:02,764 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:30:02,764 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:30:02,764 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:30:02,764 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:30:02,769 - simp.agents.bill_russel_agent - WARNING - Could not register with SIMP: HTTP Error 400: BAD REQUEST
+2026-04-10 00:30:02,771 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:31:47,690 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:31:47,690 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:31:47,692 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:47,693 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:31:47,693 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:31:47,693 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:31:47,693 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:31:47,693 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:31:47,693 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:31:47,693 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:47,693 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:31:47,693 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:31:47,693 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:47,694 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:31:47,694 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:31:47,694 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:31:47,694 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:31:47,694 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:31:47,694 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:31:47,694 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:47,695 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:31:47,697 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Correlation sweep completed: 0 correlations found
+2026-04-10 00:31:47,698 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:31:47,698 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:31:47,698 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:47,698 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:31:47,698 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:31:47,698 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:31:47,698 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:31:47,698 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:31:47,698 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:31:47,698 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:47,705 - simp.agents.bill_russel_agent - WARNING - Could not register with SIMP: HTTP Error 400: BAD REQUEST
+2026-04-10 00:31:47,705 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:31:47,705 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:31:47,705 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:47,705 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:31:47,705 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:31:47,705 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:31:47,706 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:31:47,706 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:31:47,706 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:31:47,706 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:53,234 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:31:53,234 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:31:53,236 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:53,236 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:31:53,236 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:31:53,236 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:31:53,236 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:31:53,236 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:31:53,236 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:31:53,236 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:31:53,243 - simp.agents.bill_russel_agent - WARNING - Could not register with SIMP: HTTP Error 400: BAD REQUEST
+2026-04-10 00:31:53,245 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:31:53,245 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Recorded 0 threat entries for assessment
+2026-04-10 00:31:53,245 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Recorded 0 threat entries for assessment
+2026-04-10 00:31:53,245 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Recorded 0 threat entries for assessment
+2026-04-10 00:31:53,245 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Correlation sweep completed: 0 correlations found
+2026-04-10 00:31:53,246 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Correlation sweep completed: 0 correlations found
+2026-04-10 00:31:53,246 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.25)
+2026-04-10 00:32:20,447 - mythos_implementation.bill_russel_protocol.pattern_recognition - INFO - PatternRecognizer initialized
+2026-04-10 00:32:20,448 - mythos_implementation.bill_russel_protocol.reasoning_engine - INFO - ReasoningEngine initialized
+2026-04-10 00:32:20,450 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:32:20,450 - mythos_implementation.bill_russel_protocol.memory_system - INFO - MemorySystem initialized with database: threat_memory.db
+2026-04-10 00:32:20,450 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - AlertOrchestrator initialized
+2026-04-10 00:32:20,450 - simp.agents.bill_russel_agent - INFO - Bill Russel Protocol initialized successfully
+2026-04-10 00:32:20,450 - simp.agents.bill_russel_agent - INFO - Bill Russel Agent initialized (v1.0.0)
+2026-04-10 00:32:20,450 - simp.agents.bill_russel_agent - INFO - Inbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/inbox
+2026-04-10 00:32:20,450 - simp.agents.bill_russel_agent - INFO - Outbox: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/outbox
+2026-04-10 00:32:20,450 - simp.agents.bill_russel_agent - INFO - Threat DB: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/bill_russel/threat_memory.db
+2026-04-10 00:32:20,456 - simp.agents.bill_russel_agent - WARNING - Could not register with SIMP: HTTP Error 400: BAD REQUEST
+2026-04-10 00:32:20,458 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.00)
+2026-04-10 00:32:20,458 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Recorded 0 threat entries for assessment
+2026-04-10 00:32:20,458 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Recorded 0 threat entries for assessment
+2026-04-10 00:32:20,458 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Recorded 0 threat entries for assessment
+2026-04-10 00:32:20,458 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Correlation sweep completed: 0 correlations found
+2026-04-10 00:32:20,459 - mythos_implementation.bill_russel_protocol.memory_system - INFO - Correlation sweep completed: 0 correlations found
+2026-04-10 00:32:20,459 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.25)
+2026-04-10 00:32:20,459 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.45)
+2026-04-10 00:32:20,459 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.65)
+2026-04-10 00:32:20,459 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.75)
+2026-04-10 00:32:20,459 - mythos_implementation.bill_russel_protocol.alert_orchestrator - INFO - Orchestrated response: log_only (confidence: 0.92)
