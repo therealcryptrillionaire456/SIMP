@@ -51,7 +51,7 @@ class StrixModule:
             'alerts_generated': 0,
             'threats_detected': 0,
             'start_time': time.time()
-
+        }
 
     def get_status(self) -> dict:
         """Get module status."""
@@ -101,9 +101,6 @@ class StrixModule:
     def plan_response(self, threat: dict) -> dict:
         """Plan response to threat."""
         return {'error': 'Method not implemented in this module'}
-
-
-        }
     
     def _load_monitoring_rules(self) -> List[Dict[str, Any]]:
         """Load monitoring rules."""

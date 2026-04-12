@@ -1,0 +1,11 @@
+2026-04-10 05:06:52,202 - INFO - ================================================================================
+2026-04-10 05:06:52,202 - INFO - BILL RUSSELL PROTOCOL - SECBERT FINE-TUNING
+2026-04-10 05:06:52,202 - INFO - ================================================================================
+2026-04-10 05:06:52,202 - INFO - Phase 3: Fine-tuning SecBERT on actual security logs
+2026-04-10 05:06:52,202 - INFO - Defending against: Anthropic, Meta, OpenAI, Enterprise threats
+2026-04-10 05:06:52,202 - INFO - ================================================================================
+2026-04-10 05:06:52,202 - INFO - 
+Step 1: Processing real security logs
+2026-04-10 05:06:52,202 - INFO - ----------------------------------------
+2026-04-10 05:06:52,202 - INFO - Processing Zeek logs from: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/security_datasets/raw/iot_23
+2026-04-10 05:06:52,206 - INFO - Found 23 Zeek log files

@@ -1,0 +1,20 @@
+2026-04-10 05:26:42,864 - INFO - ================================================================================
+2026-04-10 05:26:42,864 - INFO - BILL RUSSELL PROTOCOL - SIMPLIFIED SECBERT FINE-TUNING
+2026-04-10 05:26:42,864 - INFO - ================================================================================
+2026-04-10 05:26:42,864 - INFO - Phase 3: Quick fine-tuning for demonstration
+2026-04-10 05:26:42,864 - INFO - Defending against: Anthropic, Meta, OpenAI, Enterprise threats
+2026-04-10 05:26:42,865 - INFO - ================================================================================
+2026-04-10 05:26:42,865 - INFO - 
+Step 1: Creating training data
+2026-04-10 05:26:42,865 - INFO - ----------------------------------------
+2026-04-10 05:26:42,865 - INFO - Creating simulated training data...
+2026-04-10 05:26:42,902 - INFO - Created 2000 simulated training samples
+2026-04-10 05:26:42,903 - INFO - Class distribution: {0: 1400, 1: 600}
+2026-04-10 05:26:42,909 - INFO - 
+Step 2: Fine-tuning model
+2026-04-10 05:26:42,909 - INFO - ----------------------------------------
+2026-04-10 05:26:42,909 - INFO - Starting simplified fine-tuning...
+2026-04-10 05:26:42,909 - INFO - Using device: cpu
+2026-04-10 05:26:42,909 - INFO - Loading model: distilbert-base-uncased
+2026-04-10 05:30:17,457 - INFO - Training samples: 1600
+2026-04-10 05:30:17,457 - INFO - Validation samples: 400

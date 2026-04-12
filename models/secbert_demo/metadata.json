@@ -1,0 +1,13 @@
+{
+  "model_name": "bill_russel_secbert_demo",
+  "version": "1.0.0",
+  "description": "Demonstration model for security log classification",
+  "training_samples": 1000,
+  "class_distribution": {
+    "benign": 700,
+    "malicious": 300
+  },
+  "training_date": "2026-04-10T05:47:40.024986Z",
+  "status": "demonstration",
+  "note": "This is a demonstration model. For production, fine-tune on real IoT-23 data."
+}

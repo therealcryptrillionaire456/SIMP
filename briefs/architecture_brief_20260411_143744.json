@@ -1,0 +1,360 @@
+{
+  "generated_at": "2026-04-11T14:37:44.130470",
+  "graph_version": "unknown",
+  "summary": {
+    "total_files": 261,
+    "total_modules": 28,
+    "total_classes": 28,
+    "total_functions": 3380,
+    "total_edges": 19179,
+    "most_important_modules": [
+      {
+        "name": "tests",
+        "importance": 343.59999999999997,
+        "file_count": 93,
+        "class_count": 13,
+        "function_count": 1466
+      },
+      {
+        "name": "compat",
+        "importance": 48.5,
+        "file_count": 22,
+        "class_count": 1,
+        "function_count": 186
+      },
+      {
+        "name": "agents",
+        "importance": 48.1,
+        "file_count": 11,
+        "class_count": 0,
+        "function_count": 213
+      },
+      {
+        "name": "integrations",
+        "importance": 37.5,
+        "file_count": 9,
+        "class_count": 4,
+        "function_count": 159
+      },
+      {
+        "name": "server",
+        "importance": 36.3,
+        "file_count": 15,
+        "class_count": 0,
+        "function_count": 144
+      },
+      {
+        "name": "mythos_implementation",
+        "importance": 32.400000000000006,
+        "file_count": 14,
+        "class_count": 0,
+        "function_count": 127
+      },
+      {
+        "name": "security",
+        "importance": 26.900000000000002,
+        "file_count": 9,
+        "class_count": 0,
+        "function_count": 112
+      },
+      {
+        "name": "transport",
+        "importance": 20.5,
+        "file_count": 7,
+        "class_count": 0,
+        "function_count": 85
+      },
+      {
+        "name": "organs",
+        "importance": 20.1,
+        "file_count": 5,
+        "class_count": 0,
+        "function_count": 88
+      },
+      {
+        "name": "examples",
+        "importance": 16.8,
+        "file_count": 7,
+        "class_count": 1,
+        "function_count": 65
+      }
+    ],
+    "graph_density": 0.00039688885820669063,
+    "node_types": {
+      "code_files": 261,
+      "classes": 28,
+      "functions": 3380,
+      "total_nodes": 6952
+    }
+  },
+  "modules": {
+    "data_acquisition": {
+      "file_count": 2,
+      "class_count": 0,
+      "function_count": 38,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 8.600000000000001
+    },
+    "bill_russel_integration": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 29,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 6.300000000000001
+    },
+    "bill_russel_ml_pipeline": {
+      "file_count": 1,
+      "class_count": 2,
+      "function_count": 23,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 5.700000000000001
+    },
+    "bill_russel_sigma_rules": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 31,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 6.7
+    },
+    "agents": {
+      "file_count": 11,
+      "class_count": 0,
+      "function_count": 213,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 48.1
+    },
+    "bin": {
+      "file_count": 4,
+      "class_count": 0,
+      "function_count": 31,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 8.2
+    },
+    "tests": {
+      "file_count": 93,
+      "class_count": 13,
+      "function_count": 1466,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 343.59999999999997
+    },
+    "config": {
+      "file_count": 0,
+      "class_count": 0,
+      "function_count": 4,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 0.8
+    },
+    "dashboard": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 79,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 16.3
+    },
+    "scripts": {
+      "file_count": 6,
+      "class_count": 0,
+      "function_count": 36,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 10.2
+    },
+    "examples": {
+      "file_count": 7,
+      "class_count": 1,
+      "function_count": 65,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 16.8
+    },
+    "models": {
+      "file_count": 6,
+      "class_count": 4,
+      "function_count": 31,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 10.4
+    },
+    "mythos_implementation": {
+      "file_count": 14,
+      "class_count": 0,
+      "function_count": 127,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 32.400000000000006
+    },
+    "security": {
+      "file_count": 9,
+      "class_count": 0,
+      "function_count": 112,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 26.900000000000002
+    },
+    "patches": {
+      "file_count": 4,
+      "class_count": 0,
+      "function_count": 0,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 2.0
+    },
+    "pentagram_legal": {
+      "file_count": 3,
+      "class_count": 0,
+      "function_count": 70,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 15.5
+    },
+    "audit": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 12,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 2.9000000000000004
+    },
+    "compat": {
+      "file_count": 22,
+      "class_count": 1,
+      "function_count": 186,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 48.5
+    },
+    "financial": {
+      "file_count": 4,
+      "class_count": 1,
+      "function_count": 36,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 9.5
+    },
+    "integrations": {
+      "file_count": 9,
+      "class_count": 4,
+      "function_count": 159,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 37.5
+    },
+    "memory": {
+      "file_count": 5,
+      "class_count": 0,
+      "function_count": 38,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 10.100000000000001
+    },
+    "orchestration": {
+      "file_count": 4,
+      "class_count": 0,
+      "function_count": 51,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 12.200000000000001
+    },
+    "organs": {
+      "file_count": 5,
+      "class_count": 0,
+      "function_count": 88,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 20.1
+    },
+    "projectx": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 22,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 4.9
+    },
+    "routing": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 13,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 3.1
+    },
+    "server": {
+      "file_count": 15,
+      "class_count": 0,
+      "function_count": 144,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 36.3
+    },
+    "transport": {
+      "file_count": 7,
+      "class_count": 0,
+      "function_count": 85,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 20.5
+    },
+    "simp_brain": {
+      "file_count": 1,
+      "class_count": 0,
+      "function_count": 5,
+      "dependencies": [],
+      "dependents": [],
+      "importance": 1.5
+    }
+  },
+  "agents": {},
+  "tests": {
+    "total_test_files": 0,
+    "test_files_by_module": {},
+    "test_coverage": {
+      "total_modules": 0,
+      "tested_modules": 0,
+      "coverage_percent": 0,
+      "untested_modules": 0
+    }
+  },
+  "dependencies": {
+    "dependency_graph": {},
+    "most_dependent_modules": [],
+    "total_dependencies": 0,
+    "average_dependencies": 0
+  },
+  "recommendations": [],
+  "quick_start": {
+    "setup": [
+      "1. Clone repository",
+      "2. Install dependencies: pip install -r requirements.txt",
+      "3. Set environment variables (see .env.example)",
+      "4. Start broker: python -m simp.server.broker",
+      "5. Access dashboard: http://localhost:8050"
+    ],
+    "common_commands": [
+      "Run tests: python -m pytest tests/ -v",
+      "Generate brief: python tools/system_brief_generator.py",
+      "Analyze impact: python tools/change_impact_analyzer.py <files>",
+      "Select tests: python tools/test_selection_helper.py <files>"
+    ],
+    "key_files": [
+      "simp/server/broker.py - Main broker",
+      "simp/compat/ - A2A compatibility layer",
+      "dashboard/server.py - Dashboard",
+      "tests/ - Test suite"
+    ],
+    "troubleshooting": [
+      "Broker not starting: Check port 5555 is free",
+      "Tests failing: Run with SIMP_REQUIRE_API_KEY=false",
+      "Import errors: Check Python version (3.10 required)"
+    ]
+  }
+}

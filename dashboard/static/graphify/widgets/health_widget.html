@@ -1,0 +1,26 @@
+
+<div class="graphify-widget health-widget">
+    <h3>🏥 System Health</h3>
+    <div class="health-status">
+        <div class="status-indicator status-ok"></div>
+        <span class="status-text">Healthy</span>
+    </div>
+    <div class="health-metrics">
+        <div class="metric">
+            <span class="metric-label">Files</span>
+            <span class="metric-value" id="health-files">261</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Modules</span>
+            <span class="metric-value" id="health-modules">28</span>
+        </div>
+        <div class="metric">
+            <span class="metric-label">Graph Nodes</span>
+            <span class="metric-value" id="health-nodes">6,952</span>
+        </div>
+    </div>
+    <div class="health-actions">
+        <button class="btn btn-sm" onclick="refreshHealth()">Refresh</button>
+        <button class="btn btn-sm" onclick="showHealthDetails()">Details</button>
+    </div>
+</div>

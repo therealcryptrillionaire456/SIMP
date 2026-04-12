@@ -1,0 +1,205 @@
+{
+  "generated_at": "2026-04-11T14:59:01.298124",
+  "system_health": {
+    "status": "healthy",
+    "last_updated": "2026-04-11T14:59:01.298595",
+    "metrics": {
+      "total_files": 261,
+      "total_modules": 28,
+      "graph_nodes": 6952,
+      "graph_edges": 19179,
+      "test_coverage": "85%",
+      "compliance_coverage": "100%"
+    },
+    "checks": [
+      {
+        "check": "Graphify data",
+        "status": "ok",
+        "last_run": "2:00 AM"
+      },
+      {
+        "check": "Brief generation",
+        "status": "ok",
+        "last_run": "2:30 AM"
+      },
+      {
+        "check": "Compliance mapping",
+        "status": "ok",
+        "last_run": "3:00 AM"
+      },
+      {
+        "check": "Test suite",
+        "status": "ok",
+        "last_run": "manual"
+      },
+      {
+        "check": "Broker health",
+        "status": "ok",
+        "last_run": "continuous"
+      }
+    ]
+  },
+  "architecture": {
+    "summary": {
+      "total_files": 261,
+      "total_modules": 28,
+      "total_classes": 28,
+      "total_functions": 3380
+    },
+    "top_modules": [
+      {
+        "name": "tests",
+        "importance": 343.59999999999997,
+        "files": 93,
+        "classes": 13,
+        "functions": 1466
+      },
+      {
+        "name": "compat",
+        "importance": 48.5,
+        "files": 22,
+        "classes": 1,
+        "functions": 186
+      },
+      {
+        "name": "agents",
+        "importance": 48.1,
+        "files": 11,
+        "classes": 0,
+        "functions": 213
+      },
+      {
+        "name": "integrations",
+        "importance": 37.5,
+        "files": 9,
+        "classes": 4,
+        "functions": 159
+      },
+      {
+        "name": "server",
+        "importance": 36.3,
+        "files": 15,
+        "classes": 0,
+        "functions": 144
+      },
+      {
+        "name": "mythos_implementation",
+        "importance": 32.400000000000006,
+        "files": 14,
+        "classes": 0,
+        "functions": 127
+      },
+      {
+        "name": "security",
+        "importance": 26.900000000000002,
+        "files": 9,
+        "classes": 0,
+        "functions": 112
+      },
+      {
+        "name": "transport",
+        "importance": 20.5,
+        "files": 7,
+        "classes": 0,
+        "functions": 85
+      },
+      {
+        "name": "organs",
+        "importance": 20.1,
+        "files": 5,
+        "classes": 0,
+        "functions": 88
+      },
+      {
+        "name": "examples",
+        "importance": 16.8,
+        "files": 7,
+        "classes": 1,
+        "functions": 65
+      }
+    ],
+    "graph_metrics": {
+      "nodes": 6952,
+      "edges": 19179,
+      "density": 0.00039688885820669063
+    }
+  },
+  "compliance": {
+    "modules_mapped": 28,
+    "total_requirements": 411,
+    "high_priority": 0,
+    "status": "mapped"
+  },
+  "navigation": {
+    "status": "no_data"
+  },
+  "learning": {
+    "paths_available": 0,
+    "roles": [],
+    "last_generated": "never"
+  },
+  "tools": {
+    "total_tools": 7,
+    "active_tools": 5,
+    "tools": [
+      {
+        "name": "Graphify",
+        "description": "Architecture knowledge graph",
+        "status": "active"
+      },
+      {
+        "name": "System Brief Generator",
+        "description": "Architecture documentation",
+        "status": "active"
+      },
+      {
+        "name": "Change Impact Analyzer",
+        "description": "Code change analysis",
+        "status": "active"
+      },
+      {
+        "name": "Test Selection Helper",
+        "description": "Smart test selection",
+        "status": "active"
+      },
+      {
+        "name": "Compliance Mapper",
+        "description": "Code-law mapping",
+        "status": "active"
+      },
+      {
+        "name": "Graph Navigator",
+        "description": "Intelligent exploration",
+        "status": "ready"
+      },
+      {
+        "name": "Learning Path Generator",
+        "description": "Personalized learning",
+        "status": "ready"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "type": "architecture",
+      "priority": "medium",
+      "title": "Review high-importance modules",
+      "description": "Top modules by centrality need regular review",
+      "action": "Check architecture brief for details"
+    },
+    {
+      "type": "compliance",
+      "priority": "low",
+      "title": "Update compliance mappings",
+      "description": "Regular compliance review ensures legal coverage",
+      "action": "Run compliance pipeline weekly"
+    },
+    {
+      "type": "documentation",
+      "priority": "low",
+      "title": "Generate learning paths",
+      "description": "Create paths for new contributors",
+      "action": "Use learning path generator"
+    }
+  ]
+}

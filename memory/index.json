@@ -169,6 +169,22 @@
       "decisions": [
         "Task 'Test task' completed by unknown"
       ]
+    },
+    "planning": {
+      "decisions": [
+        "Task 'Intent planning' completed by test_agent_1"
+      ],
+      "tags": [
+        "planning",
+        "completed",
+        "routed"
+      ]
+    },
+    "research": {
+      "tags": [
+        "research",
+        "routed"
+      ]
     }
   },
   "agent_profiles": {
@@ -265,6 +281,15 @@
       "notes": "Specialized agent for arbitrage task type."
     },
     "unknown": {
+      "notes": ""
+    },
+    "test_agent_1": {
+      "notes": ""
+    },
+    "kashclaw_gemma": {
+      "notes": ""
+    },
+    "projectx_native": {
       "notes": ""
     }
   },

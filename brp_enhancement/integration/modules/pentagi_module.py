@@ -90,7 +90,8 @@ class PentagiModule:
                 'category': 'wireless',
                 'description': 'Wireless network security tool',
                 'capabilities': ['wifi_cracking', 'packet_injection', 'network_monitoring']
-
+            }
+        ]
 
     def get_status(self) -> dict:
         """Get module status."""
@@ -151,10 +152,6 @@ class PentagiModule:
     def plan_response(self, threat: dict) -> dict:
         """Plan response to threat."""
         return self.execute('plan_defenses', {'threats': [threat]})
-
-
-            }
-        ]
     
     def _load_vulnerability_db(self) -> List[Dict[str, Any]]:
         """Load vulnerability database."""

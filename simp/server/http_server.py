@@ -277,6 +277,50 @@ class SimpHttpServer:
         def health():
             return jsonify(self.broker.health_check()), 200
 
+        # ── TimesFM observability endpoints ────────────────────────────
+        @self.app.route("/timesfm/health", methods=["GET"])
+        def timesfm_health():
+            """TimesFM service + policy engine health. Never raises."""
+            try:
+                from simp.integrations.timesfm_service import get_timesfm_service_sync
+                tfm_health = get_timesfm_service_sync().health()
+            except Exception as exc:
+                tfm_health = {"error": str(exc), "status": "unavailable"}
+
+            try:
+                from simp.integrations.timesfm_policy_engine import PolicyEngine
+                pe_health = PolicyEngine().health()
+            except Exception as exc:
+                pe_health = {"error": str(exc), "status": "unavailable"}
+
+            return jsonify({
+                "status": "success",
+                "timesfm_service": tfm_health,
+                "policy_engine": pe_health,
+            }), 200
+
+        @self.app.route("/timesfm/audit", methods=["GET"])
+        def timesfm_audit():
+            """Recent TimesFM forecast audit records.
+            Query params: ?agent=<id>&limit=N (default 100, max 500).
+            """
+            agent_id = request.args.get("agent")
+            limit = min(int(request.args.get("limit", 100)), 500)
+            try:
+                from simp.integrations.timesfm_service import get_timesfm_service_sync
+                svc = get_timesfm_service_sync()
+                if agent_id:
+                    records = svc.audit.for_agent(agent_id, n=limit)
+                else:
+                    records = svc.audit.recent(n=limit)
+            except Exception as exc:
+                records = [{"error": str(exc)}]
+            return jsonify({
+                "status": "success",
+                "records": records,
+                "count": len(records),
+            }), 200
+
         @self.app.route("/agents/register", methods=["POST"])
         @self.limiter.limit(10)
         def register_agent():
