@@ -46,7 +46,8 @@ POLL_INTERVAL = int(os.environ.get("POLL_INTERVAL", "5"))  # seconds
 BROKER_CACHE_TTL = float(os.environ.get("BROKER_CACHE_TTL", str(max(POLL_INTERVAL * 2, 10))))
 BROKER_NEGATIVE_CACHE_TTL = float(os.environ.get("BROKER_NEGATIVE_CACHE_TTL", "30"))
 BROKER_SNAPSHOT_INTENTS = int(os.environ.get("BROKER_SNAPSHOT_INTENTS", "50"))
-BROKER_DASHBOARD_PATH = f"/dashboard?public=1&intents={BROKER_SNAPSHOT_INTENTS}"
+# BROKER_DASHBOARD_PATH = f"/dashboard?public=1&intents={BROKER_SNAPSHOT_INTENTS}"  # HTML endpoint, not JSON
+BROKER_DASHBOARD_PATH = "/agents"  # JSON endpoint for agent data
 ACTIVITY_BUFFER_SIZE = 100
 ACTIVITY_LOG_PATH = Path(__file__).parent / "activity_log.jsonl"
 OPERATOR_LOG_PATH = Path(__file__).parent / "operator_events.jsonl"
@@ -266,10 +267,20 @@ async def _broker_cached_get(
 
 
 async def _broker_snapshot(*, force_refresh: bool = False) -> dict[str, dict | None]:
-    dashboard_data, health_data = await asyncio.gather(
-        _broker_cached_get(BROKER_DASHBOARD_PATH, force_refresh=force_refresh),
+    # Get multiple data points from broker
+    agents_data, stats_data, health_data = await asyncio.gather(
+        _broker_cached_get("/agents", force_refresh=force_refresh),
+        _broker_cached_get("/stats", force_refresh=force_refresh),
         _broker_cached_get("/health", force_refresh=force_refresh),
     )
+    
+    # Combine into dashboard data structure
+    dashboard_data = {
+        "agents": agents_data.get("agents", {}) if agents_data else {},
+        "stats": stats_data if stats_data else {},
+        "health": health_data if health_data else {}
+    }
+    
     return {"dashboard": dashboard_data, "health": health_data}
 
 
