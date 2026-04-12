@@ -2,210 +2,210 @@
   "central_nodes": [
     {
       "node": "base_command",
-      "centrality": 0.09179834462001504
+      "centrality": 0.08905109489051095
     },
     {
       "node": "exceptions_usererror",
-      "centrality": 0.03937797842989716
+      "centrality": 0.038199513381995134
     },
     {
       "node": "exceptions_agentsexception",
-      "centrality": 0.03787308753448708
+      "centrality": 0.03673965936739659
     },
     {
       "node": "agent_agent",
-      "centrality": 0.03411086029596187
+      "centrality": 0.03309002433090025
     },
     {
       "node": "tool_functiontool",
-      "centrality": 0.03235515425131678
+      "centrality": 0.031386861313868614
     },
     {
       "node": "base_module_offensivemodule",
-      "centrality": 0.031101078505141707
+      "centrality": 0.030170316301703165
     },
     {
       "node": "exceptions_modelbehaviorerror",
-      "centrality": 0.02934537246049661
+      "centrality": 0.028467153284671535
     },
     {
       "node": "run_context_runcontextwrapper",
-      "centrality": 0.029094557311261596
+      "centrality": 0.028223844282238446
     },
     {
       "node": "base_module_intelligencemodule",
-      "centrality": 0.02809129671432154
+      "centrality": 0.027250608272506083
     },
     {
       "node": "handoffs_handoff",
-      "centrality": 0.026837220968146475
+      "centrality": 0.026034063260340634
     },
     {
       "node": "agent_output_agentoutputschema",
-      "centrality": 0.02583396037120642
+      "centrality": 0.025060827250608275
     },
     {
       "node": "spans_span",
-      "centrality": 0.02583396037120642
+      "centrality": 0.025060827250608275
     },
     {
       "node": "items_modelresponse",
-      "centrality": 0.025081514923501375
+      "centrality": 0.024330900243309004
     },
     {
       "node": "openai_chatcompletions_openaichatcompletionsmodel",
-      "centrality": 0.025081514923501375
+      "centrality": 0.024330900243309004
     },
     {
       "node": "model_settings_modelsettings",
-      "centrality": 0.02407825432656132
+      "centrality": 0.023357664233576644
     },
     {
       "node": "base_module_defensivemodule",
-      "centrality": 0.022322548281916224
+      "centrality": 0.021654501216545014
     },
     {
       "node": "usage_usage",
-      "centrality": 0.021068472535741158
+      "centrality": 0.020437956204379562
     },
     {
       "node": "structures_node",
-      "centrality": 0.020817657386506143
+      "centrality": 0.020194647201946473
     },
     {
       "node": "init",
-      "centrality": 0.019563581640331073
+      "centrality": 0.018978102189781024
     },
     {
       "node": "interface_modeltracing",
-      "centrality": 0.01931276649109606
+      "centrality": 0.018734793187347932
     },
     {
       "node": "items_itemhelpers",
-      "centrality": 0.019061951341861047
+      "centrality": 0.018491484184914843
     },
     {
       "node": "interface_model",
-      "centrality": 0.018560321043391018
+      "centrality": 0.01800486618004866
     },
     {
       "node": "simple_agent_manager_simpleagentmanager",
-      "centrality": 0.016302984700275896
+      "centrality": 0.015815085158150853
     },
     {
       "node": "traces_trace",
-      "centrality": 0.01605216955104088
+      "centrality": 0.015571776155717762
     },
     {
       "node": "span_data_generationspandata",
-      "centrality": 0.015801354401805866
+      "centrality": 0.015328467153284672
     },
     {
       "node": "parallel_parallelconfig",
-      "centrality": 0.01529972410333584
+      "centrality": 0.014841849148418492
     },
     {
       "node": "sigma_engine_sigmaengine",
-      "centrality": 0.015048908954100826
+      "centrality": 0.014598540145985403
     },
     {
       "node": "items_toolcalloutputitem",
-      "centrality": 0.014547278655630798
+      "centrality": 0.014111922141119223
     },
     {
       "node": "guardrail_inputguardrailresult",
-      "centrality": 0.014296463506395785
+      "centrality": 0.013868613138686132
     },
     {
       "node": "guardrail_outputguardrailresult",
-      "centrality": 0.014296463506395785
+      "centrality": 0.013868613138686132
     },
     {
       "node": "run_runner",
-      "centrality": 0.01404564835716077
-    },
-    {
-      "node": "run_runconfig",
-      "centrality": 0.013042387760220715
-    },
-    {
-      "node": "processor_interface_tracingprocessor",
-      "centrality": 0.013042387760220715
+      "centrality": 0.013625304136253041
     },
     {
       "node": "json",
-      "centrality": 0.013042387760220715
+      "centrality": 0.013381995133819952
+    },
+    {
+      "node": "run_runconfig",
+      "centrality": 0.012652068126520682
+    },
+    {
+      "node": "processor_interface_tracingprocessor",
+      "centrality": 0.012652068126520682
     },
     {
       "node": "web_scraper_securitydatasetscraper",
-      "centrality": 0.012791572610985702
+      "centrality": 0.012408759124087591
     },
     {
       "node": "init_rationale_121",
-      "centrality": 0.012540757461750688
+      "centrality": 0.012165450121654502
     },
     {
       "node": "init_rationale_134",
-      "centrality": 0.012540757461750688
+      "centrality": 0.012165450121654502
     },
     {
       "node": "init_rationale_141",
-      "centrality": 0.012540757461750688
+      "centrality": 0.012165450121654502
     },
     {
       "node": "run_impl",
-      "centrality": 0.012289942312515675
+      "centrality": 0.011922141119221411
     },
     {
       "node": "training_pipeline_mltrainingpipeline",
-      "centrality": 0.011788312014045647
+      "centrality": 0.011435523114355231
     },
     {
       "node": "base_basesampler",
-      "centrality": 0.011788312014045647
+      "centrality": 0.011435523114355231
     },
     {
       "node": "database_database",
-      "centrality": 0.011788312014045647
+      "centrality": 0.011435523114355231
     },
     {
       "node": "run_impl_queuecompletesentinel",
-      "centrality": 0.011788312014045647
+      "centrality": 0.011435523114355231
     },
     {
       "node": "cognition_cognition",
-      "centrality": 0.01128668171557562
+      "centrality": 0.010948905109489052
     },
     {
       "node": "parallel_parallelcommand",
-      "centrality": 0.01128668171557562
+      "centrality": 0.010948905109489052
     },
     {
       "node": "run_impl_tracectxmanager",
-      "centrality": 0.01128668171557562
+      "centrality": 0.010948905109489052
     },
     {
       "node": "pentagi_module_pentagimodule",
-      "centrality": 0.011035866566340606
+      "centrality": 0.01070559610705596
     },
     {
       "node": "dataset_processor_securitydatasetprocessor",
-      "centrality": 0.010785051417105592
+      "centrality": 0.010462287104622872
     },
     {
       "node": "local_python_executor",
-      "centrality": 0.010785051417105592
+      "centrality": 0.010462287104622872
     },
     {
       "node": "guardrail_inputguardrail",
-      "centrality": 0.010785051417105592
+      "centrality": 0.010462287104622872
     }
   ],
   "graph_stats": {
-    "nodes": 3988,
-    "edges": 9968,
-    "density": 0.0012538241763162576,
-    "connected_components": 86
+    "nodes": 4111,
+    "edges": 10160,
+    "density": 0.001202636567608949,
+    "connected_components": 83
   },
   "top_modules": [
     [
@@ -214,7 +214,7 @@
     ],
     [
       "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/integration/modules",
-      488
+      627
     ],
     [
       "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents",
@@ -290,8 +290,8 @@
     ]
   ],
   "file_types": {
-    "code": 2388,
-    "rationale": 1600
+    "code": 2453,
+    "rationale": 1658
   },
-  "timestamp": "2026-04-12T00:05:05.057849"
+  "timestamp": "2026-04-12T02:40:34.901773"
 }

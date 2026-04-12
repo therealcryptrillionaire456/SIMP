@@ -273,7 +273,7 @@ class CorporateGovernanceAgent(BaseLegalAgent):
         """
         super().__init__(
             agent_id=agent_id,
-            role=LegalAgentRole.CORPORATE_GOVERNANCE,
+            role=LegalAgentRole.GOVERNANCE,
             jurisdiction=jurisdiction,
             organization="Pentagram Corporate Secretariat"
         )
@@ -325,7 +325,9 @@ class CorporateGovernanceAgent(BaseLegalAgent):
         self.register_handler("assess_risks", self.handle_assess_risks)
         self.register_handler("maintain_records", self.handle_maintain_records)
         
-        logger.info("Registered governance intent handlers")    def handle_manage_board(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
+        logger.info("Registered governance intent handlers")
+    
+    def handle_manage_board(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle management of board members.
         
@@ -745,7 +747,9 @@ class CorporateGovernanceAgent(BaseLegalAgent):
                 "success": False,
                 "error": str(e),
                 "message": "Failed to prepare annual report"
-            }    def handle_track_compliance(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
+            }
+    
+    def handle_track_compliance(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle tracking of governance compliance.
         

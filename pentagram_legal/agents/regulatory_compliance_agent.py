@@ -246,7 +246,7 @@ class RegulatoryComplianceAgent(BaseLegalAgent):
         """
         super().__init__(
             agent_id=agent_id,
-            role=LegalAgentRole.REGULATORY_COMPLIANCE,
+            role=LegalAgentRole.COMPLIANCE,
             jurisdiction=jurisdiction,
             organization="Pentagram Compliance Office"
         )
@@ -295,7 +295,9 @@ class RegulatoryComplianceAgent(BaseLegalAgent):
         self.register_handler("record_training", self.handle_record_training)
         self.register_handler("monitor_deadlines", self.handle_monitor_deadlines)
         
-        logger.info("Registered compliance intent handlers")    def handle_track_regulation(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
+        logger.info("Registered compliance intent handlers")
+    
+    def handle_track_regulation(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle tracking of a new regulation.
         

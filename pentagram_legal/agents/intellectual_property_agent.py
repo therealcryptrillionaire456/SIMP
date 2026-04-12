@@ -259,7 +259,7 @@ class IntellectualPropertyAgent(BaseLegalAgent):
         """
         super().__init__(
             agent_id=agent_id,
-            role=LegalAgentRole.INTELLECTUAL_PROPERTY,
+            role=LegalAgentRole.IP,
             jurisdiction=jurisdiction,
             organization="Pentagram IP Management"
         )
@@ -307,7 +307,9 @@ class IntellectualPropertyAgent(BaseLegalAgent):
         self.register_handler("check_ip_status", self.handle_check_ip_status)
         self.register_handler("respond_to_office_action", self.handle_respond_to_office_action)
         
-        logger.info("Registered IP intent handlers")    def handle_create_patent_application(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
+        logger.info("Registered IP intent handlers")
+    
+    def handle_create_patent_application(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle creation of a new patent application.
         
@@ -1178,7 +1180,7 @@ def test_intellectual_property_agent():
     print("\n2. Testing trademark application creation...")
     trademark_data = {
         "mark": "AUTOPILOT+",
-        "trademark_class": "CLASS_9",
+        "trademark_class": "computers_software",
         "goods_services": "Computer software for autonomous vehicle control",
         "jurisdiction": "uspto",
         "applicant_name": "Tech Innovations Inc.",
@@ -1193,7 +1195,7 @@ def test_intellectual_property_agent():
     print("\n3. Testing copyright registration...")
     copyright_data = {
         "title": "Autonomous Vehicle Control Software v2.0",
-        "category": "SOFTWARE",
+        "category": "software",
         "authors": ["Tech Innovations Inc.", "Dr. Jane Smith"],
         "creation_date": datetime.now()
     }

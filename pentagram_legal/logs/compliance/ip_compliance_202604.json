@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2026-04-12T01:57:39.944997",
+    "agent_id": "ip_agent_001",
+    "action": "create_patent_application",
+    "details": {
+      "application_id": "pat_20260412_015739",
+      "title": "Self-Driving Vehicle Navigation System",
+      "patent_type": "utility",
+      "jurisdiction": "uspto",
+      "inventor_count": 1
+    },
+    "compliance_standard": "ISO 27001:2022",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T01:58:39.331121",
+    "agent_id": "ip_agent_001",
+    "action": "create_patent_application",
+    "details": {
+      "application_id": "pat_20260412_015839",
+      "title": "Self-Driving Vehicle Navigation System",
+      "patent_type": "utility",
+      "jurisdiction": "uspto",
+      "inventor_count": 1
+    },
+    "compliance_standard": "ISO 27001:2022",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T01:58:39.331516",
+    "agent_id": "ip_agent_001",
+    "action": "create_trademark_application",
+    "details": {
+      "application_id": "tm_20260412_015839",
+      "mark": "AUTOPILOT+",
+      "class": "computers_software",
+      "jurisdiction": "uspto",
+      "applicant": "Tech Innovations Inc."
+    },
+    "compliance_standard": "ISO 27001:2022",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T01:58:39.331709",
+    "agent_id": "ip_agent_001",
+    "action": "register_copyright",
+    "details": {
+      "work_id": "copy_20260412_015839",
+      "title": "Autonomous Vehicle Control Software v2.0",
+      "category": "software",
+      "author_count": 2,
+      "creation_date": "2026-04-12T01:58:39.331696"
+    },
+    "compliance_standard": "ISO 27001:2022",
+    "security_level": "confidential"
+  }
+]

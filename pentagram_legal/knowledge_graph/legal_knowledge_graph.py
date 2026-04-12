@@ -63,7 +63,7 @@ class CitationStrength(Enum):
     STRONG = "strong"  # Direct, explicit citation
     MODERATE = "moderate"  # Indirect citation
     WEAK = "weak"  # Implied or tangential reference
-    NEGATIVE = "negative"  Negative citation (criticism)
+    NEGATIVE = "negative"  # Negative citation (criticism)
 
 
 @dataclass

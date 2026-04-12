@@ -313,7 +313,9 @@ class LitigationDisputeAgent(BaseLegalAgent):
         self.register_handler("initiate_adr", self.handle_initiate_adr)
         self.register_handler("track_deadlines", self.handle_track_deadlines)
         
-        logger.info("Registered litigation intent handlers")    def handle_open_case(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
+        logger.info("Registered litigation intent handlers")
+    
+    def handle_open_case(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle opening of a new legal case.
         
@@ -805,7 +807,9 @@ class LitigationDisputeAgent(BaseLegalAgent):
                 "success": False,
                 "error": str(e),
                 "message": "Failed to negotiate settlement"
-            }    def handle_prepare_for_trial(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
+            }
+    
+    def handle_prepare_for_trial(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle preparation for trial.
         

@@ -1,21 +1,21 @@
-# SIMP Architecture Graph - 20260412_000500
+# SIMP Architecture Graph - 20260412_024026
 
 ## Statistics
-- **Nodes**: 3988
-- **Edges**: 9968
+- **Nodes**: 4111
+- **Edges**: 10160
 - **Files Processed**: 300
-- **Total Python Files**: 3638
+- **Total Python Files**: 15996
 
 ## Top 5 Central Modules
-1. **base_command** (centrality: 0.092)
-1. **exceptions_usererror** (centrality: 0.039)
-1. **exceptions_agentsexception** (centrality: 0.038)
-1. **agent_agent** (centrality: 0.034)
-1. **tool_functiontool** (centrality: 0.032)
+1. **base_command** (centrality: 0.089)
+1. **exceptions_usererror** (centrality: 0.038)
+1. **exceptions_agentsexception** (centrality: 0.037)
+1. **agent_agent** (centrality: 0.033)
+1. **tool_functiontool** (centrality: 0.031)
 
 ## Top 5 Modules by File Count
 1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/repl/commands** (714 files)
-1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/integration/modules** (488 files)
+1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/integration/modules** (627 files)
 1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents** (485 files)
 1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents/tracing** (244 files)
 1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents/models** (135 files)
