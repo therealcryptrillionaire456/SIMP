@@ -8,9 +8,11 @@ Uses stdlib urllib only — no third-party HTTP libraries.
 
 import json
 import logging
+import threading
 import time
 import urllib.request
 import urllib.error
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 
@@ -25,6 +27,7 @@ class DeliveryStatus:
     """Constants for delivery outcomes."""
     DELIVERED = "delivered"
     FILE_BASED_SKIP = "file_based_skip"
+    IDEMPOTENT_SKIP = "idempotent_skip"
     FAILED_TIMEOUT = "failed_timeout"
     FAILED_HTTP = "failed_http"
     FAILED_CONNECTION = "failed_connection"
@@ -53,6 +56,8 @@ class DeliveryConfig:
     base_backoff_s: float = 1.0
     timeout_s: float = 10.0
     max_response_body: int = 500
+    idempotency_cache_size: int = 1000  # Max entries in idempotency cache
+    idempotency_ttl_s: float = 300.0    # 5 minutes TTL for idempotency cache
 
 
 # ---------------------------------------------------------------------------
@@ -70,10 +75,15 @@ class IntentDeliveryEngine:
     - On connection error: retry up to max_attempts with exponential backoff.
     - On 4xx/5xx: fail immediately with FAILED_HTTP (no retry).
     - On timeout: fail immediately with FAILED_TIMEOUT.
+    - Idempotency: prevents duplicate delivery of same intent to same endpoint
+      within config.idempotency_ttl_s seconds.
     """
 
     def __init__(self, config: Optional[DeliveryConfig] = None):
         self.config = config or DeliveryConfig()
+        # LRU cache for idempotency: key = (endpoint, intent_id_hash)
+        self._idempotency_cache: OrderedDict = OrderedDict()
+        self._cache_lock = threading.Lock()
 
     # ------------------------------------------------------------------
     # public helpers
@@ -91,6 +101,61 @@ class IntentDeliveryEngine:
         return False
 
     # ------------------------------------------------------------------
+    # idempotency helpers
+    # ------------------------------------------------------------------
+
+    def _check_idempotency(self, endpoint: str, intent_data: Dict[str, Any]) -> bool:
+        """
+        Check if this intent has already been delivered to this endpoint.
+        Returns True if duplicate (should skip), False if new.
+        """
+        intent_id = intent_data.get("intent_id", "")
+        if not intent_id:
+            return False  # No intent_id, can't track idempotency
+        
+        # Create cache key
+        cache_key = f"{endpoint}:{intent_id}"
+        
+        with self._cache_lock:
+            # Check if in cache
+            if cache_key in self._idempotency_cache:
+                timestamp, _ = self._idempotency_cache[cache_key]
+                # Check if still within TTL
+                if time.time() - timestamp < self.config.idempotency_ttl_s:
+                    logger.debug("Idempotency check: duplicate intent %s to %s", intent_id, endpoint)
+                    return True
+                else:
+                    # Expired, remove it
+                    del self._idempotency_cache[cache_key]
+            
+            # Add to cache (or update if expired)
+            self._idempotency_cache[cache_key] = (time.time(), intent_id)
+            
+            # Trim cache if too large
+            while len(self._idempotency_cache) > self.config.idempotency_cache_size:
+                self._idempotency_cache.popitem(last=False)
+        
+        return False
+
+    def _record_delivery(self, endpoint: str, intent_data: Dict[str, Any]) -> None:
+        """
+        Record a successful delivery for idempotency tracking.
+        """
+        intent_id = intent_data.get("intent_id", "")
+        if not intent_id:
+            return
+        
+        cache_key = f"{endpoint}:{intent_id}"
+        with self._cache_lock:
+            self._idempotency_cache[cache_key] = (time.time(), intent_id)
+            # Move to end (most recent)
+            self._idempotency_cache.move_to_end(cache_key)
+            
+            # Trim cache if too large
+            while len(self._idempotency_cache) > self.config.idempotency_cache_size:
+                self._idempotency_cache.popitem(last=False)
+
+    # ------------------------------------------------------------------
     # deliver
     # ------------------------------------------------------------------
 
@@ -101,6 +166,15 @@ class IntentDeliveryEngine:
         Returns a DeliveryResult with status, attempts, elapsed time, etc.
         """
         t0 = time.monotonic()
+
+        # --- idempotency check ----------------------------------------
+        if self._check_idempotency(endpoint, intent_data):
+            return DeliveryResult(
+                status=DeliveryStatus.IDEMPOTENT_SKIP,
+                attempts=0,
+                elapsed_ms=_elapsed(t0),
+                error="Duplicate intent delivery prevented by idempotency check",
+            )
 
         # --- file-based agents ----------------------------------------
         if self.is_file_based(endpoint):
@@ -137,6 +211,9 @@ class IntentDeliveryEngine:
                     resp_body = resp.read().decode("utf-8", errors="replace")
                     resp_body = resp_body[:self.config.max_response_body]
 
+                # Record successful delivery for idempotency
+                self._record_delivery(endpoint, intent_data)
+                
                 return DeliveryResult(
                     status=DeliveryStatus.DELIVERED,
                     attempts=attempt,

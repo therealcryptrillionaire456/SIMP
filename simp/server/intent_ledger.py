@@ -10,6 +10,7 @@ import logging
 import os
 import shutil
 import time
+import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -50,6 +51,7 @@ class IntentLedger:
     def __init__(self, config: Optional[LedgerConfig] = None):
         self.config = config or LedgerConfig()
         self._path = Path(self.config.path)
+        self._lock = threading.Lock()
         self._ensure_dir()
 
     # ------------------------------------------------------------------
@@ -69,15 +71,17 @@ class IntentLedger:
     def append(self, record: Dict[str, Any]) -> None:
         """
         Write one JSON line to the ledger.  Never raises.
+        Thread-safe with file locking.
         """
         try:
             enriched = dict(record)
             if "ledger_ts" not in enriched:
                 enriched["ledger_ts"] = datetime.now(timezone.utc).isoformat()
             line = json.dumps(enriched, default=str) + "\n"
-            with open(self._path, "a", encoding="utf-8") as fh:
-                fh.write(line)
-                fh.flush()
+            with self._lock:
+                with open(self._path, "a", encoding="utf-8") as fh:
+                    fh.write(line)
+                    fh.flush()
         except Exception as exc:
             logger.error("IntentLedger.append failed: %s", exc)
 
@@ -181,21 +185,23 @@ class IntentLedger:
         Rotate the ledger file if it exceeds max_size_mb.
 
         Returns True if rotation happened.
+        Thread-safe with file locking.
         """
-        if not self._path.exists():
-            return False
-        size_mb = self._path.stat().st_size / (1024 * 1024)
-        if size_mb <= self.config.max_size_mb:
-            return False
-        ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
-        rotated = self._path.with_suffix(f".{ts}.jsonl")
-        try:
-            shutil.move(str(self._path), str(rotated))
-            logger.info("IntentLedger rotated: %s -> %s", self._path, rotated)
-            return True
-        except Exception as exc:
-            logger.error("IntentLedger.rotate failed: %s", exc)
-            return False
+        with self._lock:
+            if not self._path.exists():
+                return False
+            size_mb = self._path.stat().st_size / (1024 * 1024)
+            if size_mb <= self.config.max_size_mb:
+                return False
+            ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+            rotated = self._path.with_suffix(f".{ts}.jsonl")
+            try:
+                shutil.move(str(self._path), str(rotated))
+                logger.info("IntentLedger rotated: %s -> %s", self._path, rotated)
+                return True
+            except Exception as exc:
+                logger.error("IntentLedger.rotate failed: %s", exc)
+                return False
 
     # ------------------------------------------------------------------
     # stats helper

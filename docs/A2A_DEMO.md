@@ -67,6 +67,49 @@ A2A Client
 - Payload limits: enabled (64KB max)
 - Replay protection: planned (nonces + signed timestamps)
 
+## Persistence Architecture
+
+SIMP uses **append-only JSONL files** for critical system state. All persistence survives broker restarts:
+
+### Persistent Components
+- **Agent Registry**: Agent registrations persist across restarts via `data/agent_registry.jsonl`
+- **Intent Ledger**: All routed intents logged to `data/intent_ledger.jsonl`
+- **Security Audit**: Security events in `data/security_audit.jsonl`
+- **Financial Operations**: All financial events in respective JSONL files
+
+### Data Recovery
+All JSONL files can be manually inspected and reconstructed:
+```bash
+# View agent registrations
+tail -f data/agent_registry.jsonl
+
+# Count intents by type
+cat data/intent_ledger.jsonl | jq -r '.intent_type' | sort | uniq -c
+
+# View security events
+cat data/security_audit.jsonl | jq -c 'select(.event_type == "authentication_failure")'
+```
+
+### Non-Persistent Components
+- **Rate Limiter**: Uses `time.monotonic()` - resets on restart
+- **Delivery Engine Cache**: Idempotency cache is in-memory only
+- **Orchestration Manager**: Logs events but doesn't save/load state
+
+## Safety Guarantees
+
+### Financial Operations
+- **Default Simulated Mode**: `FINANCIAL_OPS_LIVE_ENABLED` defaults to `false`
+- **Environment Variable Only**: No hardcoded credentials
+- **Stripe Test Key Enforcement**: Only `sk_test_` keys accepted
+- **Dry-Run Mode**: `execute_small_payment()` raises RuntimeError when `dry_run=True`
+- **Rollback Instant**: Setting `FINANCIAL_OPS_LIVE_ENABLED` to `false` instantly reverts to simulation
+
+### System Integrity
+- **Thread-Safe File Operations**: All JSONL writes use file locking
+- **Idempotent Delivery**: Prevents duplicate intent delivery
+- **Hop Count Limits**: Prevents infinite routing loops (max 10 hops)
+- **Dashboard Integration**: Fixed async/sync HTTP coordination
+
 ## Architecture Note
 
 > A2A is an adapter surface. SIMP CanonicalIntent remains the routing authority.
@@ -74,3 +117,24 @@ A2A Client
 The A2A compatibility layer translates between A2A protocol conventions and SIMP's
 native intent routing. It does not replace or bypass the broker's core routing logic.
 All A2A requests are validated, translated, and routed through the standard SIMP pipeline.
+
+## Production Readiness
+
+### Critical Issues Fixed
+1. **IntentLedger race condition** - Added thread-safe file locking
+2. **DeliveryEngine duplicate delivery** - Added idempotency key tracking  
+3. **RoutingEngine infinite loop** - Added max hop count (10) tracking
+4. **Dashboard broker integration** - Fixed async/sync HTTP coordination
+5. **FinancialOps live mode safety** - Verified safety mechanisms enforced
+
+### Disk Persistence Implemented
+1. **AgentRegistry** - Save/load agent state to disk
+2. **IntentLedger** - Thread-safe append-only logging
+3. **SecurityAuditLog** - Security event persistence
+4. **RoutingPolicy** - Load from disk with fallback
+5. **FinancialOps Ledgers** - All financial events persisted
+
+### Remaining Work
+1. **RateLimiter persistence** - Currently resets on restart (uses `time.monotonic()`)
+2. **OrchestrationManager state persistence** - Currently logs events only
+3. **Test isolation** - Some tests need updating for AgentRegistry persistence

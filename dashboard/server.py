@@ -33,6 +33,9 @@ from fastapi.staticfiles import StaticFiles
 # Import operator API
 from dashboard.operator_api import router as operator_router
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 # Try to import mesh dashboard
 try:
     from dashboard.mesh_dashboard import MeshDashboard
@@ -41,9 +44,6 @@ try:
 except ImportError:
     MESH_DASHBOARD_AVAILABLE = False
     logger.warning("MeshDashboard not available. Mesh visualization will be limited.")
-
-# Configure logging
-logger = logging.getLogger(__name__)
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # ---------------------------------------------------------------------------
@@ -1858,7 +1858,7 @@ async def index():
 # Sprint 56 — _broker_get helper (stdlib urllib, no requests dependency)
 # ---------------------------------------------------------------------------
 
-def _broker_get(path: str, default=None, timeout: float = 3.0):
+def _broker_get_sync(path: str, default=None, timeout: float = 3.0):
     """Fetch JSON from the SIMP broker via stdlib urllib.
 
     Returns parsed JSON on success, *default* on any error.
@@ -1885,7 +1885,9 @@ def _broker_get(path: str, default=None, timeout: float = 3.0):
 @app.get("/dashboard/a2a/status")
 async def dashboard_a2a_status():
     """A2A compatibility status for the dashboard."""
-    agents_data = _broker_get("/agents", default={"agents": []})
+    agents_data = await _broker_get("/agents")
+    if agents_data is None:
+        agents_data = {"agents": []}
     agents_list = agents_data.get("agents", []) if isinstance(agents_data, dict) else []
 
     return {
@@ -1906,7 +1908,9 @@ async def dashboard_a2a_status():
 @app.get("/dashboard/financial-ops/status")
 async def dashboard_financial_ops_status():
     """FinancialOps connector health and mode status."""
-    health = _broker_get("/a2a/agents/financial-ops/connector-health", default={})
+    health = await _broker_get("/a2a/agents/financial-ops/connector-health")
+    if health is None:
+        health = {}
     return {
         "mode": "dry_run",
         "live_payments_enabled": False,
@@ -1917,8 +1921,8 @@ async def dashboard_financial_ops_status():
 @app.get("/dashboard/financial-ops/proposals")
 async def dashboard_financial_ops_proposals():
     """Proposals for dashboard display."""
-    data = _broker_get("/a2a/agents/financial-ops/proposals", default={"proposals": [], "count": 0})
-    if not isinstance(data, dict):
+    data = await _broker_get("/a2a/agents/financial-ops/proposals")
+    if data is None or not isinstance(data, dict):
         data = {"proposals": [], "count": 0}
     return data
 
@@ -1926,8 +1930,8 @@ async def dashboard_financial_ops_proposals():
 @app.get("/dashboard/financial-ops/ledger")
 async def dashboard_financial_ops_ledger():
     """Combined ledger for dashboard display."""
-    data = _broker_get("/a2a/agents/financial-ops/ledger", default={"simulated": {}, "live": {}})
-    if not isinstance(data, dict):
+    data = await _broker_get("/a2a/agents/financial-ops/ledger")
+    if data is None or not isinstance(data, dict):
         data = {"simulated": {}, "live": {}}
     return data
 
@@ -1935,8 +1939,8 @@ async def dashboard_financial_ops_ledger():
 @app.get("/dashboard/financial-ops/rollback")
 async def dashboard_financial_ops_rollback():
     """Rollback status for dashboard display."""
-    data = _broker_get("/a2a/agents/financial-ops/rollback/status", default={"state": "unknown"})
-    if not isinstance(data, dict):
+    data = await _broker_get("/a2a/agents/financial-ops/rollback/status")
+    if data is None or not isinstance(data, dict):
         data = {"state": "unknown"}
     return data
 
@@ -1944,8 +1948,8 @@ async def dashboard_financial_ops_rollback():
 @app.get("/dashboard/financial-ops/budget")
 async def dashboard_financial_ops_budget():
     """Budget summary for dashboard display."""
-    data = _broker_get("/a2a/agents/financial-ops/budget", default={})
-    if not isinstance(data, dict):
+    data = await _broker_get("/a2a/agents/financial-ops/budget")
+    if data is None or not isinstance(data, dict):
         data = {}
     return data
 
@@ -1953,11 +1957,369 @@ async def dashboard_financial_ops_budget():
 @app.get("/dashboard/financial-ops/gates")
 async def dashboard_financial_ops_gates():
     """Gate status for dashboard display."""
-    data = _broker_get("/a2a/agents/financial-ops/gates", default={})
-    if not isinstance(data, dict):
+    data = await _broker_get("/a2a/agents/financial-ops/gates")
+    if data is None or not isinstance(data, dict):
         data = {}
     return data
 
+
+# ---------------------------------------------------------------------------
+# Agent Lightning Integration
+# ---------------------------------------------------------------------------
+
+@app.get("/agent-lightning/health")
+async def dashboard_agent_lightning_health():
+    """Agent Lightning health status for dashboard display."""
+    try:
+        # Try to import and use Agent Lightning manager
+        from simp.integrations.agent_lightning import agent_lightning_manager
+        return agent_lightning_manager.health_check()
+    except ImportError:
+        return {"error": "Agent Lightning integration not available", "enabled": False}
+    except Exception as e:
+        return {"error": str(e), "enabled": False}
+
+@app.get("/agent-lightning/performance")
+async def dashboard_agent_lightning_performance(hours: int = 24):
+    """Agent Lightning performance metrics for dashboard display."""
+    try:
+        from simp.integrations.agent_lightning import agent_lightning_manager
+        return agent_lightning_manager.get_system_performance(hours)
+    except ImportError:
+        return {"error": "Agent Lightning integration not available"}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/agent-lightning/agents/{agent_id}/performance")
+async def dashboard_agent_lightning_agent_performance(agent_id: str, hours: int = 24):
+    """Agent-specific performance metrics for dashboard display."""
+    try:
+        from simp.integrations.agent_lightning import agent_lightning_manager
+        return agent_lightning_manager.get_agent_performance(agent_id, hours)
+    except ImportError:
+        return {"error": "Agent Lightning integration not available"}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/agent-lightning-ui/")
+async def agent_lightning_ui():
+    """Agent Lightning dashboard UI."""
+    from fastapi.responses import HTMLResponse
+    
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Agent Lightning Dashboard - SIMP Ecosystem</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 40px;
+                color: white;
+            }
+            .header h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+            }
+            .header .subtitle {
+                font-size: 1.2rem;
+                opacity: 0.9;
+            }
+            .dashboard-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            .card {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 15px;
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(10px);
+            }
+            .card h2 {
+                margin-top: 0;
+                color: #333;
+                border-bottom: 2px solid #667eea;
+                padding-bottom: 10px;
+            }
+            .health-status {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            .status-indicator {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+            .status-healthy {
+                background: #4ade80;
+                box-shadow: 0 0 10px #4ade80;
+            }
+            .status-unhealthy {
+                background: #f87171;
+                box-shadow: 0 0 10px #f87171;
+            }
+            .status-unknown {
+                background: #fbbf24;
+                box-shadow: 0 0 10px #fbbf24;
+            }
+            .metric {
+                margin: 10px 0;
+                padding: 10px;
+                background: rgba(102, 126, 234, 0.1);
+                border-radius: 8px;
+            }
+            .metric-label {
+                font-weight: bold;
+                color: #667eea;
+            }
+            .metric-value {
+                font-size: 1.5rem;
+                color: #333;
+            }
+            .chart-container {
+                height: 300px;
+                margin-top: 20px;
+            }
+            .agent-selector {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .agent-selector select {
+                flex: 1;
+                padding: 10px;
+                border-radius: 8px;
+                border: 2px solid #667eea;
+                background: white;
+                font-size: 1rem;
+            }
+            .refresh-btn {
+                padding: 10px 20px;
+                background: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1rem;
+                transition: background 0.3s;
+            }
+            .refresh-btn:hover {
+                background: #5a67d8;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>⚡ Agent Lightning Dashboard</h1>
+                <div class="subtitle">Real-time LLM call tracing and optimization across SIMP ecosystem</div>
+            </div>
+            
+            <div class="agent-selector">
+                <select id="agentSelect">
+                    <option value="all">All Agents</option>
+                    <option value="quantumarb">QuantumArb</option>
+                    <option value="kashclaw_gemma">KashClaw Gemma</option>
+                    <option value="kloutbot">KloutBot</option>
+                    <option value="projectx_native">ProjectX</option>
+                    <option value="perplexity_research">Perplexity Research</option>
+                    <option value="stray_goose">Stray Goose</option>
+                </select>
+                <select id="timeRange">
+                    <option value="1">Last hour</option>
+                    <option value="24" selected>Last 24 hours</option>
+                    <option value="168">Last week</option>
+                    <option value="720">Last month</option>
+                </select>
+                <button class="refresh-btn" onclick="loadData()">Refresh</button>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2>System Health</h2>
+                    <div class="health-status">
+                        <div class="status-indicator" id="healthIndicator"></div>
+                        <span id="healthText">Loading...</span>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Agent Lightning Proxy</div>
+                        <div class="metric-value" id="proxyStatus">Checking...</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">LightningStore</div>
+                        <div class="metric-value" id="storeStatus">Checking...</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Total Agents Tracked</div>
+                        <div class="metric-value" id="totalAgents">0</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>Performance Overview</h2>
+                    <div class="metric">
+                        <div class="metric-label">Total LLM Calls</div>
+                        <div class="metric-value" id="totalCalls">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Success Rate</div>
+                        <div class="metric-value" id="successRate">0%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Avg Response Time</div>
+                        <div class="metric-value" id="avgResponseTime">0ms</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Total Tokens</div>
+                        <div class="metric-value" id="totalTokens">0</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>APO Status</h2>
+                    <div class="metric">
+                        <div class="metric-label">APO Enabled</div>
+                        <div class="metric-value" id="apoEnabled">Checking...</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">APO Target Agent</div>
+                        <div class="metric-value" id="apoAgent">Checking...</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Optimizations Applied</div>
+                        <div class="metric-value" id="optimizationsApplied">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Last Optimization</div>
+                        <div class="metric-value" id="lastOptimization">Never</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Performance Trends</h2>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            let performanceChart = null;
+            
+            async function loadData() {
+                const agentId = document.getElementById('agentSelect').value;
+                const hours = document.getElementById('timeRange').value;
+                
+                // Load health data
+                try {
+                    const healthResponse = await fetch('/agent-lightning/health');
+                    const healthData = await healthResponse.json();
+                    updateHealthUI(healthData);
+                } catch (error) {
+                    console.error('Failed to load health data:', error);
+                }
+                
+                // Load performance data
+                try {
+                    let url = '/agent-lightning/performance';
+                    if (agentId !== 'all') {
+                        url = `/agent-lightning/agents/${agentId}/performance`;
+                    }
+                    url += `?hours=${hours}`;
+                    
+                    const perfResponse = await fetch(url);
+                    const perfData = await perfResponse.json();
+                    updatePerformanceUI(perfData);
+                } catch (error) {
+                    console.error('Failed to load performance data:', error);
+                }
+            }
+            
+            function updateHealthUI(healthData) {
+                const indicator = document.getElementById('healthIndicator');
+                const healthText = document.getElementById('healthText');
+                const proxyStatus = document.getElementById('proxyStatus');
+                const storeStatus = document.getElementById('storeStatus');
+                const totalAgents = document.getElementById('totalAgents');
+                const apoEnabled = document.getElementById('apoEnabled');
+                const apoAgent = document.getElementById('apoAgent');
+                
+                if (!healthData.enabled) {
+                    indicator.className = 'status-indicator status-unknown';
+                    healthText.textContent = 'Disabled';
+                    proxyStatus.textContent = 'N/A';
+                    storeStatus.textContent = 'N/A';
+                    totalAgents.textContent = '0';
+                    apoEnabled.textContent = 'Disabled';
+                    apoAgent.textContent = 'None';
+                    return;
+                }
+                
+                if (healthData.proxy_healthy && healthData.store_healthy) {
+                    indicator.className = 'status-indicator status-healthy';
+                    healthText.textContent = 'Healthy';
+                } else {
+                    indicator.className = 'status-indicator status-unhealthy';
+                    healthText.textContent = 'Unhealthy';
+                }
+                
+                proxyStatus.textContent = healthData.proxy_healthy ? '✅ Running' : '❌ Stopped';
+                storeStatus.textContent = healthData.store_healthy ? '✅ Running' : '❌ Stopped';
+                totalAgents.textContent = healthData.config?.trace_all_agents ? 'All' : 
+                                         (healthData.config?.trace_specific_agents?.length || '0');
+                
+                // APO info
+                apoEnabled.textContent = healthData.config?.enable_apo ? '✅ Enabled' : '❌ Disabled';
+                apoAgent.textContent = healthData.config?.trace_specific_agents?.[0] || 'All';
+            }
+            
+            function updatePerformanceUI(perfData) {
+                if (perfData.error) {
+                    document.getElementById('totalCalls').textContent = 'Error';
+                    document.getElementById('successRate').textContent = 'Error';
+                    document.getElementById('avgResponseTime').textContent = 'Error';
+                    document.getElementById('totalTokens').textContent = 'Error';
+                    return;
+                }
+                
+                document.getElementById('totalCalls').textContent = perfData.total_traces?.toLocaleString() || '0';
+                document.getElementById('successRate').textContent = 
+                    (perfData.success_rate || 0).toFixed(1) + '%';
+                document.getElementById('avgResponseTime').textContent = 
+                    (perfData.avg_response_time_ms || 0).toFixed(0) + 'ms';
+                document.getElementById('totalTokens').textContent = 
+                    (perfData.total_tokens || 0).toLocaleString();
+            }
+            
+            // Load data on page load
+            document.addEventListener('DOMContentLoaded', loadData);
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadData, 30000);
+        </script>
+    </body>
+    </html>
+    """
+    
+    return HTMLResponse(content=html_content)
 
 # Mount static files AFTER explicit routes so /api/* is not shadowed
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")

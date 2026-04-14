@@ -27,6 +27,7 @@ from simp.models.canonical_intent import CanonicalIntent, INTENT_TYPE_REGISTRY
 from simp.models.failure_taxonomy import FailureHandler, FailureClass
 from simp.routing.builder_pool import BuilderPool
 from simp.server.request_guards import sanitize_agent_id
+from simp.server.agent_registry import AgentRegistry
 from simp.orchestration.orchestration_loop import OrchestrationLoop
 from simp.projectx.computer import ProjectXComputer, ACTION_TIERS
 
@@ -158,8 +159,9 @@ class SimpBroker:
         self._ready: bool = False
         self._intents_loaded_from_disk: int = 0
 
-        # Agent registry
-        self.agents: Dict[str, Dict[str, Any]] = {}  # agent_id -> agent info
+        # Agent registry with disk persistence
+        self.agent_registry = AgentRegistry()
+        self.agents = self.agent_registry  # Backward compatibility
         self.agent_lock = threading.RLock()
 
         # Intent tracking — bounded OrderedDict with LRU eviction
@@ -318,17 +320,18 @@ class SimpBroker:
             True if registered, False if already exists or limit reached
         """
         with self.agent_lock:
-            if agent_id in self.agents:
+            # Check if agent already exists using AgentRegistry
+            if self.agent_registry.exists(agent_id):
                 self.logger.warning(f"❌ Agent '{agent_id}' already registered")
                 return False
 
-            if len(self.agents) >= self.config.max_agents:
+            if self.agent_registry.count() >= self.config.max_agents:
                 self.logger.error(f"❌ Max agents ({self.config.max_agents}) reached")
                 return False
 
             now = _utcnow_iso()
             is_file_based = "(file-based)" in (endpoint or "")
-            self.agents[agent_id] = {
+            agent_data = {
                 "agent_id": agent_id,
                 "agent_type": agent_type,
                 "endpoint": endpoint,
@@ -346,6 +349,11 @@ class SimpBroker:
                 "stale": False,
                 "file_based": is_file_based,
             }
+
+            # Register agent with disk persistence
+            if not self.agent_registry.register(agent_id, agent_data):
+                self.logger.error(f"❌ Failed to register agent '{agent_id}' in registry")
+                return False
 
             with self.stats_lock:
                 self.stats["agents_registered"] += 1
@@ -369,20 +377,22 @@ class SimpBroker:
     def deregister_agent(self, agent_id: str) -> bool:
         """Deregister an agent"""
         with self.agent_lock:
-            if agent_id in self.agents:
-                del self.agents[agent_id]
-                self.logger.info(f"✅ Agent deregistered: {agent_id}")
-                self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
-                
-                # Deregister agent from MeshBus
-                try:
-                    self.mesh_bus.deregister_agent(agent_id)
-                    self.logger.debug(f"Agent {agent_id} deregistered from MeshBus")
-                except Exception as e:
-                    self.logger.warning(f"Failed to deregister agent {agent_id} from MeshBus: {e}")
-                
-                return True
-            return False
+            # Deregister agent from AgentRegistry with disk persistence
+            if not self.agent_registry.deregister(agent_id):
+                self.logger.warning(f"❌ Agent '{agent_id}' not found")
+                return False
+            
+            self.logger.info(f"✅ Agent deregistered: {agent_id}")
+            self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
+            
+            # Deregister agent from MeshBus
+            try:
+                self.mesh_bus.deregister_agent(agent_id)
+                self.logger.debug(f"Agent {agent_id} deregistered from MeshBus")
+            except Exception as e:
+                self.logger.warning(f"Failed to deregister agent {agent_id} from MeshBus: {e}")
+            
+            return True
 
     # ------------------------------------------------------------------
     # Sprint 62: Heartbeat System
@@ -391,13 +401,15 @@ class SimpBroker:
     def record_heartbeat(self, agent_id: str) -> bool:
         """Update heartbeat timestamp for an agent. Returns True if found."""
         with self.agent_lock:
-            agent = self.agents.get(agent_id)
+            agent = self.agent_registry.get(agent_id)
             if not agent:
                 return False
-            agent["last_heartbeat"] = _utcnow_iso()
-            agent["heartbeat_count"] = agent.get("heartbeat_count", 0) + 1
-            agent["status"] = "active"
-            agent["stale"] = False
+            self.agent_registry.update(agent_id, {
+                "last_heartbeat": _utcnow_iso(),
+                "heartbeat_count": agent.get("heartbeat_count", 0) + 1,
+                "status": "active",
+                "stale": False
+            })
             return True
 
     def get_stale_agents(self, stale_after_seconds: float = 90.0) -> list:
@@ -412,7 +424,7 @@ class SimpBroker:
         now = datetime.now(timezone.utc)
         stale = []
         with self.agent_lock:
-            for aid, info in self.agents.items():
+            for aid, info in self.agent_registry.get_all().items():
                 if info.get("file_based"):
                     continue
                 hb = info.get("last_heartbeat", "")
@@ -440,7 +452,7 @@ class SimpBroker:
         now = datetime.now(timezone.utc)
         to_deregister = []
         with self.agent_lock:
-            for aid, info in list(self.agents.items()):
+            for aid, info in list(self.agent_registry.get_all().items()):
                 if info.get("file_based"):
                     continue
                 hb = info.get("last_heartbeat", "")
@@ -453,20 +465,21 @@ class SimpBroker:
                 except (ValueError, TypeError):
                     pass
             for aid in to_deregister:
-                del self.agents[aid]
-                self.logger.info(f"Deregistered stale agent: {aid}")
-                self._log_event("agent_stale_deregistered", f"Stale agent {aid} deregistered", agent_id=aid)
+                # Deregister using AgentRegistry for disk persistence
+                if self.agent_registry.deregister(aid):
+                    self.logger.info(f"Deregistered stale agent: {aid}")
+                    self._log_event("agent_stale_deregistered", f"Stale agent {aid} deregistered", agent_id=aid)
         return to_deregister
 
     def get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
         """Get agent information"""
         with self.agent_lock:
-            return self.agents.get(agent_id)
+            return self.agent_registry.get(agent_id)
 
     def list_agents(self) -> Dict[str, Dict[str, Any]]:
         """List all registered agents"""
         with self.agent_lock:
-            return dict(self.agents)
+            return self.agent_registry.get_all()
 
     def evaluate_plan(self, steps, source_agent="mother_goose", mode=BRPMode.SHADOW.value):
         """Submit a multi-step plan to BRP for review (Mother Goose integration).
@@ -529,7 +542,7 @@ class SimpBroker:
         if simp_config.REQUIRE_SIGNATURES:
             signature = intent_data.get("signature")
             source_id = intent_data.get("source_agent", "")
-            source_info = self.agents.get(source_id, {})
+            source_info = self.agent_registry.get(source_id) or {}
             public_key_pem = source_info.get("public_key")
 
             if signature and public_key_pem:
@@ -549,6 +562,23 @@ class SimpBroker:
         target_agent = intent_data.get("target_agent")
         intent_type = intent_data.get("intent_type", "unknown")
         delivery_start = time.monotonic()
+        
+        # --- Hop count check to prevent infinite loops ---
+        hop_count = intent_data.get("_hop_count", 0)
+        max_hops = 10  # Maximum allowed hops to prevent infinite loops
+        
+        if hop_count >= max_hops:
+            error_msg = f"Intent exceeded maximum hop count ({max_hops}): possible infinite loop"
+            self.logger.error(f"❌ {error_msg}")
+            return {
+                "status": "error",
+                "error_code": "MAX_HOPS_EXCEEDED",
+                "error_message": error_msg,
+                "intent_id": intent_id,
+            }
+        
+        # Increment hop count for any forwarded intents
+        intent_data["_hop_count"] = hop_count + 1
 
         # --- BRP event-level evaluation for every routed intent ---
         brp_plan_response = None
@@ -590,7 +620,7 @@ class SimpBroker:
         # Sprint 53 — routing engine: resolve target when "auto" or missing
         if not target_agent or target_agent == "auto":
             with self.agent_lock:
-                agents_snapshot = dict(self.agents)
+                agents_snapshot = self.agent_registry.get_all()
             decision = self.routing_engine.resolve(intent_type, target_agent, agents_snapshot)
             if decision.target_agent:
                 target_agent = decision.target_agent
@@ -1142,10 +1172,12 @@ class SimpBroker:
 
             if resp.status_code == 200:
                 with self.agent_lock:
-                    if agent_id in self.agents:
-                        self.agents[agent_id]["status"] = "online"
-                        self.agents[agent_id]["last_seen"] = _utcnow_iso()
-                        self.agents[agent_id]["health_check_failures"] = 0
+                    if self.agent_registry.exists(agent_id):
+                        self.agent_registry.update(agent_id, {
+                            "status": "online",
+                            "last_seen": _utcnow_iso(),
+                            "health_check_failures": 0
+                        })
                 if self.builder_pool:
                     self.builder_pool.report_capacity(agent_id, "available")
                 return True
@@ -1160,13 +1192,25 @@ class SimpBroker:
         """Record a health check failure. Auto-deregister after threshold."""
         threshold = 3
         with self.agent_lock:
-            if agent_id not in self.agents:
+            if not self.agent_registry.exists(agent_id):
                 return
-            self.agents[agent_id]["health_check_failures"] = (
-                self.agents[agent_id].get("health_check_failures", 0) + 1
-            )
-            failures = self.agents[agent_id]["health_check_failures"]
-            self.agents[agent_id]["status"] = "unreachable"
+            
+            # Get current agent data
+            agent_data = self.agent_registry.get(agent_id)
+            if not agent_data:
+                return
+            
+            # Calculate new failure count
+            current_failures = agent_data.get("health_check_failures", 0)
+            new_failures = current_failures + 1
+            
+            # Update agent with new failure count
+            self.agent_registry.update(agent_id, {
+                "health_check_failures": new_failures,
+                "status": "unreachable"
+            })
+            
+            failures = new_failures
 
         if self.builder_pool:
             self.builder_pool.report_capacity(agent_id, "offline")
@@ -1181,7 +1225,7 @@ class SimpBroker:
                 agent_id=agent_id,
             )
             with self.agent_lock:
-                self.agents.pop(agent_id, None)
+                self.agent_registry.deregister(agent_id)
             with self.stats_lock:
                 self.stats["agents_registered"] = max(
                     0, self.stats.get("agents_registered", 0) - 1
@@ -1215,7 +1259,7 @@ class SimpBroker:
 
         while self.state == BrokerState.RUNNING and not self._shutdown_event.is_set():
             try:
-                agents_snapshot = list(self.agents.items())
+                agents_snapshot = list(self.agent_registry.get_all().items())
                 if agents_snapshot:
                     tasks = [
                         self._bounded_health_check(semaphore, agent_id, agent_info)
@@ -1472,8 +1516,8 @@ class SimpBroker:
             stats = dict(self.stats)
 
         with self.agent_lock:
-            stats["agents_online"] = len(self.agents)
-            stats["agents_registered"] = len(self.agents)
+            stats["agents_online"] = self.agent_registry.count()
+            stats["agents_registered"] = self.agent_registry.count()
 
         with self.intent_lock:
             stats["pending_intents"] = sum(
@@ -1506,11 +1550,11 @@ class SimpBroker:
         # Sprint 62 — heartbeat stats
         with self.agent_lock:
             stats["stale_agents"] = sum(
-                1 for a in self.agents.values()
+                1 for a in self.agent_registry.get_all().values()
                 if a.get("stale") and not a.get("file_based")
             )
             stats["file_based_agents"] = sum(
-                1 for a in self.agents.values()
+                1 for a in self.agent_registry.get_all().values()
                 if a.get("file_based")
             )
 
@@ -1605,7 +1649,7 @@ class SimpBroker:
         # Sprint 64 — mark ready
         self._ready = True
         self.logger.info(
-            f"✅ Broker ready — {len(self.agents)} agents, "
+            f"✅ Broker ready — {self.agent_registry.count()} agents, "
             f"{self._intents_loaded_from_disk} intents loaded"
         )
         self.logger.info("✅ SIMP Broker RUNNING")
@@ -1696,7 +1740,7 @@ class SimpBroker:
         return {
             "status": "healthy" if self.state == BrokerState.RUNNING else "degraded",
             "state": self.state.value,
-            "agents_online": len(self.agents),
+            "agents_online": self.agent_registry.count(),
             "pending_intents": sum(
                 1
                 for r in self.intent_records.values()
