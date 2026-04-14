@@ -25,10 +25,22 @@ from pathlib import Path
 from typing import Any, Set
 
 import httpx
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+
+# Import operator API
+from dashboard.operator_api import router as operator_router
+
+# Try to import mesh dashboard
+try:
+    from dashboard.mesh_dashboard import MeshDashboard
+    MESH_DASHBOARD_AVAILABLE = True
+    logger.info("MeshDashboard available for mesh visualization")
+except ImportError:
+    MESH_DASHBOARD_AVAILABLE = False
+    logger.warning("MeshDashboard not available. Mesh visualization will be limited.")
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -155,6 +167,9 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+
+# Include operator API router
+app.include_router(operator_router)
 
 # ---------------------------------------------------------------------------
 # Shared state
@@ -1667,6 +1682,164 @@ async def api_memory_conversations():
     if data is None:
         return _redact(_derived_memory_conversations())
     return _redact(data)
+
+
+# ---------------------------------------------------------------------------
+# Mesh Bus Endpoints
+# ---------------------------------------------------------------------------
+
+@app.get("/api/mesh/stats")
+async def api_mesh_stats():
+    """Get mesh bus statistics."""
+    if not MESH_DASHBOARD_AVAILABLE:
+        return {"error": "Mesh dashboard not available", "status": "unavailable"}
+    
+    try:
+        dashboard = MeshDashboard()
+        stats = dashboard.fetch_mesh_stats()
+        return {"status": "success", "data": stats}
+    except Exception as e:
+        logger.error(f"Error fetching mesh stats: {e}")
+        return {"error": str(e), "status": "error"}
+
+
+@app.get("/api/mesh/channels")
+async def api_mesh_channels():
+    """Get mesh channel information."""
+    if not MESH_DASHBOARD_AVAILABLE:
+        return {"error": "Mesh dashboard not available", "status": "unavailable"}
+    
+    try:
+        dashboard = MeshDashboard()
+        channels = dashboard.fetch_channel_data()
+        core_channels = dashboard._get_core_channels_info()
+        return {
+            "status": "success",
+            "data": {
+                "channels": channels,
+                "core_channels": core_channels
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error fetching mesh channels: {e}")
+        return {"error": str(e), "status": "error"}
+
+
+@app.get("/api/mesh/events")
+async def api_mesh_events(limit: int = 50):
+    """Get recent mesh events."""
+    if not MESH_DASHBOARD_AVAILABLE:
+        return {"error": "Mesh dashboard not available", "status": "unavailable"}
+    
+    try:
+        dashboard = MeshDashboard()
+        events = dashboard.fetch_recent_events(limit=limit)
+        return {"status": "success", "events": events}
+    except Exception as e:
+        logger.error(f"Error fetching mesh events: {e}")
+        return {"error": str(e), "status": "error"}
+
+
+@app.get("/api/mesh/dashboard")
+async def api_mesh_dashboard():
+    """Get complete mesh dashboard data."""
+    if not MESH_DASHBOARD_AVAILABLE:
+        return {"error": "Mesh dashboard not available", "status": "unavailable"}
+    
+    try:
+        dashboard = MeshDashboard()
+        data = dashboard.get_dashboard_data()
+        return {"status": "success", "data": data}
+    except Exception as e:
+        logger.error(f"Error fetching mesh dashboard data: {e}")
+        return {"error": str(e), "status": "error"}
+
+
+@app.get("/api/mesh/widget")
+async def api_mesh_widget():
+    """Get HTML widget for mesh dashboard."""
+    if not MESH_DASHBOARD_AVAILABLE:
+        return {"error": "Mesh dashboard not available", "status": "unavailable"}
+    
+    try:
+        dashboard = MeshDashboard()
+        html = dashboard.generate_html_widget()
+        return HTMLResponse(html)
+    except Exception as e:
+        logger.error(f"Error generating mesh widget: {e}")
+        return {"error": str(e), "status": "error"}
+
+
+@app.post("/api/mesh/test-alert")
+async def api_mesh_test_alert(request: Request):
+    """Send a test alert to mesh bus."""
+    try:
+        data = await request.json()
+        channel = data.get("channel", "safety_alerts")
+        message = data.get("message", "Test alert from dashboard")
+        
+        # Send test alert via broker
+        alert_payload = {
+            "sender_id": "dashboard",
+            "recipient_id": "*",
+            "channel": channel,
+            "msg_type": "event",
+            "payload": {
+                "alert_type": "test_alert",
+                "severity": "INFO",
+                "message": message,
+                "source": "dashboard",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "recommended_action": "none"
+            },
+            "priority": "normal",
+            "ttl_hops": 10,
+            "ttl_seconds": 60
+        }
+        
+        # Send to broker
+        broker_response = await _broker_post("/mesh/send", alert_payload)
+        
+        if broker_response and broker_response.get("success"):
+            return {"success": True, "message_id": broker_response.get("message_id")}
+        else:
+            error = broker_response.get("error", "Unknown error") if broker_response else "No response from broker"
+            return {"success": False, "error": error}
+            
+    except Exception as e:
+        logger.error(f"Error sending test alert: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@app.get("/api/mesh/export")
+async def api_mesh_export():
+    """Export mesh data for analysis."""
+    if not MESH_DASHBOARD_AVAILABLE:
+        return {"error": "Mesh dashboard not available", "status": "unavailable"}
+    
+    try:
+        dashboard = MeshDashboard()
+        
+        # Get all data
+        stats = dashboard.fetch_mesh_stats()
+        channels = dashboard.fetch_channel_data()
+        events = dashboard.fetch_recent_events(limit=1000)
+        dashboard_data = dashboard.get_dashboard_data()
+        
+        export_data = {
+            "export_timestamp": datetime.now(timezone.utc).isoformat(),
+            "stats": stats,
+            "channels": channels,
+            "events": events,
+            "dashboard_data": dashboard_data,
+            "export_format": "simp_mesh_v1"
+        }
+        
+        return export_data
+        
+    except Exception as e:
+        logger.error(f"Error exporting mesh data: {e}")
+        return {"error": str(e), "status": "error"}
 
 
 # ---------------------------------------------------------------------------
