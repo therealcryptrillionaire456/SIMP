@@ -27,7 +27,7 @@ from simp.models.canonical_intent import CanonicalIntent, INTENT_TYPE_REGISTRY
 from simp.models.failure_taxonomy import FailureHandler, FailureClass
 from simp.routing.builder_pool import BuilderPool
 from simp.server.request_guards import sanitize_agent_id
-from simp.server.agent_registry import AgentRegistry
+from simp.server.agent_registry import AgentRegistry, AgentRegistryConfig
 from simp.orchestration.orchestration_loop import OrchestrationLoop
 from simp.projectx.computer import ProjectXComputer, ACTION_TIERS
 
@@ -76,6 +76,7 @@ class BrokerConfig:
     log_level: str = ""
     max_log_lines: int = 10000
     max_intent_records: int = 10000
+    agent_registry_config: Optional[AgentRegistryConfig] = None
 
     def __post_init__(self):
         """Fill in defaults from SimpConfig if not explicitly set."""
@@ -160,7 +161,7 @@ class SimpBroker:
         self._intents_loaded_from_disk: int = 0
 
         # Agent registry with disk persistence
-        self.agent_registry = AgentRegistry()
+        self.agent_registry = AgentRegistry(self.config.agent_registry_config)
         self.agents = self.agent_registry  # Backward compatibility
         self.agent_lock = threading.RLock()
 

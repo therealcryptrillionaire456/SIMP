@@ -394,6 +394,9 @@ Set up alerts for:
 #### Issue: Agent registry empty after restart
 **Solution**: Check `data/agent_registry.jsonl` permissions and disk space. Agents will re-register on next heartbeat.
 
+#### Issue: Orchestration plans lost after restart
+**Solution**: Ensure `persistence_enabled=True` in OrchestrationManager config. Check `data/orchestration_plans.jsonl` exists and is readable.
+
 #### Issue: JSONL file corruption
 **Solution**: Use `jq .` to validate each line. Remove corrupted lines at end of file.
 
@@ -402,6 +405,29 @@ Set up alerts for:
 
 #### Issue: Missing data files
 **Solution**: System will create missing files on first write. Check directory permissions.
+
+#### Issue: Rate limits reset on restart
+**Expected Behavior**: RateLimiter uses `time.monotonic()` which cannot be persisted. Rate limits reset on process restart by design.
+
+### 10.2 New Persistence Components (Session 3)
+
+#### OrchestrationManager Plan Persistence
+- **File**: `data/orchestration_plans.jsonl`
+- **Format**: JSONL with full plan state including steps, status, timestamps
+- **Loading**: Plans loaded on OrchestrationManager initialization
+- **Saving**: Plans saved on creation and updated on state changes
+- **Configuration**: `OrchestrationManagerConfig.persistence_enabled` (default: True)
+- **Recovery**: Use `OrchestrationPlan.from_dict()` to reconstruct plans from JSON
+
+#### AgentRegistry Enhanced Isolation
+- **Test Isolation**: Tests now use temporary files to prevent interference
+- **Configuration**: `BrokerConfig.agent_registry_config` accepts custom `AgentRegistryConfig`
+- **Backward Compatibility**: `broker.agents` maintains dictionary-like interface
+
+#### RateLimiter Persistence Decision
+- **Limitation**: Uses `time.monotonic()` which cannot be persisted
+- **Decision**: Rate limits reset on process restart (acceptable for most use cases)
+- **Alternative**: Disk-backed implementation possible but has performance impact
 
 ### 10.2 Support
 For additional support:

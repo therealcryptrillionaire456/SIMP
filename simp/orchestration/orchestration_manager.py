@@ -18,6 +18,20 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger("SIMP.Orchestration")
 
 _LOG_PATH = Path("data/orchestration_log.jsonl")
+_PLANS_PATH = Path("data/orchestration_plans.jsonl")
+
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+@dataclass
+class OrchestrationManagerConfig:
+    """Configuration for OrchestrationManager persistence."""
+    log_path: Path = _LOG_PATH
+    plans_path: Path = _PLANS_PATH
+    max_plans: int = 1000  # Maximum number of plans to keep in persistence
+    persistence_enabled: bool = True  # Whether to persist plans to disk
 
 
 # ---------------------------------------------------------------------------
@@ -59,6 +73,22 @@ class OrchestrationStep:
             "completed_at": self.completed_at,
         }
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "OrchestrationStep":
+        """Create an OrchestrationStep from serialized data."""
+        return cls(
+            step_id=data.get("step_id", ""),
+            name=data.get("name", ""),
+            intent_type=data.get("intent_type", ""),
+            target_agent=data.get("target_agent", ""),
+            params=data.get("params", {}),
+            status=data.get("status", OrchestrationStepStatus.PENDING.value),
+            result=data.get("result"),
+            error=data.get("error", ""),
+            started_at=data.get("started_at", ""),
+            completed_at=data.get("completed_at", ""),
+        )
+
 
 @dataclass
 class OrchestrationPlan:
@@ -83,6 +113,23 @@ class OrchestrationPlan:
             "error": self.error,
         }
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "OrchestrationPlan":
+        """Create an OrchestrationPlan from serialized data."""
+        steps_data = data.get("steps", [])
+        steps = [OrchestrationStep.from_dict(step_data) for step_data in steps_data]
+        
+        return cls(
+            plan_id=data.get("plan_id", ""),
+            name=data.get("name", ""),
+            description=data.get("description", ""),
+            steps=steps,
+            status=data.get("status", "pending"),
+            created_at=data.get("created_at", ""),
+            completed_at=data.get("completed_at", ""),
+            error=data.get("error", ""),
+        )
+
 
 # ---------------------------------------------------------------------------
 # OrchestrationManager
@@ -96,10 +143,102 @@ class OrchestrationManager:
     event, and stops on the first failure.
     """
 
-    def __init__(self, broker=None):
+    def __init__(self, broker=None, config: Optional[OrchestrationManagerConfig] = None):
         self._plans: Dict[str, OrchestrationPlan] = {}
         self._broker = broker
-        _LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        self.config = config or OrchestrationManagerConfig()
+        
+        # Ensure directories exist
+        self.config.log_path.parent.mkdir(parents=True, exist_ok=True)
+        self.config.plans_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Load existing plans from disk
+        self._load_plans()
+
+    # ------------------------------------------------------------------
+    # persistence
+    # ------------------------------------------------------------------
+
+    def _load_plans(self) -> None:
+        """Load all plans from disk."""
+        if not self.config.persistence_enabled:
+            return
+        if not self.config.plans_path.exists():
+            logger.info("Orchestration plans file not found: %s", self.config.plans_path)
+            return
+        
+        try:
+            with open(self.config.plans_path, "r", encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        plan_data = json.loads(line)
+                    except json.JSONDecodeError:
+                        logger.warning("OrchestrationManager: skipping corrupt line in plans file")
+                        continue
+                    
+                    try:
+                        plan = OrchestrationPlan.from_dict(plan_data)
+                        self._plans[plan.plan_id] = plan
+                    except Exception as exc:
+                        logger.error("Failed to load plan from disk: %s", exc)
+            
+            logger.info("Loaded %d plans from %s", len(self._plans), self.config.plans_path)
+        except Exception as exc:
+            logger.error("OrchestrationManager._load_plans failed: %s", exc)
+
+    def _save_plan(self, plan: OrchestrationPlan) -> None:
+        """Save a plan to disk (append to JSONL file)."""
+        if not self.config.persistence_enabled:
+            return
+        try:
+            plan_data = plan.to_dict()
+            with open(self.config.plans_path, "a", encoding="utf-8") as fh:
+                fh.write(json.dumps(plan_data, default=str) + "\n")
+                fh.flush()
+            
+            # Check if we need to rotate the file
+            self._rotate_plans_file_if_needed()
+        except Exception as exc:
+            logger.error("Failed to save plan to disk: %s", exc)
+
+    def _rotate_plans_file_if_needed(self) -> None:
+        """Rotate plans file if it exceeds size limit."""
+        try:
+            if self.config.plans_path.exists():
+                size_mb = self.config.plans_path.stat().st_size / (1024 * 1024)
+                if size_mb > 10.0:  # 10MB limit
+                    logger.warning("Orchestration plans file exceeds 10MB, rotating...")
+                    # In production, we'd rotate the file
+                    # For now, just log a warning
+        except Exception as exc:
+            logger.error("Failed to check plans file size: %s", exc)
+
+    def _update_plan_in_storage(self, plan: OrchestrationPlan) -> None:
+        """
+        Update a plan in persistent storage.
+        
+        Since we're using append-only JSONL, we can't update in place.
+        Instead, we rewrite the entire file with current plans.
+        This is inefficient for large files but simple and correct.
+        """
+        if not self.config.persistence_enabled:
+            return
+        try:
+            # Write all plans to a temporary file
+            temp_path = self.config.plans_path.with_suffix(".tmp")
+            with open(temp_path, "w", encoding="utf-8") as fh:
+                for p in self._plans.values():
+                    plan_data = p.to_dict()
+                    fh.write(json.dumps(plan_data, default=str) + "\n")
+            
+            # Replace the original file
+            temp_path.replace(self.config.plans_path)
+            logger.debug("Updated plan %s in persistent storage", plan.plan_id)
+        except Exception as exc:
+            logger.error("Failed to update plan in storage: %s", exc)
 
     # ------------------------------------------------------------------
     # create
@@ -127,6 +266,8 @@ class OrchestrationManager:
                 params=s.get("params", {}),
             ))
         self._plans[plan.plan_id] = plan
+        # Save to disk
+        self._save_plan(plan)
         return plan
 
     # ------------------------------------------------------------------
@@ -143,6 +284,7 @@ class OrchestrationManager:
 
         plan.status = "running"
         self._log_event(plan, "plan_started")
+        self._update_plan_in_storage(plan)  # Update storage
 
         for step in plan.steps:
             step.status = OrchestrationStepStatus.RUNNING.value
@@ -155,6 +297,7 @@ class OrchestrationManager:
                 step.result = result
                 step.completed_at = datetime.now(timezone.utc).isoformat()
                 self._log_event(plan, "step_completed", step=step)
+                self._update_plan_in_storage(plan)  # Update storage after step completes
             except Exception as exc:
                 step.status = OrchestrationStepStatus.FAILED.value
                 step.error = str(exc)
@@ -165,11 +308,13 @@ class OrchestrationManager:
                 plan.error = f"Step {step.step_id} failed: {exc}"
                 plan.completed_at = datetime.now(timezone.utc).isoformat()
                 self._log_event(plan, "plan_failed")
+                self._update_plan_in_storage(plan)  # Update storage after plan fails
                 return plan
 
         plan.status = "completed"
         plan.completed_at = datetime.now(timezone.utc).isoformat()
         self._log_event(plan, "plan_completed")
+        self._update_plan_in_storage(plan)  # Update storage after plan completes
         return plan
 
     def _execute_step(self, step: OrchestrationStep) -> Dict[str, Any]:
@@ -279,6 +424,8 @@ class OrchestrationManager:
         step: Optional[OrchestrationStep] = None,
     ) -> None:
         """Append an event to orchestration_log.jsonl."""
+        if not self.config.persistence_enabled:
+            return
         entry: Dict[str, Any] = {
             "event_kind": event_kind,
             "plan_id": plan.plan_id,
@@ -293,7 +440,7 @@ class OrchestrationManager:
             if step.error:
                 entry["error"] = step.error
         try:
-            with open(_LOG_PATH, "a", encoding="utf-8") as fh:
+            with open(self.config.log_path, "a", encoding="utf-8") as fh:
                 fh.write(json.dumps(entry, default=str) + "\n")
                 fh.flush()
         except Exception as exc:

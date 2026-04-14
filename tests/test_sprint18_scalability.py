@@ -13,10 +13,6 @@ from simp.server.broker import SimpBroker, BrokerConfig
 
 
 class TestAsyncHealthChecks:
-    @pytest.fixture
-    def broker(self):
-        config = BrokerConfig(max_agents=100, health_check_interval=60)
-        return SimpBroker(config)
 
     def test_health_check_loop_is_async(self, broker):
         """Health check loop should be an async coroutine."""
@@ -44,10 +40,6 @@ class TestAsyncHealthChecks:
 
 
 class TestConnectionPooling:
-    @pytest.fixture
-    def broker(self):
-        config = BrokerConfig(max_agents=100, health_check_interval=60)
-        return SimpBroker(config)
 
     def test_broker_has_http_pool_attribute(self, broker):
         """Broker should have an HTTP pool attribute (None before start)."""
@@ -79,10 +71,6 @@ class TestConnectionPooling:
 
 
 class TestDeadAgentCleanup:
-    @pytest.fixture
-    def broker(self):
-        config = BrokerConfig(max_agents=100, health_check_interval=60)
-        return SimpBroker(config)
 
     def test_agent_info_has_failure_counter(self, broker):
         """Registered agents should track health check failures."""
@@ -148,10 +136,6 @@ class TestDeadAgentCleanup:
 
 
 class TestIntentQueueWorker:
-    @pytest.fixture
-    def broker(self):
-        config = BrokerConfig(max_agents=100, health_check_interval=60)
-        return SimpBroker(config)
 
     def test_intent_queue_exists(self, broker):
         """Broker should have an intent queue."""

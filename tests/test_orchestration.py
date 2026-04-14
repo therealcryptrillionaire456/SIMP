@@ -120,7 +120,9 @@ class TestGetAndListPlans(unittest.TestCase):
         assert mgr.get_plan("bad-id") is None
 
     def test_list_plans(self):
-        mgr = OrchestrationManager()
+        from simp.orchestration.orchestration_manager import OrchestrationManagerConfig
+        config = OrchestrationManagerConfig(persistence_enabled=False)
+        mgr = OrchestrationManager(config=config)
         mgr.create_plan("Plan A", "", [{"name": "S1"}])
         mgr.create_plan("Plan B", "", [{"name": "S1"}])
         plans = mgr.list_plans()
