@@ -224,6 +224,7 @@ class SimpHttpServer:
         self._setup_security_hooks()
         self._setup_routes()
         self._setup_a2a_routes()
+        self._setup_mesh_routes()
         self._setup_sprint51_55_routes()
         self.logger.info("SIMP HTTP Server initialized")
 
@@ -1425,6 +1426,228 @@ class SimpHttpServer:
                 return jsonify({"status": "acknowledged", "alert": alert.to_dict()}), 200
             except ValueError as exc:
                 return jsonify({"status": "error", "error": str(exc)}), 400
+
+    # ------------------------------------------------------------------
+    # Mesh Bus routes (agent-to-agent messaging)
+    # ------------------------------------------------------------------
+
+    def _setup_mesh_routes(self):
+        """Setup Mesh Bus routes for agent-to-agent messaging."""
+
+        @self.app.route("/mesh/send", methods=["POST"])
+        @_require_api_key
+        def mesh_send():
+            """Send a mesh packet."""
+            data = request.get_json(silent=True) or {}
+            
+            # Validate required fields
+            if not data.get("sender_id"):
+                return jsonify({"status": "error", "error": "Missing sender_id"}), 400
+            if not data.get("recipient_id") and not data.get("channel"):
+                return jsonify({"status": "error", "error": "Missing recipient_id or channel"}), 400
+            
+            try:
+                # Create mesh packet from request data
+                from simp.mesh import MeshPacket
+                packet = MeshPacket.from_dict(data)
+                
+                # Send via broker's mesh bus
+                success = self.broker.mesh_bus.send(packet)
+                
+                if success:
+                    return jsonify({
+                        "status": "success",
+                        "message_id": packet.message_id,
+                        "message": "Packet sent successfully"
+                    }), 200
+                else:
+                    return jsonify({
+                        "status": "error",
+                        "error": "Failed to send packet (may be expired or invalid)"
+                    }), 400
+                    
+            except Exception as e:
+                self.logger.error(f"Error sending mesh packet: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
+        @self.app.route("/mesh/poll", methods=["GET"])
+        @_require_api_key
+        def mesh_poll():
+            """Poll for mesh messages."""
+            agent_id = request.args.get("agent_id")
+            max_messages = int(request.args.get("max_messages", 10))
+            
+            if not agent_id:
+                return jsonify({"status": "error", "error": "Missing agent_id parameter"}), 400
+            
+            try:
+                # Get messages from broker's mesh bus
+                messages = self.broker.mesh_bus.receive(agent_id, max_messages)
+                
+                # Convert to dict for JSON serialization
+                messages_dict = [msg.to_dict() for msg in messages]
+                
+                return jsonify({
+                    "status": "success",
+                    "agent_id": agent_id,
+                    "messages": messages_dict,
+                    "count": len(messages_dict)
+                }), 200
+                
+            except Exception as e:
+                self.logger.error(f"Error polling mesh messages: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
+        @self.app.route("/mesh/subscribe", methods=["POST"])
+        @_require_api_key
+        def mesh_subscribe():
+            """Subscribe agent to a channel."""
+            data = request.get_json(silent=True) or {}
+            agent_id = data.get("agent_id")
+            channel = data.get("channel")
+            
+            if not agent_id or not channel:
+                return jsonify({"status": "error", "error": "Missing agent_id or channel"}), 400
+            
+            try:
+                success = self.broker.mesh_bus.subscribe(agent_id, channel)
+                
+                if success:
+                    return jsonify({
+                        "status": "success",
+                        "agent_id": agent_id,
+                        "channel": channel,
+                        "message": f"Subscribed to channel {channel}"
+                    }), 200
+                else:
+                    return jsonify({
+                        "status": "error",
+                        "error": f"Failed to subscribe agent {agent_id} to channel {channel}"
+                    }), 400
+                    
+            except Exception as e:
+                self.logger.error(f"Error subscribing to mesh channel: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
+        @self.app.route("/mesh/unsubscribe", methods=["POST"])
+        @_require_api_key
+        def mesh_unsubscribe():
+            """Unsubscribe agent from a channel."""
+            data = request.get_json(silent=True) or {}
+            agent_id = data.get("agent_id")
+            channel = data.get("channel")
+            
+            if not agent_id or not channel:
+                return jsonify({"status": "error", "error": "Missing agent_id or channel"}), 400
+            
+            try:
+                success = self.broker.mesh_bus.unsubscribe(agent_id, channel)
+                
+                if success:
+                    return jsonify({
+                        "status": "success",
+                        "agent_id": agent_id,
+                        "channel": channel,
+                        "message": f"Unsubscribed from channel {channel}"
+                    }), 200
+                else:
+                    return jsonify({
+                        "status": "error",
+                        "error": f"Failed to unsubscribe agent {agent_id} from channel {channel}"
+                    }), 400
+                    
+            except Exception as e:
+                self.logger.error(f"Error unsubscribing from mesh channel: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
+        @self.app.route("/mesh/stats", methods=["GET"])
+        @_require_api_key
+        def mesh_stats():
+            """Get mesh bus statistics."""
+            try:
+                stats = self.broker.mesh_bus.get_statistics()
+                return jsonify({
+                    "status": "success",
+                    "statistics": stats
+                }), 200
+            except Exception as e:
+                self.logger.error(f"Error getting mesh stats: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
+        @self.app.route("/mesh/agent/<agent_id>/status", methods=["GET"])
+        @_require_api_key
+        def mesh_agent_status(agent_id):
+            """Get mesh status for a specific agent."""
+            try:
+                status = self.broker.mesh_bus.get_agent_status(agent_id)
+                
+                if status:
+                    return jsonify({
+                        "status": "success",
+                        "agent_id": agent_id,
+                        "mesh_status": status
+                    }), 200
+                else:
+                    return jsonify({
+                        "status": "error",
+                        "error": f"Agent {agent_id} not found in mesh bus"
+                    }), 404
+                    
+            except Exception as e:
+                self.logger.error(f"Error getting mesh agent status: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
+        @self.app.route("/mesh/channels", methods=["GET"])
+        @_require_api_key
+        def mesh_channels():
+            """Get list of mesh channels with subscriber counts."""
+            try:
+                stats = self.broker.mesh_bus.get_statistics()
+                channels = stats.get("channels", {})
+                
+                return jsonify({
+                    "status": "success",
+                    "channels": channels,
+                    "count": len(channels)
+                }), 200
+            except Exception as e:
+                self.logger.error(f"Error getting mesh channels: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
+        @self.app.route("/mesh/events", methods=["GET"])
+        @_require_api_key
+        def mesh_events():
+            """Get recent mesh events (for debugging)."""
+            try:
+                # Read last N lines from mesh events log
+                log_path = Path(__file__).parent.parent.parent / "data" / "mesh_events.jsonl"
+                if not log_path.exists():
+                    return jsonify({
+                        "status": "success",
+                        "events": [],
+                        "count": 0,
+                        "message": "No mesh events log found"
+                    }), 200
+                
+                limit = int(request.args.get("limit", 100))
+                events = []
+                
+                with open(log_path, "r") as f:
+                    lines = f.readlines()
+                    for line in lines[-limit:]:
+                        try:
+                            events.append(json.loads(line.strip()))
+                        except json.JSONDecodeError:
+                            continue
+                
+                return jsonify({
+                    "status": "success",
+                    "events": events,
+                    "count": len(events)
+                }), 200
+            except Exception as e:
+                self.logger.error(f"Error reading mesh events: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
 
     # ------------------------------------------------------------------
     # Sprint 51-55 routes (routing policy, orchestration)

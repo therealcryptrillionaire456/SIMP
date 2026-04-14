@@ -39,6 +39,7 @@ except ImportError:
 
 from simp.security.brp_models import BRPPlan, BRPMode, BRPEvent, BRPEventType, BRPObservation
 from simp.security.brp_bridge import BRPBridge
+from simp.mesh import get_mesh_bus
 
 
 def _utcnow_iso() -> str:
@@ -199,6 +200,9 @@ class SimpBroker:
         # ProjectX computer-use layer (optional)
         self._projectx: Optional[ProjectXComputer] = None
 
+        # MeshBus for agent-to-agent messaging (SIMP-native Agent Mesh Bus)
+        self.mesh_bus = get_mesh_bus()
+
         # HTTP connection pool (initialized in start(), closed in stop())
         self._http_pool: Optional["httpx.AsyncClient"] = None
 
@@ -350,6 +354,16 @@ class SimpBroker:
                 f"✅ Agent registered: {agent_id} ({agent_type}) → {endpoint}"
             )
             self._log_event("agent_registered", f"Agent {agent_id} registered", agent_id=agent_id)
+            
+            # Register agent with MeshBus
+            try:
+                self.mesh_bus.register_agent(agent_id)
+                # Auto-subscribe to safety alerts channel for all agents
+                self.mesh_bus.subscribe(agent_id, "safety_alerts")
+                self.logger.debug(f"Agent {agent_id} registered with MeshBus")
+            except Exception as e:
+                self.logger.warning(f"Failed to register agent {agent_id} with MeshBus: {e}")
+            
             return True
 
     def deregister_agent(self, agent_id: str) -> bool:
@@ -359,6 +373,14 @@ class SimpBroker:
                 del self.agents[agent_id]
                 self.logger.info(f"✅ Agent deregistered: {agent_id}")
                 self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
+                
+                # Deregister agent from MeshBus
+                try:
+                    self.mesh_bus.deregister_agent(agent_id)
+                    self.logger.debug(f"Agent {agent_id} deregistered from MeshBus")
+                except Exception as e:
+                    self.logger.warning(f"Failed to deregister agent {agent_id} from MeshBus: {e}")
+                
                 return True
             return False
 
