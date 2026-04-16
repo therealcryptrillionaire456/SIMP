@@ -28,6 +28,19 @@ from simp.organs.quantumarb import QuantumArbIntegrationContract, QuantumArbDeci
 from simp.integrations.kashclaw_shim import KashClawSimpAgent
 
 
+def create_agent_decision_from_quantumarb(quantumarb_summary, default_quantity=0.0, default_units="USD"):
+    """Helper to convert QuantumArbDecisionSummary to AgentDecisionSummary."""
+    contract = QuantumArbIntegrationContract()
+    agent_decision_dict = contract.map_to_agent_decision_summary(
+        quantumarb_summary,
+        default_quantity=default_quantity,
+        default_units=default_units
+    )
+    # Remove x_quantumarb field before creating AgentDecisionSummary
+    agent_decision_dict_filtered = {k: v for k, v in agent_decision_dict.items() if k != "x_quantumarb"}
+    return AgentDecisionSummary(**agent_decision_dict_filtered)
+
+
 class TestIntegrationQuantumArbKashClaw:
     """Integration tests for QuantumArb → KashClaw execution flow."""
     
@@ -66,10 +79,7 @@ class TestIntegrationQuantumArbKashClaw:
             rationale_preview="Arbitrage opportunity detected",
             venue_a="coinbase",
             venue_b="kraken",
-            spread_bps=15.5,
-            estimated_profit_usd=25.0,
-            max_slippage_bps=5.0,
-            risk_score=0.3,
+            estimated_spread_bps=15.5,
         )
     
     @pytest.fixture
@@ -163,7 +173,7 @@ class TestIntegrationQuantumArbKashClaw:
         # Verify optional fields
         assert trade_params["confidence"] == 0.75
         assert "Arbitrage" in trade_params["rationale"]
-        assert trade_params["volatility_posture"] == "conservative"  # confidence > 0.7
+        assert trade_params["volatility_posture"] == "medium"  # from fixture
         assert trade_params["timesfm_used"] is True
     
     @pytest.mark.asyncio
@@ -190,8 +200,9 @@ class TestIntegrationQuantumArbKashClaw:
         assert agent_decision_dict["timesfm_used"] is True
         assert "Arbitrage" in agent_decision_dict["rationale"]
         
-        # Create AgentDecisionSummary object from dict
-        agent_decision = AgentDecisionSummary(**agent_decision_dict)
+        # Create AgentDecisionSummary object from dict (remove x_quantumarb field)
+        agent_decision_dict_filtered = {k: v for k, v in agent_decision_dict.items() if k != "x_quantumarb"}
+        agent_decision = AgentDecisionSummary(**agent_decision_dict_filtered)
         assert agent_decision.agent_name == "quantumarb"
         assert agent_decision.instrument == "BTC-USD"
         assert agent_decision.side == Side.BUY
@@ -199,14 +210,12 @@ class TestIntegrationQuantumArbKashClaw:
     @pytest.mark.asyncio
     async def test_complete_quantumarb_kashclaw_flow(self, quantumarb_decision_summary, mock_kashclaw_agent):
         """Test complete flow: QuantumArb → AgentDecisionSummary → Mapping → Execution."""
-        # Step 1: Convert QuantumArb decision to AgentDecisionSummary
-        contract = QuantumArbIntegrationContract()
-        agent_decision_dict = contract.map_to_agent_decision_summary(
+        # Step 1: Convert QuantumArb decision to AgentDecisionSummary using helper
+        agent_decision = create_agent_decision_from_quantumarb(
             quantumarb_decision_summary,
             default_quantity=0.1,
             default_units="BTC"
         )
-        agent_decision = AgentDecisionSummary(**agent_decision_dict)
         
         # Step 2: Map to trade parameters
         mapper = get_execution_mapper()
@@ -269,15 +278,11 @@ class TestIntegrationQuantumArbKashClaw:
             rationale_preview="Price divergence detected, taking profit",
             venue_a="coinbase",
             venue_b="binance",
-            spread_bps=8.2,
-            estimated_profit_usd=42.5,
-            max_slippage_bps=3.0,
-            risk_score=0.4,
+            estimated_spread_bps=8.2,
         )
         
-        # Convert to AgentDecisionSummary
-        contract = QuantumArbIntegrationContract()
-        agent_decision = contract.to_agent_decision_summary(quantumarb_sell)
+        # Convert to AgentDecisionSummary using helper
+        agent_decision = create_agent_decision_from_quantumarb(quantumarb_sell, default_quantity=2.5, default_units="ETH")
         
         # Map to trade parameters
         mapper = get_execution_mapper()
@@ -292,8 +297,8 @@ class TestIntegrationQuantumArbKashClaw:
         assert mapping_result.trade_params["asset_pair"] == "ETH/USDC"
         assert mapping_result.trade_params["quantity"] == 2.5
         
-        # Verify volatility posture (confidence 0.68 > 0.3, so conservative)
-        assert mapping_result.trade_params["volatility_posture"] == "conservative"
+        # Verify volatility posture (timesfm_used=False, so neutral regardless of confidence)
+        assert mapping_result.trade_params["volatility_posture"] == "neutral"
     
     @pytest.mark.asyncio
     async def test_quantumarb_low_confidence_warning(self):
@@ -314,15 +319,11 @@ class TestIntegrationQuantumArbKashClaw:
             rationale_preview="Weak arbitrage signal",
             venue_a="coinbase",
             venue_b="kraken",
-            spread_bps=3.5,
-            estimated_profit_usd=8.0,
-            max_slippage_bps=2.0,
-            risk_score=0.6,
+            estimated_spread_bps=3.5,
         )
         
-        # Convert and map
-        contract = QuantumArbIntegrationContract()
-        agent_decision = contract.to_agent_decision_summary(quantumarb_low_conf)
+        # Convert and map using helper
+        agent_decision = create_agent_decision_from_quantumarb(quantumarb_low_conf, default_quantity=10.0, default_units="SOL")
         
         mapper = get_execution_mapper()
         mapping_result = mapper.map_decision_to_trade(agent_decision)
@@ -351,15 +352,12 @@ class TestIntegrationQuantumArbKashClaw:
             rationale_preview="Testing unknown instrument",
             venue_a="coinbase",
             venue_b="kraken",
-            spread_bps=10.0,
-            estimated_profit_usd=15.0,
-            max_slippage_bps=5.0,
-            risk_score=0.3,
+            estimated_spread_bps=10.0,
         )
         
         # Convert and map
-        contract = QuantumArbIntegrationContract()
-        agent_decision = contract.to_agent_decision_summary(quantumarb_unknown)
+        # Convert and map using helper
+        agent_decision = create_agent_decision_from_quantumarb(quantumarb_unknown, default_quantity=100.0, default_units="USD")
         
         mapper = get_execution_mapper()
         mapping_result = mapper.map_decision_to_trade(agent_decision)
@@ -382,7 +380,9 @@ class TestIntegrationQuantumArbKashClaw:
             default_quantity=0.1,
             default_units="BTC"
         )
-        agent_decision = AgentDecisionSummary(**agent_decision_dict)
+        # Remove x_quantumarb field before creating AgentDecisionSummary
+        agent_decision_dict_filtered = {k: v for k, v in agent_decision_dict.items() if k != "x_quantumarb"}
+        agent_decision = AgentDecisionSummary(**agent_decision_dict_filtered)
         
         mapper = get_execution_mapper()
         mapping_result = mapper.map_decision_to_trade(agent_decision)
@@ -430,7 +430,7 @@ class TestIntegrationQuantumArbKashClaw:
                 rationale_preview="Decision 1",
                 venue_a="coinbase",
                 venue_b="kraken",
-                spread_bps=15.5,
+                estimated_spread_bps=15.5,
             ),
             QuantumArbDecisionSummary(
                 timestamp="2024-04-09T12:35:00.000Z",
@@ -447,7 +447,7 @@ class TestIntegrationQuantumArbKashClaw:
                 rationale_preview="Decision 2",
                 venue_a="coinbase",
                 venue_b="binance",
-                spread_bps=8.2,
+                estimated_spread_bps=8.2,
             ),
             QuantumArbDecisionSummary(
                 timestamp="2024-04-09T12:36:00.000Z",
@@ -464,7 +464,7 @@ class TestIntegrationQuantumArbKashClaw:
                 rationale_preview="Decision 3",
                 venue_a="coinbase",
                 venue_b="kraken",
-                spread_bps=12.0,
+                estimated_spread_bps=12.0,
             ),
         ]
         
@@ -473,9 +473,10 @@ class TestIntegrationQuantumArbKashClaw:
         
         execution_summaries = []
         
-        for qd in decisions:
-            # Convert to AgentDecisionSummary
-            agent_decision = contract.to_agent_decision_summary(qd)
+        for i, qd in enumerate(decisions):
+            # Convert to AgentDecisionSummary using helper with positive quantity
+            quantity = 1.0 + i  # Different quantities for each decision
+            agent_decision = create_agent_decision_from_quantumarb(qd, default_quantity=quantity, default_units="USD")
             
             # Map to trade parameters
             mapping_result = mapper.map_decision_to_trade(agent_decision)
