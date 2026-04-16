@@ -493,9 +493,16 @@ class MeshDiscoveryService:
         # Get online peers
         online_peers = self.get_peers(status=PeerStatus.ONLINE)
         
-        # TODO: Update mesh bus routing table with peers
-        # This would involve creating MeshPeer objects for the mesh bus
-        # For now, we'll just log the peers
+        # Add peers to gossip router
+        for peer in online_peers:
+            if peer.agent_id != self.local_agent_id:  # Don't add ourselves
+                # Check if peer has an endpoint
+                if peer.endpoint:
+                    try:
+                        self._mesh_bus.add_gossip_peer(peer.agent_id, peer.endpoint)
+                        logger.debug(f"Added peer {peer.agent_id} to gossip router")
+                    except Exception as e:
+                        logger.warning(f"Failed to add peer {peer.agent_id} to gossip router: {e}")
         
         if online_peers:
             logger.debug(f"Mesh bus routing: {len(online_peers)} online peers available")

@@ -718,6 +718,33 @@ class SmartMeshClient:
         
         return stats
     
+    def process_incoming_packet(self, packet: MeshPacket, source_peer_id: Optional[str] = None) -> None:
+        """
+        Process a packet received from a remote peer via transport.
+        
+        This method should be called when a packet is received via HTTP, BLE, or Nostr
+        transport. It hands the packet to the gossip router for re-flooding.
+        
+        Args:
+            packet: The received mesh packet
+            source_peer_id: ID of the peer that sent this packet (if known)
+        """
+        if not self._mesh_bus:
+            logger.warning("Direct mesh bus not available, cannot process incoming packet")
+            return
+        
+        try:
+            # Hand packet to gossip router for re-flooding
+            self._mesh_bus.gossip_receive(packet, from_peer_id=source_peer_id)
+            logger.debug(f"Processed incoming packet {packet.message_id} from {source_peer_id or 'unknown'}")
+            
+            # Update statistics
+            self._stats["packets_received"] = self._stats.get("packets_received", 0) + 1
+            
+        except Exception as e:
+            logger.error(f"Failed to process incoming packet {packet.message_id}: {e}")
+            self._stats["packet_errors"] = self._stats.get("packet_errors", 0) + 1
+    
     def close(self):
         """Close client and release resources."""
         self.stop_health_monitoring()

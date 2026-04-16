@@ -12,7 +12,23 @@ from .packet import (
     create_system_packet,
     create_heartbeat_packet,
 )
-from .bus import MeshBus, get_mesh_bus
+from .bus import MeshBus
+from .enhanced_bus import (
+    EnhancedMeshBus,
+    get_enhanced_mesh_bus,
+    OfflineMessageStore,
+    BloomFilter,
+    DeliveryReceipt,
+    DeliveryReceiptManager,
+    PaymentChannel,
+    PaymentSettler,
+    GossipRouter,
+    ChannelState,
+    MessageStatus,
+)
+
+# Alias: anything that calls get_mesh_bus() transparently gets the enhanced bus
+get_mesh_bus = get_enhanced_mesh_bus
 
 __all__ = [
     "MeshPacket",
@@ -22,7 +38,18 @@ __all__ = [
     "create_system_packet",
     "create_heartbeat_packet",
     "MeshBus",
+    "EnhancedMeshBus",
     "get_mesh_bus",
+    "get_enhanced_mesh_bus",
+    "OfflineMessageStore",
+    "BloomFilter",
+    "DeliveryReceipt",
+    "DeliveryReceiptManager",
+    "PaymentChannel",
+    "PaymentSettler",
+    "GossipRouter",
+    "ChannelState",
+    "MessageStatus",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
