@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMP Dashboard - Working</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        .status-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 1.5em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .agent-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .agent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .agent-item.offline {
+            border-left-color: #f44336;
+        }
+        
+        .agent-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .agent-type {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .agent-status {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .status-online {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-offline {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+        }
+        
+        .btn-secondary {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #0b7dda;
+        }
+        
+        .refresh-info {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .timestamp {
+            color: #999;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🚀 SIMP Dashboard</h1>
+                <div class="subtitle">Real-time Multi-Agent Trading System Monitor</div>
+            </div>
+            <div class="status-badge" id="system-status">Loading...</div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2>📊 System Overview</h2>
+                <div class="stats-grid" id="system-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="agents-total">-</div>
+                        <div class="stat-label">Total Agents</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="agents-online">-</div>
+                        <div class="stat-label">Online Agents</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="pending-intents">-</div>
+                        <div class="stat-label">Pending Intents</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="file-agents">-</div>
+                        <div class="stat-label">File-based Agents</div>
+                    </div>
+                </div>
+                <div class="timestamp" id="last-updated">Last updated: -</div>
+            </div>
+            
+            <div class="card">
+                <h2>🤖 Active Agents</h2>
+                <div class="agent-list" id="agents-list">
+                    <div class="agent-item">
+                        <div>
+                            <div class="agent-name">Loading agents...</div>
+                            <div class="agent-type">Fetching data from broker</div>
+                        </div>
+                        <div class="agent-status status-online">Online</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh Now</button>
+                    <button class="btn btn-secondary" onclick="sendTestIntent()">🚀 Send Test Intent</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>⚡ Quick Actions</h2>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="openDashboard()">📊 Open Full Dashboard</button>
+                <button class="btn btn-secondary" onclick="checkBrokerHealth()">❤️ Check Broker Health</button>
+                <button class="btn btn-secondary" onclick="viewAgentDetails()">🔍 View Agent Details</button>
+            </div>
+            <div class="refresh-info">
+                Auto-refreshing every 10 seconds | 
+                <span id="next-refresh">Next refresh in: 10s</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        let countdown = 10;
+        
+        async function fetchData() {
+            try {
+                // Update countdown
+                countdown = 10;
+                updateCountdown();
+                
+                // Fetch system health
+                const healthRes = await fetch('/api/health');
+                const health = await healthRes.json();
+                
+                // Fetch agents
+                const agentsRes = await fetch('/api/agents');
+                const agentsData = await agentsRes.json();
+                
+                // Fetch stats
+                const statsRes = await fetch('/api/stats');
+                const stats = await statsRes.json();
+                
+                updateDashboard(health, agentsData, stats);
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('system-status').textContent = 'Error';
+                document.getElementById('system-status').style.background = '#f44336';
+                
+                document.getElementById('agents-list').innerHTML = `
+                    <div class="error">
+                        Error loading data: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function updateDashboard(health, agentsData, stats) {
+            const agents = agentsData.agents || {};
+            const agentList = Object.entries(agents);
+            
+            // Update system status
+            const systemStatus = document.getElementById('system-status');
+            if (health.broker === 'ok') {
+                systemStatus.textContent = '✅ System Healthy';
+                systemStatus.style.background = '#4CAF50';
+            } else {
+                systemStatus.textContent = '⚠️ System Issues';
+                systemStatus.style.background = '#ff9800';
+            }
+            
+            // Update stats
+            document.getElementById('agents-total').textContent = agentList.length;
+            document.getElementById('agents-online').textContent = 
+                agentList.filter(([_, a]) => a.status === 'online' || a.status === 'active').length;
+            document.getElementById('pending-intents').textContent = 
+                health.broker_details?.pending_intents || 0;
+            document.getElementById('file-agents').textContent = 
+                agentList.filter(([_, a]) => a.file_based).length;
+            
+            // Update agent list
+            const agentsListEl = document.getElementById('agents-list');
+            if (agentList.length === 0) {
+                agentsListEl.innerHTML = '<div class="error">No agents registered</div>';
+            } else {
+                agentsListEl.innerHTML = agentList.map(([id, agent]) => `
+                    <div class="agent-item ${agent.status !== 'online' && agent.status !== 'active' ? 'offline' : ''}">
+                        <div>
+                            <div class="agent-name">${id}</div>
+                            <div class="agent-type">${agent.agent_type || 'Unknown'} • ${agent.file_based ? 'File-based' : 'HTTP'}</div>
+                        </div>
+                        <div class="agent-status ${agent.status === 'online' || agent.status === 'active' ? 'status-online' : 'status-offline'}">
+                            ${agent.status || 'unknown'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Update timestamp
+            const now = new Date();
+            document.getElementById('last-updated').textContent = 
+                `Last updated: ${now.toLocaleTimeString()}`;
+        }
+        
+        function updateCountdown() {
+            const countdownEl = document.getElementById('next-refresh');
+            countdownEl.textContent = `Next refresh in: ${countdown}s`;
+            
+            if (countdown > 0) {
+                countdown--;
+                setTimeout(updateCountdown, 1000);
+            }
+        }
+        
+        function refreshData() {
+            fetchData();
+        }
+        
+        async function sendTestIntent() {
+            try {
+                const response = await fetch('http://localhost:5555/intents/route', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        intent_type: 'trade_execution',
+                        source_agent: 'dashboard',
+                        target_agent: 'gate4_real',
+                        params: {
+                            symbol: 'BTC-USD',
+                            amount: 0.001,
+                            side: 'buy',
+                            test_mode: true,
+                            note: 'Test from dashboard'
+                        }
+                    })
+                });
+                
+                const result = await response.json();
+                alert(`Test intent sent!\nIntent ID: ${result.intent_id}\nStatus: ${result.status}`);
+                
+                // Refresh data to show new intent
+                refreshData();
+                
+            } catch (error) {
+                alert(`Error sending intent: ${error.message}`);
+            }
+        }
+        
+        function openDashboard() {
+            window.open('http://localhost:8050', '_blank');
+        }
+        
+        async function checkBrokerHealth() {
+            try {
+                const response = await fetch('http://localhost:5555/health');
+                const health = await response.json();
+                alert(`Broker Health:\nStatus: ${health.status}\nAgents Online: ${health.agents_online}\nPending Intents: ${health.pending_intents}`);
+            } catch (error) {
+                alert(`Error checking broker: ${error.message}`);
+            }
+        }
+        
+        function viewAgentDetails() {
+            window.open('http://localhost:8050/api/agents', '_blank');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load data immediately
+            fetchData();
+            
+            // Set up auto-refresh every 10 seconds
+            refreshInterval = setInterval(fetchData, 10000);
+            
+            // Start countdown
+            updateCountdown();
+        });
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>
