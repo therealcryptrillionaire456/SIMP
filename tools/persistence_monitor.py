@@ -143,9 +143,23 @@ class PersistenceMonitor:
     
     def get_summary_stats(self) -> Dict[str, Any]:
         """Get summary statistics for all recorded metrics"""
+        # Always include timestamp and file stats
+        result = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "file_stats": self.get_file_stats()
+        }
+        
         with self._lock:
             if not self.metrics:
-                return {"total_operations": 0}
+                result.update({
+                    "total_operations": 0,
+                    "success_rate": 0,
+                    "avg_duration_ms": 0,
+                    "min_duration_ms": 0,
+                    "max_duration_ms": 0,
+                    "operations": {}
+                })
+                return result
             
             # Group by operation
             by_operation = {}
@@ -170,16 +184,16 @@ class PersistenceMonitor:
             all_durations = [m.duration_ms for m in self.metrics]
             success_count = sum(1 for m in self.metrics if m.success)
             
-            return {
+            result.update({
                 "total_operations": len(self.metrics),
                 "success_rate": success_count / len(self.metrics) if self.metrics else 0,
                 "avg_duration_ms": statistics.mean(all_durations) if all_durations else 0,
                 "min_duration_ms": min(all_durations) if all_durations else 0,
                 "max_duration_ms": max(all_durations) if all_durations else 0,
-                "operations": operation_stats,
-                "file_stats": self.get_file_stats(),
-                "timestamp": datetime.utcnow().isoformat() + "Z"
-            }
+                "operations": operation_stats
+            })
+            
+            return result
     
     def save_metrics(self, output_path: Path):
         """Save metrics to JSON file"""
@@ -204,36 +218,58 @@ class PersistenceMonitor:
             else:
                 initial_sizes[name] = 0
         
-        print(f"Starting file growth monitoring (interval: {interval_seconds}s)")
-        print("Press Ctrl+C to stop\n")
+        try:
+            print(f"Starting file growth monitoring (interval: {interval_seconds}s)")
+            print("Press Ctrl+C to stop\n")
+        except BrokenPipeError:
+            # Pipe broken (e.g., output piped to head which exited)
+            self._running = False
+            return
         
         try:
             while self._running:
                 time.sleep(interval_seconds)
                 
                 current_stats = self.get_file_stats()
-                print(f"\n[{datetime.now().strftime('%H:%M:%S')}] File Statistics:")
-                print("-" * 80)
-                
-                for name, stats in current_stats.items():
-                    if stats.get("exists"):
-                        growth = stats["size_bytes"] - initial_sizes.get(name, 0)
-                        growth_mb = growth / (1024 * 1024)
-                        print(f"{name:20} | {stats['line_count']:8,d} lines | "
-                              f"{stats['size_bytes'] / 1024:8.1f} KB | "
-                              f"Growth: {growth_mb:+.2f} MB")
+                try:
+                    print(f"\n[{datetime.now().strftime('%H:%M:%S')}] File Statistics:")
+                    print("-" * 80)
+                    
+                    for name, stats in current_stats.items():
+                        if stats.get("exists"):
+                            growth = stats["size_bytes"] - initial_sizes.get(name, 0)
+                            growth_mb = growth / (1024 * 1024)
+                            print(f"{name:20} | {stats['line_count']:8,d} lines | "
+                                  f"{stats['size_bytes'] / 1024:8.1f} KB | "
+                                  f"Growth: {growth_mb:+.2f} MB")
+                        else:
+                            print(f"{name:20} | File does not exist")
+                    
+                    # Update initial sizes for next interval
+                    for name, stats in current_stats.items():
+                        if stats.get("exists"):
+                            initial_sizes[name] = stats["size_bytes"]
+                    
+                    sys.stdout.flush()
+                except BrokenPipeError:
+                    # Pipe broken (e.g., output piped to head which exited)
+                    self._running = False
+                    break
+                except OSError as e:
+                    # Other I/O errors
+                    if e.errno == 32:  # Broken pipe
+                        self._running = False
+                        break
                     else:
-                        print(f"{name:20} | File does not exist")
-                
-                # Update initial sizes for next interval
-                for name, stats in current_stats.items():
-                    if stats.get("exists"):
-                        initial_sizes[name] = stats["size_bytes"]
-                
-                sys.stdout.flush()
+                        # Re-raise other OSErrors
+                        raise
                 
         except KeyboardInterrupt:
-            print("\nMonitoring stopped by user")
+            try:
+                print("\nMonitoring stopped by user")
+            except BrokenPipeError:
+                # Pipe is broken, can't print
+                pass
             self._running = False
     
     def stop(self):
@@ -259,8 +295,7 @@ class PersistenceBenchmark:
         
         # Initialize AgentRegistry
         config = AgentRegistryConfig(
-            persistence_enabled=True,
-            registry_file=str(temp_file)
+            path=str(temp_file)
         )
         registry = AgentRegistry(config)
         
@@ -273,11 +308,13 @@ class PersistenceBenchmark:
             start_time = time.perf_counter()
             
             try:
-                registry.register_agent(
+                registry.register(
                     agent_id=agent_id,
-                    endpoint=f"http://127.0.0.1:{8000 + i}",
-                    capabilities=["ping", "echo"],
-                    metadata={"benchmark": True, "iteration": i}
+                    agent_data={
+                        "endpoint": f"http://127.0.0.1:{8000 + i}",
+                        "capabilities": ["ping", "echo"],
+                        "metadata": {"benchmark": True, "iteration": i}
+                    }
                 )
                 success = True
             except Exception as e:
@@ -341,9 +378,8 @@ class PersistenceBenchmark:
         
         # Initialize OrchestrationManager
         config = OrchestrationManagerConfig(
-            persistence_enabled=True,
-            plans_file=str(plans_file),
-            log_file=str(log_file)
+            plans_path=plans_file,
+            log_path=log_file
         )
         manager = OrchestrationManager(config)
         
@@ -558,6 +594,7 @@ def main():
     parser.add_argument("--iterations", type=int, default=1000, help="Iterations for benchmarking")
     parser.add_argument("--output", type=str, default="persistence_metrics.json", help="Output file for metrics")
     parser.add_argument("--data-dir", type=str, default="data", help="Data directory path")
+    parser.add_argument("--status", action="store_true", help="Show current persistence status")
     
     args = parser.parse_args()
     
@@ -566,7 +603,32 @@ def main():
         print(f"Error: Data directory does not exist: {data_dir}")
         sys.exit(1)
     
-    if args.monitor:
+    if args.status:
+        # Show current persistence status
+        monitor = PersistenceMonitor(data_dir)
+        stats = monitor.get_summary_stats()
+        print("Persistence System Status")
+        print("=" * 50)
+        print(f"Timestamp: {stats['timestamp']}")
+        print(f"Total operations: {stats['total_operations']:,}")
+        print(f"Success rate: {stats['success_rate']:.1%}")
+        print()
+        print("File Status:")
+        for name, file_stats in stats["file_stats"].items():
+            if file_stats["exists"]:
+                size_mb = file_stats["size_bytes"] / (1024 * 1024)
+                print(f"  {name:20} | {file_stats['line_count']:8,d} lines | {size_mb:8.2f} MB")
+            else:
+                print(f"  {name:20} | File does not exist")
+        print()
+        if stats["total_operations"] > 0:
+            print("Performance Statistics:")
+            print("-" * 40)
+            print(f"Avg duration: {stats['avg_duration_ms']:.3f} ms")
+            print(f"Min duration: {stats['min_duration_ms']:.3f} ms")
+            print(f"Max duration: {stats['max_duration_ms']:.3f} ms")
+    
+    elif args.monitor:
         # Run monitoring mode
         monitor = PersistenceMonitor(data_dir)
         try:
@@ -606,7 +668,7 @@ def main():
         
         print()
         
-        if stats["total_operations"] > 0:
+        if stats.get("total_operations", 0) > 0:
             print("Performance Statistics:")
             print("-" * 40)
             print(f"Total operations: {stats['total_operations']:,}")
@@ -617,15 +679,21 @@ def main():
             
             print()
             print("Operations Detail:")
-            for op, op_stats in stats["operations"].items():
+            for op, op_stats in stats.get("operations", {}).items():
                 print(f"  {op:30} | {op_stats['count']:6,d} ops | "
                       f"Avg: {op_stats['avg_ms']:6.3f} ms | "
                       f"Success: {op_stats['success_rate']:.1%}")
+        else:
+            print("No performance metrics recorded yet.")
+            print("Run benchmarks with --benchmark flag to record metrics.")
         
-        # Save metrics
+        # Save metrics only if we have some
         output_path = Path(args.output)
-        monitor.save_metrics(output_path)
-        print(f"\nMetrics saved to: {output_path}")
+        if stats.get("total_operations", 0) > 0:
+            monitor.save_metrics(output_path)
+            print(f"\nMetrics saved to: {output_path}")
+        else:
+            print(f"\nNo metrics to save (output would be: {output_path})")
 
 
 if __name__ == "__main__":
