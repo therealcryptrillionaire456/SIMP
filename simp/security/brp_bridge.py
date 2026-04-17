@@ -183,7 +183,48 @@ class BRPBridge:
 
     def _score_event(self, event: BRPEvent):
         """Return (threat_score, severity, threat_tags) for an event."""
-        return self._score_action(event.action, event.params)
+        threat_score, _, threat_tags = self._score_action(event.action, event.params)
+
+        if event.event_type == BRPEventType.MESH_INTENT.value:
+            threat_score = max(threat_score, 0.15)
+            threat_tags.append("mesh_intent")
+
+            context = event.context or {}
+            trust_score = self._coerce_float(context.get("target_trust_score"))
+            reputation_score = self._coerce_float(context.get("target_reputation_score"))
+            stake_amount = self._coerce_float(context.get("mesh_stake_amount"))
+            route_mode = str(context.get("mesh_route_mode", "")).strip().lower()
+
+            if trust_score is None:
+                threat_score = max(threat_score, 0.25)
+                threat_tags.append("missing_mesh_trust")
+            elif trust_score < 1.5:
+                threat_score = max(threat_score, 0.7)
+                threat_tags.append("low_mesh_trust")
+            elif trust_score < 3.0:
+                threat_score = max(threat_score, 0.4)
+                threat_tags.append("reduced_mesh_trust")
+
+            if reputation_score is None:
+                threat_score = max(threat_score, 0.25)
+                threat_tags.append("missing_mesh_reputation")
+            elif reputation_score < 0.35:
+                threat_score = max(threat_score, 0.6)
+                threat_tags.append("low_mesh_reputation")
+            elif reputation_score < 0.6:
+                threat_score = max(threat_score, 0.35)
+                threat_tags.append("reduced_mesh_reputation")
+
+            if route_mode == "exclusive":
+                threat_score = max(threat_score, 0.3)
+                threat_tags.append("mesh_exclusive_route")
+
+            if stake_amount is not None and stake_amount >= 250:
+                threat_score = max(threat_score, 0.45)
+                threat_tags.append("high_mesh_stake")
+
+        severity = self._severity_for(threat_score)
+        return threat_score, severity, list(dict.fromkeys(threat_tags))
 
     def _score_action(self, action: str, params: Dict[str, Any] = None):
         """Score a single action string + params."""
@@ -266,3 +307,13 @@ class BRPBridge:
             f"BRP evaluated action='{action}': "
             f"decision={decision}, threat_score={threat_score:.2f}"
         )
+
+    @staticmethod
+    def _coerce_float(value: Any) -> Optional[float]:
+        """Best-effort float coercion for event context values."""
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None

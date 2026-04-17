@@ -392,6 +392,24 @@ class SimpHttpServer:
                 "agents": agents
             }), 200
 
+        @self.app.route("/agents/heartbeat", methods=["POST"])
+        def post_heartbeat():
+            """Legacy endpoint: record heartbeat with agent_id in JSON body."""
+            data = request.get_json(silent=True) or {}
+            agent_id = data.get("agent_id")
+            if not agent_id:
+                return jsonify({"status": "error", "error": "Missing agent_id in request body"}), 400
+            
+            success = self.broker.record_heartbeat(agent_id)
+            if success:
+                agent = self.broker.get_agent(agent_id)
+                return jsonify({
+                    "agent_id": agent_id,
+                    "heartbeat_at": agent.get("last_heartbeat") if agent else _utcnow_iso_http(),
+                    "count": agent.get("heartbeat_count", 0) if agent else 0,
+                }), 200
+            return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
+
         @self.app.route("/agents/<agent_id>", methods=["GET"])
         def get_agent(agent_id):
             ok, err = sanitize_agent_id(agent_id)
@@ -471,7 +489,7 @@ class SimpHttpServer:
         # ----- Sprint 62: Heartbeat Routes -----
 
         @self.app.route("/agents/<agent_id>/heartbeat", methods=["POST"])
-        def post_heartbeat(agent_id):
+        def post_heartbeat_with_id(agent_id):
             """Record a heartbeat for an agent (no auth required)."""
             success = self.broker.record_heartbeat(agent_id)
             if success:
@@ -1433,6 +1451,161 @@ class SimpHttpServer:
 
     def _setup_mesh_routes(self):
         """Setup Mesh Bus routes for agent-to-agent messaging."""
+        
+        @self.app.route("/mesh/routing/status", methods=["GET"])
+        @_require_api_key
+        def mesh_routing_status():
+            """Get mesh routing status."""
+            try:
+                if not hasattr(self.broker, 'mesh_routing') or not self.broker.mesh_routing:
+                    return jsonify({
+                        "status": "success",
+                        "mesh_routing": {
+                            "enabled": False,
+                            "message": "Mesh routing not initialized"
+                        }
+                    })
+                
+                status = self.broker.mesh_routing.get_status()
+                return jsonify({
+                    "status": "success",
+                    "mesh_routing": status
+                })
+            except Exception as e:
+                return jsonify({"status": "error", "error": str(e)}), 500
+        
+        @self.app.route("/mesh/routing/agents", methods=["GET"])
+        @_require_api_key
+        def mesh_routing_agents():
+            """Get all mesh-capable agents."""
+            try:
+                if not hasattr(self.broker, 'mesh_routing') or not self.broker.mesh_routing:
+                    return jsonify({
+                        "status": "success",
+                        "agents": {},
+                        "message": "Mesh routing not initialized"
+                    })
+                
+                agents = self.broker.mesh_routing.get_all_mesh_agents()
+                return jsonify({
+                    "status": "success",
+                    "agents": agents,
+                    "count": len(agents)
+                })
+            except Exception as e:
+                return jsonify({"status": "error", "error": str(e)}), 500
+        
+        @self.app.route("/mesh/routing/discover", methods=["POST"])
+        @_require_api_key
+        def mesh_routing_discover():
+            """Discover mesh capabilities."""
+            try:
+                if not hasattr(self.broker, 'mesh_routing') or not self.broker.mesh_routing:
+                    return jsonify({
+                        "status": "error",
+                        "error": "Mesh routing not initialized"
+                    }), 400
+                
+                result = self.broker.mesh_routing.discover_mesh_capabilities()
+                return jsonify({
+                    "status": "success" if result.get("success") else "error",
+                    **result
+                })
+            except Exception as e:
+                return jsonify({"status": "error", "error": str(e)}), 500
+        
+        @self.app.route("/mesh/routing/agent/<agent_id>", methods=["GET"])
+        @_require_api_key
+        def mesh_routing_agent_info(agent_id):
+            """Get mesh information for a specific agent."""
+            try:
+                if not hasattr(self.broker, 'mesh_routing') or not self.broker.mesh_routing:
+                    return jsonify({
+                        "status": "error",
+                        "error": "Mesh routing not initialized"
+                    }), 400
+                
+                info = self.broker.mesh_routing.get_mesh_agent_info(agent_id)
+                if info:
+                    return jsonify({
+                        "status": "success",
+                        "agent_id": agent_id,
+                        "mesh_info": info
+                    })
+                else:
+                    return jsonify({
+                        "status": "success",
+                        "agent_id": agent_id,
+                        "mesh_info": None,
+                        "message": "Agent not mesh-capable or not found"
+                    })
+            except Exception as e:
+                return jsonify({"status": "error", "error": str(e)}), 500
+        
+        @self.app.route("/mesh/routing/config", methods=["GET", "POST"])
+        @_require_api_key
+        def mesh_routing_config():
+            """Get or update mesh routing configuration."""
+            try:
+                if not hasattr(self.broker, 'mesh_routing') or not self.broker.mesh_routing:
+                    return jsonify({
+                        "status": "error",
+                        "error": "Mesh routing not initialized"
+                    }), 400
+                
+                if request.method == "GET":
+                    config = self.broker.mesh_routing.config
+                    return jsonify({
+                        "status": "success",
+                        "config": {
+                            "mode": config.mode.value,
+                            "enable_capability_discovery": config.enable_capability_discovery,
+                            "mesh_stake_amount": config.mesh_stake_amount,
+                            "mesh_timeout_seconds": config.mesh_timeout_seconds,
+                            "mesh_retry_count": config.mesh_retry_count,
+                            "agent_mesh_settings": config.agent_mesh_settings
+                        }
+                    })
+                else:
+                    # POST - update configuration
+                    data = request.get_json(silent=True) or {}
+                    
+                    # Update configuration
+                    if "mode" in data:
+                        from simp.server.mesh_routing import MeshRoutingMode
+                        try:
+                            self.broker.mesh_routing.config.mode = MeshRoutingMode(data["mode"])
+                        except ValueError:
+                            return jsonify({
+                                "status": "error",
+                                "error": f"Invalid mode. Must be one of: {[m.value for m in MeshRoutingMode]}"
+                            }), 400
+                    
+                    if "mesh_stake_amount" in data:
+                        self.broker.mesh_routing.config.mesh_stake_amount = float(data["mesh_stake_amount"])
+                    
+                    if "mesh_timeout_seconds" in data:
+                        self.broker.mesh_routing.config.mesh_timeout_seconds = float(data["mesh_timeout_seconds"])
+                    
+                    if "mesh_retry_count" in data:
+                        self.broker.mesh_routing.config.mesh_retry_count = int(data["mesh_retry_count"])
+                    
+                    if "enable_capability_discovery" in data:
+                        self.broker.mesh_routing.config.enable_capability_discovery = bool(data["enable_capability_discovery"])
+                    
+                    return jsonify({
+                        "status": "success",
+                        "message": "Configuration updated",
+                        "config": {
+                            "mode": self.broker.mesh_routing.config.mode.value,
+                            "enable_capability_discovery": self.broker.mesh_routing.config.enable_capability_discovery,
+                            "mesh_stake_amount": self.broker.mesh_routing.config.mesh_stake_amount,
+                            "mesh_timeout_seconds": self.broker.mesh_routing.config.mesh_timeout_seconds,
+                            "mesh_retry_count": self.broker.mesh_routing.config.mesh_retry_count
+                        }
+                    })
+            except Exception as e:
+                return jsonify({"status": "error", "error": str(e)}), 500
 
         @self.app.route("/mesh/send", methods=["POST"])
         @_require_api_key

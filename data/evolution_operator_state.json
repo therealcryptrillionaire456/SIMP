@@ -1,0 +1,251 @@
+{
+  "last_daily_check": "2026-04-14T20:04:44.758701",
+  "last_weekly_check": "2026-04-14T12:36:13.257572",
+  "last_monthly_check": "2026-04-14T12:36:13.262690",
+  "daily_checks_completed": [
+    {
+      "timestamp": "2026-04-14T12:36:13.252096",
+      "all_passed": false,
+      "results": {
+        "timestamp": "2026-04-14T12:36:12.226524",
+        "checks": {
+          "Dashboard Status": {
+            "passed": false,
+            "timestamp": "2026-04-14T12:36:12.234583"
+          },
+          "Daily Report": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:12.235177"
+          },
+          "SIMP Log Entry": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:12.235450"
+          },
+          "System Resources": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:13.252090"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-14T12:38:15.719288",
+      "all_passed": false,
+      "results": {
+        "timestamp": "2026-04-14T12:38:14.692802",
+        "checks": {
+          "Dashboard Status": {
+            "passed": false,
+            "timestamp": "2026-04-14T12:38:14.700147"
+          },
+          "Daily Report": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:38:14.700777"
+          },
+          "SIMP Log Entry": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:38:14.700919"
+          },
+          "System Resources": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:38:15.719261"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-14T14:15:08.501294",
+      "all_passed": false,
+      "results": {
+        "timestamp": "2026-04-14T14:15:07.474068",
+        "checks": {
+          "Dashboard Status": {
+            "passed": false,
+            "timestamp": "2026-04-14T14:15:07.481839"
+          },
+          "Daily Report": {
+            "passed": true,
+            "timestamp": "2026-04-14T14:15:07.482578"
+          },
+          "SIMP Log Entry": {
+            "passed": true,
+            "timestamp": "2026-04-14T14:15:07.482887"
+          },
+          "System Resources": {
+            "passed": true,
+            "timestamp": "2026-04-14T14:15:08.501278"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-14T15:06:08.185304",
+      "all_passed": false,
+      "results": {
+        "timestamp": "2026-04-14T15:06:07.161364",
+        "checks": {
+          "Dashboard Status": {
+            "passed": false,
+            "timestamp": "2026-04-14T15:06:07.166850"
+          },
+          "Daily Report": {
+            "passed": true,
+            "timestamp": "2026-04-14T15:06:07.167589"
+          },
+          "SIMP Log Entry": {
+            "passed": true,
+            "timestamp": "2026-04-14T15:06:07.167747"
+          },
+          "System Resources": {
+            "passed": true,
+            "timestamp": "2026-04-14T15:06:08.185276"
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-14T20:04:44.758703",
+      "all_passed": false,
+      "results": {
+        "timestamp": "2026-04-14T20:04:43.716234",
+        "checks": {
+          "Dashboard Status": {
+            "passed": false,
+            "timestamp": "2026-04-14T20:04:43.730030"
+          },
+          "Daily Report": {
+            "passed": true,
+            "timestamp": "2026-04-14T20:04:43.730723"
+          },
+          "SIMP Log Entry": {
+            "passed": true,
+            "timestamp": "2026-04-14T20:04:43.730990"
+          },
+          "System Resources": {
+            "passed": true,
+            "timestamp": "2026-04-14T20:04:44.758696"
+          }
+        }
+      }
+    }
+  ],
+  "weekly_checks_completed": [
+    {
+      "timestamp": "2026-04-14T12:36:13.257580",
+      "all_passed": false,
+      "results": {
+        "timestamp": "2026-04-14T12:36:13.252697",
+        "checks": {
+          "Performance Trends": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:13.252944"
+          },
+          "Evolution Parameters": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:13.253380"
+          },
+          "Results Backup": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:13.257013"
+          },
+          "Strategy Updates": {
+            "passed": false,
+            "timestamp": "2026-04-14T12:36:13.257387"
+          }
+        }
+      }
+    }
+  ],
+  "monthly_checks_completed": [
+    {
+      "timestamp": "2026-04-14T12:36:13.262692",
+      "all_passed": false,
+      "results": {
+        "timestamp": "2026-04-14T12:36:13.258028",
+        "checks": {
+          "Performance Review": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:13.258534"
+          },
+          "Strategy Optimization": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:13.258647"
+          },
+          "Knowledge Base Updates": {
+            "passed": true,
+            "timestamp": "2026-04-14T12:36:13.258880"
+          },
+          "System Health Audit": {
+            "passed": false,
+            "timestamp": "2026-04-14T12:36:13.262494"
+          }
+        }
+      }
+    }
+  ],
+  "alerts_sent": [
+    {
+      "timestamp": "2026-04-14T12:36:12.234641",
+      "level": "warning",
+      "subject": "Daily check failed: Dashboard Status",
+      "message": "The daily operator check 'Dashboard Status' failed."
+    },
+    {
+      "timestamp": "2026-04-14T12:36:13.257441",
+      "level": "info",
+      "subject": "Weekly check action needed: Strategy Updates",
+      "message": "The weekly check 'Strategy Updates' indicates action may be needed."
+    },
+    {
+      "timestamp": "2026-04-14T12:36:13.262541",
+      "level": "info",
+      "subject": "Monthly check action needed: System Health Audit",
+      "message": "The monthly check 'System Health Audit' indicates action may be needed."
+    },
+    {
+      "timestamp": "2026-04-14T12:38:14.700223",
+      "level": "warning",
+      "subject": "Daily check failed: Dashboard Status",
+      "message": "The daily operator check 'Dashboard Status' failed."
+    },
+    {
+      "timestamp": "2026-04-14T14:15:07.481900",
+      "level": "warning",
+      "subject": "Daily check failed: Dashboard Status",
+      "message": "The daily operator check 'Dashboard Status' failed."
+    },
+    {
+      "timestamp": "2026-04-14T15:06:07.166909",
+      "level": "warning",
+      "subject": "Daily check failed: Dashboard Status",
+      "message": "The daily operator check 'Dashboard Status' failed."
+    },
+    {
+      "timestamp": "2026-04-14T20:04:43.730103",
+      "level": "warning",
+      "subject": "Daily check failed: Dashboard Status",
+      "message": "The daily operator check 'Dashboard Status' failed."
+    }
+  ],
+  "backups_created": [
+    {
+      "timestamp": "2026-04-14T12:36:13.256867",
+      "file": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/backups/evolution/evolution_backup_20260414_123613.tar.gz",
+      "size": 683
+    }
+  ],
+  "schedule_changes": [
+    {
+      "timestamp": "2026-04-14T15:05:11.704833",
+      "change": "Updated schedule: Evolution at 16:00 (4:00 PM ET), Operator check at 15:30 (3:30 PM ET)",
+      "previous_schedule": {
+        "evolution": "04:00 daily",
+        "operator_check": "08:00 daily"
+      },
+      "new_schedule": {
+        "evolution": "16:00 daily (4:00 PM ET)",
+        "operator_check": "15:30 daily (3:30 PM ET)"
+      }
+    }
+  ]
+}

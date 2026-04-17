@@ -1,0 +1,15 @@
+{
+  "intent_type": "arbitrage_opportunity",
+  "source_agent": "stress_tester",
+  "target_agent": "auto",
+  "timestamp": "2026-04-14T00:30:00Z",
+  "intent_id": "test_arb_001",
+  "correlation_id": "test_corr_001",
+  "parameters": {
+    "symbol": "BTC-USD",
+    "exchange_a": "coinbase",
+    "exchange_b": "binance",
+    "spread_percent": 0.5,
+    "volume": 1000.0
+  }
+}

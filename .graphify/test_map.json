@@ -1,5 +1,66 @@
 {
   "test_nodes": [
+    "backend_test",
+    "backend_test_keepthechangeapitester",
+    "backend_test_keepthechangeapitester_init",
+    "backend_test_keepthechangeapitester_log_test",
+    "backend_test_keepthechangeapitester_test_endpoint",
+    "backend_test_keepthechangeapitester_test_auth_endpoints",
+    "backend_test_keepthechangeapitester_test_user_endpoints",
+    "backend_test_keepthechangeapitester_test_post_endpoints",
+    "backend_test_keepthechangeapitester_test_shopping_endpoints",
+    "backend_test_keepthechangeapitester_test_crypto_endpoints",
+    "backend_test_keepthechangeapitester_test_notification_endpoints",
+    "backend_test_keepthechangeapitester_test_follow_system",
+    "backend_test_keepthechangeapitester_create_test_image",
+    "backend_test_keepthechangeapitester_test_image_upload",
+    "backend_test_keepthechangeapitester_test_receipt_scanning",
+    "backend_test_keepthechangeapitester_test_auto_conversion_rules",
+    "backend_test_keepthechangeapitester_test_auto_conversion_trigger",
+    "backend_test_keepthechangeapitester_run_all_tests",
+    "backend_test_main",
+    "backend_test_rationale_46",
+    "backend_test_rationale_79",
+    "backend_test_rationale_122",
+    "backend_test_rationale_154",
+    "backend_test_rationale_207",
+    "backend_test_rationale_214",
+    "backend_test_rationale_243",
+    "backend_test_rationale_260",
+    "backend_test_rationale_290",
+    "backend_test_rationale_299",
+    "backend_test_rationale_360",
+    "backend_test_rationale_425",
+    "backend_test_rationale_473",
+    "phase2_mesh_completion_test",
+    "phase2_mesh_completion_test_test_phase2_deliverables",
+    "phase2_mesh_completion_test_generate_phase2_report",
+    "phase2_mesh_completion_test_rationale_26",
+    "phase2_mesh_completion_test_rationale_412",
+    "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+    "apply_agent_lightning_patch_test_agent_lightning_integration",
+    "apply_dashboard_patch_test_dashboard_integration",
+    "begin_gate1_testing",
+    "begin_gate1_testing_gate1tester",
+    "begin_gate1_testing_gate1tester_init",
+    "begin_gate1_testing_gate1tester_create_test_signal",
+    "begin_gate1_testing_gate1tester_send_signal",
+    "begin_gate1_testing_gate1tester_monitor_processing",
+    "begin_gate1_testing_gate1tester_update_progress",
+    "begin_gate1_testing_gate1tester_run_batch",
+    "begin_gate1_testing_gate1tester_check_system_health",
+    "begin_gate1_testing_gate1tester_display_progress_summary",
+    "begin_gate1_testing_gate1tester_run",
+    "begin_gate1_testing_gate1tester_get_current_progress",
+    "begin_gate1_testing_main",
+    "begin_gate1_testing_rationale_59",
+    "begin_gate1_testing_rationale_96",
+    "begin_gate1_testing_rationale_109",
+    "begin_gate1_testing_rationale_143",
+    "begin_gate1_testing_rationale_184",
+    "begin_gate1_testing_rationale_226",
+    "begin_gate1_testing_rationale_265",
+    "begin_gate1_testing_rationale_400",
     "test_protocol",
     "test_protocol_main",
     "test_protocol_rationale_20",
@@ -9,6 +70,7 @@
     "asi_evolve_module_asievolvemodule_test_offensive_capability",
     "asi_evolve_simple_module_asievolvesimplemodule_test_evolved_detector",
     "asi_evolve_simple_module_asievolvesimplemodule_test_offensive_capability",
+    "decepticon_module_decepticonmodule_test_offensive_capability",
     "hexstrike_module_hexstrikemodule_test_defenses",
     "openshell_module_openshellmodule_test_connectivity",
     "pentagi_module_pentagimodule_load_pentesting_tools",
@@ -41,11 +103,153 @@
     "mcp_mcpcommand_handle_test"
   ],
   "module_to_tests": {
+    "json": [
+      {
+        "test": "backend_test",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "backend_test",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "backend_test_keepthechangeapitester",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "backend_test_main",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test_test_phase2_deliverables",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test_generate_phase2_report",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "begin_gate1_testing_gate1tester",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing_main",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "simple_one_tool_test_main",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_rationale_1",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_rationale_24",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed_main",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed_rationale_1",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed_rationale_26",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
     "logging": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 1,
+        "connection_type": "direct"
+      },
       {
         "test": "test_protocol",
         "distance": 1,
         "connection_type": "direct"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test_test_phase2_deliverables",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test_generate_phase2_report",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
       },
       {
         "test": "test_protocol",
@@ -54,6 +258,173 @@
       },
       {
         "test": "test_protocol_main",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_record_compliance_event": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_rationale_650": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "apply_agent_lightning_patch": [
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "apply_agent_lightning_patch_apply_agent_lightning_patch": [
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "apply_agent_lightning_patch_main": [
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "apply_agent_lightning_patch_rationale_81": [
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "apply_dashboard_patch": [
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "apply_dashboard_patch_apply_dashboard_patch": [
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "apply_dashboard_patch_rationale_77": [
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "random": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      },
+      {
+        "test": "begin_gate1_testing_gate1tester",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing_main",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       },
@@ -231,6 +602,54 @@
       },
       {
         "test": "asi_evolve_simple_module_asievolvesimplemodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_execute_reconnaissance": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_execute_exploitation": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "indirect_1_hop"
+      }
+    ],
+    "decepticon_module_rationale_658": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 1,
+        "connection_type": "direct"
+      },
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
         "distance": 1,
         "connection_type": "indirect_1_hop"
       }
@@ -434,63 +853,21 @@
         "connection_type": "indirect_1_hop"
       }
     ],
-    "json": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 1,
-        "connection_type": "direct"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 1,
-        "connection_type": "direct"
-      },
-      {
-        "test": "simple_one_tool_test",
-        "distance": 1,
-        "connection_type": "indirect_1_hop"
-      },
-      {
-        "test": "simple_one_tool_test_main",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_rationale_1",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_rationale_24",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 1,
-        "connection_type": "indirect_1_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed_main",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed_rationale_1",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed_rationale_26",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
     "init": [
       {
         "test": "init_is_pentestperf_available",
         "distance": 1,
         "connection_type": "direct"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
       },
       {
         "test": "test_protocol",
@@ -551,7 +928,59 @@
         "connection_type": "indirect_1_hop"
       }
     ],
+    "server": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
     "acquire_security_datasets": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -568,7 +997,369 @@
         "connection_type": "indirect_2_hop"
       }
     ],
+    "add_deerflow_intent_types": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "deerflow_agent": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "deerflow_agent_fixed": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "deerflow_agent_fixed_v2": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate3_5_enhanced_agent": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2a": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "analyze_pdf_structure": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
     "dataset_processor": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -587,6 +1378,21 @@
     ],
     "web_scraper": [
       {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
@@ -603,6 +1409,21 @@
       }
     ],
     "integration_system": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -621,6 +1442,21 @@
     ],
     "training_pipeline": [
       {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
@@ -637,6 +1473,21 @@
       }
     ],
     "sigma_engine": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -655,6 +1506,21 @@
     ],
     "cowork_bridge": [
       {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
@@ -666,19 +1532,27 @@
       },
       {
         "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "deploy_kashclaw_gemma": [
-      {
-        "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
     ],
     "start_gemma4_agent": [
       {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
@@ -694,21 +1568,22 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "start_server": [
-      {
-        "test": "test_protocol",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "brp_service": [
-      {
-        "test": "test_protocol",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
     "brp_enhanced_framework": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -730,14 +1605,101 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "base_module": [
+    "asi_evolve_module": [
       {
-        "test": "test_protocol",
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "asi_evolve_module_asievolvemodule_test_evolved_detector",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "asi_evolve_module_asievolvemodule_generate_test_data",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "asi_evolve_module_asievolvemodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "asi_evolve_simple_module": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "asi_evolve_simple_module_asievolvesimplemodule_test_evolved_detector",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "asi_evolve_simple_module_asievolvesimplemodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
     ],
     "cai_module": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -754,7 +1716,140 @@
         "connection_type": "indirect_2_hop"
       }
     ],
+    "decepticon_c2": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_killchain": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "hexstrike_module": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "hexstrike_module_hexstrikemodule_test_defenses",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
     "hexstrike_module_broken": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -772,6 +1867,21 @@
       }
     ],
     "openshell_module": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -794,6 +1904,21 @@
       }
     ],
     "pentagi_module": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -832,6 +1957,21 @@
     ],
     "strix_module": [
       {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
@@ -847,9 +1987,29 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "logger": [
+    "cognition": [
       {
-        "test": "test_protocol",
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       },
@@ -859,7 +2019,462 @@
         "connection_type": "indirect_2_hop"
       }
     ],
+    "database": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "evaluator": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "main": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "analyzer": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "engineer": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "best_snapshot": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "llm": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "eval": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "output_guardrails": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "usage_tracking_example": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "llm_as_judge": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "agent_as_tool": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "handoffs": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "message_filter": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "message_filter_streaming": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
     "util": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -872,6 +2487,432 @@
       },
       {
         "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "portswiggerbot": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "memory": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "history": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "virtualization": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "workspace": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "exceptions": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "global_usage_tracker": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "openai_chatcompletions": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "openai_responses": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "run_to_jsonl": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "tool": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "error_tracing": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "json_validate_json": [
+      {
+        "test": "backend_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "simple_one_tool_test_streamed",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "deploy_kashclaw_gemma": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "start_server": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "brp_service": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "base_module": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "logger": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       },
@@ -883,6 +2924,11 @@
     ],
     "local_python_executor": [
       {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
@@ -890,12 +2936,22 @@
     ],
     "cli": [
       {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
     ],
     "mcp": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -909,6 +2965,11 @@
     ],
     "run": [
       {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
@@ -921,12 +2982,22 @@
     ],
     "banner": [
       {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
     ],
     "logging_setup_session_logging": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -935,12 +3006,22 @@
     ],
     "logging_rationale_1": [
       {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
     ],
     "function_schema": [
+      {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
       {
         "test": "test_protocol",
         "distance": 2,
@@ -949,7 +3030,674 @@
     ],
     "parallel_tool_executor": [
       {
+        "test": "phase2_mesh_completion_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
         "test": "test_protocol",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1_tradingstrategy": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1_ordertype": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1_gate4config": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1_scaledposition": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1_marketmicrostructure": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1_riskmetrics": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part1_gate4scaledagent": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2a_tradeexecution": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2a_positionstate": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2a_performancemetrics": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2a_tradeengine": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_init": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_start": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_stop": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_place_order": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_validate_order_parameters": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_check_compliance_rules": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_detect_market_manipulation": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_detect_wash_trading": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_check_position_concentration": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_monitor_order_execution": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_cancel_order": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_reconciliation_loop": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_run_reconciliation": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_save_reconciliation_log": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_monitoring_loop": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_monitor_position_durations": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_monitor_risk_exposures": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_calculate_value_at_risk": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_monitor_compliance": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_check_best_execution": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_run_trade_surveillance": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_save_compliance_record": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_send_compliance_alert": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_get_order_statistics": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_rationale_87": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_telemetrydata": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_alert": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_gate4scaledmicroscopicagent": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_46": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_73": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_135": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_161": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_193": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_206": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_274": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_326": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_365": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_451": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_474": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_557": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_569": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_582": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_635": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_646": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_669": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_699": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_722": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_744": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_767": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part3_rationale_788": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_simpbroker": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_canonicalintent": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_arbdetector": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_arbopportunity": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_exchangeconnector": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_stubexchangeconnector": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_rationale_70": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_rationale_120": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_rationale_147": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_microscopic_agent_rationale_229": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_compliancerecord": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "gate4_scaled_agent_part2b_rationale_561": [
+      {
+        "test": "gate4_scaled_agent_part2b_ordermanager_run_stress_test",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "apply_agent_lightning_patch_setup_agent_lightning_environment": [
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "apply_agent_lightning_patch_rationale_19": [
+      {
+        "test": "apply_agent_lightning_patch_test_agent_lightning_integration",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "apply_dashboard_patch_create_dashboard_restart_script": [
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "apply_dashboard_patch_main": [
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "apply_dashboard_patch_rationale_19": [
+      {
+        "test": "apply_dashboard_patch_test_dashboard_integration",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "base": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "factory": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "island": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "random_randomsampler": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "random_rationale_1": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "ucb1": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "agent_lifecycle_example": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "dynamic_system_prompt": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "lifecycle_example": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "stream_items": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "my_workflow": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "endpoints": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "processors": [
+      {
+        "test": "begin_gate1_testing",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      },
+      {
+        "test": "init_is_pentestperf_available",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
@@ -1188,33 +3936,6 @@
     "brp_enhanced_framework_rationale_630": [
       {
         "test": "brp_enhanced_framework_brpenhancedframework_test_offensive_capability",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "asi_evolve_module": [
-      {
-        "test": "asi_evolve_module_asievolvemodule_test_evolved_detector",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "asi_evolve_module_asievolvemodule_generate_test_data",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "asi_evolve_module_asievolvemodule_test_offensive_capability",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
@@ -1474,28 +4195,6 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "asi_evolve_simple_module": [
-      {
-        "test": "asi_evolve_simple_module_asievolvesimplemodule_test_evolved_detector",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "asi_evolve_simple_module_asievolvesimplemodule_test_offensive_capability",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
     "asi_evolve_simple_module_asievolvesimplemodule_init": [
       {
         "test": "asi_evolve_simple_module_asievolvesimplemodule_test_evolved_detector",
@@ -1700,6 +4399,111 @@
         "connection_type": "indirect_2_hop"
       }
     ],
+    "decepticon_module_decepticonmodule_init": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_load_mitre_techniques": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_load_threat_actor_profiles": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_create_engagement": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_save_document": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_validate_authorization": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_log_audit_trail": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_get_status": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_get_capabilities": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_run_defensive_scan": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_decepticonmodule_analyze_threat_intelligence": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_create_decepticon_module": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_rationale_116": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_rationale_420": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
+    "decepticon_module_rationale_527": [
+      {
+        "test": "decepticon_module_decepticonmodule_test_offensive_capability",
+        "distance": 2,
+        "connection_type": "indirect_2_hop"
+      }
+    ],
     "base_module_brpmodule": [
       {
         "test": "hexstrike_module_hexstrikemodule_test_defenses",
@@ -1749,23 +4553,6 @@
     "base_module_hybridmodule": [
       {
         "test": "hexstrike_module_hexstrikemodule_test_defenses",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "hexstrike_module": [
-      {
-        "test": "hexstrike_module_hexstrikemodule_test_defenses",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
         "distance": 2,
         "connection_type": "indirect_2_hop"
       }
@@ -2913,445 +5700,6 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "analyze_pdf_structure": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "cognition": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "database": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "evaluator": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "main": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "analyzer": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "engineer": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "best_snapshot": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "llm": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "eval": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "output_guardrails": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "usage_tracking_example": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "llm_as_judge": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "agent_as_tool": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "handoffs": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "server": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "message_filter": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "message_filter_streaming": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "portswiggerbot": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "memory": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "history": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "virtualization": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "workspace": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "exceptions": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "global_usage_tracker": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "openai_chatcompletions": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "openai_responses": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "run_to_jsonl": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "tool": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "error_tracing": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "json_validate_json": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "openai_stt": [
-      {
-        "test": "simple_one_tool_test",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      },
-      {
-        "test": "simple_one_tool_test_streamed",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
     "init_rationale_1": [
       {
         "test": "init_is_pentestperf_available",
@@ -3359,42 +5707,7 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "base": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "random": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
     "greedy": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "ucb1": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "island": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "factory": [
       {
         "test": "init_is_pentestperf_available",
         "distance": 2,
@@ -3681,13 +5994,6 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "processors": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
     "setup": [
       {
         "test": "init_is_pentestperf_available",
@@ -3744,42 +6050,7 @@
         "connection_type": "indirect_2_hop"
       }
     ],
-    "events": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "input": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
     "model": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "pipeline": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "pipeline_config": [
-      {
-        "test": "init_is_pentestperf_available",
-        "distance": 2,
-        "connection_type": "indirect_2_hop"
-      }
-    ],
-    "workflow": [
       {
         "test": "init_is_pentestperf_available",
         "distance": 2,
@@ -3942,10 +6213,363 @@
     ]
   },
   "test_to_modules": {
+    "backend_test": [
+      "json",
+      "json",
+      "server",
+      "acquire_security_datasets",
+      "add_deerflow_intent_types",
+      "deerflow_agent",
+      "deerflow_agent_fixed",
+      "deerflow_agent_fixed_v2",
+      "gate3_5_enhanced_agent",
+      "gate4_scaled_agent_part1",
+      "gate4_scaled_agent_part2a",
+      "gate4_scaled_agent_part2b",
+      "gate4_scaled_agent_part3",
+      "gate4_scaled_microscopic_agent",
+      "analyze_pdf_structure",
+      "dataset_processor",
+      "web_scraper",
+      "integration_system",
+      "training_pipeline",
+      "sigma_engine",
+      "cowork_bridge",
+      "start_gemma4_agent",
+      "brp_enhanced_framework",
+      "asi_evolve_module",
+      "asi_evolve_simple_module",
+      "cai_module",
+      "decepticon_c2",
+      "decepticon_killchain",
+      "decepticon_module",
+      "hexstrike_module",
+      "hexstrike_module_broken",
+      "openshell_module",
+      "pentagi_module",
+      "strix_module",
+      "cognition",
+      "database",
+      "evaluator",
+      "main",
+      "analyzer",
+      "engineer",
+      "best_snapshot",
+      "llm",
+      "eval",
+      "output_guardrails",
+      "usage_tracking_example",
+      "llm_as_judge",
+      "agent_as_tool",
+      "handoffs",
+      "message_filter",
+      "message_filter_streaming",
+      "util",
+      "portswiggerbot",
+      "memory",
+      "history",
+      "virtualization",
+      "workspace",
+      "exceptions",
+      "global_usage_tracker",
+      "openai_chatcompletions",
+      "openai_responses",
+      "run_to_jsonl",
+      "tool",
+      "error_tracing",
+      "json_validate_json"
+    ],
+    "phase2_mesh_completion_test": [
+      "json",
+      "logging",
+      "json",
+      "logging",
+      "server",
+      "acquire_security_datasets",
+      "add_deerflow_intent_types",
+      "deerflow_agent",
+      "deerflow_agent_fixed",
+      "deerflow_agent_fixed_v2",
+      "gate3_5_enhanced_agent",
+      "gate4_scaled_agent_part1",
+      "gate4_scaled_agent_part2a",
+      "gate4_scaled_agent_part2b",
+      "gate4_scaled_agent_part3",
+      "gate4_scaled_microscopic_agent",
+      "analyze_pdf_structure",
+      "dataset_processor",
+      "web_scraper",
+      "integration_system",
+      "training_pipeline",
+      "sigma_engine",
+      "cowork_bridge",
+      "start_gemma4_agent",
+      "brp_enhanced_framework",
+      "asi_evolve_module",
+      "asi_evolve_simple_module",
+      "cai_module",
+      "decepticon_c2",
+      "decepticon_killchain",
+      "decepticon_module",
+      "hexstrike_module",
+      "hexstrike_module_broken",
+      "openshell_module",
+      "pentagi_module",
+      "strix_module",
+      "cognition",
+      "database",
+      "evaluator",
+      "main",
+      "analyzer",
+      "engineer",
+      "best_snapshot",
+      "llm",
+      "eval",
+      "output_guardrails",
+      "usage_tracking_example",
+      "llm_as_judge",
+      "agent_as_tool",
+      "handoffs",
+      "message_filter",
+      "message_filter_streaming",
+      "util",
+      "portswiggerbot",
+      "memory",
+      "history",
+      "virtualization",
+      "workspace",
+      "exceptions",
+      "global_usage_tracker",
+      "openai_chatcompletions",
+      "openai_responses",
+      "run_to_jsonl",
+      "tool",
+      "error_tracing",
+      "json_validate_json",
+      "init",
+      "apply_agent_lightning_patch",
+      "apply_dashboard_patch",
+      "deploy_kashclaw_gemma",
+      "start_server",
+      "brp_service",
+      "base_module",
+      "logger",
+      "local_python_executor",
+      "cli",
+      "mcp",
+      "run",
+      "banner",
+      "logging_setup_session_logging",
+      "logging_rationale_1",
+      "function_schema",
+      "parallel_tool_executor"
+    ],
+    "gate4_scaled_agent_part2b_ordermanager_run_stress_test": [
+      "gate4_scaled_agent_part2b_ordermanager",
+      "gate4_scaled_agent_part2b_ordermanager_record_compliance_event",
+      "gate4_scaled_agent_part2b_rationale_650",
+      "gate4_scaled_agent_part2b_ordermanager",
+      "gate4_scaled_agent_part2b_ordermanager_record_compliance_event",
+      "gate4_scaled_agent_part2b_rationale_650",
+      "gate4_scaled_agent_part1_tradingstrategy",
+      "gate4_scaled_agent_part1_ordertype",
+      "gate4_scaled_agent_part1_gate4config",
+      "gate4_scaled_agent_part1_scaledposition",
+      "gate4_scaled_agent_part1_marketmicrostructure",
+      "gate4_scaled_agent_part1_riskmetrics",
+      "gate4_scaled_agent_part1_gate4scaledagent",
+      "gate4_scaled_agent_part2a_tradeexecution",
+      "gate4_scaled_agent_part2a_positionstate",
+      "gate4_scaled_agent_part2a_performancemetrics",
+      "gate4_scaled_agent_part2a_tradeengine",
+      "gate4_scaled_agent_part2b",
+      "gate4_scaled_agent_part2b_ordermanager_init",
+      "gate4_scaled_agent_part2b_ordermanager_start",
+      "gate4_scaled_agent_part2b_ordermanager_stop",
+      "gate4_scaled_agent_part2b_ordermanager_place_order",
+      "gate4_scaled_agent_part2b_ordermanager_validate_order_parameters",
+      "gate4_scaled_agent_part2b_ordermanager_check_compliance_rules",
+      "gate4_scaled_agent_part2b_ordermanager_detect_market_manipulation",
+      "gate4_scaled_agent_part2b_ordermanager_detect_wash_trading",
+      "gate4_scaled_agent_part2b_ordermanager_check_position_concentration",
+      "gate4_scaled_agent_part2b_ordermanager_monitor_order_execution",
+      "gate4_scaled_agent_part2b_ordermanager_cancel_order",
+      "gate4_scaled_agent_part2b_ordermanager_reconciliation_loop",
+      "gate4_scaled_agent_part2b_ordermanager_run_reconciliation",
+      "gate4_scaled_agent_part2b_ordermanager_save_reconciliation_log",
+      "gate4_scaled_agent_part2b_ordermanager_monitoring_loop",
+      "gate4_scaled_agent_part2b_ordermanager_monitor_position_durations",
+      "gate4_scaled_agent_part2b_ordermanager_monitor_risk_exposures",
+      "gate4_scaled_agent_part2b_ordermanager_calculate_value_at_risk",
+      "gate4_scaled_agent_part2b_ordermanager_monitor_compliance",
+      "gate4_scaled_agent_part2b_ordermanager_check_best_execution",
+      "gate4_scaled_agent_part2b_ordermanager_run_trade_surveillance",
+      "gate4_scaled_agent_part2b_ordermanager_save_compliance_record",
+      "gate4_scaled_agent_part2b_ordermanager_send_compliance_alert",
+      "gate4_scaled_agent_part2b_ordermanager_get_order_statistics",
+      "gate4_scaled_agent_part2b_rationale_87",
+      "gate4_scaled_agent_part3_telemetrydata",
+      "gate4_scaled_agent_part3_alert",
+      "gate4_scaled_agent_part3_gate4scaledmicroscopicagent",
+      "gate4_scaled_agent_part3_rationale_46",
+      "gate4_scaled_agent_part3_rationale_73",
+      "gate4_scaled_agent_part3_rationale_135",
+      "gate4_scaled_agent_part3_rationale_161",
+      "gate4_scaled_agent_part3_rationale_193",
+      "gate4_scaled_agent_part3_rationale_206",
+      "gate4_scaled_agent_part3_rationale_274",
+      "gate4_scaled_agent_part3_rationale_326",
+      "gate4_scaled_agent_part3_rationale_365",
+      "gate4_scaled_agent_part3_rationale_451",
+      "gate4_scaled_agent_part3_rationale_474",
+      "gate4_scaled_agent_part3_rationale_557",
+      "gate4_scaled_agent_part3_rationale_569",
+      "gate4_scaled_agent_part3_rationale_582",
+      "gate4_scaled_agent_part3_rationale_635",
+      "gate4_scaled_agent_part3_rationale_646",
+      "gate4_scaled_agent_part3_rationale_669",
+      "gate4_scaled_agent_part3_rationale_699",
+      "gate4_scaled_agent_part3_rationale_722",
+      "gate4_scaled_agent_part3_rationale_744",
+      "gate4_scaled_agent_part3_rationale_767",
+      "gate4_scaled_agent_part3_rationale_788",
+      "gate4_scaled_microscopic_agent_simpbroker",
+      "gate4_scaled_microscopic_agent_canonicalintent",
+      "gate4_scaled_microscopic_agent_arbdetector",
+      "gate4_scaled_microscopic_agent_arbopportunity",
+      "gate4_scaled_microscopic_agent_exchangeconnector",
+      "gate4_scaled_microscopic_agent_stubexchangeconnector",
+      "gate4_scaled_microscopic_agent_rationale_70",
+      "gate4_scaled_microscopic_agent_rationale_120",
+      "gate4_scaled_microscopic_agent_rationale_147",
+      "gate4_scaled_microscopic_agent_rationale_229",
+      "gate4_scaled_agent_part2b_compliancerecord",
+      "gate4_scaled_agent_part2b_rationale_561"
+    ],
+    "apply_agent_lightning_patch_test_agent_lightning_integration": [
+      "apply_agent_lightning_patch",
+      "apply_agent_lightning_patch_apply_agent_lightning_patch",
+      "apply_agent_lightning_patch_main",
+      "apply_agent_lightning_patch_rationale_81",
+      "apply_agent_lightning_patch",
+      "apply_agent_lightning_patch_apply_agent_lightning_patch",
+      "apply_agent_lightning_patch_main",
+      "apply_agent_lightning_patch_rationale_81",
+      "logging",
+      "apply_agent_lightning_patch_setup_agent_lightning_environment",
+      "apply_agent_lightning_patch_rationale_19"
+    ],
+    "apply_dashboard_patch_test_dashboard_integration": [
+      "apply_dashboard_patch",
+      "apply_dashboard_patch_apply_dashboard_patch",
+      "apply_dashboard_patch_rationale_77",
+      "apply_dashboard_patch",
+      "apply_dashboard_patch_apply_dashboard_patch",
+      "apply_dashboard_patch_rationale_77",
+      "logging",
+      "apply_dashboard_patch_create_dashboard_restart_script",
+      "apply_dashboard_patch_main",
+      "apply_dashboard_patch_rationale_19"
+    ],
+    "begin_gate1_testing": [
+      "json",
+      "random",
+      "json",
+      "random",
+      "server",
+      "acquire_security_datasets",
+      "add_deerflow_intent_types",
+      "deerflow_agent",
+      "deerflow_agent_fixed",
+      "deerflow_agent_fixed_v2",
+      "gate3_5_enhanced_agent",
+      "gate4_scaled_agent_part1",
+      "gate4_scaled_agent_part2a",
+      "gate4_scaled_agent_part2b",
+      "gate4_scaled_agent_part3",
+      "gate4_scaled_microscopic_agent",
+      "analyze_pdf_structure",
+      "dataset_processor",
+      "web_scraper",
+      "integration_system",
+      "training_pipeline",
+      "sigma_engine",
+      "cowork_bridge",
+      "start_gemma4_agent",
+      "brp_enhanced_framework",
+      "asi_evolve_module",
+      "asi_evolve_simple_module",
+      "cai_module",
+      "decepticon_c2",
+      "decepticon_killchain",
+      "decepticon_module",
+      "hexstrike_module",
+      "hexstrike_module_broken",
+      "openshell_module",
+      "pentagi_module",
+      "strix_module",
+      "cognition",
+      "database",
+      "evaluator",
+      "main",
+      "analyzer",
+      "engineer",
+      "best_snapshot",
+      "llm",
+      "eval",
+      "output_guardrails",
+      "usage_tracking_example",
+      "llm_as_judge",
+      "agent_as_tool",
+      "handoffs",
+      "message_filter",
+      "message_filter_streaming",
+      "util",
+      "portswiggerbot",
+      "memory",
+      "history",
+      "virtualization",
+      "workspace",
+      "exceptions",
+      "global_usage_tracker",
+      "openai_chatcompletions",
+      "openai_responses",
+      "run_to_jsonl",
+      "tool",
+      "error_tracing",
+      "json_validate_json",
+      "init",
+      "base",
+      "factory",
+      "island",
+      "random_randomsampler",
+      "random_rationale_1",
+      "ucb1",
+      "agent_lifecycle_example",
+      "dynamic_system_prompt",
+      "lifecycle_example",
+      "stream_items",
+      "my_workflow",
+      "endpoints",
+      "processors"
+    ],
     "test_protocol": [
       "logging",
       "logging",
+      "server",
+      "init",
       "acquire_security_datasets",
+      "deerflow_agent",
+      "deerflow_agent_fixed",
+      "deerflow_agent_fixed_v2",
+      "gate3_5_enhanced_agent",
+      "gate4_scaled_agent_part1",
+      "gate4_scaled_agent_part2a",
+      "gate4_scaled_agent_part2b",
+      "gate4_scaled_agent_part3",
+      "gate4_scaled_microscopic_agent",
+      "apply_agent_lightning_patch",
+      "apply_dashboard_patch",
       "dataset_processor",
       "web_scraper",
       "integration_system",
@@ -3963,7 +6587,6 @@
       "openshell_module",
       "pentagi_module",
       "strix_module",
-      "init",
       "logger",
       "util",
       "local_python_executor",
@@ -4136,6 +6759,32 @@
       "asi_evolve_simple_module_asievolvesimplemodule_add_knowledge",
       "asi_evolve_simple_module_create_asi_evolve_simple_module",
       "asi_evolve_simple_module_rationale_20"
+    ],
+    "decepticon_module_decepticonmodule_test_offensive_capability": [
+      "decepticon_module_decepticonmodule",
+      "decepticon_module_decepticonmodule_execute_reconnaissance",
+      "decepticon_module_decepticonmodule_execute_exploitation",
+      "decepticon_module_rationale_658",
+      "decepticon_module_decepticonmodule",
+      "decepticon_module_decepticonmodule_execute_reconnaissance",
+      "decepticon_module_decepticonmodule_execute_exploitation",
+      "decepticon_module_rationale_658",
+      "decepticon_module",
+      "decepticon_module_decepticonmodule_init",
+      "decepticon_module_decepticonmodule_load_mitre_techniques",
+      "decepticon_module_decepticonmodule_load_threat_actor_profiles",
+      "decepticon_module_decepticonmodule_create_engagement",
+      "decepticon_module_decepticonmodule_save_document",
+      "decepticon_module_decepticonmodule_validate_authorization",
+      "decepticon_module_decepticonmodule_log_audit_trail",
+      "decepticon_module_decepticonmodule_get_status",
+      "decepticon_module_decepticonmodule_get_capabilities",
+      "decepticon_module_decepticonmodule_run_defensive_scan",
+      "decepticon_module_decepticonmodule_analyze_threat_intelligence",
+      "decepticon_module_create_decepticon_module",
+      "decepticon_module_rationale_116",
+      "decepticon_module_rationale_420",
+      "decepticon_module_rationale_527"
     ],
     "hexstrike_module_hexstrikemodule_test_defenses": [
       "hexstrike_module_hexstrikemodule",
@@ -4397,7 +7046,18 @@
     "simple_one_tool_test": [
       "json",
       "json",
+      "server",
       "acquire_security_datasets",
+      "add_deerflow_intent_types",
+      "deerflow_agent",
+      "deerflow_agent_fixed",
+      "deerflow_agent_fixed_v2",
+      "gate3_5_enhanced_agent",
+      "gate4_scaled_agent_part1",
+      "gate4_scaled_agent_part2a",
+      "gate4_scaled_agent_part2b",
+      "gate4_scaled_agent_part3",
+      "gate4_scaled_microscopic_agent",
       "analyze_pdf_structure",
       "dataset_processor",
       "web_scraper",
@@ -4410,6 +7070,9 @@
       "asi_evolve_module",
       "asi_evolve_simple_module",
       "cai_module",
+      "decepticon_c2",
+      "decepticon_killchain",
+      "decepticon_module",
       "hexstrike_module",
       "hexstrike_module_broken",
       "openshell_module",
@@ -4429,7 +7092,6 @@
       "llm_as_judge",
       "agent_as_tool",
       "handoffs",
-      "server",
       "message_filter",
       "message_filter_streaming",
       "util",
@@ -4445,13 +7107,23 @@
       "run_to_jsonl",
       "tool",
       "error_tracing",
-      "json_validate_json",
-      "openai_stt"
+      "json_validate_json"
     ],
     "simple_one_tool_test_streamed": [
       "json",
       "json",
+      "server",
       "acquire_security_datasets",
+      "add_deerflow_intent_types",
+      "deerflow_agent",
+      "deerflow_agent_fixed",
+      "deerflow_agent_fixed_v2",
+      "gate3_5_enhanced_agent",
+      "gate4_scaled_agent_part1",
+      "gate4_scaled_agent_part2a",
+      "gate4_scaled_agent_part2b",
+      "gate4_scaled_agent_part3",
+      "gate4_scaled_microscopic_agent",
       "analyze_pdf_structure",
       "dataset_processor",
       "web_scraper",
@@ -4464,6 +7136,9 @@
       "asi_evolve_module",
       "asi_evolve_simple_module",
       "cai_module",
+      "decepticon_c2",
+      "decepticon_killchain",
+      "decepticon_module",
       "hexstrike_module",
       "hexstrike_module_broken",
       "openshell_module",
@@ -4483,7 +7158,6 @@
       "llm_as_judge",
       "agent_as_tool",
       "handoffs",
-      "server",
       "message_filter",
       "message_filter_streaming",
       "util",
@@ -4499,14 +7173,14 @@
       "run_to_jsonl",
       "tool",
       "error_tracing",
-      "json_validate_json",
-      "openai_stt"
+      "json_validate_json"
     ],
     "init_is_pentestperf_available": [
       "init",
       "init_rationale_6",
       "init",
       "init_rationale_6",
+      "server",
       "cognition",
       "init_rationale_1",
       "database",
@@ -4565,7 +7239,6 @@
       "init_set_default_openai_client",
       "init_set_default_openai_api",
       "init_enable_verbose_stdout_logging",
-      "server",
       "util",
       "create",
       "processor_interface",
@@ -4578,12 +7251,7 @@
       "init_set_trace_processors",
       "init_set_tracing_disabled",
       "init_set_tracing_export_api_key",
-      "events",
-      "input",
-      "model",
-      "pipeline",
-      "pipeline_config",
-      "workflow"
+      "model"
     ],
     "mcp_mcpcommand_handle_test": [
       "mcp_mcpcommand",
@@ -4616,6 +7284,28 @@
       "exceptions_modelbehaviorerror",
       "mcp_rationale_565"
     ],
+    "backend_test_keepthechangeapitester": [
+      "json"
+    ],
+    "backend_test_main": [
+      "json"
+    ],
+    "phase2_mesh_completion_test_test_phase2_deliverables": [
+      "json",
+      "logging"
+    ],
+    "phase2_mesh_completion_test_generate_phase2_report": [
+      "json",
+      "logging"
+    ],
+    "begin_gate1_testing_gate1tester": [
+      "json",
+      "random"
+    ],
+    "begin_gate1_testing_main": [
+      "json",
+      "random"
+    ],
     "test_protocol_main": [
       "logging"
     ],
@@ -4639,8 +7329,8 @@
     ]
   },
   "stats": {
-    "total_tests": 39,
-    "modules_with_tests": 332,
-    "avg_tests_per_module": 0.11746987951807229
+    "total_tests": 101,
+    "modules_with_tests": 454,
+    "avg_tests_per_module": 0.22246696035242292
   }
 }

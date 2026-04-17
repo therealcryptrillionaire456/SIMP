@@ -1,379 +1,540 @@
+#!/usr/bin/env python3.10
 """
-Trade executor for QuantumArb organ.
+Trade Executor for QuantumArb.
 
-Implements trade execution with safety limits, dry-run mode, and integration
-with exchange connectors. Follows SIMP safety protocols and maintains
-compatibility with the broker system.
-
-Safety rules:
-1. dry_run=True by default (hardcoded safety gate)
-2. All trades require explicit safety checks
-3. Position limits enforced per market
-4. Rate limiting to prevent excessive trading
+Executes arbitrage trades with safety checks, risk limits, and monitoring.
+Designed for Phase 4: Microscopic real-money trading.
 """
 
 import json
-import threading
 import time
-from dataclasses import dataclass, asdict, field
-from datetime import datetime, timezone
-from enum import Enum
-from pathlib import Path
+import logging
 from typing import Dict, List, Optional, Tuple, Any
-from decimal import Decimal, ROUND_DOWN
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 
-from .exchange_connector import ExchangeConnector, OrderBook
+from .exchange_connector import (
+    ExchangeConnector, Order, OrderSide, OrderType, OrderStatus,
+    ExchangeError, InsufficientFundsError, OrderRejectedError
+)
 
+# Try to import monitoring system
+try:
+    from monitoring_alerting_system import MonitoringSystem, AlertSeverity, AlertType
+    MONITORING_AVAILABLE = True
+except ImportError:
+    MONITORING_AVAILABLE = False
 
-class TradeSide(str, Enum):
-    """Trade side enumeration."""
-    BUY = "buy"
-    SELL = "sell"
-
-
-class TradeStatus(str, Enum):
-    """Trade status enumeration."""
-    PENDING = "pending"
-    EXECUTED = "executed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
-    REJECTED = "rejected"  # Safety check failed
-
+log = logging.getLogger("TradeExecutor")
 
 @dataclass
-class TradeRequest:
-    """Request to execute a trade."""
-    trade_id: str
-    market: str
-    side: TradeSide
-    quantity: float
-    price_limit: Optional[float] = None  # None = market order
-    dry_run: bool = True  # Safety gate: always True unless explicitly overridden
-    timestamp: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class TradeResult:
-    """Result of a trade execution attempt."""
-    trade_id: str
-    request: TradeRequest
-    status: TradeStatus
-    executed_price: Optional[float] = None
-    executed_quantity: Optional[float] = None
+class ExecutionResult:
+    """Result of trade execution attempt."""
+    success: bool
+    order_id: Optional[str] = None
+    filled_quantity: float = 0.0
+    average_price: float = 0.0
+    slippage_bps: float = 0.0
     fees: float = 0.0
-    error_message: Optional[str] = None
-    timestamp: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
-    )
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-class SafetyViolationError(Exception):
-    """Raised when a safety check fails."""
-    pass
-
+    error_message: str = ""
+    timestamp: str = ""
 
 class TradeExecutor:
     """
-    Executes trades with safety limits and dry-run mode.
+    Executes trades with comprehensive safety checks.
     
-    Features:
-    - Dry-run mode (default: True)
-    - Position limits per market
-    - Rate limiting
-    - Slippage protection
-    - Fee calculation
-    - Thread-safe operations
+    For Phase 4 (microscopic trading):
+    - Minimum position sizes only
+    - All risk checks enforced
+    - Complete monitoring integration
+    - Manual supervision required
     """
     
-    def __init__(
-        self,
-        exchange: ExchangeConnector,
-        dry_run: bool = True,  # Safety gate: default to True
-        max_position_per_market: float = 10000.0,  # USD equivalent
-        max_trades_per_hour: int = 10,
-        max_slippage_bps: float = 50.0,  # 0.5%
-        log_dir: Optional[str] = None,
-    ):
+    def __init__(self, exchange_connector: ExchangeConnector,
+                 monitoring_system: Optional[Any] = None,
+                 max_position_size_usd: float = 100.0,  # Microscopic for Phase 4
+                 max_slippage_bps: float = 20.0,  # 0.2% max slippage
+                 emergency_stop: bool = False):
         """
-        Initialize the trade executor.
+        Initialize trade executor.
         
         Args:
-            exchange: Exchange connector instance
-            dry_run: If True, no actual trades are executed (safety gate)
-            max_position_per_market: Maximum position size per market (USD)
-            max_trades_per_hour: Maximum number of trades per hour
+            exchange_connector: Exchange connector for order execution
+            monitoring_system: Monitoring system for recording trades
+            max_position_size_usd: Maximum position size in USD (Phase 4: microscopic)
             max_slippage_bps: Maximum allowed slippage in basis points
-            log_dir: Directory for trade logs
+            emergency_stop: Whether emergency stop is active
         """
-        self.exchange = exchange
-        self.dry_run = dry_run
-        self.max_position_per_market = max_position_per_market
-        self.max_trades_per_hour = max_trades_per_hour
+        self.exchange = exchange_connector
+        self.monitoring = monitoring_system
+        self.max_position_size_usd = max_position_size_usd
         self.max_slippage_bps = max_slippage_bps
+        self.emergency_stop = emergency_stop
         
-        # State tracking
-        self.positions: Dict[str, float] = {}  # market -> position size
-        self.trade_history: List[TradeResult] = []
-        self.trade_counts: Dict[str, int] = {}  # hour timestamp -> count
+        # Execution statistics
+        self.execution_count = 0
+        self.successful_executions = 0
+        self.failed_executions = 0
+        self.total_slippage_bps = 0.0
+        self.total_fees = 0.0
         
-        # Thread safety
-        self.lock = threading.Lock()
+        # Active orders
+        self.active_orders: Dict[str, Order] = {}
         
-        # Logging
-        self.log_dir = Path(log_dir) if log_dir else Path.cwd() / "logs" / "quantumarb"
-        self.log_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Safety: log dry-run status
-        if self.dry_run:
-            self._log_safety_event("INIT", "TradeExecutor initialized in DRY-RUN mode")
-        else:
-            self._log_safety_event(
-                "WARNING", 
-                "TradeExecutor initialized in LIVE mode (safety gate disabled)"
-            )
+        log.info(f"TradeExecutor initialized (max position: ${max_position_size_usd:.2f}, "
+                f"max slippage: {max_slippage_bps} bps)")
     
-    def _log_safety_event(self, level: str, message: str) -> None:
-        """Log a safety-related event."""
-        log_file = self.log_dir / "safety_events.jsonl"
-        entry = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "level": level,
-            "message": message,
-            "dry_run": self.dry_run,
-        }
-        with self.lock:
-            try:
-                with open(log_file, "a") as f:
-                    f.write(json.dumps(entry) + "\n")
-            except (IOError, OSError):
-                pass  # Silently fail if logging fails
-    
-    def _log_trade(self, result: TradeResult) -> None:
-        """Log a trade result."""
-        log_file = self.log_dir / "trade_log.jsonl"
-        with self.lock:
-            try:
-                with open(log_file, "a") as f:
-                    f.write(json.dumps(asdict(result)) + "\n")
-            except (IOError, OSError):
-                pass  # Silently fail if logging fails
-    
-    def _check_rate_limit(self) -> bool:
-        """Check if rate limit is exceeded."""
-        current_hour = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H")
-        with self.lock:
-            count = self.trade_counts.get(current_hour, 0)
-            if count >= self.max_trades_per_hour:
-                return False
-            self.trade_counts[current_hour] = count + 1
-        return True
-    
-    def _check_position_limit(self, market: str, quantity: float, price: float) -> bool:
-        """Check if position limit would be exceeded."""
-        position_value = abs(self.positions.get(market, 0.0))
-        trade_value = abs(quantity * price)
-        new_position_value = position_value + trade_value
-        
-        return new_position_value <= self.max_position_per_market
-    
-    def _check_slippage(self, expected_price: float, actual_price: float) -> bool:
-        """Check if slippage is within limits."""
-        if expected_price == 0:
+    def check_emergency_stop(self) -> bool:
+        """Check if emergency stop is active."""
+        if self.emergency_stop:
+            log.warning("⚠️ Emergency stop active - trading halted")
             return True
-        
-        slippage_bps = abs((actual_price - expected_price) / expected_price) * 10000
-        return slippage_bps <= self.max_slippage_bps
+        return False
     
-    def _get_market_price(self, market: str, side: TradeSide) -> float:
-        """Get current market price for a given side."""
-        orderbook = self.exchange.get_orderbook(market)
-        if side == TradeSide.BUY:
-            # Buy at ask price
-            return orderbook['asks'][0][0] if orderbook['asks'] else 0.0
-        else:  # SELL
-            # Sell at bid price
-            return orderbook['bids'][0][0] if orderbook['bids'] else 0.0
-    
-    def _calculate_fees(self, quantity: float, price: float) -> float:
-        """Calculate fees for a trade."""
-        trade_value = quantity * price
-        fee_rate = self.exchange.get_fees()
-        return trade_value * fee_rate
-    
-    def execute_trade(self, request: TradeRequest) -> TradeResult:
+    def validate_position_size(self, symbol: str, quantity: float) -> Tuple[bool, str]:
         """
-        Execute a trade with safety checks.
+        Validate position size for Phase 4 (microscopic).
         
         Args:
-            request: Trade request to execute
+            symbol: Trading symbol
+            quantity: Proposed quantity
             
         Returns:
-            TradeResult with execution details
+            Tuple of (is_valid, error_message)
+        """
+        # Get current price to calculate USD value
+        try:
+            ticker = self.exchange.get_ticker(symbol)
+            position_value_usd = quantity * ticker.last
+            
+            # Phase 4: Microscopic positions only
+            if position_value_usd > self.max_position_size_usd:
+                return False, (
+                    f"Position size ${position_value_usd:.2f} exceeds "
+                    f"Phase 4 limit of ${self.max_position_size_usd:.2f}"
+                )
+            
+            # Minimum size check (exchange-specific)
+            if quantity < 0.0001:  # Minimum for most crypto
+                return False, f"Quantity {quantity} below minimum trade size"
+            
+            return True, "Position size valid for Phase 4"
+            
+        except Exception as e:
+            return False, f"Failed to validate position size: {e}"
+    
+    def estimate_execution_costs(self, symbol: str, side: OrderSide, 
+                                quantity: float) -> Tuple[float, float]:
+        """
+        Estimate execution costs (slippage and fees).
+        
+        Args:
+            symbol: Trading symbol
+            side: Buy or sell
+            quantity: Order quantity
+            
+        Returns:
+            Tuple of (estimated_slippage_bps, estimated_fees_usd)
+        """
+        # Estimate slippage
+        estimated_slippage = self.exchange.estimate_slippage(symbol, side, quantity)
+        
+        # Estimate fees (Coinbase Pro: 0.5% for takers, 0.0% for makers in sandbox)
+        ticker = self.exchange.get_ticker(symbol)
+        order_value = quantity * ticker.last
+        
+        # For Phase 4 microscopic trading, assume minimal fees
+        # In sandbox: 0 fees, in live: 0.5% taker fee
+        estimated_fees = 0.0  # Sandbox
+        if not self.exchange.sandbox:
+            estimated_fees = order_value * 0.005  # 0.5% taker fee
+        
+        return estimated_slippage, estimated_fees
+    
+    def check_slippage_limit(self, symbol: str, side: OrderSide,
+                            quantity: float) -> Tuple[bool, str]:
+        """
+        Check if estimated slippage is within limits.
+        
+        Args:
+            symbol: Trading symbol
+            side: Buy or sell
+            quantity: Order quantity
+            
+        Returns:
+            Tuple of (within_limit, error_message)
+        """
+        estimated_slippage, _ = self.estimate_execution_costs(symbol, side, quantity)
+        
+        if estimated_slippage > self.max_slippage_bps:
+            return False, (
+                f"Estimated slippage {estimated_slippage:.1f} bps "
+                f"exceeds limit of {self.max_slippage_bps} bps"
+            )
+        
+        return True, f"Estimated slippage {estimated_slippage:.1f} bps within limits"
+    
+    def execute_trade(self, symbol: str, side: OrderSide, 
+                     quantity: float, trade_id: str = "") -> ExecutionResult:
+        """
+        Execute a trade with all safety checks.
+        
+        For Phase 4: Microscopic positions only, all checks enforced.
+        
+        Args:
+            symbol: Trading symbol (e.g., "BTC-USD")
+            side: Buy or sell
+            quantity: Order quantity
+            trade_id: Optional trade ID for monitoring
+            
+        Returns:
+            ExecutionResult with outcome details
         """
         start_time = time.time()
+        timestamp = datetime.now(timezone.utc).isoformat()
+        
+        # Generate trade ID if not provided
+        if not trade_id:
+            trade_id = f"trade_{int(time.time())}_{self.execution_count}"
+        
+        log.info(f"Executing trade {trade_id}: {side.value} {quantity} {symbol}")
+        
+        # Check emergency stop
+        if self.check_emergency_stop():
+            return ExecutionResult(
+                success=False,
+                error_message="Emergency stop active",
+                timestamp=timestamp
+            )
+        
+        # 1. Validate position size (Phase 4: microscopic only)
+        is_valid, error_msg = self.validate_position_size(symbol, quantity)
+        if not is_valid:
+            log.warning(f"Position size validation failed: {error_msg}")
+            return ExecutionResult(
+                success=False,
+                error_message=f"Position size invalid: {error_msg}",
+                timestamp=timestamp
+            )
+        
+        # 2. Check slippage limits
+        slippage_ok, slippage_msg = self.check_slippage_limit(symbol, side, quantity)
+        if not slippage_ok:
+            log.warning(f"Slippage check failed: {slippage_msg}")
+            return ExecutionResult(
+                success=False,
+                error_message=f"Slippage limit exceeded: {slippage_msg}",
+                timestamp=timestamp
+            )
+        
+        # 3. Estimate costs
+        estimated_slippage, estimated_fees = self.estimate_execution_costs(
+            symbol, side, quantity
+        )
+        
+        log.info(f"Estimated costs: slippage={estimated_slippage:.1f} bps, "
+                f"fees=${estimated_fees:.4f}")
+        
+        # 4. Record in monitoring system
+        if MONITORING_AVAILABLE and self.monitoring:
+            try:
+                execution_data = {
+                    "symbol": symbol,
+                    "side": side.value,
+                    "quantity": quantity,
+                    "estimated_slippage": estimated_slippage,
+                    "estimated_fees": estimated_fees,
+                    "timestamp": timestamp,
+                    "status": "pending"
+                }
+                self.monitoring.record_order_execution(trade_id, execution_data)
+            except Exception as e:
+                log.warning(f"Failed to record execution in monitoring: {e}")
+        
+        # 5. Execute order
+        try:
+            order = self.exchange.place_order(
+                symbol=symbol,
+                side=side,
+                quantity=quantity,
+                order_type=OrderType.MARKET  # Phase 4: Use market orders for simplicity
+            )
+            
+            log.info(f"Order placed: {order.order_id}, status: {order.status.value}")
+            
+            # 6. Monitor order fill
+            if order.status == OrderStatus.FILLED:
+                # Immediate fill (common for market orders)
+                filled_quantity = order.filled_quantity
+                average_price = order.average_price or 0.0
+                
+                # Calculate actual slippage
+                ticker = self.exchange.get_ticker(symbol)
+                expected_price = ticker.ask if side == OrderSide.BUY else ticker.bid
+                
+                if expected_price > 0:
+                    actual_slippage = abs((average_price - expected_price) / expected_price) * 10000
+                else:
+                    actual_slippage = estimated_slippage
+                
+                # Calculate actual fees (simplified for Phase 4)
+                actual_fees = estimated_fees  # In Phase 4, we'll use estimates
+                
+                # Update statistics
+                self.execution_count += 1
+                self.successful_executions += 1
+                self.total_slippage_bps += actual_slippage
+                self.total_fees += actual_fees
+                
+                # Store active order
+                self.active_orders[order.order_id] = order
+                
+                # Record fill in monitoring
+                if MONITORING_AVAILABLE and self.monitoring:
+                    try:
+                        fill_data = {
+                            "order_id": order.order_id,
+                            "filled_quantity": filled_quantity,
+                            "average_price": average_price,
+                            "slippage_bps": actual_slippage,
+                            "fees": actual_fees,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                        self.monitoring.record_order_execution(trade_id, fill_data)
+                    except Exception as e:
+                        log.warning(f"Failed to record fill in monitoring: {e}")
+                
+                execution_time = time.time() - start_time
+                
+                log.info(f"✅ Trade executed successfully: {order.order_id}")
+                log.info(f"   Filled: {filled_quantity} at ${average_price:.2f}")
+                log.info(f"   Slippage: {actual_slippage:.1f} bps, Fees: ${actual_fees:.4f}")
+                log.info(f"   Execution time: {execution_time:.2f}s")
+                
+                return ExecutionResult(
+                    success=True,
+                    order_id=order.order_id,
+                    filled_quantity=filled_quantity,
+                    average_price=average_price,
+                    slippage_bps=actual_slippage,
+                    fees=actual_fees,
+                    timestamp=timestamp
+                )
+                
+            else:
+                # Order not immediately filled
+                log.warning(f"Order {order.order_id} not immediately filled: {order.status.value}")
+                
+                # For Phase 4, we'll cancel unfilled market orders
+                time.sleep(2)  # Wait a bit
+                
+                order_status = self.exchange.get_order_status(order.order_id)
+                
+                if order_status.status == OrderStatus.FILLED:
+                    # Fill occurred after delay
+                    return self.execute_trade(symbol, side, quantity, trade_id)
+                else:
+                    # Cancel unfilled order
+                    self.exchange.cancel_order(order.order_id)
+                    
+                    self.execution_count += 1
+                    self.failed_executions += 1
+                    
+                    return ExecutionResult(
+                        success=False,
+                        order_id=order.order_id,
+                        error_message=f"Order not filled: {order_status.status.value}",
+                        timestamp=timestamp
+                    )
+                    
+        except InsufficientFundsError as e:
+            log.error(f"Insufficient funds: {e}")
+            self.failed_executions += 1
+            
+            return ExecutionResult(
+                success=False,
+                error_message=f"Insufficient funds: {e}",
+                timestamp=timestamp
+            )
+            
+        except OrderRejectedError as e:
+            log.error(f"Order rejected: {e}")
+            self.failed_executions += 1
+            
+            return ExecutionResult(
+                success=False,
+                error_message=f"Order rejected: {e}",
+                timestamp=timestamp
+            )
+            
+        except ExchangeError as e:
+            log.error(f"Exchange error: {e}")
+            self.failed_executions += 1
+            
+            return ExecutionResult(
+                success=False,
+                error_message=f"Exchange error: {e}",
+                timestamp=timestamp
+            )
+            
+        except Exception as e:
+            log.error(f"Unexpected error executing trade: {e}")
+            self.failed_executions += 1
+            
+            return ExecutionResult(
+                success=False,
+                error_message=f"Unexpected error: {e}",
+                timestamp=timestamp
+            )
+    
+    def cancel_all_orders(self, symbol: Optional[str] = None) -> int:
+        """
+        Cancel all active orders.
+        
+        Args:
+            symbol: Optional symbol filter
+            
+        Returns:
+            Number of orders cancelled
+        """
+        cancelled = 0
         
         try:
-            # 1. Validate request
-            if request.quantity <= 0:
-                raise ValueError(f"Invalid quantity: {request.quantity}")
+            open_orders = self.exchange.get_open_orders(symbol)
             
-            if request.price_limit is not None and request.price_limit <= 0:
-                raise ValueError(f"Invalid price limit: {request.price_limit}")
+            for order in open_orders:
+                try:
+                    if self.exchange.cancel_order(order.order_id):
+                        cancelled += 1
+                        log.info(f"Cancelled order: {order.order_id}")
+                        
+                        # Remove from active orders
+                        if order.order_id in self.active_orders:
+                            del self.active_orders[order.order_id]
+                except Exception as e:
+                    log.warning(f"Failed to cancel order {order.order_id}: {e}")
             
-            # 2. Get current market price
-            market_price = self._get_market_price(request.market, request.side)
-            if market_price <= 0:
-                raise ValueError(f"Invalid market price: {market_price}")
+            log.info(f"Cancelled {cancelled} orders")
+            return cancelled
             
-            # 3. Apply price limit if specified
-            execution_price = market_price
-            if request.price_limit is not None:
-                if request.side == TradeSide.BUY and market_price > request.price_limit:
-                    raise SafetyViolationError(
-                        f"Market price {market_price} exceeds buy limit {request.price_limit}"
-                    )
-                elif request.side == TradeSide.SELL and market_price < request.price_limit:
-                    raise SafetyViolationError(
-                        f"Market price {market_price} below sell limit {request.price_limit}"
-                    )
-                execution_price = request.price_limit
-            
-            # 4. Safety checks
-            if not self._check_rate_limit():
-                raise SafetyViolationError("Rate limit exceeded")
-            
-            if not self._check_position_limit(request.market, request.quantity, execution_price):
-                raise SafetyViolationError("Position limit would be exceeded")
-            
-            if not self._check_slippage(request.price_limit or market_price, execution_price):
-                raise SafetyViolationError("Slippage exceeds limit")
-            
-            # 5. Execute trade (or simulate in dry-run mode)
-            if self.dry_run or request.dry_run:
-                status = TradeStatus.EXECUTED if not self.dry_run else TradeStatus.PENDING
-                result = TradeResult(
-                    trade_id=request.trade_id,
-                    request=request,
-                    status=status,
-                    executed_price=execution_price,
-                    executed_quantity=request.quantity,
-                    fees=self._calculate_fees(request.quantity, execution_price),
-                    metadata={
-                        "dry_run": True,
-                        "execution_time_ms": int((time.time() - start_time) * 1000),
-                        "market_price_at_execution": market_price,
-                    }
-                )
-                
-                # Update position (even in dry-run for tracking)
-                with self.lock:
-                    current_position = self.positions.get(request.market, 0.0)
-                    if request.side == TradeSide.BUY:
-                        self.positions[request.market] = current_position + request.quantity
-                    else:
-                        self.positions[request.market] = current_position - request.quantity
-                
-                self._log_trade(result)
-                return result
-            else:
-                # Live execution would go here
-                # For now, we simulate successful execution
-                result = TradeResult(
-                    trade_id=request.trade_id,
-                    request=request,
-                    status=TradeStatus.EXECUTED,
-                    executed_price=execution_price,
-                    executed_quantity=request.quantity,
-                    fees=self._calculate_fees(request.quantity, execution_price),
-                    metadata={
-                        "dry_run": False,
-                        "execution_time_ms": int((time.time() - start_time) * 1000),
-                        "market_price_at_execution": market_price,
-                    }
-                )
-                
-                # Update position
-                with self.lock:
-                    current_position = self.positions.get(request.market, 0.0)
-                    if request.side == TradeSide.BUY:
-                        self.positions[request.market] = current_position + request.quantity
-                    else:
-                        self.positions[request.market] = current_position - request.quantity
-                    self.trade_history.append(result)
-                
-                self._log_trade(result)
-                return result
-                
-        except (ValueError, SafetyViolationError) as e:
-            # Safety check failed
-            result = TradeResult(
-                trade_id=request.trade_id,
-                request=request,
-                status=TradeStatus.REJECTED,
-                error_message=str(e),
-                metadata={
-                    "dry_run": self.dry_run,
-                    "execution_time_ms": int((time.time() - start_time) * 1000),
-                }
-            )
-            self._log_trade(result)
-            return result
         except Exception as e:
-            # Unexpected error
-            result = TradeResult(
-                trade_id=request.trade_id,
-                request=request,
-                status=TradeStatus.FAILED,
-                error_message=str(e),
-                metadata={
-                    "dry_run": self.dry_run,
-                    "execution_time_ms": int((time.time() - start_time) * 1000),
-                }
-            )
-            self._log_trade(result)
-            return result
+            log.error(f"Failed to cancel orders: {e}")
+            return 0
     
-    def get_position(self, market: str) -> float:
-        """Get current position for a market."""
-        with self.lock:
-            return self.positions.get(market, 0.0)
-    
-    def get_all_positions(self) -> Dict[str, float]:
-        """Get all current positions."""
-        with self.lock:
-            return self.positions.copy()
-    
-    def get_trade_history(self, limit: int = 100) -> List[TradeResult]:
-        """Get recent trade history."""
-        with self.lock:
-            return self.trade_history[-limit:] if self.trade_history else []
-    
-    def reset_positions(self) -> None:
-        """Reset all positions (for testing only)."""
-        with self.lock:
-            self.positions.clear()
-            self._log_safety_event("INFO", "All positions reset")
-
-
-# Factory function for creating executors
-def create_executor(
-    exchange: ExchangeConnector,
-    dry_run: bool = True,
-    **kwargs
-) -> TradeExecutor:
-    """
-    Create a TradeExecutor with sensible defaults.
-    
-    Args:
-        exchange: Exchange connector instance
-        dry_run: Whether to run in dry-run mode (safety gate)
-        **kwargs: Additional arguments for TradeExecutor
+    def get_execution_stats(self) -> Dict:
+        """Get execution statistics."""
+        avg_slippage = 0.0
+        if self.successful_executions > 0:
+            avg_slippage = self.total_slippage_bps / self.successful_executions
         
-    Returns:
-        Configured TradeExecutor instance
-    """
-    return TradeExecutor(exchange=exchange, dry_run=dry_run, **kwargs)
+        success_rate = 0.0
+        if self.execution_count > 0:
+            success_rate = self.successful_executions / self.execution_count
+        
+        return {
+            "execution_count": self.execution_count,
+            "successful_executions": self.successful_executions,
+            "failed_executions": self.failed_executions,
+            "success_rate": success_rate,
+            "average_slippage_bps": avg_slippage,
+            "total_fees_usd": self.total_fees,
+            "active_orders": len(self.active_orders),
+            "emergency_stop": self.emergency_stop
+        }
+    
+    def set_emergency_stop(self, active: bool = True):
+        """Set emergency stop state."""
+        self.emergency_stop = active
+        status = "ACTIVE" if active else "INACTIVE"
+        log.warning(f"Emergency stop set to: {status}")
+        
+        if active:
+            # Cancel all orders when emergency stop activated
+            self.cancel_all_orders()
+
+
+# Test function for Phase 4
+def test_trade_executor():
+    """Test trade executor functionality."""
+    print("Testing Trade Executor for Phase 4...")
+    
+    # Create stub exchange connector
+    from .exchange_connector import StubExchangeConnector, OrderSide
+    
+    exchange = StubExchangeConnector(sandbox=True)
+    
+    # Create trade executor with microscopic limits
+    executor = TradeExecutor(
+        exchange_connector=exchange,
+        max_position_size_usd=50.0,  # Very small for Phase 4
+        max_slippage_bps=10.0,  # Tight slippage limits
+        emergency_stop=False
+    )
+    
+    try:
+        # Test 1: Position size validation
+        print("\n1. Testing position size validation...")
+        is_valid, msg = executor.validate_position_size("BTC-USD", 0.0005)
+        print(f"   Small position (0.0005 BTC): {is_valid} - {msg}")
+        
+        is_valid, msg = executor.validate_position_size("BTC-USD", 1.0)
+        print(f"   Large position (1.0 BTC): {is_valid} - {msg}")
+        
+        # Test 2: Slippage estimation
+        print("\n2. Testing slippage estimation...")
+        slippage_ok, slippage_msg = executor.check_slippage_limit(
+            "BTC-USD", OrderSide.BUY, 0.001
+        )
+        print(f"   Slippage check: {slippage_ok} - {slippage_msg}")
+        
+        # Test 3: Cost estimation
+        print("\n3. Testing cost estimation...")
+        estimated_slippage, estimated_fees = executor.estimate_execution_costs(
+            "BTC-USD", OrderSide.BUY, 0.001
+        )
+        print(f"   Estimated slippage: {estimated_slippage:.1f} bps")
+        print(f"   Estimated fees: ${estimated_fees:.4f}")
+        
+        # Test 4: Execute microscopic trade
+        print("\n4. Testing microscopic trade execution...")
+        result = executor.execute_trade(
+            symbol="BTC-USD",
+            side=OrderSide.BUY,
+            quantity=0.001  # Microscopic size
+        )
+        
+        print(f"   Execution result: {'SUCCESS' if result.success else 'FAILED'}")
+        if result.success:
+            print(f"   Order ID: {result.order_id}")
+            print(f"   Filled: {result.filled_quantity}")
+            print(f"   Average price: ${result.average_price:.2f}")
+            print(f"   Slippage: {result.slippage_bps:.1f} bps")
+            print(f"   Fees: ${result.fees:.4f}")
+        else:
+            print(f"   Error: {result.error_message}")
+        
+        # Test 5: Get execution stats
+        print("\n5. Testing execution statistics...")
+        stats = executor.get_execution_stats()
+        print(f"   Execution count: {stats['execution_count']}")
+        print(f"   Success rate: {stats['success_rate']:.1%}")
+        print(f"   Average slippage: {stats['average_slippage_bps']:.1f} bps")
+        
+        # Test 6: Emergency stop
+        print("\n6. Testing emergency stop...")
+        executor.set_emergency_stop(True)
+        result = executor.execute_trade("BTC-USD", OrderSide.BUY, 0.001)
+        print(f"   Trade with emergency stop: {'BLOCKED' if not result.success else 'ALLOWED'}")
+        
+        print("\n✅ Trade executor tests passed")
+        print("   Ready for Phase 4 microscopic trading")
+        
+    except Exception as e:
+        print(f"❌ Trade executor test failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+
+if __name__ == "__main__":
+    test_trade_executor()

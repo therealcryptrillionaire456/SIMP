@@ -1,0 +1,22 @@
+{
+  "intent_type": "arbitrage_signal",
+  "source_agent": "gate1_adjusted",
+  "target_agent": "quantumarb_minimal",
+  "timestamp": "2026-04-14T14:46:30.595906",
+  "payload": {
+    "signal_id": "adj_gate1_4_1776177990",
+    "arb_type": "cross_venue",
+    "symbol_a": "BTC-USD",
+    "symbol_b": "BTC-USD",
+    "venue_a": "coinbase_sandbox",
+    "venue_b": "coinbase_sandbox",
+    "spread_pct": 0.25,
+    "expected_return_pct": 0.23,
+    "confidence": 0.7,
+    "metadata": {
+      "gate": 1,
+      "test": true,
+      "adjusted_scoring": true
+    }
+  }
+}

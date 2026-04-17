@@ -344,18 +344,18 @@ class SmartMeshClient:
         Returns:
             Message ID or None if failed
         """
-        # Create packet
-        packet = MeshPacket(
-            message_id=str(uuid.uuid4()),
-            source_agent=self.agent_id,
-            target_agent=target_agent,
-            target_channel=target_channel,
-            message_type=message_type,
-            priority=priority,
+        # Create packet using the canonical helper (correct field names)
+        packet = create_event_packet(
+            sender_id=self.agent_id,
+            recipient_id=target_agent or "*",
+            channel=target_channel or "",
             payload=payload or {},
-            timestamp=time.time(),
-            ttl=ttl,
+            priority=priority,
+            ttl_seconds=ttl,
         )
+        # Override message_id (pre-generated for callback tracking) and msg_type
+        packet.message_id = str(uuid.uuid4())
+        packet.msg_type = message_type
         
         # Store delivery callback
         if delivery_callback:

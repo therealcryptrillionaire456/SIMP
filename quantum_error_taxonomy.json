@@ -1,0 +1,269 @@
+{
+  "taxonomy_version": "1.0",
+  "description": "Structured error taxonomy for Quantum Mode in Stray Goose",
+  "last_updated": "2024-04-13",
+  "errors": [
+    {
+      "code": "QMODE_DETECTION_FALSE_POSITIVE",
+      "name": "Detection False Positive",
+      "description": "Task was flagged as quantum but was not actually quantum-related",
+      "category": "detection",
+      "severity": "low",
+      "action": "exit quantum mode and continue normal handling",
+      "recovery": "none",
+      "learning_signal": "negative",
+      "prevention": "Improve keyword detection with context analysis",
+      "examples": [
+        "Query: 'Quantum leap in technology' (metaphorical use)",
+        "Query: 'I have a quantum of solace' (movie reference)"
+      ]
+    },
+    {
+      "code": "QMODE_RETRIEVAL_EMPTY",
+      "name": "Empty Retrieval",
+      "description": "No relevant dataset examples found for the quantum query",
+      "category": "retrieval",
+      "severity": "medium",
+      "action": "block executable generation, escalate explanation-only path if safe",
+      "recovery": "broaden search, check for typos, suggest similar algorithms",
+      "learning_signal": "negative",
+      "prevention": "Expand dataset coverage, improve retrieval algorithm",
+      "examples": [
+        "Query: 'Implement quantum algorithm XYZ' (algorithm not in dataset)",
+        "Query: 'Quantum algorithm for protein folding' (advanced topic not covered)"
+      ]
+    },
+    {
+      "code": "QMODE_RETRIEVAL_LOW_CONFIDENCE",
+      "name": "Low Confidence Retrieval",
+      "description": "Examples found but match quality is weak or uncertain",
+      "category": "retrieval",
+      "severity": "medium",
+      "action": "consult ProjectX or answer cautiously with disclaimers",
+      "recovery": "use most relevant example with explicit uncertainty notice",
+      "learning_signal": "negative",
+      "prevention": "Improve similarity scoring, add more examples",
+      "examples": [
+        "Query: 'Quantum state preparation' (vague, multiple matches)",
+        "Query: 'Quantum gates tutorial' (general, many possible examples)"
+      ]
+    },
+    {
+      "code": "QMODE_FRAMEWORK_UNSUPPORTED",
+      "name": "Unsupported Framework",
+      "description": "Requested framework is not currently supported",
+      "category": "framework",
+      "severity": "high",
+      "action": "block or propose supported fallback",
+      "recovery": "suggest supported framework alternative",
+      "learning_signal": "negative",
+      "prevention": "Clear documentation of supported frameworks",
+      "examples": [
+        "Query: 'Implement in Cirq' (Cirq not supported)",
+        "Query: 'Use Amazon Braket' (Braket not implemented)"
+      ]
+    },
+    {
+      "code": "QMODE_FRAMEWORK_MISMATCH",
+      "name": "Framework Mismatch",
+      "description": "Retrieved examples and requested framework don't match",
+      "category": "framework",
+      "severity": "medium",
+      "action": "re-retrieve using framework filter or translate with notice",
+      "recovery": "filter examples by framework, translate if possible",
+      "learning_signal": "negative",
+      "prevention": "Better framework detection in retrieval",
+      "examples": [
+        "Query: 'Bell state in Qiskit' but only PennyLane examples found",
+        "Query: 'QFT in PennyLane' but examples are Qiskit-only"
+      ]
+    },
+    {
+      "code": "QMODE_TASK_INVALID",
+      "name": "Invalid Task",
+      "description": "Required task fields are missing or invalid",
+      "category": "validation",
+      "severity": "medium",
+      "action": "ask for missing fields or normalize to closest valid task",
+      "recovery": "prompt for missing information, suggest defaults",
+      "learning_signal": "negative",
+      "prevention": "Better task parsing and validation",
+      "examples": [
+        "Query: 'Create quantum circuit' (missing qubit count)",
+        "Query: 'Implement algorithm' (missing algorithm name)"
+      ]
+    },
+    {
+      "code": "QMODE_IMPORT_FAILURE",
+      "name": "Import Failure",
+      "description": "Quantum framework import failed",
+      "category": "execution",
+      "severity": "high",
+      "action": "mark execution failed, log environment details",
+      "recovery": "check framework installation, suggest installation steps",
+      "learning_signal": "negative",
+      "prevention": "Pre-flight dependency checks",
+      "examples": [
+        "ImportError: No module named 'qiskit'",
+        "ModuleNotFoundError: pennylane not installed"
+      ]
+    },
+    {
+      "code": "QMODE_SYNTAX_ERROR",
+      "name": "Syntax Error",
+      "description": "Generated or provided code has syntax errors",
+      "category": "execution",
+      "severity": "medium",
+      "action": "attempt minimal repair, then re-verify",
+      "recovery": "syntax check before execution, suggest fixes",
+      "learning_signal": "negative",
+      "prevention": "Better code generation, syntax validation",
+      "examples": [
+        "SyntaxError: invalid syntax at line 5",
+        "IndentationError: unexpected indent"
+      ]
+    },
+    {
+      "code": "QMODE_SIMULATOR_FAILURE",
+      "name": "Simulator Failure",
+      "description": "Quantum simulator failed to run the circuit/program",
+      "category": "execution",
+      "severity": "high",
+      "action": "capture stack/error details, classify, escalate if persistent",
+      "recovery": "simplify circuit, reduce shots, try different simulator",
+      "learning_signal": "negative",
+      "prevention": "Circuit validation, resource limits",
+      "examples": [
+        "MemoryError: circuit too large",
+        "Timeout: simulation took too long",
+        "SimulatorError: invalid operation"
+      ]
+    },
+    {
+      "code": "QMODE_LOGIC_FAILURE",
+      "name": "Logic Failure",
+      "description": "Code runs but fails algorithm-specific assertions",
+      "category": "verification",
+      "severity": "high",
+      "action": "treat as incorrect solution, retrieve analogous examples",
+      "recovery": "debug algorithm logic, check expected vs actual",
+      "learning_signal": "negative",
+      "prevention": "Better algorithm understanding, more test cases",
+      "examples": [
+        "Expected Bell state (00:50%, 11:50%) but got different distribution",
+        "Deutsch algorithm should output constant but outputs balanced"
+      ]
+    },
+    {
+      "code": "QMODE_PROBABILISTIC_MISMATCH",
+      "name": "Probabilistic Mismatch",
+      "description": "Measured distribution deviates from expected probabilistic behavior",
+      "category": "verification",
+      "severity": "medium",
+      "action": "re-run within tolerance bounds, inspect shot count and assertion settings",
+      "recovery": "increase shots, adjust tolerance, check random seed",
+      "learning_signal": "negative",
+      "prevention": "Statistical tolerance settings, sufficient shots",
+      "examples": [
+        "Expected 50/50 distribution but got 45/55 (within statistical noise)",
+        "Probability mismatch beyond tolerance"
+      ]
+    },
+    {
+      "code": "QMODE_RESOURCE_LIMIT",
+      "name": "Resource Limit Exceeded",
+      "description": "Task exceeds configured qubit/runtime/memory limits",
+      "category": "resources",
+      "severity": "high",
+      "action": "block and escalate",
+      "recovery": "suggest smaller problem size, explain limits",
+      "learning_signal": "negative",
+      "prevention": "Pre-flight resource estimation",
+      "examples": [
+        "Requested 100 qubits but limit is 10",
+        "Circuit depth 500 exceeds limit of 100",
+        "Estimated runtime 5 minutes exceeds 30 second limit"
+      ]
+    },
+    {
+      "code": "QMODE_PROJECTX_BLOCK",
+      "name": "ProjectX Block",
+      "description": "ProjectX explicitly blocked the task",
+      "category": "safety",
+      "severity": "high",
+      "action": "stop and report rationale",
+      "recovery": "none - safety decision is final",
+      "learning_signal": "positive (if respected)",
+      "prevention": "Better task formulation, stay within scope",
+      "examples": [
+        "ProjectX: 'Unsupported framework requested'",
+        "ProjectX: 'Resource limits exceeded'",
+        "ProjectX: 'Algorithm out of scope'"
+      ]
+    },
+    {
+      "code": "QMODE_UNKNOWN",
+      "name": "Unknown Error",
+      "description": "Unclassified failure",
+      "category": "unknown",
+      "severity": "critical",
+      "action": "log raw evidence, escalate",
+      "recovery": "manual investigation required",
+      "learning_signal": "negative",
+      "prevention": "Better error classification coverage",
+      "examples": [
+        "Unexpected exception type",
+        "Error without clear category"
+      ]
+    }
+  ],
+  "categories": {
+    "detection": "Errors in detecting quantum queries",
+    "retrieval": "Errors in retrieving relevant examples",
+    "framework": "Errors related to quantum frameworks",
+    "validation": "Errors in task validation and parsing",
+    "execution": "Errors during code execution",
+    "verification": "Errors in verifying results",
+    "resources": "Errors due to resource limitations",
+    "safety": "Errors related to safety decisions",
+    "unknown": "Unclassified errors"
+  },
+  "severity_levels": {
+    "low": "Minor issue, can continue normally",
+    "medium": "Significant issue, may affect quality",
+    "high": "Serious issue, blocks execution",
+    "critical": "Critical issue, requires immediate attention"
+  },
+  "learning_signals": {
+    "positive": "Correct behavior to reinforce",
+    "negative": "Incorrect behavior to avoid",
+    "corrective": "Behavior that was corrected"
+  },
+  "recovery_strategies": {
+    "retry": "Can be retried with same parameters",
+    "adjust": "Can be retried with adjusted parameters",
+    "escalate": "Requires human intervention",
+    "block": "Cannot be recovered, task blocked"
+  },
+  "prevention_methods": [
+    "Better validation",
+    "Improved detection",
+    "Expanded dataset",
+    "Resource estimation",
+    "Pre-flight checks",
+    "Clear documentation"
+  ],
+  "statistics_tracking": {
+    "error_frequency": "Track how often each error occurs",
+    "recovery_rate": "Track success of recovery attempts",
+    "severity_distribution": "Track distribution of error severities",
+    "category_trends": "Track trends in error categories over time",
+    "learning_impact": "Track impact of errors on learning signals"
+  },
+  "integration": {
+    "with_projectx": "Errors feed into ProjectX safety judgments",
+    "with_learning": "Errors generate learning signals",
+    "with_tracing": "Errors are logged in structured traces",
+    "with_metrics": "Errors contribute to system metrics"
+  }
+}

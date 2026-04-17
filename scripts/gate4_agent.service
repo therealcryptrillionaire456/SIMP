@@ -1,0 +1,17 @@
+[Unit]
+Description=Gate 4 Scaled Microscopic Agent
+After=network.target
+
+[Service]
+Type=simple
+User=kaseymarcelle
+WorkingDirectory=/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp
+Environment="PATH=venv_gate4/bin"
+ExecStart=venv_gate4/bin/python3.10 agents/gate4_scaled_microscopic_agent.py --config config/gate4_scaled_microscopic.json
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:logs/gate4_agent.log
+StandardError=append:logs/gate4_agent.error.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,136 @@
+{
+  "timestamp": "2026-04-14T12:16:20.190289",
+  "phase": 4,
+  "components": {
+    "simp_broker": {
+      "status": "online",
+      "data": {
+        "agents_online": 3,
+        "pending_intents": 1808,
+        "state": "running",
+        "status": "healthy",
+        "timestamp": "2026-04-14T16:16:20Z"
+      }
+    },
+    "dashboard": {
+      "status": "online",
+      "data": {
+        "status": "healthy",
+        "broker_reachable": true,
+        "dashboard_version": "1.4.1",
+        "broker_state": "running",
+        "agents_registered": 3,
+        "uptime_seconds": 0
+      }
+    },
+    "bullbear_agent": {
+      "status": "online",
+      "data": {
+        "agent_id": "bullbear_predictor",
+        "analysis_requests": 2,
+        "available_sectors": [
+          "crypto",
+          "stocks",
+          "sports",
+          "politics",
+          "real_estate"
+        ],
+        "port": 5559,
+        "signals_generated": 1,
+        "status": "running",
+        "timestamp": "2026-04-14T16:16:20.200338+00:00"
+      }
+    },
+    "projectx": {
+      "status": "online",
+      "data": {
+        "status": "ok",
+        "agent_id": "projectx_native",
+        "version": "0.1.0",
+        "registered": false,
+        "intents_handled": 0,
+        "security_audit_status": "findings_detected",
+        "timestamp": "2026-04-14T16:16:20.204377+00:00"
+      }
+    },
+    "kashclaw_gemma": {
+      "status": "online",
+      "data": {
+        "status": "ok",
+        "agent_id": "kashclaw_gemma",
+        "name": "Kashclaw Gemma4 Reasoning Worker",
+        "version": "1.0.0",
+        "model": "gemma4:e2b",
+        "ollama_url": "http://127.0.0.1:11434",
+        "capabilities": [
+          "research",
+          "code_task",
+          "planning",
+          "status_check",
+          "capability_query",
+          "ping"
+        ],
+        "timestamp": "2026-04-14T16:16:20.205547+00:00",
+        "requests_received": 0,
+        "firewall_blocks": 0,
+        "sync_handled": 0,
+        "async_dispatched": 0,
+        "unsupported": 0,
+        "errors": 0,
+        "started_at": "2026-04-14T05:59:35.681572+00:00"
+      }
+    },
+    "quantumarb_minimal": {
+      "status": "running",
+      "pids": [
+        "48164",
+        "48168"
+      ]
+    },
+    "quantumarb_other": {
+      "status": "running",
+      "pids": [
+        "48164",
+        "48168",
+        "56170",
+        "56171",
+        "62506",
+        "62535",
+        "62990",
+        "63370"
+      ]
+    },
+    "phase4_config": {
+      "status": "exists",
+      "size_bytes": 5059
+    },
+    "gate1_progress": {
+      "status": "active",
+      "progress": {
+        "gate_1_progress": {
+          "start_date": "2026-04-14",
+          "target_trades": 100,
+          "completed_trades": 100,
+          "successful_trades": 87,
+          "failed_trades": 13,
+          "total_pnl_usd": 0.0532799110768557,
+          "average_slippage_pct": 0.0,
+          "daily_progress": {
+            "2026-04-14": {
+              "trades": 100,
+              "pnl": 0.04976643999999998
+            }
+          }
+        }
+      }
+    },
+    "obsidian": {
+      "status": "available",
+      "md_files": 62681
+    },
+    "logs": {
+      "total_files": 44,
+      "recent_files": 20
+    }
+  }
+}

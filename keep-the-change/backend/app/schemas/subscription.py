@@ -33,7 +33,7 @@ class SubscriptionTierResponse(SubscriptionTierBase):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def yearly_savings(self) -> Optional[float]:
@@ -108,7 +108,7 @@ class SubscriptionResponse(SubscriptionBase):
     tier: Optional[SubscriptionTierResponse] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def is_active(self) -> bool:
@@ -159,7 +159,7 @@ class InvoiceResponse(BaseModel):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def is_paid(self) -> bool:
@@ -204,7 +204,7 @@ class PromoCodeResponse(BaseModel):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def is_valid(self) -> bool:

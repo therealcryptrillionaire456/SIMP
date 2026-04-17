@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-04-14T14:09:52.651229",
+  "signal": {
+    "signal_id": "ethusd_gate3_1776190192_1867",
+    "arb_type": "cross_venue",
+    "symbol_a": "ETH-USD",
+    "symbol_b": "ETH-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.0514,
+    "expected_return_pct": 0.0442,
+    "confidence": 0.89,
+    "timestamp": "2026-04-14T14:09:52.650542",
+    "metadata": {
+      "gate": "3",
+      "market": "ETH-USD",
+      "microscopic": true,
+      "multi_market": true,
+      "test_signal": true,
+      "estimated_price": 3113.6980102902808
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "ethusd_gate3_1776190192_1867",
+      "arb_type": "cross_venue",
+      "symbol_a": "ETH-USD",
+      "symbol_b": "ETH-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.0514,
+      "expected_return_pct": 0.0442,
+      "confidence": 0.89,
+      "timestamp": "2026-04-14T14:09:52.650542",
+      "metadata": {
+        "gate": "3",
+        "market": "ETH-USD",
+        "microscopic": true,
+        "multi_market": true,
+        "test_signal": true,
+        "estimated_price": 3113.6980102902808
+      }
+    },
+    "decision": "reject_risk",
+    "decision_reason": "Risk score 0.604 < minimum 0.62 for ETH-USD",
+    "position_size_usd": 0.0,
+    "expected_pnl_usd": 0.0,
+    "risk_score": 0.6040810163447402,
+    "metadata": {
+      "rejection_reason": "low_risk_score",
+      "symbol": "ETH-USD"
+    }
+  },
+  "execution_result": null,
+  "session_id": "gate3_1776190187",
+  "gate": "3"
+}

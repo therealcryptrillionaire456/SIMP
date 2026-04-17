@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "proxy_url": "http://localhost:8235",
+  "store_url": "http://localhost:43887",
+  "model": "glm-4-plus",
+  "enable_apo": true,
+  "trace_agent": true,
+  "agent_id": "kloutbot",
+  "agent_type": "orchestration",
+  "llm_methods_to_trace": [
+    "coordinate_agents",
+    "generate_strategy",
+    "resolve_conflicts"
+  ],
+  "optimization_focus_areas": [
+    "coordination",
+    "strategy_planning"
+  ]
+}

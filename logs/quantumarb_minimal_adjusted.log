@@ -1,0 +1,297 @@
+2026-04-14 10:43:25,542 - quantumarb_minimal - INFO - QuantumArbEngineMinimal initialized for Phase 4 microscopic trading
+2026-04-14 10:43:25,542 - quantumarb_minimal - INFO - QuantumArbAgentMinimal initialized with poll interval 2.0s
+2026-04-14 10:43:25,542 - quantumarb_minimal - INFO - Starting QuantumArbAgentMinimal...
+2026-04-14 10:46:15,700 - quantumarb_minimal - INFO - Evaluating arbitrage signal: adj_gate1_1_1776177975
+2026-04-14 10:46:15,700 - quantumarb_minimal - INFO - Decision: {'signal_id': 'adj_gate1_1_1776177975', 'spread_pct': 0.15, 'decision': 'execute', 'reason': 'Approved: spread=0.1500%, risk=0.61', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00010000000000000002, 'risk_score': 0.6100000000000001, 'timestamp': '2026-04-14T14:46:15.700915'}
+2026-04-14 10:46:15,701 - quantumarb_minimal - INFO - Processed signal adj_gate1_1_1776177975, result: data/quantumarb_minimal/outbox/result_adj_gate1_1_1776177975.json
+2026-04-14 10:46:21,709 - quantumarb_minimal - INFO - Evaluating arbitrage signal: adj_gate1_2_1776177980
+2026-04-14 10:46:21,709 - quantumarb_minimal - INFO - Decision: {'signal_id': 'adj_gate1_2_1776177980', 'spread_pct': 0.2, 'decision': 'execute', 'reason': 'Approved: spread=0.2000%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00015000000000000004, 'risk_score': 0.6300000000000001, 'timestamp': '2026-04-14T14:46:21.709738'}
+2026-04-14 10:46:21,713 - quantumarb_minimal - INFO - Processed signal adj_gate1_2_1776177980, result: data/quantumarb_minimal/outbox/result_adj_gate1_2_1776177980.json
+2026-04-14 10:46:25,718 - quantumarb_minimal - INFO - Evaluating arbitrage signal: adj_gate1_3_1776177985
+2026-04-14 10:46:25,718 - quantumarb_minimal - INFO - Decision: {'signal_id': 'adj_gate1_3_1776177985', 'spread_pct': 0.1, 'decision': 'execute', 'reason': 'Approved: spread=0.1000%, risk=0.59', 'position_size_usd': 0.1, 'expected_pnl_usd': 5.000000000000001e-05, 'risk_score': 0.5900000000000001, 'timestamp': '2026-04-14T14:46:25.718619'}
+2026-04-14 10:46:25,720 - quantumarb_minimal - INFO - Processed signal adj_gate1_3_1776177985, result: data/quantumarb_minimal/outbox/result_adj_gate1_3_1776177985.json
+2026-04-14 10:46:31,725 - quantumarb_minimal - INFO - Evaluating arbitrage signal: adj_gate1_4_1776177990
+2026-04-14 10:46:31,726 - quantumarb_minimal - INFO - Decision: {'signal_id': 'adj_gate1_4_1776177990', 'spread_pct': 0.25, 'decision': 'execute', 'reason': 'Approved: spread=0.2500%, risk=0.65', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00020000000000000004, 'risk_score': 0.65, 'timestamp': '2026-04-14T14:46:31.726172'}
+2026-04-14 10:46:31,727 - quantumarb_minimal - INFO - Processed signal adj_gate1_4_1776177990, result: data/quantumarb_minimal/outbox/result_adj_gate1_4_1776177990.json
+2026-04-14 10:46:35,733 - quantumarb_minimal - INFO - Evaluating arbitrage signal: adj_gate1_5_1776177995
+2026-04-14 10:46:35,733 - quantumarb_minimal - INFO - Decision: {'signal_id': 'adj_gate1_5_1776177995', 'spread_pct': 0.3, 'decision': 'execute', 'reason': 'Approved: spread=0.3000%, risk=0.67', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00025, 'risk_score': 0.67, 'timestamp': '2026-04-14T14:46:35.733543'}
+2026-04-14 10:46:35,735 - quantumarb_minimal - INFO - Processed signal adj_gate1_5_1776177995, result: data/quantumarb_minimal/outbox/result_adj_gate1_5_1776177995.json
+2026-04-14 10:50:01,908 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178201
+2026-04-14 10:50:01,909 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178201', 'spread_pct': 0.1737, 'decision': 'execute', 'reason': 'Approved: spread=0.1737%, risk=0.67', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00011380000000000001, 'risk_score': 0.6689600000000001, 'timestamp': '2026-04-14T14:50:01.909783'}
+2026-04-14 10:50:01,912 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178201, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178201.json
+2026-04-14 10:50:09,918 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178208
+2026-04-14 10:50:09,918 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178208', 'spread_pct': 0.1724, 'decision': 'execute', 'reason': 'Approved: spread=0.1724%, risk=0.60', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00011910000000000002, 'risk_score': 0.60392, 'timestamp': '2026-04-14T14:50:09.918913'}
+2026-04-14 10:50:09,919 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178208, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178208.json
+2026-04-14 10:50:15,924 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178215
+2026-04-14 10:50:15,924 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178215', 'spread_pct': 0.2568, 'decision': 'execute', 'reason': 'Approved: spread=0.2568%, risk=0.69', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00020610000000000002, 'risk_score': 0.68744, 'timestamp': '2026-04-14T14:50:15.924374'}
+2026-04-14 10:50:15,924 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178215, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178215.json
+2026-04-14 10:50:23,931 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178222
+2026-04-14 10:50:23,931 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178222', 'spread_pct': 0.0864, 'decision': 'execute', 'reason': 'Approved: spread=0.0864%, risk=0.52', 'position_size_usd': 0.1, 'expected_pnl_usd': 2.9600000000000005e-05, 'risk_score': 0.52312, 'timestamp': '2026-04-14T14:50:23.931254'}
+2026-04-14 10:50:23,931 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178222, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178222.json
+2026-04-14 10:50:29,935 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178229
+2026-04-14 10:50:29,935 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178229', 'spread_pct': 0.1145, 'decision': 'execute', 'reason': 'Approved: spread=0.1145%, risk=0.61', 'position_size_usd': 0.1, 'expected_pnl_usd': 6.98e-05, 'risk_score': 0.6056, 'timestamp': '2026-04-14T14:50:29.935377'}
+2026-04-14 10:50:29,935 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178229, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178229.json
+2026-04-14 10:50:43,944 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178242
+2026-04-14 10:50:43,944 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178242', 'spread_pct': 0.3282, 'decision': 'execute', 'reason': 'Approved: spread=0.3282%, risk=0.75', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0002772, 'risk_score': 0.7485600000000001, 'timestamp': '2026-04-14T14:50:43.944078'}
+2026-04-14 10:50:43,944 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178242, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178242.json
+2026-04-14 10:50:49,948 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178249
+2026-04-14 10:50:49,948 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178249', 'spread_pct': 0.3229, 'decision': 'execute', 'reason': 'Approved: spread=0.3229%, risk=0.78', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00027480000000000007, 'risk_score': 0.7763200000000001, 'timestamp': '2026-04-14T14:50:49.948726'}
+2026-04-14 10:50:49,949 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178249, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178249.json
+2026-04-14 10:50:57,955 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178256
+2026-04-14 10:50:57,956 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178256', 'spread_pct': 0.1468, 'decision': 'execute', 'reason': 'Approved: spread=0.1468%, risk=0.61', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00010290000000000001, 'risk_score': 0.6074400000000001, 'timestamp': '2026-04-14T14:50:57.955967'}
+2026-04-14 10:50:57,958 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178256, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178256.json
+2026-04-14 10:51:03,965 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178263
+2026-04-14 10:51:03,965 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178263', 'spread_pct': 0.2689, 'decision': 'execute', 'reason': 'Approved: spread=0.2689%, risk=0.72', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00021820000000000002, 'risk_score': 0.7211200000000001, 'timestamp': '2026-04-14T14:51:03.965875'}
+2026-04-14 10:51:03,974 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178263, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178263.json
+2026-04-14 10:51:11,981 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178270
+2026-04-14 10:51:11,981 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178270', 'spread_pct': 0.2369, 'decision': 'execute', 'reason': 'Approved: spread=0.2369%, risk=0.65', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00019250000000000004, 'risk_score': 0.65152, 'timestamp': '2026-04-14T14:51:11.981906'}
+2026-04-14 10:51:11,982 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178270, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178270.json
+2026-04-14 10:51:23,997 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178283
+2026-04-14 10:51:23,998 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178283', 'spread_pct': 0.2302, 'decision': 'execute', 'reason': 'Approved: spread=0.2302%, risk=0.71', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001804, 'risk_score': 0.70616, 'timestamp': '2026-04-14T14:51:23.998043'}
+2026-04-14 10:51:24,001 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178283, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178283.json
+2026-04-14 10:51:32,012 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178290
+2026-04-14 10:51:32,012 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178290', 'spread_pct': 0.1537, 'decision': 'execute', 'reason': 'Approved: spread=0.1537%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00010730000000000002, 'risk_score': 0.6289600000000001, 'timestamp': '2026-04-14T14:51:32.012540'}
+2026-04-14 10:51:32,014 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178290, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178290.json
+2026-04-14 10:51:38,021 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178297
+2026-04-14 10:51:38,021 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178297', 'spread_pct': 0.1303, 'decision': 'execute', 'reason': 'Approved: spread=0.1303%, risk=0.59', 'position_size_usd': 0.1, 'expected_pnl_usd': 7.21e-05, 'risk_score': 0.5862400000000001, 'timestamp': '2026-04-14T14:51:38.021686'}
+2026-04-14 10:51:38,023 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178297, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178297.json
+2026-04-14 10:51:46,035 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178304
+2026-04-14 10:51:46,036 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178304', 'spread_pct': 0.2048, 'decision': 'execute', 'reason': 'Approved: spread=0.2048%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001542, 'risk_score': 0.6258400000000001, 'timestamp': '2026-04-14T14:51:46.035974'}
+2026-04-14 10:51:46,036 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178304, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178304.json
+2026-04-14 10:51:52,042 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178311
+2026-04-14 10:51:52,043 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178311', 'spread_pct': 0.1369, 'decision': 'execute', 'reason': 'Approved: spread=0.1369%, risk=0.55', 'position_size_usd': 0.1, 'expected_pnl_usd': 8.970000000000001e-05, 'risk_score': 0.54752, 'timestamp': '2026-04-14T14:51:52.043118'}
+2026-04-14 10:51:52,045 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178311, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178311.json
+2026-04-14 10:52:00,052 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:52:06,062 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178324
+2026-04-14 10:52:06,063 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178324', 'spread_pct': 0.1281, 'decision': 'execute', 'reason': 'Approved: spread=0.1281%, risk=0.59', 'position_size_usd': 0.1, 'expected_pnl_usd': 7.22e-05, 'risk_score': 0.5884800000000001, 'timestamp': '2026-04-14T14:52:06.063261'}
+2026-04-14 10:52:06,065 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178324, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178324.json
+2026-04-14 10:52:12,072 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178331
+2026-04-14 10:52:12,073 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178331', 'spread_pct': 0.1475, 'decision': 'execute', 'reason': 'Approved: spread=0.1475%, risk=0.59', 'position_size_usd': 0.1, 'expected_pnl_usd': 9.95e-05, 'risk_score': 0.5880000000000001, 'timestamp': '2026-04-14T14:52:12.072976'}
+2026-04-14 10:52:12,075 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178331, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178331.json
+2026-04-14 10:52:20,088 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178338
+2026-04-14 10:52:20,089 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178338', 'spread_pct': 0.1734, 'decision': 'execute', 'reason': 'Approved: spread=0.1734%, risk=0.62', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00011380000000000001, 'risk_score': 0.62072, 'timestamp': '2026-04-14T14:52:20.088946'}
+2026-04-14 10:52:20,092 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178338, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178338.json
+2026-04-14 10:52:26,099 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178345
+2026-04-14 10:52:26,100 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178345', 'spread_pct': 0.2175, 'decision': 'execute', 'reason': 'Approved: spread=0.2175%, risk=0.61', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001746, 'risk_score': 0.6080000000000001, 'timestamp': '2026-04-14T14:52:26.100237'}
+2026-04-14 10:52:26,102 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178345, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178345.json
+2026-04-14 10:52:34,108 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178352
+2026-04-14 10:52:34,108 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178352', 'spread_pct': 0.3187, 'decision': 'execute', 'reason': 'Approved: spread=0.3187%, risk=0.73', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00025870000000000005, 'risk_score': 0.7329600000000002, 'timestamp': '2026-04-14T14:52:34.108829'}
+2026-04-14 10:52:34,109 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178352, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178352.json
+2026-04-14 10:53:00,138 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:54:00,189 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:55:00,241 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:56:00,295 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:56:18,317 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178577
+2026-04-14 10:56:18,317 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178577', 'spread_pct': 0.2836, 'decision': 'execute', 'reason': 'Approved: spread=0.2836%, risk=0.69', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0002246, 'risk_score': 0.68888, 'timestamp': '2026-04-14T14:56:18.317871'}
+2026-04-14 10:56:18,319 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178577, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178577.json
+2026-04-14 10:56:26,327 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178584
+2026-04-14 10:56:26,327 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178584', 'spread_pct': 0.1632, 'decision': 'execute', 'reason': 'Approved: spread=0.1632%, risk=0.60', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00012160000000000003, 'risk_score': 0.6045600000000001, 'timestamp': '2026-04-14T14:56:26.327909'}
+2026-04-14 10:56:26,330 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178584, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178584.json
+2026-04-14 10:56:32,337 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178591
+2026-04-14 10:56:32,337 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178591', 'spread_pct': 0.1573, 'decision': 'execute', 'reason': 'Approved: spread=0.1573%, risk=0.60', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001024, 'risk_score': 0.60384, 'timestamp': '2026-04-14T14:56:32.337842'}
+2026-04-14 10:56:32,339 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178591, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178591.json
+2026-04-14 10:56:40,346 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178598
+2026-04-14 10:56:40,346 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178598', 'spread_pct': 0.1344, 'decision': 'execute', 'reason': 'Approved: spread=0.1344%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 8.88e-05, 'risk_score': 0.6295200000000001, 'timestamp': '2026-04-14T14:56:40.346452'}
+2026-04-14 10:56:40,347 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178598, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178598.json
+2026-04-14 10:56:46,356 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178605
+2026-04-14 10:56:46,356 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178605', 'spread_pct': 0.1882, 'decision': 'execute', 'reason': 'Approved: spread=0.1882%, risk=0.60', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00013020000000000002, 'risk_score': 0.60056, 'timestamp': '2026-04-14T14:56:46.356657'}
+2026-04-14 10:56:46,358 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178605, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178605.json
+2026-04-14 10:56:54,368 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178612
+2026-04-14 10:56:54,369 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178612', 'spread_pct': 0.1154, 'decision': 'execute', 'reason': 'Approved: spread=0.1154%, risk=0.54', 'position_size_usd': 0.1, 'expected_pnl_usd': 6.33e-05, 'risk_score': 0.54232, 'timestamp': '2026-04-14T14:56:54.369065'}
+2026-04-14 10:56:54,370 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178612, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178612.json
+2026-04-14 10:57:00,377 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:57:06,383 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178625
+2026-04-14 10:57:06,384 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178625', 'spread_pct': 0.136, 'decision': 'execute', 'reason': 'Approved: spread=0.1360%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 7.75e-05, 'risk_score': 0.6348, 'timestamp': '2026-04-14T14:57:06.384473'}
+2026-04-14 10:57:06,387 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178625, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178625.json
+2026-04-14 10:57:14,393 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178632
+2026-04-14 10:57:14,394 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178632', 'spread_pct': 0.2924, 'decision': 'execute', 'reason': 'Approved: spread=0.2924%, risk=0.74', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00023540000000000006, 'risk_score': 0.73992, 'timestamp': '2026-04-14T14:57:14.394208'}
+2026-04-14 10:57:14,395 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178632, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178632.json
+2026-04-14 10:57:20,402 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178639
+2026-04-14 10:57:20,403 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178639', 'spread_pct': 0.1109, 'decision': 'execute', 'reason': 'Approved: spread=0.1109%, risk=0.59', 'position_size_usd': 0.1, 'expected_pnl_usd': 5.690000000000001e-05, 'risk_score': 0.59072, 'timestamp': '2026-04-14T14:57:20.403268'}
+2026-04-14 10:57:20,405 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178639, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178639.json
+2026-04-14 10:57:28,414 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178646
+2026-04-14 10:57:28,415 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178646', 'spread_pct': 0.1279, 'decision': 'execute', 'reason': 'Approved: spread=0.1279%, risk=0.58', 'position_size_usd': 0.1, 'expected_pnl_usd': 7.780000000000001e-05, 'risk_score': 0.5803200000000001, 'timestamp': '2026-04-14T14:57:28.415149'}
+2026-04-14 10:57:28,418 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178646, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178646.json
+2026-04-14 10:57:34,428 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178653
+2026-04-14 10:57:34,428 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178653', 'spread_pct': 0.2108, 'decision': 'execute', 'reason': 'Approved: spread=0.2108%, risk=0.60', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00015690000000000002, 'risk_score': 0.6026400000000001, 'timestamp': '2026-04-14T14:57:34.428730'}
+2026-04-14 10:57:34,431 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178653, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178653.json
+2026-04-14 10:57:42,442 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178660
+2026-04-14 10:57:42,443 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178660', 'spread_pct': 0.2356, 'decision': 'execute', 'reason': 'Approved: spread=0.2356%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00019480000000000002, 'risk_score': 0.63048, 'timestamp': '2026-04-14T14:57:42.443277'}
+2026-04-14 10:57:42,446 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178660, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178660.json
+2026-04-14 10:57:54,458 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178673
+2026-04-14 10:57:54,459 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178673', 'spread_pct': 0.2216, 'decision': 'execute', 'reason': 'Approved: spread=0.2216%, risk=0.64', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001714, 'risk_score': 0.63528, 'timestamp': '2026-04-14T14:57:54.459411'}
+2026-04-14 10:57:54,461 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178673, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178673.json
+2026-04-14 10:58:00,469 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:58:02,474 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178680
+2026-04-14 10:58:02,474 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178680', 'spread_pct': 0.1876, 'decision': 'execute', 'reason': 'Approved: spread=0.1876%, risk=0.64', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00014199999999999998, 'risk_score': 0.6360800000000001, 'timestamp': '2026-04-14T14:58:02.474586'}
+2026-04-14 10:58:02,476 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178680, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178680.json
+2026-04-14 10:58:08,482 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178687
+2026-04-14 10:58:08,483 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178687', 'spread_pct': 0.1693, 'decision': 'execute', 'reason': 'Approved: spread=0.1693%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.000121, 'risk_score': 0.6294400000000001, 'timestamp': '2026-04-14T14:58:08.483204'}
+2026-04-14 10:58:08,484 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178687, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178687.json
+2026-04-14 10:58:16,495 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178695
+2026-04-14 10:58:16,495 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178695', 'spread_pct': 0.1556, 'decision': 'execute', 'reason': 'Approved: spread=0.1556%, risk=0.60', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00010360000000000001, 'risk_score': 0.59848, 'timestamp': '2026-04-14T14:58:16.495613'}
+2026-04-14 10:58:16,498 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178695, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178695.json
+2026-04-14 10:58:22,505 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178702
+2026-04-14 10:58:22,505 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178702', 'spread_pct': 0.1331, 'decision': 'execute', 'reason': 'Approved: spread=0.1331%, risk=0.54', 'position_size_usd': 0.1, 'expected_pnl_usd': 8.940000000000002e-05, 'risk_score': 0.5364800000000001, 'timestamp': '2026-04-14T14:58:22.505733'}
+2026-04-14 10:58:22,507 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178702, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178702.json
+2026-04-14 10:58:30,519 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178709
+2026-04-14 10:58:30,519 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178709', 'spread_pct': 0.2204, 'decision': 'execute', 'reason': 'Approved: spread=0.2204%, risk=0.64', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001674, 'risk_score': 0.63832, 'timestamp': '2026-04-14T14:58:30.519626'}
+2026-04-14 10:58:30,521 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178709, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178709.json
+2026-04-14 10:58:42,533 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178722
+2026-04-14 10:58:42,533 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178722', 'spread_pct': 0.1339, 'decision': 'execute', 'reason': 'Approved: spread=0.1339%, risk=0.58', 'position_size_usd': 0.1, 'expected_pnl_usd': 7.620000000000001e-05, 'risk_score': 0.5811200000000001, 'timestamp': '2026-04-14T14:58:42.533165'}
+2026-04-14 10:58:42,533 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178722, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178722.json
+2026-04-14 10:58:50,538 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178729
+2026-04-14 10:58:50,538 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178729', 'spread_pct': 0.0857, 'decision': 'execute', 'reason': 'Approved: spread=0.0857%, risk=0.55', 'position_size_usd': 0.1, 'expected_pnl_usd': 4.1400000000000003e-05, 'risk_score': 0.54656, 'timestamp': '2026-04-14T14:58:50.538317'}
+2026-04-14 10:58:50,538 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178729, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178729.json
+2026-04-14 10:58:56,545 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178736
+2026-04-14 10:58:56,546 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178736', 'spread_pct': 0.1354, 'decision': 'execute', 'reason': 'Approved: spread=0.1354%, risk=0.54', 'position_size_usd': 0.1, 'expected_pnl_usd': 8.14e-05, 'risk_score': 0.53832, 'timestamp': '2026-04-14T14:58:56.546228'}
+2026-04-14 10:58:56,547 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178736, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178736.json
+2026-04-14 10:59:00,552 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:59:04,557 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178743
+2026-04-14 10:59:04,558 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178743', 'spread_pct': 0.3495, 'decision': 'execute', 'reason': 'Approved: spread=0.3495%, risk=0.77', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00029010000000000006, 'risk_score': 0.7696000000000002, 'timestamp': '2026-04-14T14:59:04.558142'}
+2026-04-14 10:59:04,560 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178743, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178743.json
+2026-04-14 10:59:10,567 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178750
+2026-04-14 10:59:10,568 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178750', 'spread_pct': 0.2629, 'decision': 'execute', 'reason': 'Approved: spread=0.2629%, risk=0.71', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00020830000000000002, 'risk_score': 0.7123200000000001, 'timestamp': '2026-04-14T14:59:10.568201'}
+2026-04-14 10:59:10,569 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178750, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178750.json
+2026-04-14 10:59:18,577 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178757
+2026-04-14 10:59:18,577 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178757', 'spread_pct': 0.1795, 'decision': 'execute', 'reason': 'Approved: spread=0.1795%, risk=0.66', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00012670000000000002, 'risk_score': 0.6576000000000001, 'timestamp': '2026-04-14T14:59:18.577797'}
+2026-04-14 10:59:18,578 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178757, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178757.json
+2026-04-14 10:59:30,589 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178770
+2026-04-14 10:59:30,590 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178770', 'spread_pct': 0.2505, 'decision': 'execute', 'reason': 'Approved: spread=0.2505%, risk=0.73', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0002026, 'risk_score': 0.7264, 'timestamp': '2026-04-14T14:59:30.590434'}
+2026-04-14 10:59:30,592 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178770, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178770.json
+2026-04-14 10:59:38,601 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178777
+2026-04-14 10:59:38,602 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178777', 'spread_pct': 0.2341, 'decision': 'execute', 'reason': 'Approved: spread=0.2341%, risk=0.71', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00017880000000000004, 'risk_score': 0.70528, 'timestamp': '2026-04-14T14:59:38.602764'}
+2026-04-14 10:59:38,605 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178777, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178777.json
+2026-04-14 10:59:44,613 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178784
+2026-04-14 10:59:44,614 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178784', 'spread_pct': 0.1236, 'decision': 'execute', 'reason': 'Approved: spread=0.1236%, risk=0.58', 'position_size_usd': 0.1, 'expected_pnl_usd': 7.130000000000001e-05, 'risk_score': 0.5808800000000001, 'timestamp': '2026-04-14T14:59:44.614400'}
+2026-04-14 10:59:44,616 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178784, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178784.json
+2026-04-14 10:59:52,622 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178791
+2026-04-14 10:59:52,622 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178791', 'spread_pct': 0.2948, 'decision': 'execute', 'reason': 'Approved: spread=0.2948%, risk=0.74', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00023950000000000002, 'risk_score': 0.74184, 'timestamp': '2026-04-14T14:59:52.622584'}
+2026-04-14 10:59:52,624 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178791, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178791.json
+2026-04-14 10:59:58,631 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178798
+2026-04-14 10:59:58,631 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178798', 'spread_pct': 0.3239, 'decision': 'execute', 'reason': 'Approved: spread=0.3239%, risk=0.73', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0002641, 'risk_score': 0.7331200000000001, 'timestamp': '2026-04-14T14:59:58.631460'}
+2026-04-14 10:59:58,632 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178798, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178798.json
+2026-04-14 11:00:00,635 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:00:06,641 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178805
+2026-04-14 11:00:06,641 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178805', 'spread_pct': 0.1948, 'decision': 'execute', 'reason': 'Approved: spread=0.1948%, risk=0.62', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00015370000000000002, 'risk_score': 0.6218400000000001, 'timestamp': '2026-04-14T15:00:06.641275'}
+2026-04-14 11:00:06,641 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178805, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178805.json
+2026-04-14 11:01:00,696 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:01:16,716 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178875
+2026-04-14 11:01:16,717 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178875', 'spread_pct': 0.2757, 'decision': 'execute', 'reason': 'Approved: spread=0.2757%, risk=0.71', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00021700000000000002, 'risk_score': 0.7065600000000001, 'timestamp': '2026-04-14T15:01:16.717014'}
+2026-04-14 11:01:16,719 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178875, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178875.json
+2026-04-14 11:01:22,727 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178882
+2026-04-14 11:01:22,728 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178882', 'spread_pct': 0.3421, 'decision': 'execute', 'reason': 'Approved: spread=0.3421%, risk=0.74', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00028800000000000006, 'risk_score': 0.73568, 'timestamp': '2026-04-14T15:01:22.728314'}
+2026-04-14 11:01:22,733 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178882, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178882.json
+2026-04-14 11:01:30,743 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178889
+2026-04-14 11:01:30,743 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178889', 'spread_pct': 0.2872, 'decision': 'execute', 'reason': 'Approved: spread=0.2872%, risk=0.70', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00024400000000000005, 'risk_score': 0.70376, 'timestamp': '2026-04-14T15:01:30.743613'}
+2026-04-14 11:01:30,746 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178889, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178889.json
+2026-04-14 11:01:36,753 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178896
+2026-04-14 11:01:36,754 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178896', 'spread_pct': 0.2569, 'decision': 'execute', 'reason': 'Approved: spread=0.2569%, risk=0.66', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00020110000000000004, 'risk_score': 0.65952, 'timestamp': '2026-04-14T15:01:36.754355'}
+2026-04-14 11:01:36,757 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178896, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178896.json
+2026-04-14 11:01:44,766 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178903
+2026-04-14 11:01:44,767 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178903', 'spread_pct': 0.2097, 'decision': 'execute', 'reason': 'Approved: spread=0.2097%, risk=0.65', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00015590000000000002, 'risk_score': 0.6497600000000001, 'timestamp': '2026-04-14T15:01:44.767146'}
+2026-04-14 11:01:44,769 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178903, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178903.json
+2026-04-14 11:01:50,774 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178910
+2026-04-14 11:01:50,774 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178910', 'spread_pct': 0.2163, 'decision': 'execute', 'reason': 'Approved: spread=0.2163%, risk=0.61', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001575, 'risk_score': 0.61104, 'timestamp': '2026-04-14T15:01:50.774723'}
+2026-04-14 11:01:50,777 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178910, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178910.json
+2026-04-14 11:01:58,784 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178917
+2026-04-14 11:01:58,785 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178917', 'spread_pct': 0.0971, 'decision': 'execute', 'reason': 'Approved: spread=0.0971%, risk=0.55', 'position_size_usd': 0.1, 'expected_pnl_usd': 5.5400000000000005e-05, 'risk_score': 0.5516800000000001, 'timestamp': '2026-04-14T15:01:58.785506'}
+2026-04-14 11:01:58,791 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178917, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178917.json
+2026-04-14 11:02:00,792 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:02:04,798 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178924
+2026-04-14 11:02:04,798 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178924', 'spread_pct': 0.1003, 'decision': 'execute', 'reason': 'Approved: spread=0.1003%, risk=0.52', 'position_size_usd': 0.1, 'expected_pnl_usd': 5.62e-05, 'risk_score': 0.52224, 'timestamp': '2026-04-14T15:02:04.798511'}
+2026-04-14 11:02:04,800 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178924, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178924.json
+2026-04-14 11:02:18,819 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178937
+2026-04-14 11:02:18,820 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178937', 'spread_pct': 0.2368, 'decision': 'execute', 'reason': 'Approved: spread=0.2368%, risk=0.67', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001965, 'risk_score': 0.6714400000000001, 'timestamp': '2026-04-14T15:02:18.820436'}
+2026-04-14 11:02:18,822 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178937, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178937.json
+2026-04-14 11:02:24,830 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178944
+2026-04-14 11:02:24,831 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178944', 'spread_pct': 0.1902, 'decision': 'execute', 'reason': 'Approved: spread=0.1902%, risk=0.62', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00013470000000000002, 'risk_score': 0.61816, 'timestamp': '2026-04-14T15:02:24.831031'}
+2026-04-14 11:02:24,832 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178944, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178944.json
+2026-04-14 11:02:32,839 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178951
+2026-04-14 11:02:32,839 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178951', 'spread_pct': 0.2243, 'decision': 'execute', 'reason': 'Approved: spread=0.2243%, risk=0.70', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001736, 'risk_score': 0.6974400000000001, 'timestamp': '2026-04-14T15:02:32.839916'}
+2026-04-14 11:02:32,841 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178951, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178951.json
+2026-04-14 11:02:38,849 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178958
+2026-04-14 11:02:38,850 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178958', 'spread_pct': 0.135, 'decision': 'execute', 'reason': 'Approved: spread=0.1350%, risk=0.59', 'position_size_usd': 0.1, 'expected_pnl_usd': 9.14e-05, 'risk_score': 0.5940000000000001, 'timestamp': '2026-04-14T15:02:38.850254'}
+2026-04-14 11:02:38,853 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178958, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178958.json
+2026-04-14 11:02:46,862 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776178965
+2026-04-14 11:02:46,862 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776178965', 'spread_pct': 0.1219, 'decision': 'execute', 'reason': 'Approved: spread=0.1219%, risk=0.57', 'position_size_usd': 0.1, 'expected_pnl_usd': 7.100000000000002e-05, 'risk_score': 0.57152, 'timestamp': '2026-04-14T15:02:46.862500'}
+2026-04-14 11:02:46,865 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776178965, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776178965.json
+2026-04-14 11:02:52,870 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178972
+2026-04-14 11:02:52,871 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178972', 'spread_pct': 0.3122, 'decision': 'execute', 'reason': 'Approved: spread=0.3122%, risk=0.74', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00027000000000000006, 'risk_score': 0.7437600000000001, 'timestamp': '2026-04-14T15:02:52.871266'}
+2026-04-14 11:02:52,873 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178972, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178972.json
+2026-04-14 11:03:00,887 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178979
+2026-04-14 11:03:00,888 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178979', 'spread_pct': 0.0913, 'decision': 'execute', 'reason': 'Approved: spread=0.0913%, risk=0.51', 'position_size_usd': 0.1, 'expected_pnl_usd': 4.7100000000000006e-05, 'risk_score': 0.50704, 'timestamp': '2026-04-14T15:03:00.888053'}
+2026-04-14 11:03:00,890 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178979, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178979.json
+2026-04-14 11:03:00,890 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:03:06,895 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776178986
+2026-04-14 11:03:06,896 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776178986', 'spread_pct': 0.1573, 'decision': 'execute', 'reason': 'Approved: spread=0.1573%, risk=0.61', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001023, 'risk_score': 0.61184, 'timestamp': '2026-04-14T15:03:06.896050'}
+2026-04-14 11:03:06,896 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776178986, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776178986.json
+2026-04-14 11:03:20,910 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776178999
+2026-04-14 11:03:20,910 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776178999', 'spread_pct': 0.222, 'decision': 'execute', 'reason': 'Approved: spread=0.2220%, risk=0.66', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00016700000000000002, 'risk_score': 0.6636000000000001, 'timestamp': '2026-04-14T15:03:20.910733'}
+2026-04-14 11:03:20,912 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776178999, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776178999.json
+2026-04-14 11:03:26,921 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179006
+2026-04-14 11:03:26,922 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179006', 'spread_pct': 0.1871, 'decision': 'execute', 'reason': 'Approved: spread=0.1871%, risk=0.61', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00014230000000000002, 'risk_score': 0.61168, 'timestamp': '2026-04-14T15:03:26.922070'}
+2026-04-14 11:03:26,923 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179006, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179006.json
+2026-04-14 11:03:34,932 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776179013
+2026-04-14 11:03:34,932 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776179013', 'spread_pct': 0.1468, 'decision': 'execute', 'reason': 'Approved: spread=0.1468%, risk=0.59', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001001, 'risk_score': 0.5874400000000001, 'timestamp': '2026-04-14T15:03:34.932768'}
+2026-04-14 11:03:34,934 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776179013, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776179013.json
+2026-04-14 11:03:40,942 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_eth-usd_1776179020
+2026-04-14 11:03:40,943 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_eth-usd_1776179020', 'spread_pct': 0.1646, 'decision': 'execute', 'reason': 'Approved: spread=0.1646%, risk=0.60', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001089, 'risk_score': 0.6016800000000001, 'timestamp': '2026-04-14T15:03:40.943359'}
+2026-04-14 11:03:40,946 - quantumarb_minimal - INFO - Processed signal gate1_cont_eth-usd_1776179020, result: data/quantumarb_minimal/outbox/result_gate1_cont_eth-usd_1776179020.json
+2026-04-14 11:03:48,955 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179027
+2026-04-14 11:03:48,956 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179027', 'spread_pct': 0.2418, 'decision': 'execute', 'reason': 'Approved: spread=0.2418%, risk=0.68', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001862, 'risk_score': 0.6834400000000002, 'timestamp': '2026-04-14T15:03:48.956207'}
+2026-04-14 11:03:48,958 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179027, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179027.json
+2026-04-14 11:03:54,964 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179034
+2026-04-14 11:03:54,965 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179034', 'spread_pct': 0.2433, 'decision': 'execute', 'reason': 'Approved: spread=0.2433%, risk=0.65', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001992, 'risk_score': 0.65264, 'timestamp': '2026-04-14T15:03:54.964963'}
+2026-04-14 11:03:54,966 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179034, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179034.json
+2026-04-14 11:04:00,972 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:04:02,975 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179041
+2026-04-14 11:04:02,976 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179041', 'spread_pct': 0.2417, 'decision': 'execute', 'reason': 'Approved: spread=0.2417%, risk=0.63', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001958, 'risk_score': 0.63136, 'timestamp': '2026-04-14T15:04:02.976462'}
+2026-04-14 11:04:02,978 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179041, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179041.json
+2026-04-14 11:04:08,984 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179048
+2026-04-14 11:04:08,984 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179048', 'spread_pct': 0.1575, 'decision': 'execute', 'reason': 'Approved: spread=0.1575%, risk=0.62', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.000113, 'risk_score': 0.6200000000000001, 'timestamp': '2026-04-14T15:04:08.984424'}
+2026-04-14 11:04:08,985 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179048, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179048.json
+2026-04-14 11:04:22,998 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776179061
+2026-04-14 11:04:22,998 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776179061', 'spread_pct': 0.2499, 'decision': 'execute', 'reason': 'Approved: spread=0.2499%, risk=0.67', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.000207, 'risk_score': 0.6699200000000001, 'timestamp': '2026-04-14T15:04:22.998820'}
+2026-04-14 11:04:23,000 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776179061, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776179061.json
+2026-04-14 11:04:29,008 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776179068
+2026-04-14 11:04:29,009 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776179068', 'spread_pct': 0.221, 'decision': 'execute', 'reason': 'Approved: spread=0.2210%, risk=0.64', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00016779999999999999, 'risk_score': 0.6428, 'timestamp': '2026-04-14T15:04:29.008903'}
+2026-04-14 11:04:29,011 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776179068, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776179068.json
+2026-04-14 11:04:37,020 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179075
+2026-04-14 11:04:37,020 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179075', 'spread_pct': 0.2174, 'decision': 'execute', 'reason': 'Approved: spread=0.2174%, risk=0.69', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0001619, 'risk_score': 0.6879200000000001, 'timestamp': '2026-04-14T15:04:37.020790'}
+2026-04-14 11:04:37,022 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179075, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179075.json
+2026-04-14 11:04:43,028 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179082
+2026-04-14 11:04:43,029 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179082', 'spread_pct': 0.2271, 'decision': 'execute', 'reason': 'Approved: spread=0.2271%, risk=0.68', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00017050000000000002, 'risk_score': 0.6756800000000002, 'timestamp': '2026-04-14T15:04:43.029284'}
+2026-04-14 11:04:43,030 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179082, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179082.json
+2026-04-14 11:04:51,039 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_ltc-usd_1776179090
+2026-04-14 11:04:51,040 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_ltc-usd_1776179090', 'spread_pct': 0.3312, 'decision': 'execute', 'reason': 'Approved: spread=0.3312%, risk=0.70', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0002771, 'risk_score': 0.6989600000000001, 'timestamp': '2026-04-14T15:04:51.040325'}
+2026-04-14 11:04:51,042 - quantumarb_minimal - INFO - Processed signal gate1_cont_ltc-usd_1776179090, result: data/quantumarb_minimal/outbox/result_gate1_cont_ltc-usd_1776179090.json
+2026-04-14 11:04:57,049 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179097
+2026-04-14 11:04:57,050 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179097', 'spread_pct': 0.229, 'decision': 'execute', 'reason': 'Approved: spread=0.2290%, risk=0.66', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.00018420000000000003, 'risk_score': 0.6572000000000001, 'timestamp': '2026-04-14T15:04:57.050108'}
+2026-04-14 11:04:57,052 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179097, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179097.json
+2026-04-14 11:05:05,059 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_cont_btc-usd_1776179104
+2026-04-14 11:05:05,060 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_cont_btc-usd_1776179104', 'spread_pct': 0.1034, 'decision': 'execute', 'reason': 'Approved: spread=0.1034%, risk=0.53', 'position_size_usd': 0.1, 'expected_pnl_usd': 5.44e-05, 'risk_score': 0.52872, 'timestamp': '2026-04-14T15:05:05.060105'}
+2026-04-14 11:05:05,061 - quantumarb_minimal - INFO - Processed signal gate1_cont_btc-usd_1776179104, result: data/quantumarb_minimal/outbox/result_gate1_cont_btc-usd_1776179104.json
+2026-04-14 11:37:00,394 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:38:00,479 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:39:00,562 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:40:00,642 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:41:00,720 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:42:00,802 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:43:00,879 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 11:44:00,938 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:02:00,013 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:03:00,084 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:04:00,155 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:05:00,225 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:06:00,290 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:07:00,352 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:08:00,424 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:09:00,501 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:10:00,575 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:11:00,629 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:12:00,682 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:13:00,717 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:14:00,771 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:15:00,884 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 12:16:00,952 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading

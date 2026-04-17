@@ -15,3 +15,45 @@
 {"timestamp": "2026-04-11T18:55:37.952952Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_agent_1", "agent_type": "test_agent"}}
 {"timestamp": "2026-04-12T03:08:58.008711Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_agent_1", "agent_type": "test_agent"}}
 {"timestamp": "2026-04-12T04:13:45.886691Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "kashclaw_gemma", "agent_type": "llm_reasoning"}}
+{"timestamp": "2026-04-13T17:56:37.864147Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "claude_cowork", "agent_type": "llm"}}
+{"timestamp": "2026-04-13T17:56:37.905017Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gemma4_local", "agent_type": "llm"}}
+{"timestamp": "2026-04-13T17:56:37.935173Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "bullbear_predictor", "agent_type": "predictor"}}
+{"timestamp": "2026-04-13T17:56:37.967482Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "kashclaw", "agent_type": "trader"}}
+{"timestamp": "2026-04-13T17:56:37.998356Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb", "agent_type": "arbitrage"}}
+{"timestamp": "2026-04-13T23:09:55.262066Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb_enhanced", "agent_type": "arbitrage_enhanced"}}
+{"timestamp": "2026-04-13T23:40:20.318155Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb_enhanced", "agent_type": "arbitrage_enhanced"}}
+{"timestamp": "2026-04-14T00:29:20.473022Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb_risk_simple", "agent_type": "arbitrage_risk_simple"}}
+{"timestamp": "2026-04-14T01:23:40.812669Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb", "agent_type": "arbitrage"}}
+{"timestamp": "2026-04-14T16:32:47.874314Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_mesh_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-14T17:54:44.184261Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb_mesh", "agent_type": "arbitrage_enhanced"}}
+{"timestamp": "2026-04-14T19:02:10.572330Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_mesh_agent_2", "agent_type": "test"}}
+{"timestamp": "2026-04-14T19:02:54.706827Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "offline_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-14T19:03:32.634883Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "offline_test_agent_2", "agent_type": "test"}}
+{"timestamp": "2026-04-14T19:09:54.641852Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_agent_a", "agent_type": "test"}}
+{"timestamp": "2026-04-14T19:09:54.643522Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_agent_b", "agent_type": "test"}}
+{"timestamp": "2026-04-14T19:09:54.644925Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_agent_c", "agent_type": "test"}}
+{"timestamp": "2026-04-14T19:09:54.660090Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "test_agent_a"}}
+{"timestamp": "2026-04-14T19:09:54.661262Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "test_agent_b"}}
+{"timestamp": "2026-04-14T19:09:54.662567Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "test_agent_c"}}
+{"timestamp": "2026-04-14T23:33:10.696080Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_scaled", "agent_type": "trading"}}
+{"timestamp": "2026-04-14T23:42:46.982867Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gemma4_local", "agent_type": "llm"}}
+{"timestamp": "2026-04-15T00:03:30.243759Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "deerflow", "agent_type": "management"}}
+{"timestamp": "2026-04-15T00:04:13.649613Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "projectx_native", "agent_type": "native_maintenance"}}
+{"timestamp": "2026-04-15T10:48:07.307287Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_http", "agent_type": "trading"}}
+{"timestamp": "2026-04-15T10:48:07.317089Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb_http", "agent_type": "arbitrage"}}
+{"timestamp": "2026-04-15T11:23:38.611966Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_real", "agent_type": "trading"}}
+{"timestamp": "2026-04-15T11:23:38.622779Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb_real", "agent_type": "analysis"}}
+{"timestamp": "2026-04-15T21:53:58.954986Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_live", "agent_type": "trading"}}
+{"timestamp": "2026-04-15T21:53:58.968479Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantumarb_live", "agent_type": "analysis"}}
+{"timestamp": "2026-04-16T01:55:30.659788Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "t:001", "agent_type": "test"}}
+{"timestamp": "2026-04-16T02:38:41.599577Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "projectx_native", "agent_type": "native_maintenance"}}
+{"timestamp": "2026-04-16T03:47:54.809175Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "gate4_http"}}
+{"timestamp": "2026-04-16T03:47:54.822495Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "gate4_live"}}
+{"timestamp": "2026-04-16T03:50:56.372086Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_http", "agent_type": "trading"}}
+{"timestamp": "2026-04-16T03:50:56.386918Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_live", "agent_type": "trading"}}
+{"timestamp": "2026-04-16T04:10:29.429959Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_http", "agent_type": "trading"}}
+{"timestamp": "2026-04-16T04:10:29.434383Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "gate4_live", "agent_type": "trading"}}
+{"timestamp": "2026-04-16T04:49:40.784642Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "bullbear_predictor", "agent_type": "prediction"}}
+{"timestamp": "2026-04-17T14:44:05.010740Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "projectx_native", "agent_type": "native_maintenance"}}
+{"timestamp": "2026-04-17T15:22:17.834118Z", "event_type": "validation_error", "severity": "low", "details": {"reason": "invalid_content_type", "content_type": "application/x-www-form-urlencoded", "path": "/mesh/poll", "method": "POST"}}
+{"timestamp": "2026-04-17T15:35:11.421012Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "ktc_agent", "agent_type": "ktc"}}

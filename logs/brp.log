@@ -1,0 +1,85 @@
+🧪 Testing BRP Security Scanner
+============================================================
+🔍 BRP Security Scanner initialized
+   Scan ID: scan_20260415_000503
+   Repository: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp
+   Secret patterns: 7 categories
+   Vulnerability patterns: 5 categories
+🚀 Starting security scan of: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp
+   Scan ID: scan_20260415_000503
+   Time: 2026-04-15 00:05:03 UTC
+
+📁 Found 143401 files to scan
+  📊 Progress: 100/1000 files, 1 findings
+  📊 Progress: 200/1000 files, 19 findings
+  📊 Progress: 300/1000 files, 26 findings
+  📊 Progress: 400/1000 files, 26 findings
+  📊 Progress: 500/1000 files, 37 findings
+  📊 Progress: 600/1000 files, 38 findings
+  📊 Progress: 700/1000 files, 38 findings
+  📊 Progress: 800/1000 files, 41 findings
+  📊 Progress: 900/1000 files, 55 findings
+  📊 Progress: 1000/1000 files, 55 findings
+
+============================================================
+🔍 BRP SECURITY SCAN COMPLETE
+============================================================
+
+📊 Scan Summary:
+   Scan ID: scan_20260415_000503
+   Duration: 9.9 seconds
+   Files Scanned: 1000
+   Total Findings: 55
+
+🚨 Findings by Severity:
+   Critical: 21
+   High: 16
+   Medium: 18
+
+📈 Security Score: 0/100
+
+⚠️  CRITICAL FINDINGS (21):
+   • stress_test_phase1.py: Potential api key found in code
+   • activate_agent_lightning.sh: Potential api key found in code
+   • activate_agent_lightning.sh: Potential api key found in code
+   • integrate_brp_safety_rules.py: Potential command injection vulnerability
+   • integrate_brp_safety_rules.py: Potential command injection vulnerability
+
+⚠️  HIGH SEVERITY FINDINGS (16):
+   • fix_security_issues.py: Potential password found in code
+   • ktc_migration_plan.md: Potential password found in code
+   • ktc_migration_plan.md: Potential password found in code
+   • brp_security_scanner.py: Potential xss vulnerability
+   • update_passwords.py: Potential password found in code
+
+============================================================
+✅ Scan completed successfully
+============================================================
+📄 Report saved to: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/security_reports/security_scan_scan_20260415_000503.json
+📄 Summary saved to: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/security_reports/security_summary_scan_20260415_000503.md
+
+📄 Detailed report saved to: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/security_reports/security_scan_scan_20260415_000503.json
+
+🔍 Sample Critical/High Findings:
+
+  ID: secret_0031b66a
+  Severity: critical
+  Location: stress_test_phase1.py
+  Description: Potential api key found in code
+  Recommendation: Remove hardcoded api key and use environment variables or secure secret management
+
+  ID: secret_f697d9c0
+  Severity: critical
+  Location: activate_agent_lightning.sh
+  Description: Potential api key found in code
+  Recommendation: Remove hardcoded api key and use environment variables or secure secret management
+
+  ID: secret_034d4596
+  Severity: critical
+  Location: activate_agent_lightning.sh
+  Description: Potential api key found in code
+  Recommendation: Remove hardcoded api key and use environment variables or secure secret management
+
+============================================================
+✅ BRP Security Scanner test completed
+============================================================

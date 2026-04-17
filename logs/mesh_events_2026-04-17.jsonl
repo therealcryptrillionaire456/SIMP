@@ -1,0 +1,19 @@
+{"timestamp": "2026-04-17T14:36:34.310183", "event_type": "agent_registered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:38:31.734898", "event_type": "agent_registered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:38:32.635148", "event_type": "agent_registered", "agent_id": "quantum_intelligence_prime", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:40:42.149684", "event_type": "agent_registered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:40:42.754083", "event_type": "agent_registered", "agent_id": "quantum_intelligence_prime", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:42:27.002496", "event_type": "agent_registered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:42:27.621989", "event_type": "agent_registered", "agent_id": "quantum_intelligence_prime", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:44:05.010427", "event_type": "agent_registered", "agent_id": "projectx_native", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:48:26.991245", "event_type": "agent_deregistered", "agent_id": "quantum_intelligence_prime", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T14:50:02.986206", "event_type": "agent_deregistered", "agent_id": "projectx_native", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T15:05:20.453702", "event_type": "agent_deregistered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T15:35:11.420315", "event_type": "agent_registered", "agent_id": "ktc_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T15:35:38.161148", "event_type": "agent_registered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T15:35:38.868041", "event_type": "agent_registered", "agent_id": "quantum_intelligence_prime", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T15:37:53.728773", "event_type": "message_sent", "agent_id": "probe", "channel": "system", "message": "Message 60b99677-bcd4-4f8c-b543-28f2543d7237 sent", "data": {}}
+{"timestamp": "2026-04-17T15:37:53.734799", "event_type": "message_sent", "agent_id": "probe", "channel": "system", "message": "Message 2eb5ad58-2e24-49ac-bfc1-3d55a21b4f7a sent", "data": {}}
+{"timestamp": "2026-04-17T15:41:03.132987", "event_type": "agent_deregistered", "agent_id": "ktc_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-17T15:41:07.813793", "event_type": "message_sent", "agent_id": "probe", "channel": "system", "message": "Message ac091ee7-d483-4229-9936-996c455fd87c sent", "data": {}}
+{"timestamp": "2026-04-17T15:41:38.153389", "event_type": "agent_deregistered", "agent_id": "quantum_intelligence_prime", "channel": "system", "message": "", "data": {}}

@@ -1,0 +1,30 @@
+{
+  "session_id": "ff7d7919",
+  "goal_id": "b1c2810c",
+  "trace_id": "7a3c5978-f5a6-4228-8e60-d1b1bf2fb586",
+  "goal": "Test default",
+  "max_cycles": 1,
+  "target_directories": null,
+  "operator_approval": false,
+  "start_time": "2026-04-14T19:54:32.760146Z",
+  "cycles": [
+    {
+      "cycle_number": 1,
+      "start_time": "2026-04-14T19:54:32.760171Z",
+      "phases": {},
+      "status": "failed",
+      "error": "'InventoryScanner' object has no attribute 'scan_directories'",
+      "should_continue": false
+    }
+  ],
+  "final_status": "unknown",
+  "summary": {},
+  "continuous_mode": false,
+  "pause_between_cycles": 60,
+  "max_consecutive_failures": 3,
+  "max_total_time_seconds": 3600,
+  "consecutive_failures": 1,
+  "stop_reason": null,
+  "_persisted_at": "2026-04-14T19:54:32.760229Z",
+  "_persisted_version": "1.0"
+}

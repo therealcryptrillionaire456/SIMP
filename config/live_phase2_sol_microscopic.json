@@ -1,0 +1,99 @@
+{
+  "mode": "live_phase_2_microscopic_sol",
+  "exchange": "coinbase",
+  "symbols": ["SOL-USD"],
+  "position_sizing": {
+    "position_type": "fixed_dollar",
+    "min_notional": 0.01,
+    "max_notional": 0.10,
+    "default_notional": 0.05
+  },
+  "risk_limits": {
+    "max_risk_per_trade_dollar": 0.10,
+    "max_session_loss_dollar": 1.00,
+    "max_open_positions": 1,
+    "max_concurrent_orders": 2
+  },
+  "brp": {
+    "mode": "ENFORCED",
+    "min_confidence": 0.70,
+    "block_on_config_mismatch": true
+  },
+  "projectx": {
+    "advisory_enabled": true,
+    "require_for": ["trading_intent", "config_change"]
+  },
+  "agent_lightning": {
+    "enabled": true,
+    "trace_all_quantumarb_calls": true,
+    "record_brp_and_projectx_decisions": true
+  },
+  "execution": {
+    "max_slippage_bps": 10,
+    "cancel_on_disconnect": true,
+    "time_in_force": "GTC"
+  },
+  "logging": {
+    "ledger_path": "data/live_phase2_sol_spend_ledger.jsonl",
+    "mesh_events_path": "data/mesh_events.jsonl"
+  },
+  "risk": {
+    "risk_score_threshold": 0.50,
+    "min_spread_pct": 0.01,
+    "max_slippage_pct": 0.10,
+    "max_position_size_usd": 0.10,
+    "max_daily_trades": 100,
+    "cooldown_seconds_after_loss": 300
+  },
+  "spread_thresholds": {
+    "min_spread_pct": 0.01,
+    "target_spread_pct": 0.05,
+    "max_spread_pct": 0.50
+  },
+  "slippage_limits": {
+    "max_slippage_pct": 0.10,
+    "typical_slippage_pct": 0.03,
+    "slippage_warning_pct": 0.05
+  },
+  "monitoring": {
+    "enabled": true,
+    "alert_on_slippage": true,
+    "alert_on_latency": true,
+    "alert_on_balance_change": true,
+    "alert_on_error": true
+  },
+  "microscopic_trading": {
+    "enabled": true,
+    "gate": 2,
+    "primary_market": "SOL-USD",
+    "max_trades_per_hour": 30,
+    "session_duration_hours": 4,
+    "target_trades": 100,
+    "min_trades_for_success": 80
+  },
+  "safety_gates": {
+    "gate_1_complete": true,
+    "gate_2_active": true,
+    "gate_3_pending": false,
+    "emergency_stop_enabled": true,
+    "auto_fallback_to_sandbox": true
+  },
+  "connectors": {
+    "coinbase": {
+      "use_sandbox": false,
+      "live_trading": true,
+      "api_key_env": "COINBASE_API_KEY",
+      "api_secret_env": "COINBASE_API_SECRET",
+      "api_passphrase_env": "COINBASE_API_PASSPHRASE"
+    }
+  },
+  "pair_characteristics": {
+    "SOL-USD": {
+      "min_spread_pct": 0.01,
+      "typical_liquidity": "very_high",
+      "volatility_class": "high",
+      "microscopic_suitable": true,
+      "typical_order_size_usd": 0.05
+    }
+  }
+}

@@ -5,7 +5,7 @@ User models for KEEPTHECHANGE.com
 import uuid
 from datetime import datetime
 from typing import Optional, List
-from sqlalchemy import Column, String, DateTime, Boolean, Float, JSON, Text
+from sqlalchemy import Column, String, DateTime, Boolean, Float, JSON, Text, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -150,10 +150,3 @@ class UserAuditLog(Base):
     
     def __repr__(self):
         return f"<UserAuditLog(user_id={self.user_id}, action={self.action})>"
-
-
-# Import Integer for the failed_login_attempts column
-from sqlalchemy import Integer
-
-# Update the User model with the Integer import
-User.__table__.c['failed_login_attempts'].type = Integer()

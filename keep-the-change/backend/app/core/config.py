@@ -4,7 +4,8 @@ Configuration settings for KEEPTHECHANGE.com
 
 import os
 from typing import List, Optional
-from pydantic import BaseSettings, Field, validator
+from pydantic import Field, validator
+from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -23,10 +24,10 @@ class Settings(BaseSettings):
     HOST: str = Field(default="127.0.0.1", env="HOST")
     PORT: int = Field(default=8000, env="PORT")
     
-    # CORS
-    CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:8080"],
-        env="CORS_ORIGINS"
+    # CORS - Store as comma-separated string
+    CORS_ORIGINS: str = Field(
+        default="http://localhost:3000,http://localhost:8080",
+        description="Comma-separated list of CORS origins"
     )
     
     # Database
@@ -152,12 +153,12 @@ class Settings(BaseSettings):
             raise ValueError("SECRET_KEY must be changed in production")
         return v
     
-    @validator("CORS_ORIGINS", pre=True)
-    def parse_cors_origins(cls, v):
-        """Parse CORS origins from string to list"""
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+    @property
+    def cors_origins(self) -> List[str]:
+        """Parse CORS origins string to list"""
+        if not self.CORS_ORIGINS.strip():
+            return []
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
     
     class Config:
         env_file = ".env"

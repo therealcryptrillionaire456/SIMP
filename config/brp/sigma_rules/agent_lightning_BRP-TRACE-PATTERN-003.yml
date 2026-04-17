@@ -1,0 +1,22 @@
+title: 'Agent Lightning: Rapid sequence of similar operations without pauses'
+id: BRP-TRACE-PATTERN-003
+status: experimental
+description: 'Generated from Agent Lightning trace analysis. Pattern: PATTERN-003'
+author: Agent Lightning Safety Analyzer
+date: 2026/04/14
+modified: 2026/04/14
+logsource:
+  category: agent_behavior
+  product: simp
+detection:
+  condition: all of them
+  selection:
+    operation_count: '> 5'
+    time_window: < 2s
+    agent_type: quantumarb
+level: critical
+tags:
+- agent-lightning
+- safety
+- brp
+- quantumarb

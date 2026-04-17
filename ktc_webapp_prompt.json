@@ -1,0 +1,222 @@
+{
+  "project": "KEEPTHECHANGE.com - Instagram's Crypto Twin",
+  "description": "A revolutionary social shopping platform that turns everyday savings into crypto investments through an Instagram-like experience",
+  "documentation_folder": "/Users/kaseymarcelle/Downloads/KTC_MASTER_DOCS",
+  "alternate_location": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/keep-the-change/documents/KTC_MASTER_DOCS",
+  
+  "webapp_creation_instructions": {
+    "phase": "Phase 1: Foundation (Months 1-3)",
+    "objective": "Build the core web application with essential features for user onboarding, basic savings functionality, and social engagement",
+    
+    "technical_stack": {
+      "frontend": {
+        "framework": "Next.js 14+ with App Router",
+        "language": "TypeScript 5+",
+        "styling": "Tailwind CSS + CSS Modules",
+        "state_management": "React Query + Zustand",
+        "authentication": "NextAuth.js with JWT",
+        "real_time": "WebSocket + Server-Sent Events",
+        "performance_target": "Lighthouse score > 90",
+        "accessibility": "WCAG 2.1 AA compliant"
+      },
+      "backend": {
+        "api_gateway": "FastAPI with OpenAPI 3.0",
+        "microservices": [
+          "User Service (Python/FastAPI)",
+          "Transaction Service (Python/FastAPI)", 
+          "Social Service (Python/FastAPI)",
+          "Portfolio Service (Python/FastAPI)",
+          "Notification Service (Node.js/NestJS)",
+          "Search Service (Python/FastAPI + Elasticsearch)"
+        ],
+        "databases": {
+          "primary": "PostgreSQL 15+",
+          "cache": "Redis 7+",
+          "search": "Elasticsearch 8+",
+          "time_series": "TimescaleDB"
+        },
+        "message_queue": "Apache Kafka"
+      },
+      "mobile": {
+        "framework": "React Native 0.72+ with Expo",
+        "platforms": ["iOS 15+", "Android 10+"]
+      }
+    },
+    
+    "core_features_to_implement": [
+      {
+        "feature": "User Management & Authentication",
+        "components": [
+          "User registration with email/password and social login",
+          "Profile creation with photo, bio, preferences",
+          "Email verification system",
+          "Password management with strength requirements",
+          "Basic security with rate limiting"
+        ],
+        "priority": "P0",
+        "estimated_time": "2 weeks"
+      },
+      {
+        "feature": "Receipt Processing & Roundups",
+        "components": [
+          "Receipt image upload via web interface",
+          "Basic OCR using Tesseract",
+          "Transaction parsing (merchant, amount, date)",
+          "Roundup calculation (nearest-dollar rounding)",
+          "Roundup pool for savings accumulation"
+        ],
+        "priority": "P0",
+        "estimated_time": "3 weeks"
+      },
+      {
+        "feature": "Social Feed (Instagram-inspired)",
+        "components": [
+          "Basic chronological feed display",
+          "Post creation with text + single image",
+          "Engagement system (likes and basic comments)",
+          "Public user profile viewing",
+          "One-way following system"
+        ],
+        "priority": "P0",
+        "estimated_time": "2 weeks"
+      },
+      {
+        "feature": "Web Application Foundation",
+        "components": [
+          "Responsive mobile-first web interface",
+          "Core pages: Home feed, profile, post creation",
+          "Basic navigation with bottom bar",
+          "Real-time updates via WebSocket",
+          "Progressive Web App capabilities"
+        ],
+        "priority": "P0",
+        "estimated_time": "3 weeks"
+      },
+      {
+        "feature": "Backend Foundation",
+        "components": [
+          "API Gateway with FastAPI and OpenAPI docs",
+          "User Service for authentication and profiles",
+          "Transaction Service for receipt processing",
+          "Social Service for feed generation",
+          "Basic PostgreSQL database schemas"
+        ],
+        "priority": "P0",
+        "estimated_time": "3 weeks"
+      }
+    ],
+    
+    "development_approach": {
+      "methodology": "Agile with 2-week sprints",
+      "team_structure": [
+        "Product Manager: 1",
+        "Engineering Manager: 1", 
+        "Frontend Engineers: 2",
+        "Backend Engineers: 2",
+        "DevOps Engineer: 1",
+        "QA Engineer: 1",
+        "UI/UX Designer: 1"
+      ],
+      "testing_strategy": {
+        "unit_tests": "> 90% coverage",
+        "integration_tests": "> 80% coverage",
+        "e2e_tests": "100% of critical user journeys",
+        "performance_tests": "API response < 200ms P95",
+        "security_tests": "OWASP Top 10 compliance"
+      }
+    },
+    
+    "success_criteria": {
+      "user_registration": "1,000+ beta users",
+      "receipt_processing": "90%+ OCR accuracy on clear receipts",
+      "roundup_adoption": "50%+ of users enabling roundups",
+      "social_engagement": "3+ posts per active user",
+      "system_uptime": "99.5% during beta",
+      "performance": "< 2s page load, < 500ms API response"
+    },
+    
+    "key_documents_to_reference": {
+      "architecture": "04-system-architecture.md",
+      "api_specification": "05-api-specification.md",
+      "database_schema": "06-database-schema.md",
+      "api_contracts": "07-api-contracts.md",
+      "monorepo_structure": "08-monorepo-structure.md",
+      "development_phases": "11-development-phases.md",
+      "testing_strategy": "12-testing-strategy.md"
+    },
+    
+    "design_system": {
+      "color_palette": {
+        "primary": "#FF6B6B (Coral) - energy and action",
+        "secondary": "#FFD166 (Yellow) - optimism and savings",
+        "accent": "#06D6A0 (Teal) - growth and crypto",
+        "neutral": "#FFFFFF, #F8F9FA, #6C757D, #212529"
+      },
+      "typography": {
+        "primary_font": "Inter or system sans-serif",
+        "heading_sizes": ["2.5rem", "2rem", "1.75rem", "1.5rem", "1.25rem", "1rem"],
+        "body_size": "1rem (16px)",
+        "line_height": "1.5"
+      },
+      "spacing_scale": "4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px, 96px, 128px",
+      "border_radius": "8px (default), 12px (cards), 24px (pill buttons)"
+    },
+    
+    "implementation_priority_order": [
+      "1. Project setup and monorepo structure",
+      "2. User authentication and profile management",
+      "3. Basic receipt upload and OCR processing",
+      "4. Roundup calculation and savings tracking",
+      "5. Social feed with post creation",
+      "6. Real-time updates and notifications",
+      "7. Performance optimization and testing",
+      "8. Deployment pipeline and monitoring"
+    ],
+    
+    "simp_system_integration": {
+      "ktc_agent": "Specialized agent for receipt processing and price comparison",
+      "quantumarb_integration": "For crypto investment optimization",
+      "simp_broker": "For agent communication and intent routing",
+      "real_time_features": "WebSocket integration for social engagement"
+    },
+    
+    "quick_start_commands": [
+      "# Clone and setup",
+      "git clone <repository> keepthechange",
+      "cd keepthechange",
+      "pnpm install",
+      "cp .env.example .env",
+      "# Edit .env with your configuration",
+      "pnpm dev"
+    ],
+    
+    "quality_gates": {
+      "code_coverage": "> 90% unit test coverage",
+      "performance": "Lighthouse score > 90",
+      "accessibility": "WCAG 2.1 AA compliant",
+      "security": "Zero critical vulnerabilities",
+      "api_documentation": "100% OpenAPI coverage"
+    }
+  },
+  
+  "additional_resources": {
+    "instagram_inspiration": "Study Instagram's UX patterns for feed, stories, and engagement",
+    "crypto_integration": "Reference Coinbase or Binance for crypto wallet UX",
+    "financial_compliance": "Review Stripe or Plaid for financial data handling",
+    "social_features": "Examine Twitter/X or TikTok for social interaction patterns"
+  },
+  
+  "contact_points": {
+    "product_questions": "Refer to 01-product-requirements.md and 02-user-stories-acceptance-criteria.md",
+    "technical_questions": "Refer to 04-system-architecture.md and 06-database-schema.md",
+    "project_management": "Refer to 10-engineering-scope-definition.md and 11-development-phases.md",
+    "testing_guidance": "Refer to 12-testing-strategy.md"
+  },
+  
+  "next_phases_summary": {
+    "phase_2": "Mobile apps, crypto integration, advanced social features (Months 4-6)",
+    "phase_3": "Merchant ecosystem, affiliate program, revenue features (Months 7-12)",
+    "phase_4": "Advanced AI, international expansion, platform ecosystem (Months 13-18)",
+    "phase_5": "Market leadership, innovation lab, financial services (Months 19-24)"
+  }
+}

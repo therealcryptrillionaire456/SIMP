@@ -96,13 +96,13 @@ class SimpleIntentMeshRouter:
         logger.info(f"Simple intent router initialized for {local_agent_id}")
     
     def _advertise_capabilities(self) -> None:
-        """Advertise local capabilities to mesh."""
+        """Advertise local capabilities to mesh and register locally."""
         # Convert local capabilities to list
         capabilities = list(self._local_capabilities)
-        
+
         if not capabilities:
             capabilities = ["mesh_relay"]  # Default capability
-        
+
         advertisement = CapabilityAdvertisement(
             agent_id=self.local_agent_id,
             endpoint=self.local_endpoint,
@@ -110,10 +110,14 @@ class SimpleIntentMeshRouter:
             channel_capacity=1000.0,
             reputation_score=1.0
         )
-        
-        # Broadcast capability advertisement
+
+        # Register self in capability table so get_capabilities() includes local agent
+        with self._capabilities_lock:
+            self._capabilities[self.local_agent_id] = advertisement
+
+        # Broadcast capability advertisement to peers
         self._broadcast_capability_ad(advertisement)
-        
+
         logger.info(f"Advertised capabilities: {capabilities}")
     
     def _broadcast_capability_ad(self, ad: CapabilityAdvertisement) -> None:
@@ -328,34 +332,50 @@ class SimpleIntentMeshRouter:
     def _find_agent_for_intent_type(self, intent_type: str) -> Optional[str]:
         """
         Find best agent for an intent type.
+
+        L4 trust integration: if a TrustGraph is injected (via
+        trust_graph.inject_into_router(self) or patch_router_with_trust_graph),
+        live trust scores replace the static reputation_score for routing
+        decisions.  Falls back to reputation_score if no graph is available.
         """
         with self._capabilities_lock:
             suitable_agents = []
-            
+
+            # Grab trust graph reference once (avoid per-loop attr lookups)
+            trust_graph = getattr(self, '_trust_graph', None)
+
             for agent_id, ad in self._capabilities.items():
                 if intent_type in ad.capabilities:
-                    # Calculate score based on reputation and recency
-                    score = ad.reputation_score
-                    
+                    # L4: use live effective trust score if available
+                    if trust_graph is not None:
+                        score = trust_graph.get_effective_score(agent_id)
+                    else:
+                        score = ad.reputation_score
+
                     # Penalize for being offline too long
                     offline_time = time.time() - ad.last_seen
                     if offline_time > 300:  # 5 minutes
                         score *= 0.5
-                    
+
                     suitable_agents.append((score, offline_time, agent_id))
-            
+
             if not suitable_agents:
                 return None
-            
+
             # Sort by score (highest first), then by recency
             suitable_agents.sort(key=lambda x: (-x[0], x[1]))
-            
+
             return suitable_agents[0][2]
     
     def get_capabilities(self) -> List[CapabilityAdvertisement]:
-        """Get all known capability advertisements."""
+        """Get all known capability advertisements (includes local agent)."""
         with self._capabilities_lock:
             return list(self._capabilities.values())
+
+    def get_local_capabilities(self) -> List[str]:
+        """Get the capability types this local agent advertises."""
+        caps = list(self._local_capabilities)
+        return caps if caps else ["mesh_relay"]
     
     def update_reputation(self, agent_id: str, delta: float) -> None:
         """Update reputation score for an agent."""

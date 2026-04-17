@@ -16,8 +16,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 import uuid
 
-from .exchange_connector import ExchangeConnector, OrderBook
-from .executor import TradeExecutor, TradeRequest, TradeSide, TradeStatus
+from .exchange_connector import ExchangeConnector
+from .executor import TradeExecutor
 
 
 class ArbType(str, Enum):

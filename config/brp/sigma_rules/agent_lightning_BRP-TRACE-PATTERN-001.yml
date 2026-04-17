@@ -1,0 +1,25 @@
+title: 'Agent Lightning: Agent attempts to modify protected files without proper checks'
+id: BRP-TRACE-PATTERN-001
+status: experimental
+description: 'Generated from Agent Lightning trace analysis. Pattern: PATTERN-001'
+author: Agent Lightning Safety Analyzer
+date: 2026/04/14
+modified: 2026/04/14
+logsource:
+  category: agent_behavior
+  product: simp
+detection:
+  condition: all of them
+  selection:
+    operation_type: file_write
+    file_path:
+    - /etc/*
+    - /usr/bin/*
+    - broker.py
+    - config.py
+level: high
+tags:
+- agent-lightning
+- safety
+- brp
+- stray_goose

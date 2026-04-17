@@ -1,0 +1,92 @@
+/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/quantumarb_http_agent.py:38: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+INFO:__main__:Starting QuantumArb HTTP Agent on port 8770
+INFO:     Started server process [32423]
+INFO:     Waiting for application startup.
+INFO:__main__:Initializing QuantumArb HTTP agent...
+INFO:__main__:QuantumArb HTTP agent initialized
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8770 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61309 - "POST /intents/handle HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61309 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61396 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61463 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61542 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61602 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61713 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61781 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61850 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61923 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61991 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62062 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62147 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62221 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62303 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62393 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62474 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62542 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62618 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62678 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62748 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62789 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62843 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62906 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63000 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63072 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63189 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63290 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63393 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63467 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63545 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63611 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63683 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63759 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63843 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63947 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64067 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64134 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64223 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64293 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64300 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64385 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64469 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64549 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64606 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64659 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64695 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64773 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64842 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64931 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64994 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65090 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65162 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65242 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65321 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65369 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65381 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65417 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65429 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65496 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49202 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49269 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49322 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49401 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49453 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49497 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49561 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49620 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49685 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49781 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49851 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49905 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49971 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50039 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [32423]

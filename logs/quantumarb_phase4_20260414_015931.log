@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/agents/quantumarb_agent_phase4.py", line 22, in <module>
+    from simp.security.brp_bridge import get_brp_bridge
+ImportError: cannot import name 'get_brp_bridge' from 'simp.security.brp_bridge' (/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/security/brp_bridge.py)

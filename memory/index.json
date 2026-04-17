@@ -172,7 +172,8 @@
     },
     "planning": {
       "decisions": [
-        "Task 'Intent planning' completed by test_agent_1"
+        "Task 'Intent planning' completed by test_agent_1",
+        "Task 'Intent planning' completed by gemma4_local"
       ],
       "tags": [
         "planning",
@@ -183,6 +184,42 @@
     "research": {
       "tags": [
         "research",
+        "routed"
+      ]
+    },
+    "arbitrage_opportunity": {
+      "tags": [
+        "arbitrage_opportunity",
+        "routed"
+      ]
+    },
+    "market_analysis": {
+      "tags": [
+        "market_analysis",
+        "routed"
+      ]
+    },
+    "trade_execution": {
+      "tags": [
+        "trade_execution",
+        "routed"
+      ]
+    },
+    "analyze_patterns": {
+      "tags": [
+        "analyze_patterns",
+        "routed"
+      ]
+    },
+    "code_task": {
+      "tags": [
+        "code_task",
+        "routed"
+      ]
+    },
+    "status_check": {
+      "tags": [
+        "status_check",
         "routed"
       ]
     }
@@ -290,6 +327,30 @@
       "notes": ""
     },
     "projectx_native": {
+      "notes": ""
+    },
+    "quantumarb_enhanced": {
+      "notes": ""
+    },
+    "quantumarb_risk_simple": {
+      "notes": ""
+    },
+    "gate4_scaled": {
+      "notes": ""
+    },
+    "deerflow": {
+      "notes": ""
+    },
+    "quantumarb_mesh": {
+      "notes": ""
+    },
+    "gate4_http": {
+      "notes": ""
+    },
+    "quantumarb_http": {
+      "notes": ""
+    },
+    "gate4_real": {
       "notes": ""
     }
   },

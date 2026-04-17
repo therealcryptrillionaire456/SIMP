@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-04-14T14:13:31.304730",
+  "signal": {
+    "signal_id": "ethusd_gate3_1776190411_9697",
+    "arb_type": "cross_venue",
+    "symbol_a": "ETH-USD",
+    "symbol_b": "ETH-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.0908,
+    "expected_return_pct": 0.0819,
+    "confidence": 0.95,
+    "timestamp": "2026-04-14T14:13:31.303804",
+    "metadata": {
+      "gate": "3",
+      "market": "ETH-USD",
+      "microscopic": true,
+      "multi_market": true,
+      "test_signal": true,
+      "estimated_price": 3569.694605258863
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "ethusd_gate3_1776190411_9697",
+      "arb_type": "cross_venue",
+      "symbol_a": "ETH-USD",
+      "symbol_b": "ETH-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.0908,
+      "expected_return_pct": 0.0819,
+      "confidence": 0.95,
+      "timestamp": "2026-04-14T14:13:31.303804",
+      "metadata": {
+        "gate": "3",
+        "market": "ETH-USD",
+        "microscopic": true,
+        "multi_market": true,
+        "test_signal": true,
+        "estimated_price": 3569.694605258863
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: ETH-USD risk score 0.797, spread 0.0908%, confidence 0.95",
+    "position_size_usd": 0.1,
+    "expected_pnl_usd": 8.19e-05,
+    "risk_score": 0.7966134645035456,
+    "metadata": {
+      "approved": true,
+      "symbol": "ETH-USD",
+      "estimated_slippage_bps": 5.374140282915796,
+      "size_tier": "determined_by_risk",
+      "multi_market": true
+    }
+  },
+  "execution_result": {
+    "trade_id": "trade_1776190411_4711",
+    "timestamp": "2026-04-14T14:13:31.304471",
+    "symbol": "ETH-USD",
+    "side": "buy",
+    "quantity": 2.2696728841080297e-05,
+    "price": 3569.694605258863,
+    "notional_usd": 0.08102039050102758,
+    "fees_usd": 8.102039050102758e-05,
+    "slippage_pct": 0.0008338292160934259,
+    "pnl_usd": -1.4664690680686005e-05,
+    "status": "filled",
+    "metadata": {
+      "gate": "3",
+      "order_type": "limit",
+      "time_in_force": "GTC",
+      "fill_percentage": 81.02039050102758,
+      "price_improvement_pct": 0.0021516545736102277,
+      "limit_order": true,
+      "partial_fill": true,
+      "multi_market": true,
+      "symbol": "ETH-USD"
+    }
+  },
+  "session_id": "gate3_1776190276",
+  "gate": "3"
+}

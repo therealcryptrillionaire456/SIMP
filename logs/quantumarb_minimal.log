@@ -1,0 +1,11 @@
+2026-04-14 02:07:17,545 - quantumarb_minimal - INFO - QuantumArbEngineMinimal initialized for Phase 4 microscopic trading
+2026-04-14 02:07:17,546 - quantumarb_minimal - INFO - QuantumArbAgentMinimal initialized with poll interval 2.0s
+2026-04-14 02:07:17,546 - quantumarb_minimal - INFO - Starting QuantumArbAgentMinimal...
+2026-04-14 02:09:57,692 - quantumarb_minimal - INFO - Evaluating arbitrage signal: demo_signal_1776146997
+2026-04-14 02:09:57,692 - quantumarb_minimal - INFO - Decision: {'signal_id': 'demo_signal_1776146997', 'spread_pct': 0.05, 'decision': 'reject_risk', 'reason': 'Risk score 0.41 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T06:09:57.692634'}
+2026-04-14 02:09:57,694 - quantumarb_minimal - INFO - Processed signal demo_signal_1776146997, result: data/quantumarb_minimal/outbox/result_demo_signal_1776146997.json
+2026-04-14 02:16:00,039 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 02:17:00,101 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 02:18:00,193 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 03:16:00,729 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 09:45:00,703 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading

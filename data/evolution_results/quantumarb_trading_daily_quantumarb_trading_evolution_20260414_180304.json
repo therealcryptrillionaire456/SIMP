@@ -1,0 +1,105 @@
+{
+  "timestamp": "2026-04-14T18:03:04.663639",
+  "component": "quantumarb_trading",
+  "experiment": "daily_quantumarb_trading_evolution",
+  "results": {
+    "success": true,
+    "final_best_score": 26103.171073904683,
+    "rounds_completed": 5,
+    "best_algorithm": {
+      "threshold_bps": 9.545961629318121,
+      "min_confidence": 0.6188568580222634,
+      "max_position_per_market": 12291.936376739559,
+      "risk_tolerance": 0.10916429071991303,
+      "liquidity_weight": 0.7550577215797477,
+      "execution_speed_weight": 0.42860792333053843
+    },
+    "evolution_history": [
+      {
+        "round": 1,
+        "best_score": 24724.342820397207,
+        "average_score": 19094.20075135951,
+        "score_std": 5993.2750981474555,
+        "best_algorithm": {
+          "threshold_bps": 9.545961629318121,
+          "min_confidence": 0.6188568580222634,
+          "max_position_per_market": 12291.936376739559,
+          "risk_tolerance": 0.10916429071991303,
+          "liquidity_weight": 0.7550577215797477,
+          "execution_speed_weight": 0.41974337668915807
+        },
+        "timestamp": "2026-04-14T18:03:04.662646"
+      },
+      {
+        "round": 2,
+        "best_score": 26103.171073904683,
+        "average_score": 25598.45337626095,
+        "score_std": 379.14646657997116,
+        "best_algorithm": {
+          "threshold_bps": 9.545961629318121,
+          "min_confidence": 0.6188568580222634,
+          "max_position_per_market": 12291.936376739559,
+          "risk_tolerance": 0.10916429071991303,
+          "liquidity_weight": 0.7550577215797477,
+          "execution_speed_weight": 0.42860792333053843
+        },
+        "timestamp": "2026-04-14T18:03:04.662931"
+      },
+      {
+        "round": 3,
+        "best_score": 25645.740400955314,
+        "average_score": 24877.247328727026,
+        "score_std": 659.0298872831169,
+        "best_algorithm": {
+          "threshold_bps": 5.0,
+          "min_confidence": 0.6188568580222634,
+          "max_position_per_market": 12291.936376739559,
+          "risk_tolerance": 0.10916429071991303,
+          "liquidity_weight": 0.7550577215797477,
+          "execution_speed_weight": 0.3602625191574323
+        },
+        "timestamp": "2026-04-14T18:03:04.663174"
+      },
+      {
+        "round": 4,
+        "best_score": 25743.52748487223,
+        "average_score": 25459.100749471472,
+        "score_std": 286.46528620336346,
+        "best_algorithm": {
+          "threshold_bps": 5.0,
+          "min_confidence": 0.6188568580222634,
+          "max_position_per_market": 12291.936376739559,
+          "risk_tolerance": 0.10916429071991303,
+          "liquidity_weight": 0.7550577215797477,
+          "execution_speed_weight": 0.3602625191574323
+        },
+        "timestamp": "2026-04-14T18:03:04.663399"
+      },
+      {
+        "round": 5,
+        "best_score": 25241.851155070046,
+        "average_score": 24958.881456881893,
+        "score_std": 201.27381199810867,
+        "best_algorithm": {
+          "threshold_bps": 5.0,
+          "min_confidence": 0.6188568580222634,
+          "max_position_per_market": 12291.936376739559,
+          "risk_tolerance": 0.10916429071991303,
+          "liquidity_weight": 0.7550577215797477,
+          "execution_speed_weight": 0.3602625191574323
+        },
+        "timestamp": "2026-04-14T18:03:04.663638"
+      }
+    ],
+    "improvement_percent": 0.0,
+    "parameters_optimized": [
+      "threshold_bps",
+      "min_confidence",
+      "max_position_per_market",
+      "risk_tolerance",
+      "liquidity_weight",
+      "execution_speed_weight"
+    ]
+  },
+  "success": true
+}

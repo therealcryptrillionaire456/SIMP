@@ -27,6 +27,7 @@ INTENT_TYPE_REGISTRY = {
     "test_harness": {"task_type": "test", "description": "Test creation and execution"},
     "prediction_signal": {"task_type": "analysis", "description": "Predictive signal generation"},
     "arbitrage": {"task_type": "implementation", "description": "Arbitrage opportunity execution"},
+    "arbitrage_opportunity": {"task_type": "implementation", "description": "Arbitrage opportunity detection and execution"},
     "spec": {"task_type": "spec", "description": "Specification writing"},
     "architecture": {"task_type": "architecture", "description": "Architecture design"},
     "docs": {"task_type": "docs", "description": "Documentation generation"},

@@ -28,7 +28,7 @@ class AdminUserResponse(BaseModel):
     deleted_at: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def full_name(self) -> str:
@@ -78,7 +78,7 @@ class AuditLogResponse(BaseModel):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FinancialReportResponse(BaseModel):

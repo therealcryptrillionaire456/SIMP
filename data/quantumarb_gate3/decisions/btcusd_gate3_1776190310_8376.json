@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-04-14T14:11:50.652320",
+  "signal": {
+    "signal_id": "btcusd_gate3_1776190310_8376",
+    "arb_type": "cross_venue",
+    "symbol_a": "BTC-USD",
+    "symbol_b": "BTC-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.0732,
+    "expected_return_pct": 0.0642,
+    "confidence": 0.82,
+    "timestamp": "2026-04-14T14:11:50.651186",
+    "metadata": {
+      "gate": "3",
+      "market": "BTC-USD",
+      "microscopic": true,
+      "multi_market": true,
+      "test_signal": true,
+      "estimated_price": 61058.25595010666
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "btcusd_gate3_1776190310_8376",
+      "arb_type": "cross_venue",
+      "symbol_a": "BTC-USD",
+      "symbol_b": "BTC-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.0732,
+      "expected_return_pct": 0.0642,
+      "confidence": 0.82,
+      "timestamp": "2026-04-14T14:11:50.651186",
+      "metadata": {
+        "gate": "3",
+        "market": "BTC-USD",
+        "microscopic": true,
+        "multi_market": true,
+        "test_signal": true,
+        "estimated_price": 61058.25595010666
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: BTC-USD risk score 0.672, spread 0.0732%, confidence 0.82",
+    "position_size_usd": 0.1,
+    "expected_pnl_usd": 6.419999999999999e-05,
+    "risk_score": 0.6717180328450338,
+    "metadata": {
+      "approved": true,
+      "symbol": "BTC-USD",
+      "estimated_slippage_bps": 3.9172888924042057,
+      "size_tier": "determined_by_risk",
+      "multi_market": true
+    }
+  },
+  "execution_result": {
+    "trade_id": "trade_1776190310_8284",
+    "timestamp": "2026-04-14T14:11:50.652185",
+    "symbol": "BTC-USD",
+    "side": "sell",
+    "quantity": 1.3456758228472261e-06,
+    "price": 61058.25595010666,
+    "notional_usd": 0.08216461881727631,
+    "fees_usd": 8.216461881727632e-05,
+    "slippage_pct": 0.0020848096896809573,
+    "pnl_usd": -2.9414933536584942e-05,
+    "status": "filled",
+    "metadata": {
+      "gate": "3",
+      "order_type": "limit",
+      "time_in_force": "GTC",
+      "fill_percentage": 82.1646188172763,
+      "price_improvement_pct": 0.008300898537401754,
+      "limit_order": true,
+      "partial_fill": true,
+      "multi_market": true,
+      "symbol": "BTC-USD"
+    }
+  },
+  "session_id": "gate3_1776190276",
+  "gate": "3"
+}

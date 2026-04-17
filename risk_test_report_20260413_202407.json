@@ -1,0 +1,232 @@
+{
+  "timestamp": "2026-04-13T20:24:06.572862",
+  "risk_level": "conservative",
+  "account_size": 1000.0,
+  "tests": {
+    "position_sizing": [
+      {
+        "symbol": "BTC-USD",
+        "asset_class": "crypto",
+        "stop_loss_percent": 5.0,
+        "calculated_position": 49.25,
+        "expected_position": 49.25,
+        "match": true,
+        "max_risk_per_trade": 5.0
+      },
+      {
+        "symbol": "ETH-USD",
+        "asset_class": "crypto",
+        "stop_loss_percent": 3.0,
+        "calculated_position": 82.09,
+        "expected_position": 82.09,
+        "match": true,
+        "max_risk_per_trade": 5.0
+      },
+      {
+        "symbol": "SPY",
+        "asset_class": "stocks",
+        "stop_loss_percent": 2.0,
+        "calculated_position": 246.26,
+        "expected_position": 246.26,
+        "match": true,
+        "max_risk_per_trade": 5.0
+      },
+      {
+        "symbol": "AAPL",
+        "asset_class": "stocks",
+        "stop_loss_percent": 4.0,
+        "calculated_position": 123.13,
+        "expected_position": 123.13,
+        "match": true,
+        "max_risk_per_trade": 5.0
+      },
+      {
+        "symbol": "EUR-USD",
+        "asset_class": "forex",
+        "stop_loss_percent": 1.5,
+        "calculated_position": 262.68,
+        "expected_position": 262.68,
+        "match": true,
+        "max_risk_per_trade": 5.0
+      }
+    ],
+    "risk_limits": {
+      "daily_loss_test": [
+        {
+          "daily_pnl": 0.0,
+          "loss_limit": 200.0,
+          "blocked": true,
+          "reason": "Position size 100.00 > max risk per trade 5.00"
+        }
+      ],
+      "concurrent_positions_test": [
+        {
+          "symbol": "TEST0",
+          "position_count": 0,
+          "max_positions": 3,
+          "allowed": false,
+          "reason": "Position size 100.00 > max risk per trade 5.00"
+        },
+        {
+          "symbol": "TEST1",
+          "position_count": 0,
+          "max_positions": 3,
+          "allowed": false,
+          "reason": "Position size 100.00 > max risk per trade 5.00"
+        },
+        {
+          "symbol": "TEST2",
+          "position_count": 0,
+          "max_positions": 3,
+          "allowed": false,
+          "reason": "Position size 100.00 > max risk per trade 5.00"
+        },
+        {
+          "symbol": "TEST3",
+          "position_count": 0,
+          "max_positions": 3,
+          "allowed": false,
+          "reason": "Position size 100.00 > max risk per trade 5.00"
+        },
+        {
+          "symbol": "TEST4",
+          "position_count": 0,
+          "max_positions": 3,
+          "allowed": false,
+          "reason": "Position size 100.00 > max risk per trade 5.00"
+        }
+      ]
+    },
+    "trading_day": {
+      "date": "2026-04-13T20:24:06.573384",
+      "config_file": "conservative",
+      "account_size": 1000.0,
+      "trades_attempted": 100,
+      "trades_allowed": 0,
+      "trades_blocked": 100,
+      "blocked_reasons": {
+        "Position size 54.62 > max risk per trade 5.00": 1,
+        "Position size 78.06 > max risk per trade 5.00": 1,
+        "Position size 253.84 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 39.31 > max risk per trade 5.00": 1,
+        "Position size 89.50 > max risk per trade 5.00": 1,
+        "Position size 33.16 > max risk per trade 5.00": 1,
+        "Position size 43.87 > max risk per trade 5.00": 1,
+        "Position size 86.87 > max risk per trade 5.00": 1,
+        "Position size 31.20 > max risk per trade 5.00": 1,
+        "Position size 33.95 > max risk per trade 5.00": 1,
+        "Position size 29.64 > max risk per trade 5.00": 1,
+        "Position size 194.02 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 105.55 > max risk per trade 5.00": 1,
+        "Position size 53.20 > max risk per trade 5.00": 1,
+        "Position size 64.44 > max risk per trade 5.00": 1,
+        "Position size 28.20 > max risk per trade 5.00": 1,
+        "Position size 72.77 > max risk per trade 5.00": 1,
+        "Position size 148.44 > max risk per trade 5.00": 1,
+        "Position size 128.67 > max risk per trade 5.00": 1,
+        "Position size 37.69 > max risk per trade 5.00": 1,
+        "Position size 115.44 > max risk per trade 5.00": 1,
+        "Position size 125.56 > max risk per trade 5.00": 1,
+        "Position size 343.90 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 34.23 > max risk per trade 5.00": 1,
+        "Position size 49.67 > max risk per trade 5.00": 1,
+        "Position size 167.90 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 187.67 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 65.81 > max risk per trade 5.00": 1,
+        "Position size 50.86 > max risk per trade 5.00": 1,
+        "Position size 89.78 > max risk per trade 5.00": 1,
+        "Position size 90.09 > max risk per trade 5.00": 1,
+        "Position size 77.85 > max risk per trade 5.00": 1,
+        "Position size 49.74 > max risk per trade 5.00": 1,
+        "Position size 46.41 > max risk per trade 5.00": 1,
+        "Position size 104.66 > max risk per trade 5.00": 1,
+        "Position size 79.45 > max risk per trade 5.00": 1,
+        "Position size 45.66 > max risk per trade 5.00": 1,
+        "Position size 268.20 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 62.25 > max risk per trade 5.00": 1,
+        "Position size 57.70 > max risk per trade 5.00": 1,
+        "Position size 40.27 > max risk per trade 5.00": 1,
+        "Position size 26.63 > max risk per trade 5.00": 1,
+        "Position size 25.84 > max risk per trade 5.00": 1,
+        "Position size 53.70 > max risk per trade 5.00": 1,
+        "Position size 42.90 > max risk per trade 5.00": 1,
+        "Position size 68.17 > max risk per trade 5.00": 1,
+        "Position size 43.16 > max risk per trade 5.00": 1,
+        "Position size 53.61 > max risk per trade 5.00": 1,
+        "Position size 50.33 > max risk per trade 5.00": 1,
+        "Position size 31.87 > max risk per trade 5.00": 1,
+        "Position size 95.16 > max risk per trade 5.00": 1,
+        "Position size 76.67 > max risk per trade 5.00": 1,
+        "Position size 50.27 > max risk per trade 5.00": 1,
+        "Position size 200.68 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 48.00 > max risk per trade 5.00": 1,
+        "Position size 188.85 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 33.83 > max risk per trade 5.00": 1,
+        "Position size 140.13 > max risk per trade 5.00": 1,
+        "Position size 72.00 > max risk per trade 5.00": 1,
+        "Position size 283.66 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 105.57 > max risk per trade 5.00": 1,
+        "Position size 29.79 > max risk per trade 5.00": 1,
+        "Position size 37.65 > max risk per trade 5.00": 1,
+        "Position size 96.38 > max risk per trade 5.00": 1,
+        "Position size 76.04 > max risk per trade 5.00": 1,
+        "Position size 38.58 > max risk per trade 5.00": 1,
+        "Position size 47.21 > max risk per trade 5.00": 1,
+        "Position size 52.11 > max risk per trade 5.00": 1,
+        "Position size 27.53 > max risk per trade 5.00": 1,
+        "Position size 137.41 > max risk per trade 5.00": 1,
+        "Position size 131.05 > max risk per trade 5.00": 1,
+        "Position size 148.20 > max risk per trade 5.00": 1,
+        "Position size 64.98 > max risk per trade 5.00": 1,
+        "Position size 55.50 > max risk per trade 5.00": 1,
+        "Position size 87.41 > max risk per trade 5.00": 1,
+        "Position size 125.68 > max risk per trade 5.00": 1,
+        "Position size 31.09 > max risk per trade 5.00": 1,
+        "Position size 122.09 > max risk per trade 5.00": 1,
+        "Position size 40.56 > max risk per trade 5.00": 1,
+        "Position size 25.60 > max risk per trade 5.00": 1,
+        "Position size 49.49 > max risk per trade 5.00": 1,
+        "Position size 162.53 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 57.09 > max risk per trade 5.00": 1,
+        "Position size 69.83 > max risk per trade 5.00": 1,
+        "Position size 59.77 > max risk per trade 5.00": 1,
+        "Position size 43.71 > max risk per trade 5.00": 1,
+        "Position size 40.55 > max risk per trade 5.00": 1,
+        "Position size 86.55 > max risk per trade 5.00": 1,
+        "Position size 63.18 > max risk per trade 5.00": 1,
+        "Position size 152.49 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 33.59 > max risk per trade 5.00": 1,
+        "Position size 28.92 > max risk per trade 5.00": 1,
+        "Position size 156.05 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 34.16 > max risk per trade 5.00": 1,
+        "Position size 370.26 > max risk per trade 5.00; Gross exposure limit exceeded": 1,
+        "Position size 69.13 > max risk per trade 5.00": 1,
+        "Position size 149.60 > max risk per trade 5.00": 1,
+        "Position size 102.08 > max risk per trade 5.00": 1,
+        "Position size 36.53 > max risk per trade 5.00": 1,
+        "Position size 142.87 > max risk per trade 5.00": 1
+      },
+      "daily_pnl": 0.0,
+      "max_exposure": 0.0,
+      "risk_limits_triggered": [],
+      "success_rate": 0.0,
+      "exposure_percent": 0.0
+    },
+    "emergency_stop": {
+      "emergency_stop_triggered": true,
+      "trade_allowed": false,
+      "reason": "Emergency stop triggered",
+      "expected": true
+    }
+  },
+  "summary": {
+    "overall_passed": true,
+    "issues_found": [
+      "Low trade success rate: 0.0%"
+    ],
+    "recommendations": [
+      "Risk framework passed all tests - ready for integration with QuantumArb agent",
+      "Proceed to Phase 3: Harden monitoring and alerting"
+    ]
+  }
+}

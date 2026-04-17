@@ -1,499 +1,666 @@
+#!/usr/bin/env python3.10
 """
-Exchange connector abstraction for QuantumArb organ.
+Exchange Connector Abstract Base Class and Base Implementation.
 
-Provides ABC for exchange connectors and implementations for various
-exchanges. Supports both real and stub connectors for testing.
+This module provides:
+1. ExchangeConnector ABC - Abstract interface for all exchange connectors
+2. StubExchangeConnector - For testing and sandbox mode
+3. BaseExchangeConnector - Common functionality for real exchanges
 """
 
 import json
 import time
+import logging
+import hashlib
+import hmac
+import base64
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, asdict
-from decimal import Decimal, ROUND_HALF_UP
-from enum import Enum
 from typing import Dict, List, Optional, Tuple, Any
-import uuid
+from dataclasses import dataclass
+from enum import Enum
+from datetime import datetime, timezone
 
+# Configure logging
+log = logging.getLogger("ExchangeConnector")
+log.setLevel(logging.INFO)
 
-class OrderBookSide(str, Enum):
-    """Order book side enumeration."""
-    BID = "bid"
-    ASK = "ask"
+class OrderSide(Enum):
+    """Order side (buy/sell)."""
+    BUY = "buy"
+    SELL = "sell"
 
+class OrderType(Enum):
+    """Order type."""
+    MARKET = "market"
+    LIMIT = "limit"
+
+class OrderStatus(Enum):
+    """Order status."""
+    NEW = "new"
+    PARTIALLY_FILLED = "partially_filled"
+    FILLED = "filled"
+    CANCELLED = "cancelled"
+    REJECTED = "rejected"
+    EXPIRED = "expired"
 
 @dataclass
-class OrderBookLevel:
-    """A single level in the order book."""
-    price: float
+class Order:
+    """Order representation."""
+    order_id: str
+    symbol: str
+    side: OrderSide
+    order_type: OrderType
     quantity: float
-    exchange_timestamp: Optional[float] = None
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary."""
-        return asdict(self)
-
+    price: Optional[float] = None
+    status: OrderStatus = OrderStatus.NEW
+    filled_quantity: float = 0.0
+    average_price: Optional[float] = None
+    timestamp: str = ""
+    exchange_timestamp: Optional[str] = None
 
 @dataclass
-class OrderBook:
-    """Complete order book for a market."""
-    market: str
-    timestamp: float
-    bids: List[OrderBookLevel]  # Sorted descending (best bid first)
-    asks: List[OrderBookLevel]  # Sorted ascending (best ask first)
-    sequence_id: Optional[int] = None
-    exchange: Optional[str] = None
-    
-    def get_best_bid(self) -> Optional[OrderBookLevel]:
-        """Get the best (highest) bid."""
-        return self.bids[0] if self.bids else None
-    
-    def get_best_ask(self) -> Optional[OrderBookLevel]:
-        """Get the best (lowest) ask."""
-        return self.asks[0] if self.asks else None
-    
-    def get_mid_price(self) -> Optional[float]:
-        """Calculate mid price from best bid and ask."""
-        best_bid = self.get_best_bid()
-        best_ask = self.get_best_ask()
-        
-        if not best_bid or not best_ask:
-            return None
-        
-        return (best_bid.price + best_ask.price) / 2
-    
-    def get_spread_bps(self) -> Optional[float]:
-        """Calculate spread in basis points."""
-        best_bid = self.get_best_bid()
-        best_ask = self.get_best_ask()
-        
-        if not best_bid or not best_ask or best_bid.price <= 0:
-            return None
-        
-        spread = best_ask.price - best_bid.price
-        return (spread / best_bid.price) * 10000
-    
-    def get_depth(self, side: OrderBookSide, levels: int = 10) -> List[OrderBookLevel]:
-        """Get order book depth for a given side."""
-        if side == OrderBookSide.BID:
-            return self.bids[:levels]
-        else:
-            return self.asks[:levels]
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for serialization."""
-        return {
-            "market": self.market,
-            "timestamp": self.timestamp,
-            "bids": [level.to_dict() for level in self.bids],
-            "asks": [level.to_dict() for level in self.asks],
-            "sequence_id": self.sequence_id,
-            "exchange": self.exchange,
-        }
-
+class Balance:
+    """Account balance for a currency."""
+    currency: str
+    available: float
+    total: float
+    held: float = 0.0
 
 @dataclass
 class Ticker:
-    """Market ticker information."""
-    market: str
-    last_price: float
-    bid_price: float
-    ask_price: float
-    volume_24h: float
-    timestamp: float
-    exchange: Optional[str] = None
-    
-    def get_spread_bps(self) -> float:
-        """Calculate spread in basis points."""
-        if self.bid_price <= 0:
-            return 0.0
-        spread = self.ask_price - self.bid_price
-        return (spread / self.bid_price) * 10000
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary."""
-        return asdict(self)
+    """Market ticker data."""
+    symbol: str
+    bid: float
+    ask: float
+    last: float
+    volume: float
+    timestamp: str
 
+class ExchangeError(Exception):
+    """Base exception for exchange errors."""
+    pass
 
-@dataclass
-class Trade:
-    """A single trade execution."""
-    trade_id: str
-    market: str
-    side: str  # "buy" or "sell"
-    price: float
-    quantity: float
-    timestamp: float
-    exchange: Optional[str] = None
-    fee: float = 0.0
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary."""
-        return asdict(self)
+class AuthenticationError(ExchangeError):
+    """Authentication failed."""
+    pass
+
+class InsufficientFundsError(ExchangeError):
+    """Insufficient funds for order."""
+    pass
+
+class OrderRejectedError(ExchangeError):
+    """Order was rejected by exchange."""
+    pass
+
+class RateLimitError(ExchangeError):
+    """Rate limit exceeded."""
+    pass
 
 
 class ExchangeConnector(ABC):
     """
-    Abstract base class for exchange connectors.
+    Abstract Base Class for exchange connectors.
     
     All exchange connectors must implement these methods.
     """
     
     @abstractmethod
-    def get_name(self) -> str:
-        """Get exchange name."""
-        pass
-    
-    @abstractmethod
-    def get_ticker(self, market: str) -> Ticker:
-        """Get ticker information for a market."""
-        pass
-    
-    @abstractmethod
-    def get_orderbook(self, market: str, depth: int = 10) -> OrderBook:
-        """Get order book for a market."""
-        pass
-    
-    @abstractmethod
-    def get_fees(self) -> float:
+    def get_balance(self, currency: str) -> Balance:
         """
-        Get trading fee rate.
+        Get balance for a specific currency.
         
+        Args:
+            currency: Currency symbol (e.g., "USD", "BTC")
+            
         Returns:
-            Fee rate as a decimal (e.g., 0.001 for 0.1%)
+            Balance object
+            
+        Raises:
+            ExchangeError: If balance cannot be retrieved
         """
         pass
     
     @abstractmethod
-    def get_balance(self, currency: str) -> float:
-        """Get balance for a currency."""
+    def get_ticker(self, symbol: str) -> Ticker:
+        """
+        Get current ticker data for a symbol.
+        
+        Args:
+            symbol: Trading symbol (e.g., "BTC-USD")
+            
+        Returns:
+            Ticker object
+            
+        Raises:
+            ExchangeError: If ticker cannot be retrieved
+        """
         pass
     
     @abstractmethod
-    def place_order(
-        self,
-        market: str,
-        side: str,
-        order_type: str,
-        quantity: float,
-        price: Optional[float] = None,
-    ) -> Dict[str, Any]:
+    def place_order(self, symbol: str, side: OrderSide, 
+                   quantity: float, order_type: OrderType = OrderType.MARKET,
+                   price: Optional[float] = None) -> Order:
         """
         Place an order on the exchange.
         
         Args:
-            market: Market symbol
-            side: "buy" or "sell"
-            order_type: "market" or "limit"
+            symbol: Trading symbol
+            side: Buy or sell
             quantity: Order quantity
-            price: Limit price (required for limit orders)
+            order_type: Market or limit
+            price: Required for limit orders
             
         Returns:
-            Order response dictionary
+            Order object with order_id
+            
+        Raises:
+            InsufficientFundsError: If insufficient balance
+            OrderRejectedError: If order is rejected
+            ExchangeError: For other exchange errors
         """
         pass
     
     @abstractmethod
     def cancel_order(self, order_id: str) -> bool:
-        """Cancel an order."""
+        """
+        Cancel an existing order.
+        
+        Args:
+            order_id: Order ID to cancel
+            
+        Returns:
+            True if cancelled successfully
+            
+        Raises:
+            ExchangeError: If order cannot be cancelled
+        """
         pass
     
     @abstractmethod
-    def get_order_status(self, order_id: str) -> Dict[str, Any]:
-        """Get order status."""
+    def get_order_status(self, order_id: str) -> Order:
+        """
+        Get current status of an order.
+        
+        Args:
+            order_id: Order ID to check
+            
+        Returns:
+            Order object with current status
+            
+        Raises:
+            ExchangeError: If order status cannot be retrieved
+        """
         pass
     
-    def get_mid_price(self, market: str) -> Optional[float]:
-        """Get mid price for a market."""
-        ticker = self.get_ticker(market)
-        if ticker.bid_price > 0 and ticker.ask_price > 0:
-            return (ticker.bid_price + ticker.ask_price) / 2
-        return None
+    @abstractmethod
+    def get_open_orders(self, symbol: Optional[str] = None) -> List[Order]:
+        """
+        Get list of open orders.
+        
+        Args:
+            symbol: Optional symbol filter
+            
+        Returns:
+            List of open Order objects
+            
+        Raises:
+            ExchangeError: If orders cannot be retrieved
+        """
+        pass
     
-    def get_spread_bps(self, market: str) -> float:
-        """Get spread in basis points for a market."""
-        ticker = self.get_ticker(market)
-        return ticker.get_spread_bps()
+    @abstractmethod
+    def get_fees(self) -> float:
+        """
+        Get the fee rate for the exchange.
+        
+        Returns:
+            Fee rate as a decimal (e.g., 0.001 for 0.1% fee)
+            
+        Raises:
+            ExchangeError: If fee information cannot be retrieved
+        """
+        pass
     
-    def is_market_open(self, market: str) -> bool:
-        """Check if a market is open for trading."""
-        try:
-            ticker = self.get_ticker(market)
-            return ticker.bid_price > 0 and ticker.ask_price > 0
-        except Exception:
-            return False
+    def get_mid_price(self, symbol: str) -> float:
+        """
+        Get mid price (average of bid and ask).
+        
+        Args:
+            symbol: Trading symbol
+            
+        Returns:
+            Mid price
+        """
+        ticker = self.get_ticker(symbol)
+        return (ticker.bid + ticker.ask) / 2
+    
+    def estimate_slippage(self, symbol: str, side: OrderSide, 
+                         quantity: float) -> float:
+        """
+        Estimate slippage for an order.
+        
+        Args:
+            symbol: Trading symbol
+            side: Buy or sell
+            quantity: Order quantity
+            
+        Returns:
+            Estimated slippage in basis points
+        """
+        ticker = self.get_ticker(symbol)
+        if side == OrderSide.BUY:
+            # Buying at ask price
+            return 0.0  # Base implementation - override for real estimates
+        else:
+            # Selling at bid price
+            return 0.0
+    
+    def validate_order(self, symbol: str, side: OrderSide,
+                      quantity: float, order_type: OrderType,
+                      price: Optional[float] = None) -> Tuple[bool, str]:
+        """
+        Validate order parameters before placing.
+        
+        Args:
+            symbol: Trading symbol
+            side: Buy or sell
+            quantity: Order quantity
+            order_type: Market or limit
+            price: Required for limit orders
+            
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        if quantity <= 0:
+            return False, "Quantity must be positive"
+        
+        if order_type == OrderType.LIMIT and price is None:
+            return False, "Price required for limit orders"
+        
+        if order_type == OrderType.LIMIT and price <= 0:
+            return False, "Price must be positive"
+        
+        # Check symbol format (basic validation)
+        if "-" not in symbol:
+            return False, "Symbol must be in format BASE-QUOTE"
+        
+        return True, ""
 
 
-class StubExchangeConnector(ExchangeConnector):
+class BaseExchangeConnector(ExchangeConnector):
     """
-    Stub exchange connector for testing.
+    Base implementation with common functionality for real exchanges.
     
-    Uses predefined prices and order books.
+    Provides:
+    - Rate limiting
+    - Request signing
+    - Error handling
+    - Retry logic
     """
     
-    def __init__(
-        self,
-        name: str = "stub",
-        prices: Optional[Dict[str, float]] = None,
-        orderbooks: Optional[Dict[str, OrderBook]] = None,
-        fee_rate: float = 0.001,
-        balances: Optional[Dict[str, float]] = None,
-    ):
+    def __init__(self, api_key: str = "", api_secret: str = "",
+                 passphrase: str = "", sandbox: bool = True,
+                 rate_limit_per_minute: int = 60):
+        """
+        Initialize base exchange connector.
+        
+        Args:
+            api_key: Exchange API key
+            api_secret: Exchange API secret
+            passphrase: Exchange API passphrase (if required)
+            sandbox: Whether to use sandbox/testnet
+            rate_limit_per_minute: API rate limit
+        """
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.passphrase = passphrase
+        self.sandbox = sandbox
+        self.rate_limit_per_minute = rate_limit_per_minute
+        
+        # Rate limiting
+        self._last_request_time = 0
+        self._min_request_interval = 60.0 / rate_limit_per_minute
+        
+        # Session management
+        self._session = None
+        
+        log.info(f"Initialized {self.__class__.__name__} "
+                f"(sandbox: {sandbox}, rate limit: {rate_limit_per_minute}/min)")
+    
+    def get_fees(self) -> float:
+        """
+        Get the fee rate for the exchange.
+        
+        Returns:
+            Fee rate as a decimal (e.g., 0.001 for 0.1% fee)
+            
+        Raises:
+            NotImplementedError: Base implementation - must be overridden
+        """
+        raise NotImplementedError("get_fees must be implemented by subclass")
+    
+    def _rate_limit(self):
+        """Enforce rate limiting."""
+        current_time = time.time()
+        time_since_last = current_time - self._last_request_time
+        
+        if time_since_last < self._min_request_interval:
+            sleep_time = self._min_request_interval - time_since_last
+            log.debug(f"Rate limiting: sleeping {sleep_time:.2f}s")
+            time.sleep(sleep_time)
+        
+        self._last_request_time = time.time()
+    
+    def _sign_request(self, method: str, path: str, 
+                     body: Optional[Dict] = None,
+                     timestamp: Optional[str] = None) -> Dict[str, str]:
+        """
+        Sign request for authenticated API calls.
+        
+        Args:
+            method: HTTP method (GET, POST, etc.)
+            path: API path
+            body: Request body
+            timestamp: Timestamp for signature
+            
+        Returns:
+            Dictionary of headers to add to request
+        """
+        # Base implementation - override for specific exchange
+        return {}
+    
+    def _handle_error(self, response, context: str = ""):
+        """
+        Handle API error response.
+        
+        Args:
+            response: Response object
+            context: Context for error message
+            
+        Raises:
+            Appropriate ExchangeError subclass
+        """
+        status_code = getattr(response, 'status_code', 0)
+        
+        if status_code == 401:
+            raise AuthenticationError(f"Authentication failed: {context}")
+        elif status_code == 429:
+            raise RateLimitError(f"Rate limit exceeded: {context}")
+        elif status_code >= 400:
+            raise ExchangeError(f"API error {status_code}: {context}")
+    
+    def _create_order_object(self, order_data: Dict) -> Order:
+        """
+        Create Order object from exchange response.
+        
+        Args:
+            order_data: Order data from exchange
+            
+        Returns:
+            Order object
+        """
+        # Base implementation - override for specific exchange format
+        return Order(
+            order_id=order_data.get("id", ""),
+            symbol=order_data.get("symbol", ""),
+            side=OrderSide(order_data.get("side", "buy")),
+            order_type=OrderType(order_data.get("type", "market")),
+            quantity=float(order_data.get("size", 0)),
+            price=float(order_data.get("price", 0)) if order_data.get("price") else None,
+            status=OrderStatus(order_data.get("status", "new")),
+            filled_quantity=float(order_data.get("filled_size", 0)),
+            average_price=float(order_data.get("executed_value", 0)) / float(order_data.get("filled_size", 1)) if order_data.get("filled_size", 0) > 0 else None,
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            exchange_timestamp=order_data.get("created_at")
+        )
+
+
+class StubExchangeConnector(BaseExchangeConnector):
+    """
+    Stub exchange connector for testing and sandbox mode.
+    
+    Simulates exchange behavior without real API calls.
+    """
+    
+    def __init__(self, initial_balances: Optional[Dict[str, float]] = None,
+                 simulated_latency_ms: int = 100, **kwargs):
         """
         Initialize stub exchange connector.
         
         Args:
-            name: Exchange name
-            prices: Dictionary of market -> price
-            orderbooks: Dictionary of market -> OrderBook
-            fee_rate: Trading fee rate
-            balances: Dictionary of currency -> balance
+            initial_balances: Initial account balances
+            simulated_latency_ms: Simulated network latency
+            **kwargs: Passed to parent
         """
-        self.name = name
-        self.prices = prices or {"BTC-USD": 50000.0, "ETH-USD": 3000.0}
-        self.orderbooks = orderbooks or {}
-        self.fee_rate = fee_rate
-        self.balances = balances or {"USD": 100000.0, "BTC": 10.0, "ETH": 100.0}
+        super().__init__(**kwargs)
         
-        # Initialize orderbooks if not provided
-        for market, price in self.prices.items():
-            if market not in self.orderbooks:
-                self.orderbooks[market] = self._create_stub_orderbook(market, price)
-        
-        # Order tracking
-        self.orders: Dict[str, Dict[str, Any]] = {}
-    
-    def _create_stub_orderbook(self, market: str, mid_price: float) -> OrderBook:
-        """Create a stub order book."""
-        spread = mid_price * 0.001  # 0.1% spread
-        
-        bids = []
-        asks = []
-        
-        # Create 10 levels on each side
-        for i in range(10):
-            bid_price = mid_price - (spread * (i + 1) / 10)
-            ask_price = mid_price + (spread * (i + 1) / 10)
-            
-            bids.append(OrderBookLevel(
-                price=bid_price,
-                quantity=1.0 - (i * 0.1),
-                exchange_timestamp=time.time()
-            ))
-            
-            asks.append(OrderBookLevel(
-                price=ask_price,
-                quantity=1.0 - (i * 0.1),
-                exchange_timestamp=time.time()
-            ))
-        
-        return OrderBook(
-            market=market,
-            timestamp=time.time(),
-            bids=bids,
-            asks=asks,
-            exchange=self.name,
-        )
-    
-    def get_name(self) -> str:
-        return self.name
-    
-    def get_ticker(self, market: str) -> Ticker:
-        if market not in self.prices:
-            raise ValueError(f"Market not found: {market}")
-        
-        price = self.prices[market]
-        spread = price * 0.001  # 0.1% spread
-        
-        return Ticker(
-            market=market,
-            last_price=price,
-            bid_price=price - (spread / 2),
-            ask_price=price + (spread / 2),
-            volume_24h=1000.0,
-            timestamp=time.time(),
-            exchange=self.name,
-        )
-    
-    def get_orderbook(self, market: str, depth: int = 10) -> OrderBook:
-        if market not in self.orderbooks:
-            raise ValueError(f"Market not found: {market}")
-        
-        orderbook = self.orderbooks[market]
-        
-        # Return limited depth
-        return OrderBook(
-            market=market,
-            timestamp=time.time(),
-            bids=orderbook.bids[:depth],
-            asks=orderbook.asks[:depth],
-            sequence_id=None,
-            exchange=self.name,
-        )
-    
-    def get_fees(self) -> float:
-        return self.fee_rate
-    
-    def get_balance(self, currency: str) -> float:
-        return self.balances.get(currency.upper(), 0.0)
-    
-    def place_order(
-        self,
-        market: str,
-        side: str,
-        order_type: str,
-        quantity: float,
-        price: Optional[float] = None,
-    ) -> Dict[str, Any]:
-        order_id = f"order-{uuid.uuid4().hex[:8]}"
-        
-        # Validate market
-        if market not in self.prices:
-            raise ValueError(f"Market not found: {market}")
-        
-        # Validate quantity
-        if quantity <= 0:
-            raise ValueError(f"Invalid quantity: {quantity}")
-        
-        # For market orders, use current price
-        if order_type == "market":
-            ticker = self.get_ticker(market)
-            if side == "buy":
-                price = ticker.ask_price
-            else:
-                price = ticker.bid_price
-        elif order_type == "limit":
-            if price is None or price <= 0:
-                raise ValueError("Limit price required for limit orders")
-        else:
-            raise ValueError(f"Unsupported order type: {order_type}")
-        
-        # Check balance (simplified)
-        if side == "buy":
-            cost = quantity * price
-            usd_balance = self.get_balance("USD")
-            if cost > usd_balance:
-                raise ValueError(f"Insufficient USD balance: {usd_balance} < {cost}")
-        else:  # sell
-            # Check if we have the asset
-            asset = market.split("-")[0]  # Extract base currency
-            asset_balance = self.get_balance(asset)
-            if quantity > asset_balance:
-                raise ValueError(f"Insufficient {asset} balance: {asset_balance} < {quantity}")
-        
-        # Create order record
-        order = {
-            "order_id": order_id,
-            "market": market,
-            "side": side,
-            "order_type": order_type,
-            "quantity": quantity,
-            "price": price,
-            "status": "filled" if order_type == "market" else "open",
-            "filled_quantity": quantity if order_type == "market" else 0.0,
-            "remaining_quantity": 0.0 if order_type == "market" else quantity,
-            "created_at": time.time(),
-            "updated_at": time.time(),
+        # Simulated balances
+        self.balances = initial_balances or {
+            "USD": 10000.0,
+            "BTC": 1.0,
+            "ETH": 10.0
         }
         
+        # Simulated orders
+        self.orders = {}
+        self.order_counter = 0
+        
+        # Simulated market data
+        self.market_data = {
+            "BTC-USD": {"bid": 65000.0, "ask": 65010.0, "last": 65005.0, "volume": 1000.0},
+            "ETH-USD": {"bid": 3500.0, "ask": 3502.0, "last": 3501.0, "volume": 5000.0},
+            "SOL-USD": {"bid": 150.0, "ask": 150.5, "last": 150.25, "volume": 10000.0}
+        }
+        
+        self.simulated_latency_ms = simulated_latency_ms
+        
+        log.info(f"Stub exchange initialized with balances: {self.balances}")
+    
+    def _simulate_latency(self):
+        """Simulate network latency."""
+        if self.simulated_latency_ms > 0:
+            time.sleep(self.simulated_latency_ms / 1000.0)
+    
+    def get_fees(self) -> float:
+        """
+        Get the fee rate for the stub exchange.
+        
+        Returns:
+            Fee rate as a decimal (0.001 for 0.1% fee)
+        """
+        return 0.001  # 0.1% fee for stub exchange
+    
+    def get_balance(self, currency: str) -> Balance:
+        self._rate_limit()
+        self._simulate_latency()
+        
+        if currency not in self.balances:
+            raise ExchangeError(f"Currency not found: {currency}")
+        
+        total = self.balances[currency]
+        held = sum(order.quantity for order in self.orders.values() 
+                  if order.status in [OrderStatus.NEW, OrderStatus.PARTIALLY_FILLED])
+        available = total - held
+        
+        return Balance(
+            currency=currency,
+            available=available,
+            total=total,
+            held=held
+        )
+    
+    def get_ticker(self, symbol: str) -> Ticker:
+        self._rate_limit()
+        self._simulate_latency()
+        
+        if symbol not in self.market_data:
+            raise ExchangeError(f"Symbol not found: {symbol}")
+        
+        data = self.market_data[symbol]
+        
+        # Add some random noise to simulate market movement
+        import random
+        noise = random.uniform(-0.001, 0.001)  # ±0.1%
+        
+        return Ticker(
+            symbol=symbol,
+            bid=data["bid"] * (1 + noise),
+            ask=data["ask"] * (1 + noise),
+            last=data["last"] * (1 + noise),
+            volume=data["volume"] * (1 + random.uniform(-0.1, 0.1)),
+            timestamp=datetime.now(timezone.utc).isoformat()
+        )
+    
+    def place_order(self, symbol: str, side: OrderSide, 
+                   quantity: float, order_type: OrderType = OrderType.MARKET,
+                   price: Optional[float] = None) -> Order:
+        self._rate_limit()
+        self._simulate_latency()
+        
+        # Validate
+        is_valid, error_msg = self.validate_order(symbol, side, quantity, order_type, price)
+        if not is_valid:
+            raise OrderRejectedError(f"Order validation failed: {error_msg}")
+        
+        # Check balance for buy orders
+        if side == OrderSide.BUY:
+            quote_currency = symbol.split("-")[1]
+            ticker = self.get_ticker(symbol)
+            cost = quantity * ticker.ask  # Buying at ask price
+            
+            balance = self.get_balance(quote_currency)
+            if cost > balance.available:
+                raise InsufficientFundsError(
+                    f"Insufficient {quote_currency}: need {cost:.2f}, have {balance.available:.2f}"
+                )
+        
+        # Create order
+        self.order_counter += 1
+        order_id = f"stub_order_{self.order_counter}"
+        
+        ticker = self.get_ticker(symbol)
+        order_price = price if price else (ticker.ask if side == OrderSide.BUY else ticker.bid)
+        
+        order = Order(
+            order_id=order_id,
+            symbol=symbol,
+            side=side,
+            order_type=order_type,
+            quantity=quantity,
+            price=order_price,
+            status=OrderStatus.NEW,
+            timestamp=datetime.now(timezone.utc).isoformat()
+        )
+        
+        # Store order
         self.orders[order_id] = order
         
-        # Update balances for market orders
-        if order_type == "market":
-            self._update_balances_for_trade(market, side, quantity, price)
+        # Simulate immediate fill for market orders
+        if order_type == OrderType.MARKET:
+            time.sleep(0.1)  # Simulate processing time
+            order.status = OrderStatus.FILLED
+            order.filled_quantity = quantity
+            order.average_price = order_price
+            
+            # Update balances
+            base_currency = symbol.split("-")[0]
+            quote_currency = symbol.split("-")[1]
+            
+            if side == OrderSide.BUY:
+                # Buy base with quote
+                self.balances[base_currency] = self.balances.get(base_currency, 0) + quantity
+                self.balances[quote_currency] = self.balances.get(quote_currency, 0) - (quantity * order_price)
+            else:
+                # Sell base for quote
+                self.balances[base_currency] = self.balances.get(base_currency, 0) - quantity
+                self.balances[quote_currency] = self.balances.get(quote_currency, 0) + (quantity * order_price)
+        
+        log.info(f"Placed {order_type.value} order {order_id}: {side.value} {quantity} {symbol} "
+                f"at {order_price:.2f}")
         
         return order
     
-    def _update_balances_for_trade(
-        self,
-        market: str,
-        side: str,
-        quantity: float,
-        price: float,
-    ) -> None:
-        """Update balances after a trade."""
-        base_currency, quote_currency = market.split("-")
-        
-        if side == "buy":
-            # Spend quote currency, receive base currency
-            cost = quantity * price
-            fee = cost * self.fee_rate
-            
-            self.balances[quote_currency] -= (cost + fee)
-            self.balances[base_currency] = self.balances.get(base_currency, 0.0) + quantity
-        else:  # sell
-            # Spend base currency, receive quote currency
-            proceeds = quantity * price
-            fee = proceeds * self.fee_rate
-            
-            self.balances[base_currency] -= quantity
-            self.balances[quote_currency] = self.balances.get(quote_currency, 0.0) + (proceeds - fee)
-    
     def cancel_order(self, order_id: str) -> bool:
+        self._rate_limit()
+        self._simulate_latency()
+        
         if order_id not in self.orders:
-            return False
+            raise ExchangeError(f"Order not found: {order_id}")
         
         order = self.orders[order_id]
-        if order["status"] == "open":
-            order["status"] = "cancelled"
-            order["updated_at"] = time.time()
-            return True
         
-        return False
+        if order.status in [OrderStatus.FILLED, OrderStatus.CANCELLED, OrderStatus.REJECTED]:
+            raise ExchangeError(f"Cannot cancel order in status: {order.status.value}")
+        
+        order.status = OrderStatus.CANCELLED
+        log.info(f"Cancelled order {order_id}")
+        
+        return True
     
-    def get_order_status(self, order_id: str) -> Dict[str, Any]:
+    def get_order_status(self, order_id: str) -> Order:
+        self._rate_limit()
+        self._simulate_latency()
+        
         if order_id not in self.orders:
-            raise ValueError(f"Order not found: {order_id}")
+            raise ExchangeError(f"Order not found: {order_id}")
         
-        return self.orders[order_id].copy()
+        return self.orders[order_id]
     
-    def update_price(self, market: str, price: float) -> None:
-        """Update price for a market (for testing)."""
-        self.prices[market] = price
-        if market in self.orderbooks:
-            self.orderbooks[market] = self._create_stub_orderbook(market, price)
+    def get_open_orders(self, symbol: Optional[str] = None) -> List[Order]:
+        self._rate_limit()
+        self._simulate_latency()
+        
+        open_orders = []
+        for order in self.orders.values():
+            if order.status in [OrderStatus.NEW, OrderStatus.PARTIALLY_FILLED]:
+                if symbol is None or order.symbol == symbol:
+                    open_orders.append(order)
+        
+        return open_orders
+    
+    def estimate_slippage(self, symbol: str, side: OrderSide, 
+                         quantity: float) -> float:
+        """Estimate slippage for stub exchange."""
+        # Simple linear slippage model
+        ticker = self.get_ticker(symbol)
+        spread = ticker.ask - ticker.bid
+        
+        # Slippage increases with order size relative to volume
+        volume_ratio = quantity / ticker.volume
+        slippage_bps = volume_ratio * 100  # 1% slippage at volume equal to daily volume
+        
+        # Add spread component
+        spread_bps = (spread / ticker.last) * 10000
+        
+        return min(slippage_bps + spread_bps, 50.0)  # Cap at 50 bps
 
 
-# Factory functions for creating connectors
-def create_stub_connector(
-    name: str = "stub",
-    prices: Optional[Dict[str, float]] = None,
-    **kwargs
-) -> StubExchangeConnector:
+# Factory function for creating connectors
+def create_exchange_connector(exchange_name: str, **kwargs) -> ExchangeConnector:
     """
-    Create a stub exchange connector.
+    Factory function to create exchange connectors.
     
     Args:
-        name: Exchange name
-        prices: Dictionary of market -> price
-        **kwargs: Additional arguments for StubExchangeConnector
-        
-    Returns:
-        StubExchangeConnector instance
-    """
-    return StubExchangeConnector(name=name, prices=prices, **kwargs)
-
-
-def create_connector_from_config(config: Dict[str, Any]) -> ExchangeConnector:
-    """
-    Create an exchange connector from configuration.
-    
-    Args:
-        config: Configuration dictionary
+        exchange_name: Name of exchange ("coinbase", "binance", "kraken", "stub")
+        **kwargs: Connector-specific arguments
         
     Returns:
         ExchangeConnector instance
         
     Raises:
-        ValueError: If connector type is not supported
+        ValueError: If exchange name not recognized
     """
-    connector_type = config.get("type", "stub")
+    exchange_name = exchange_name.lower()
     
-    if connector_type == "stub":
-        return create_stub_connector(
-            name=config.get("name", "stub"),
-            prices=config.get("prices"),
-            fee_rate=config.get("fee_rate", 0.001),
-            balances=config.get("balances"),
-        )
+    if exchange_name == "stub":
+        return StubExchangeConnector(**kwargs)
+    elif exchange_name == "coinbase":
+        # Import here to avoid circular dependencies
+        try:
+            from .coinbase_connector import CoinbaseConnector
+            return CoinbaseConnector(**kwargs)
+        except ImportError:
+            log.warning("Coinbase connector not available, using stub")
+            return StubExchangeConnector(**kwargs)
     else:
-        raise ValueError(f"Unsupported connector type: {connector_type}")
+        raise ValueError(f"Unsupported exchange: {exchange_name}")

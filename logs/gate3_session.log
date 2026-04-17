@@ -1,0 +1,684 @@
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Configuration loaded from config/gate3_multi_market.json
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Gate 3 Agent initialized with session ID: gate3_1776190276
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Config loaded: gate_3_multi_market
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Target trades: 150
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Markets: SOL-USD, BTC-USD, ETH-USD
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Starting Gate 3 multi-market trading session...
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Target: 150 trades across 3 markets
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Minimum for success: 120 trades
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - Markets: SOL-USD, BTC-USD, ETH-USD
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.810 (spread=1.000, confidence=0.880, liquidity=0.950, volatility=0.111, slippage=0.839)
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.810 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:16,586 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190276_9924, Size: $0.0852, Fill: 85.2%, P&L: $-0.000031, Slippage: 0.0015%, Price improvement: 0.0002%
+2026-04-14 14:11:16,926 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.633 (spread=1.000, confidence=0.360, liquidity=0.850, volatility=0.086, slippage=0.600)
+2026-04-14 14:11:16,926 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.633 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:16,927 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190276_3793, Size: $0.0984, Fill: 98.4%, P&L: $-0.000022, Slippage: 0.0036%, Price improvement: 0.0020%
+2026-04-14 14:11:17,439 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.464 (spread=0.213, confidence=0.640, liquidity=0.850, volatility=0.000, slippage=0.705)
+2026-04-14 14:11:18,037 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.580 (spread=1.000, confidence=0.200, liquidity=0.900, volatility=0.000, slippage=0.501)
+2026-04-14 14:11:18,623 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.662 (spread=1.000, confidence=0.360, liquidity=0.850, volatility=0.242, slippage=0.661)
+2026-04-14 14:11:18,624 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.662 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:18,624 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190278_6333, Size: $0.0908, Fill: 90.8%, P&L: $-0.000033, Slippage: 0.0028%, Price improvement: 0.0000%
+2026-04-14 14:11:19,421 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.517 (spread=0.226, confidence=0.720, liquidity=0.850, volatility=0.256, slippage=0.614)
+2026-04-14 14:11:20,132 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.531 (spread=0.225, confidence=0.840, liquidity=0.950, volatility=0.000, slippage=0.638)
+2026-04-14 14:11:20,849 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.568 (spread=0.618, confidence=0.440, liquidity=0.950, volatility=0.018, slippage=0.805)
+2026-04-14 14:11:21,653 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.777 (spread=1.000, confidence=0.720, liquidity=0.950, volatility=0.285, slippage=0.648)
+2026-04-14 14:11:21,654 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.777 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:21,654 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190281_8899, Size: $0.0893, Fill: 89.3%, P&L: $-0.000049, Slippage: 0.0014%, Price improvement: 0.0057%
+2026-04-14 14:11:22,197 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.531 (spread=0.521, confidence=0.320, liquidity=0.900, volatility=0.231, slippage=0.799)
+2026-04-14 14:11:22,957 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.529 (spread=0.660, confidence=0.320, liquidity=0.850, volatility=0.000, slippage=0.814)
+2026-04-14 14:11:23,594 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.572 (spread=0.836, confidence=0.320, liquidity=0.900, volatility=0.000, slippage=0.608)
+2026-04-14 14:11:24,104 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.733 (spread=1.000, confidence=0.680, liquidity=0.900, volatility=0.000, slippage=0.826)
+2026-04-14 14:11:24,104 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.733 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:24,104 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190284_5678, Size: $0.0945, Fill: 94.5%, P&L: $-0.000009, Slippage: 0.0047%, Price improvement: 0.0088%
+2026-04-14 14:11:24,484 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.652 (spread=1.000, confidence=0.440, liquidity=0.900, volatility=0.000, slippage=0.619)
+2026-04-14 14:11:24,484 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.652 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:24,484 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190284_7003, Size: $0.0969, Fill: 96.9%, P&L: $0.000015, Slippage: 0.0010%, Price improvement: 0.0033%
+2026-04-14 14:11:24,887 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.712 (spread=1.000, confidence=0.680, liquidity=0.850, volatility=0.104, slippage=0.567)
+2026-04-14 14:11:24,888 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.712 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:24,888 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190284_3108, Size: $0.0900, Fill: 90.0%, P&L: $-0.000034, Slippage: 0.0033%, Price improvement: 0.0057%
+2026-04-14 14:11:25,546 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.653 (spread=0.654, confidence=0.680, liquidity=0.900, volatility=0.238, slippage=0.712)
+2026-04-14 14:11:25,546 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.653 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:25,546 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190285_8728, Size: $0.0847, Fill: 84.7%, P&L: $-0.000032, Slippage: 0.0042%, Price improvement: 0.0081%
+2026-04-14 14:11:25,913 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.420 (spread=0.434, confidence=0.120, liquidity=0.900, volatility=0.141, slippage=0.581)
+2026-04-14 14:11:26,597 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.401 (spread=0.162, confidence=0.360, liquidity=0.850, volatility=0.133, slippage=0.721)
+2026-04-14 14:11:27,314 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.648 (spread=1.000, confidence=0.320, liquidity=0.950, volatility=0.136, slippage=0.577)
+2026-04-14 14:11:27,647 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.500 (spread=0.317, confidence=0.560, liquidity=0.850, volatility=0.239, slippage=0.589)
+2026-04-14 14:11:28,380 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.624 (spread=0.523, confidence=0.760, liquidity=0.850, volatility=0.279, slippage=0.651)
+2026-04-14 14:11:28,381 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.624 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:28,381 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190288_7160, Size: $0.0882, Fill: 88.2%, P&L: $-0.000058, Slippage: 0.0021%, Price improvement: 0.0045%
+2026-04-14 14:11:28,721 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.734 (spread=1.000, confidence=0.760, liquidity=0.900, volatility=0.000, slippage=0.637)
+2026-04-14 14:11:28,722 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.734 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:28,722 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190288_4799, Size: $0.0979, Fill: 97.9%, P&L: $0.000033, Slippage: 0.0010%, Price improvement: 0.0057%
+2026-04-14 14:11:29,340 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.664 (spread=0.823, confidence=0.640, liquidity=0.900, volatility=0.146, slippage=0.554)
+2026-04-14 14:11:29,340 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.664 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:29,340 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190289_5774, Size: $0.0825, Fill: 82.5%, P&L: $-0.000022, Slippage: 0.0034%, Price improvement: 0.0022%
+2026-04-14 14:11:29,921 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.595 (spread=0.723, confidence=0.520, liquidity=0.950, volatility=0.000, slippage=0.580)
+2026-04-14 14:11:30,359 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.455 (spread=0.213, confidence=0.600, liquidity=0.900, volatility=0.000, slippage=0.612)
+2026-04-14 14:11:30,972 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.701 (spread=1.000, confidence=0.600, liquidity=0.950, volatility=0.000, slippage=0.611)
+2026-04-14 14:11:30,973 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.701 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:30,973 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190290_7673, Size: $0.0817, Fill: 81.7%, P&L: $-0.000036, Slippage: 0.0018%, Price improvement: 0.0046%
+2026-04-14 14:11:31,738 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.838 (spread=1.000, confidence=0.880, liquidity=0.950, volatility=0.362, slippage=0.734)
+2026-04-14 14:11:31,739 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.838 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:31,739 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190291_4401, Size: $0.0907, Fill: 90.7%, P&L: $-0.000022, Slippage: 0.0007%, Price improvement: 0.0011%
+2026-04-14 14:11:32,504 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.779 (spread=1.000, confidence=0.760, liquidity=0.950, volatility=0.161, slippage=0.746)
+2026-04-14 14:11:32,505 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.779 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:32,505 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190292_3599, Size: $0.0844, Fill: 84.4%, P&L: $-0.000032, Slippage: 0.0030%, Price improvement: 0.0051%
+2026-04-14 14:11:32,918 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.629 (spread=0.599, confidence=0.600, liquidity=0.900, volatility=0.274, slippage=0.780)
+2026-04-14 14:11:32,918 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.629 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:32,919 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190292_4163, Size: $0.0865, Fill: 86.5%, P&L: $-0.000038, Slippage: 0.0014%, Price improvement: 0.0093%
+2026-04-14 14:11:33,596 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.633 (spread=1.000, confidence=0.360, liquidity=0.850, volatility=0.000, slippage=0.730)
+2026-04-14 14:11:33,597 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.633 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:33,597 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190293_8243, Size: $0.0989, Fill: 98.9%, P&L: $-0.000008, Slippage: 0.0035%, Price improvement: 0.0014%
+2026-04-14 14:11:34,168 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.557 (spread=0.798, confidence=0.240, liquidity=0.850, volatility=0.058, slippage=0.790)
+2026-04-14 14:11:34,849 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.765 (spread=0.958, confidence=0.640, liquidity=0.950, volatility=0.292, slippage=0.841)
+2026-04-14 14:11:34,850 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.765 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:34,850 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190294_4429, Size: $0.0867, Fill: 86.7%, P&L: $-0.000063, Slippage: 0.0009%, Price improvement: 0.0008%
+2026-04-14 14:11:35,243 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.686 (spread=1.000, confidence=0.480, liquidity=0.900, volatility=0.126, slippage=0.672)
+2026-04-14 14:11:35,243 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.686 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:35,244 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190295_2439, Size: $0.0895, Fill: 89.5%, P&L: $0.000024, Slippage: 0.0016%, Price improvement: 0.0070%
+2026-04-14 14:11:35,673 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.743 (spread=1.000, confidence=0.640, liquidity=0.950, volatility=0.219, slippage=0.599)
+2026-04-14 14:11:35,674 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.743 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:35,674 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190295_4314, Size: $0.0911, Fill: 91.1%, P&L: $-0.000055, Slippage: 0.0012%, Price improvement: 0.0079%
+2026-04-14 14:11:36,195 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.528 (spread=0.481, confidence=0.320, liquidity=0.950, volatility=0.385, slippage=0.564)
+2026-04-14 14:11:36,539 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.767 (spread=1.000, confidence=0.760, liquidity=0.950, volatility=0.195, slippage=0.579)
+2026-04-14 14:11:36,539 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.767 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:36,540 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190296_9018, Size: $0.0831, Fill: 83.1%, P&L: $-0.000049, Slippage: 0.0028%, Price improvement: 0.0066%
+2026-04-14 14:11:36,542 - quantumarb_gate3 - INFO - Progress: 20 trades executed, P&L: $-0.000522
+2026-04-14 14:11:36,543 - quantumarb_gate3 - INFO -   SOL-USD: 7 trades, P&L: $-0.000030
+2026-04-14 14:11:36,543 - quantumarb_gate3 - INFO -   BTC-USD: 8 trades, P&L: $-0.000337
+2026-04-14 14:11:36,543 - quantumarb_gate3 - INFO -   ETH-USD: 5 trades, P&L: $-0.000155
+2026-04-14 14:11:37,244 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.396 (spread=0.274, confidence=0.320, liquidity=0.850, volatility=0.041, slippage=0.577)
+2026-04-14 14:11:37,245 - quantumarb_gate3 - INFO - Progress: 20 trades executed, P&L: $-0.000522
+2026-04-14 14:11:37,245 - quantumarb_gate3 - INFO -   SOL-USD: 7 trades, P&L: $-0.000030
+2026-04-14 14:11:37,245 - quantumarb_gate3 - INFO -   BTC-USD: 8 trades, P&L: $-0.000337
+2026-04-14 14:11:37,245 - quantumarb_gate3 - INFO -   ETH-USD: 5 trades, P&L: $-0.000155
+2026-04-14 14:11:37,725 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.706 (spread=1.000, confidence=0.680, liquidity=0.900, volatility=0.000, slippage=0.562)
+2026-04-14 14:11:37,726 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.706 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:37,726 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190297_9996, Size: $0.0911, Fill: 91.1%, P&L: $0.000029, Slippage: 0.0035%, Price improvement: 0.0074%
+2026-04-14 14:11:38,446 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.802 (spread=1.000, confidence=0.920, liquidity=0.950, volatility=0.166, slippage=0.569)
+2026-04-14 14:11:38,447 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.802 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:38,447 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190298_8632, Size: $0.0919, Fill: 91.9%, P&L: $-0.000033, Slippage: 0.0027%, Price improvement: 0.0023%
+2026-04-14 14:11:38,774 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.639 (spread=1.000, confidence=0.400, liquidity=0.900, volatility=0.000, slippage=0.594)
+2026-04-14 14:11:38,774 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.639 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:38,774 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190298_7771, Size: $0.0829, Fill: 82.9%, P&L: $0.000025, Slippage: 0.0035%, Price improvement: 0.0006%
+2026-04-14 14:11:39,433 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.738 (spread=1.000, confidence=0.640, liquidity=0.900, volatility=0.183, slippage=0.702)
+2026-04-14 14:11:39,433 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.738 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:39,434 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190299_2589, Size: $0.0849, Fill: 84.9%, P&L: $0.000011, Slippage: 0.0031%, Price improvement: 0.0014%
+2026-04-14 14:11:39,836 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.756 (spread=1.000, confidence=0.800, liquidity=0.900, volatility=0.000, slippage=0.761)
+2026-04-14 14:11:39,836 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.756 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:39,837 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190299_5719, Size: $0.0891, Fill: 89.1%, P&L: $0.000020, Slippage: 0.0027%, Price improvement: 0.0055%
+2026-04-14 14:11:40,474 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.762 (spread=1.000, confidence=0.840, liquidity=0.850, volatility=0.000, slippage=0.823)
+2026-04-14 14:11:40,475 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.762 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:40,475 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190300_7684, Size: $0.0994, Fill: 99.4%, P&L: $-0.000010, Slippage: 0.0033%, Price improvement: 0.0039%
+2026-04-14 14:11:41,081 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.456 (spread=0.200, confidence=0.480, liquidity=0.950, volatility=0.122, slippage=0.680)
+2026-04-14 14:11:41,606 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.465 (spread=0.453, confidence=0.320, liquidity=0.850, volatility=0.008, slippage=0.779)
+2026-04-14 14:11:42,392 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.720 (spread=1.000, confidence=0.520, liquidity=0.850, volatility=0.299, slippage=0.751)
+2026-04-14 14:11:42,392 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.720 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:42,392 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190302_6319, Size: $0.0874, Fill: 87.4%, P&L: $-0.000036, Slippage: 0.0016%, Price improvement: 0.0071%
+2026-04-14 14:11:42,819 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.384 (spread=0.221, confidence=0.240, liquidity=0.900, volatility=0.019, slippage=0.745)
+2026-04-14 14:11:43,182 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.601 (spread=1.000, confidence=0.200, liquidity=0.850, volatility=0.000, slippage=0.806)
+2026-04-14 14:11:43,908 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.382 (spread=0.210, confidence=0.240, liquidity=0.900, volatility=0.000, slippage=0.791)
+2026-04-14 14:11:44,567 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.701 (spread=0.951, confidence=0.520, liquidity=0.950, volatility=0.111, slippage=0.789)
+2026-04-14 14:11:44,567 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.701 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:44,567 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190304_7535, Size: $0.0804, Fill: 80.4%, P&L: $-0.000053, Slippage: 0.0007%, Price improvement: 0.0052%
+2026-04-14 14:11:45,359 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.527 (spread=0.483, confidence=0.440, liquidity=0.900, volatility=0.151, slippage=0.700)
+2026-04-14 14:11:45,833 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.660 (spread=1.000, confidence=0.440, liquidity=0.900, volatility=0.031, slippage=0.649)
+2026-04-14 14:11:45,833 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.660 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:45,834 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190305_8067, Size: $0.0985, Fill: 98.5%, P&L: $-0.000004, Slippage: 0.0039%, Price improvement: 0.0066%
+2026-04-14 14:11:46,301 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.606 (spread=0.817, confidence=0.480, liquidity=0.900, volatility=0.000, slippage=0.609)
+2026-04-14 14:11:46,302 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.606 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:46,302 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190306_2084, Size: $0.0864, Fill: 86.4%, P&L: $-0.000027, Slippage: 0.0046%, Price improvement: 0.0034%
+2026-04-14 14:11:46,743 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.720 (spread=1.000, confidence=0.600, liquidity=0.950, volatility=0.000, slippage=0.804)
+2026-04-14 14:11:46,743 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.720 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:46,743 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190306_4921, Size: $0.0946, Fill: 94.6%, P&L: $-0.000037, Slippage: 0.0008%, Price improvement: 0.0015%
+2026-04-14 14:11:47,331 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.690 (spread=1.000, confidence=0.600, liquidity=0.950, volatility=0.000, slippage=0.504)
+2026-04-14 14:11:47,331 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.690 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:47,331 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190307_7348, Size: $0.0871, Fill: 87.1%, P&L: $-0.000054, Slippage: 0.0020%, Price improvement: 0.0070%
+2026-04-14 14:11:47,642 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.635 (spread=1.000, confidence=0.240, liquidity=0.950, volatility=0.000, slippage=0.846)
+2026-04-14 14:11:48,353 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.645 (spread=1.000, confidence=0.400, liquidity=0.850, volatility=0.035, slippage=0.700)
+2026-04-14 14:11:48,353 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.645 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:48,353 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190308_6973, Size: $0.0971, Fill: 97.1%, P&L: $-0.000034, Slippage: 0.0020%, Price improvement: 0.0063%
+2026-04-14 14:11:48,933 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.714 (spread=1.000, confidence=0.680, liquidity=0.850, volatility=0.100, slippage=0.586)
+2026-04-14 14:11:48,934 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.714 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:48,934 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190308_8445, Size: $0.0821, Fill: 82.1%, P&L: $-0.000030, Slippage: 0.0010%, Price improvement: 0.0054%
+2026-04-14 14:11:49,697 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.518 (spread=0.262, confidence=0.600, liquidity=0.850, volatility=0.235, slippage=0.840)
+2026-04-14 14:11:50,331 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.680 (spread=1.000, confidence=0.400, liquidity=0.900, volatility=0.125, slippage=0.814)
+2026-04-14 14:11:50,331 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.680 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:50,332 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190310_7885, Size: $0.0892, Fill: 89.2%, P&L: $0.000004, Slippage: 0.0030%, Price improvement: 0.0047%
+2026-04-14 14:11:50,651 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.672 (spread=1.000, confidence=0.280, liquidity=0.950, volatility=0.188, slippage=0.835)
+2026-04-14 14:11:50,652 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.672 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:50,652 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190310_8284, Size: $0.0822, Fill: 82.2%, P&L: $-0.000029, Slippage: 0.0021%, Price improvement: 0.0083%
+2026-04-14 14:11:51,200 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.736 (spread=1.000, confidence=0.720, liquidity=0.950, volatility=0.000, slippage=0.664)
+2026-04-14 14:11:51,200 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.736 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:51,200 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190311_9093, Size: $0.0877, Fill: 87.7%, P&L: $-0.000062, Slippage: 0.0007%, Price improvement: 0.0065%
+2026-04-14 14:11:51,883 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.672 (spread=1.000, confidence=0.560, liquidity=0.850, volatility=0.000, slippage=0.618)
+2026-04-14 14:11:51,884 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.672 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:51,884 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190311_8717, Size: $0.0827, Fill: 82.7%, P&L: $-0.000026, Slippage: 0.0034%, Price improvement: 0.0083%
+2026-04-14 14:11:52,626 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.774 (spread=1.000, confidence=0.840, liquidity=0.950, volatility=0.000, slippage=0.739)
+2026-04-14 14:11:52,626 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.774 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:52,626 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190312_5842, Size: $0.0827, Fill: 82.7%, P&L: $-0.000051, Slippage: 0.0015%, Price improvement: 0.0098%
+2026-04-14 14:11:52,992 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.647 (spread=1.000, confidence=0.240, liquidity=0.900, volatility=0.231, slippage=0.728)
+2026-04-14 14:11:52,993 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.647 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:52,993 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190312_6726, Size: $0.0803, Fill: 80.3%, P&L: $0.000001, Slippage: 0.0019%, Price improvement: 0.0008%
+2026-04-14 14:11:52,995 - quantumarb_gate3 - INFO - Progress: 40 trades executed, P&L: $-0.000920
+2026-04-14 14:11:52,995 - quantumarb_gate3 - INFO -   SOL-USD: 15 trades, P&L: $0.000027
+2026-04-14 14:11:52,995 - quantumarb_gate3 - INFO -   BTC-USD: 15 trades, P&L: $-0.000657
+2026-04-14 14:11:52,995 - quantumarb_gate3 - INFO -   ETH-USD: 10 trades, P&L: $-0.000291
+2026-04-14 14:11:53,371 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.490 (spread=0.439, confidence=0.280, liquidity=0.950, volatility=0.165, slippage=0.739)
+2026-04-14 14:11:53,372 - quantumarb_gate3 - INFO - Progress: 40 trades executed, P&L: $-0.000920
+2026-04-14 14:11:53,372 - quantumarb_gate3 - INFO -   SOL-USD: 15 trades, P&L: $0.000027
+2026-04-14 14:11:53,373 - quantumarb_gate3 - INFO -   BTC-USD: 15 trades, P&L: $-0.000657
+2026-04-14 14:11:53,373 - quantumarb_gate3 - INFO -   ETH-USD: 10 trades, P&L: $-0.000291
+2026-04-14 14:11:53,960 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.511 (spread=0.393, confidence=0.440, liquidity=0.900, volatility=0.237, slippage=0.677)
+2026-04-14 14:11:53,960 - quantumarb_gate3 - INFO - Progress: 40 trades executed, P&L: $-0.000920
+2026-04-14 14:11:53,960 - quantumarb_gate3 - INFO -   SOL-USD: 15 trades, P&L: $0.000027
+2026-04-14 14:11:53,960 - quantumarb_gate3 - INFO -   BTC-USD: 15 trades, P&L: $-0.000657
+2026-04-14 14:11:53,960 - quantumarb_gate3 - INFO -   ETH-USD: 10 trades, P&L: $-0.000291
+2026-04-14 14:11:54,758 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.688 (spread=0.972, confidence=0.520, liquidity=0.950, volatility=0.013, slippage=0.749)
+2026-04-14 14:11:54,759 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.688 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:54,759 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190314_7887, Size: $0.0838, Fill: 83.8%, P&L: $-0.000060, Slippage: 0.0019%, Price improvement: 0.0097%
+2026-04-14 14:11:55,444 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.692 (spread=1.000, confidence=0.560, liquidity=0.900, volatility=0.081, slippage=0.601)
+2026-04-14 14:11:55,445 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.692 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:55,445 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190315_1242, Size: $0.0823, Fill: 82.3%, P&L: $0.000030, Slippage: 0.0044%, Price improvement: 0.0014%
+2026-04-14 14:11:55,763 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.748 (spread=1.000, confidence=0.720, liquidity=0.900, volatility=0.111, slippage=0.712)
+2026-04-14 14:11:55,763 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.748 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:55,764 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190315_3617, Size: $0.0841, Fill: 84.1%, P&L: $0.000003, Slippage: 0.0046%, Price improvement: 0.0025%
+2026-04-14 14:11:56,071 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.433 (spread=0.490, confidence=0.120, liquidity=0.900, volatility=0.100, slippage=0.607)
+2026-04-14 14:11:56,493 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.581 (spread=1.000, confidence=0.200, liquidity=0.900, volatility=0.000, slippage=0.508)
+2026-04-14 14:11:56,976 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.630 (spread=0.938, confidence=0.400, liquidity=0.850, volatility=0.000, slippage=0.789)
+2026-04-14 14:11:56,977 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.630 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:56,977 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190316_4857, Size: $0.0927, Fill: 92.7%, P&L: $-0.000042, Slippage: 0.0039%, Price improvement: 0.0065%
+2026-04-14 14:11:57,354 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.765 (spread=1.000, confidence=0.760, liquidity=0.950, volatility=0.191, slippage=0.563)
+2026-04-14 14:11:57,354 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.765 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:57,354 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190317_1524, Size: $0.0889, Fill: 88.9%, P&L: $-0.000055, Slippage: 0.0023%, Price improvement: 0.0010%
+2026-04-14 14:11:57,839 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.484 (spread=0.229, confidence=0.480, liquidity=0.900, volatility=0.248, slippage=0.781)
+2026-04-14 14:11:58,623 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.697 (spread=1.000, confidence=0.520, liquidity=0.900, volatility=0.160, slippage=0.630)
+2026-04-14 14:11:58,623 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.697 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:58,623 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190318_9785, Size: $0.0914, Fill: 91.4%, P&L: $-0.000007, Slippage: 0.0026%, Price improvement: 0.0074%
+2026-04-14 14:11:59,196 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.735 (spread=1.000, confidence=0.720, liquidity=0.850, volatility=0.065, slippage=0.755)
+2026-04-14 14:11:59,196 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.735 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:59,196 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190319_4928, Size: $0.0969, Fill: 96.9%, P&L: $-0.000028, Slippage: 0.0010%, Price improvement: 0.0090%
+2026-04-14 14:11:59,862 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.699 (spread=1.000, confidence=0.520, liquidity=0.850, volatility=0.109, slippage=0.831)
+2026-04-14 14:11:59,863 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.699 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:11:59,863 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190319_5152, Size: $0.0917, Fill: 91.7%, P&L: $-0.000017, Slippage: 0.0036%, Price improvement: 0.0065%
+2026-04-14 14:12:00,487 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.465 (spread=0.233, confidence=0.600, liquidity=0.900, volatility=0.048, slippage=0.584)
+2026-04-14 14:12:00,942 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.718 (spread=0.933, confidence=0.520, liquidity=0.950, volatility=0.362, slippage=0.637)
+2026-04-14 14:12:00,943 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.718 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:00,943 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190320_4369, Size: $0.0965, Fill: 96.5%, P&L: $-0.000070, Slippage: 0.0005%, Price improvement: 0.0081%
+2026-04-14 14:12:01,477 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.783 (spread=1.000, confidence=0.760, liquidity=0.950, volatility=0.142, slippage=0.813)
+2026-04-14 14:12:01,477 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.783 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:01,478 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190321_5297, Size: $0.0992, Fill: 99.2%, P&L: $-0.000063, Slippage: 0.0011%, Price improvement: 0.0060%
+2026-04-14 14:12:02,073 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.655 (spread=1.000, confidence=0.320, liquidity=0.950, volatility=0.000, slippage=0.846)
+2026-04-14 14:12:02,074 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.655 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:02,074 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190322_9590, Size: $0.0863, Fill: 86.3%, P&L: $-0.000049, Slippage: 0.0013%, Price improvement: 0.0088%
+2026-04-14 14:12:02,588 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.357 (spread=0.146, confidence=0.240, liquidity=0.900, volatility=0.081, slippage=0.615)
+2026-04-14 14:12:03,274 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.728 (spread=1.000, confidence=0.560, liquidity=0.900, volatility=0.214, slippage=0.754)
+2026-04-14 14:12:03,274 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.728 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:03,274 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190323_6531, Size: $0.0962, Fill: 96.2%, P&L: $0.000022, Slippage: 0.0043%, Price improvement: 0.0037%
+2026-04-14 14:12:03,639 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.519 (spread=0.344, confidence=0.560, liquidity=0.950, volatility=0.122, slippage=0.680)
+2026-04-14 14:12:04,423 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.630 (spread=1.000, confidence=0.160, liquidity=0.900, volatility=0.233, slippage=0.748)
+2026-04-14 14:12:04,423 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.630 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:04,423 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190324_9818, Size: $0.0942, Fill: 94.2%, P&L: $0.000030, Slippage: 0.0037%, Price improvement: 0.0067%
+2026-04-14 14:12:05,142 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.678 (spread=1.000, confidence=0.520, liquidity=0.900, volatility=0.019, slippage=0.650)
+2026-04-14 14:12:05,142 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.678 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:05,142 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190325_5295, Size: $0.0898, Fill: 89.8%, P&L: $0.000005, Slippage: 0.0030%, Price improvement: 0.0038%
+2026-04-14 14:12:05,596 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.734 (spread=1.000, confidence=0.760, liquidity=0.900, volatility=0.000, slippage=0.638)
+2026-04-14 14:12:05,597 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.734 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:05,597 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190325_5449, Size: $0.0895, Fill: 89.5%, P&L: $-0.000002, Slippage: 0.0020%, Price improvement: 0.0057%
+2026-04-14 14:12:06,002 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.754 (spread=1.000, confidence=0.800, liquidity=0.850, volatility=0.110, slippage=0.679)
+2026-04-14 14:12:06,002 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.754 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:06,002 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190326_1579, Size: $0.0952, Fill: 95.2%, P&L: $-0.000018, Slippage: 0.0012%, Price improvement: 0.0090%
+2026-04-14 14:12:06,780 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.741 (spread=1.000, confidence=0.680, liquidity=0.900, volatility=0.081, slippage=0.791)
+2026-04-14 14:12:06,781 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.741 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:06,781 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190326_1554, Size: $0.0969, Fill: 96.9%, P&L: $0.000026, Slippage: 0.0033%, Price improvement: 0.0057%
+2026-04-14 14:12:07,403 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.708 (spread=1.000, confidence=0.600, liquidity=0.950, volatility=0.065, slippage=0.586)
+2026-04-14 14:12:07,403 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.708 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:07,404 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190327_9369, Size: $0.0877, Fill: 87.7%, P&L: $-0.000027, Slippage: 0.0029%, Price improvement: 0.0003%
+2026-04-14 14:12:07,898 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.785 (spread=1.000, confidence=0.760, liquidity=0.950, volatility=0.327, slippage=0.557)
+2026-04-14 14:12:07,898 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.785 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:07,898 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190327_3801, Size: $0.0997, Fill: 99.7%, P&L: $-0.000054, Slippage: 0.0027%, Price improvement: 0.0031%
+2026-04-14 14:12:08,589 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.789 (spread=1.000, confidence=0.880, liquidity=0.950, volatility=0.123, slippage=0.604)
+2026-04-14 14:12:08,589 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.789 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:08,589 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190328_4456, Size: $0.0871, Fill: 87.1%, P&L: $-0.000054, Slippage: 0.0012%, Price improvement: 0.0001%
+2026-04-14 14:12:08,591 - quantumarb_gate3 - INFO - Progress: 60 trades executed, P&L: $-0.001350
+2026-04-14 14:12:08,591 - quantumarb_gate3 - INFO -   SOL-USD: 23 trades, P&L: $0.000134
+2026-04-14 14:12:08,591 - quantumarb_gate3 - INFO -   BTC-USD: 23 trades, P&L: $-0.001089
+2026-04-14 14:12:08,591 - quantumarb_gate3 - INFO -   ETH-USD: 14 trades, P&L: $-0.000395
+2026-04-14 14:12:09,094 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.509 (spread=0.179, confidence=0.760, liquidity=0.950, volatility=0.064, slippage=0.655)
+2026-04-14 14:12:09,097 - quantumarb_gate3 - INFO - Progress: 60 trades executed, P&L: $-0.001350
+2026-04-14 14:12:09,097 - quantumarb_gate3 - INFO -   SOL-USD: 23 trades, P&L: $0.000134
+2026-04-14 14:12:09,097 - quantumarb_gate3 - INFO -   BTC-USD: 23 trades, P&L: $-0.001089
+2026-04-14 14:12:09,097 - quantumarb_gate3 - INFO -   ETH-USD: 14 trades, P&L: $-0.000395
+2026-04-14 14:12:09,867 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.357 (spread=0.164, confidence=0.240, liquidity=0.900, volatility=0.000, slippage=0.676)
+2026-04-14 14:12:09,868 - quantumarb_gate3 - INFO - Progress: 60 trades executed, P&L: $-0.001350
+2026-04-14 14:12:09,868 - quantumarb_gate3 - INFO -   SOL-USD: 23 trades, P&L: $0.000134
+2026-04-14 14:12:09,868 - quantumarb_gate3 - INFO -   BTC-USD: 23 trades, P&L: $-0.001089
+2026-04-14 14:12:09,868 - quantumarb_gate3 - INFO -   ETH-USD: 14 trades, P&L: $-0.000395
+2026-04-14 14:12:10,326 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.500 (spread=0.274, confidence=0.560, liquidity=0.950, volatility=0.176, slippage=0.611)
+2026-04-14 14:12:10,327 - quantumarb_gate3 - INFO - Progress: 60 trades executed, P&L: $-0.001350
+2026-04-14 14:12:10,327 - quantumarb_gate3 - INFO -   SOL-USD: 23 trades, P&L: $0.000134
+2026-04-14 14:12:10,327 - quantumarb_gate3 - INFO -   BTC-USD: 23 trades, P&L: $-0.001089
+2026-04-14 14:12:10,327 - quantumarb_gate3 - INFO -   ETH-USD: 14 trades, P&L: $-0.000395
+2026-04-14 14:12:11,109 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.502 (spread=0.274, confidence=0.640, liquidity=0.850, volatility=0.037, slippage=0.838)
+2026-04-14 14:12:11,111 - quantumarb_gate3 - INFO - Progress: 60 trades executed, P&L: $-0.001350
+2026-04-14 14:12:11,111 - quantumarb_gate3 - INFO -   SOL-USD: 23 trades, P&L: $0.000134
+2026-04-14 14:12:11,111 - quantumarb_gate3 - INFO -   BTC-USD: 23 trades, P&L: $-0.001089
+2026-04-14 14:12:11,111 - quantumarb_gate3 - INFO -   ETH-USD: 14 trades, P&L: $-0.000395
+2026-04-14 14:12:11,826 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.665 (spread=1.000, confidence=0.280, liquidity=0.850, volatility=0.306, slippage=0.787)
+2026-04-14 14:12:11,827 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.665 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:11,827 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190331_9127, Size: $0.0903, Fill: 90.3%, P&L: $-0.000039, Slippage: 0.0009%, Price improvement: 0.0028%
+2026-04-14 14:12:12,408 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.513 (spread=0.659, confidence=0.200, liquidity=0.900, volatility=0.092, slippage=0.712)
+2026-04-14 14:12:13,164 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.446 (spread=0.450, confidence=0.240, liquidity=0.900, volatility=0.064, slippage=0.617)
+2026-04-14 14:12:13,800 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.726 (spread=1.000, confidence=0.520, liquidity=0.850, volatility=0.316, slippage=0.789)
+2026-04-14 14:12:13,801 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.726 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:13,801 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190333_8415, Size: $0.0910, Fill: 91.0%, P&L: $-0.000025, Slippage: 0.0030%, Price improvement: 0.0024%
+2026-04-14 14:12:14,325 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.649 (spread=1.000, confidence=0.240, liquidity=0.950, volatility=0.238, slippage=0.629)
+2026-04-14 14:12:15,020 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.758 (spread=1.000, confidence=0.760, liquidity=0.850, volatility=0.238, slippage=0.625)
+2026-04-14 14:12:15,020 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.758 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:15,020 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190335_9309, Size: $0.0868, Fill: 86.8%, P&L: $-0.000039, Slippage: 0.0026%, Price improvement: 0.0088%
+2026-04-14 14:12:15,476 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.561 (spread=0.263, confidence=0.720, liquidity=0.950, volatility=0.230, slippage=0.777)
+2026-04-14 14:12:16,240 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.640 (spread=1.000, confidence=0.280, liquidity=0.850, volatility=0.274, slippage=0.587)
+2026-04-14 14:12:16,241 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.640 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:16,241 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190336_8632, Size: $0.0818, Fill: 81.8%, P&L: $-0.000013, Slippage: 0.0032%, Price improvement: 0.0051%
+2026-04-14 14:12:16,981 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.579 (spread=0.189, confidence=0.880, liquidity=0.950, volatility=0.208, slippage=0.805)
+2026-04-14 14:12:17,463 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.655 (spread=1.000, confidence=0.200, liquidity=0.950, volatility=0.239, slippage=0.792)
+2026-04-14 14:12:17,463 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.655 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:17,463 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190337_5083, Size: $0.0893, Fill: 89.3%, P&L: $-0.000047, Slippage: 0.0020%, Price improvement: 0.0095%
+2026-04-14 14:12:17,977 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.708 (spread=1.000, confidence=0.560, liquidity=0.950, volatility=0.167, slippage=0.535)
+2026-04-14 14:12:17,978 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.708 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:17,978 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190337_8966, Size: $0.0963, Fill: 96.3%, P&L: $-0.000038, Slippage: 0.0024%, Price improvement: 0.0003%
+2026-04-14 14:12:18,352 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.644 (spread=0.958, confidence=0.320, liquidity=0.950, volatility=0.210, slippage=0.550)
+2026-04-14 14:12:19,128 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.733 (spread=1.000, confidence=0.760, liquidity=0.850, volatility=0.000, slippage=0.730)
+2026-04-14 14:12:19,128 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.733 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:19,128 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190339_9611, Size: $0.0991, Fill: 99.1%, P&L: $-0.000016, Slippage: 0.0012%, Price improvement: 0.0031%
+2026-04-14 14:12:19,689 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.753 (spread=1.000, confidence=0.760, liquidity=0.950, volatility=0.000, slippage=0.730)
+2026-04-14 14:12:19,689 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.753 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:19,690 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190339_7054, Size: $0.0930, Fill: 93.0%, P&L: $-0.000041, Slippage: 0.0028%, Price improvement: 0.0088%
+2026-04-14 14:12:20,367 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.733 (spread=1.000, confidence=0.800, liquidity=0.850, volatility=0.000, slippage=0.632)
+2026-04-14 14:12:20,367 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.733 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:20,367 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190340_5559, Size: $0.0893, Fill: 89.3%, P&L: $-0.000007, Slippage: 0.0025%, Price improvement: 0.0063%
+2026-04-14 14:12:20,946 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.686 (spread=0.723, confidence=0.640, liquidity=0.950, volatility=0.230, slippage=0.848)
+2026-04-14 14:12:20,946 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.686 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:20,947 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190340_8425, Size: $0.0844, Fill: 84.4%, P&L: $-0.000062, Slippage: 0.0027%, Price improvement: 0.0056%
+2026-04-14 14:12:21,682 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.708 (spread=1.000, confidence=0.640, liquidity=0.850, volatility=0.080, slippage=0.665)
+2026-04-14 14:12:21,682 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.708 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:21,683 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190341_2870, Size: $0.0921, Fill: 92.1%, P&L: $-0.000024, Slippage: 0.0020%, Price improvement: 0.0067%
+2026-04-14 14:12:22,182 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.778 (spread=1.000, confidence=0.680, liquidity=0.950, volatility=0.316, slippage=0.710)
+2026-04-14 14:12:22,182 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.778 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:22,183 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190342_6121, Size: $0.0817, Fill: 81.7%, P&L: $-0.000026, Slippage: 0.0019%, Price improvement: 0.0086%
+2026-04-14 14:12:22,937 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.709 (spread=1.000, confidence=0.600, liquidity=0.900, volatility=0.107, slippage=0.635)
+2026-04-14 14:12:22,937 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.709 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:22,937 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190342_1940, Size: $0.0833, Fill: 83.3%, P&L: $-0.000010, Slippage: 0.0016%, Price improvement: 0.0026%
+2026-04-14 14:12:23,334 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.723 (spread=0.917, confidence=0.800, liquidity=0.850, volatility=0.000, slippage=0.775)
+2026-04-14 14:12:23,334 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.723 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:23,334 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190343_6047, Size: $0.0923, Fill: 92.3%, P&L: $-0.000047, Slippage: 0.0033%, Price improvement: 0.0099%
+2026-04-14 14:12:23,793 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.665 (spread=1.000, confidence=0.480, liquidity=0.900, volatility=0.000, slippage=0.652)
+2026-04-14 14:12:23,793 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.665 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:23,793 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190343_3910, Size: $0.0918, Fill: 91.8%, P&L: $0.000027, Slippage: 0.0012%, Price improvement: 0.0026%
+2026-04-14 14:12:24,384 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.709 (spread=1.000, confidence=0.560, liquidity=0.900, volatility=0.094, slippage=0.746)
+2026-04-14 14:12:24,385 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.709 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:24,385 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190344_3229, Size: $0.0954, Fill: 95.4%, P&L: $0.000036, Slippage: 0.0027%, Price improvement: 0.0006%
+2026-04-14 14:12:25,152 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.682 (spread=1.000, confidence=0.480, liquidity=0.900, volatility=0.007, slippage=0.811)
+2026-04-14 14:12:25,152 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.682 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:25,153 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190345_1412, Size: $0.0819, Fill: 81.9%, P&L: $0.000009, Slippage: 0.0012%, Price improvement: 0.0030%
+2026-04-14 14:12:25,682 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.538 (spread=0.383, confidence=0.600, liquidity=0.850, volatility=0.163, slippage=0.783)
+2026-04-14 14:12:26,445 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.613 (spread=1.000, confidence=0.160, liquidity=0.900, volatility=0.156, slippage=0.700)
+2026-04-14 14:12:26,446 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.613 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:26,446 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190346_2310, Size: $0.0814, Fill: 81.4%, P&L: $-0.000001, Slippage: 0.0028%, Price improvement: 0.0041%
+2026-04-14 14:12:27,140 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.429 (spread=0.394, confidence=0.120, liquidity=0.900, volatility=0.185, slippage=0.733)
+2026-04-14 14:12:27,903 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.603 (spread=0.883, confidence=0.280, liquidity=0.900, volatility=0.230, slippage=0.536)
+2026-04-14 14:12:27,903 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.603 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:27,903 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190347_3119, Size: $0.0854, Fill: 85.4%, P&L: $-0.000022, Slippage: 0.0041%, Price improvement: 0.0037%
+2026-04-14 14:12:28,328 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.522 (spread=0.281, confidence=0.520, liquidity=0.950, volatility=0.342, slippage=0.669)
+2026-04-14 14:12:28,888 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.672 (spread=1.000, confidence=0.600, liquidity=0.850, volatility=0.000, slippage=0.523)
+2026-04-14 14:12:28,888 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.672 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:28,888 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190348_6702, Size: $0.0832, Fill: 83.2%, P&L: $-0.000026, Slippage: 0.0018%, Price improvement: 0.0091%
+2026-04-14 14:12:28,889 - quantumarb_gate3 - INFO - Progress: 80 trades executed, P&L: $-0.001762
+2026-04-14 14:12:28,889 - quantumarb_gate3 - INFO -   SOL-USD: 29 trades, P&L: $0.000171
+2026-04-14 14:12:28,889 - quantumarb_gate3 - INFO -   BTC-USD: 28 trades, P&L: $-0.001302
+2026-04-14 14:12:28,889 - quantumarb_gate3 - INFO -   ETH-USD: 23 trades, P&L: $-0.000630
+2026-04-14 14:12:29,372 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.680 (spread=1.000, confidence=0.440, liquidity=0.850, volatility=0.283, slippage=0.574)
+2026-04-14 14:12:29,372 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.680 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:29,372 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190349_4168, Size: $0.0854, Fill: 85.4%, P&L: $-0.000022, Slippage: 0.0021%, Price improvement: 0.0017%
+2026-04-14 14:12:29,943 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.641 (spread=1.000, confidence=0.280, liquidity=0.850, volatility=0.189, slippage=0.725)
+2026-04-14 14:12:29,944 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.641 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:29,944 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190349_8512, Size: $0.0936, Fill: 93.6%, P&L: $-0.000011, Slippage: 0.0028%, Price improvement: 0.0087%
+2026-04-14 14:12:30,663 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.669 (spread=1.000, confidence=0.440, liquidity=0.950, volatility=0.062, slippage=0.595)
+2026-04-14 14:12:30,664 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.669 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:30,664 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190350_9274, Size: $0.0913, Fill: 91.3%, P&L: $-0.000030, Slippage: 0.0026%, Price improvement: 0.0092%
+2026-04-14 14:12:31,002 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.737 (spread=1.000, confidence=0.640, liquidity=0.850, volatility=0.312, slippage=0.607)
+2026-04-14 14:12:31,002 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.737 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:31,002 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190351_5350, Size: $0.0965, Fill: 96.5%, P&L: $-0.000012, Slippage: 0.0029%, Price improvement: 0.0053%
+2026-04-14 14:12:31,789 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.497 (spread=0.523, confidence=0.320, liquidity=0.850, volatility=0.097, slippage=0.759)
+2026-04-14 14:12:32,471 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.691 (spread=1.000, confidence=0.280, liquidity=0.950, volatility=0.376, slippage=0.745)
+2026-04-14 14:12:32,473 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.691 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:32,473 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190352_7250, Size: $0.0877, Fill: 87.7%, P&L: $-0.000028, Slippage: 0.0026%, Price improvement: 0.0082%
+2026-04-14 14:12:33,085 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.544 (spread=0.432, confidence=0.560, liquidity=0.950, volatility=0.079, slippage=0.725)
+2026-04-14 14:12:33,756 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.700 (spread=1.000, confidence=0.680, liquidity=0.900, volatility=0.000, slippage=0.500)
+2026-04-14 14:12:33,756 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.700 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:33,757 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190353_8848, Size: $0.0867, Fill: 86.7%, P&L: $0.000033, Slippage: 0.0017%, Price improvement: 0.0089%
+2026-04-14 14:12:34,282 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.649 (spread=1.000, confidence=0.320, liquidity=0.950, volatility=0.052, slippage=0.714)
+2026-04-14 14:12:34,932 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.606 (spread=0.531, confidence=0.760, liquidity=0.900, volatility=0.000, slippage=0.763)
+2026-04-14 14:12:34,932 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.606 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:34,932 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190354_1882, Size: $0.0999, Fill: 99.9%, P&L: $-0.000047, Slippage: 0.0044%, Price improvement: 0.0098%
+2026-04-14 14:12:35,712 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.399 (spread=0.260, confidence=0.240, liquidity=0.850, volatility=0.220, slippage=0.585)
+2026-04-14 14:12:36,050 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.669 (spread=1.000, confidence=0.320, liquidity=0.850, volatility=0.271, slippage=0.780)
+2026-04-14 14:12:36,051 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.669 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:36,051 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190356_1540, Size: $0.0806, Fill: 80.6%, P&L: $-0.000011, Slippage: 0.0024%, Price improvement: 0.0053%
+2026-04-14 14:12:36,855 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.707 (spread=1.000, confidence=0.640, liquidity=0.900, volatility=0.074, slippage=0.561)
+2026-04-14 14:12:36,855 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.707 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:36,855 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190356_9081, Size: $0.0934, Fill: 93.4%, P&L: $0.000001, Slippage: 0.0012%, Price improvement: 0.0041%
+2026-04-14 14:12:37,274 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.633 (spread=1.000, confidence=0.160, liquidity=0.850, volatility=0.284, slippage=0.805)
+2026-04-14 14:12:37,274 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.633 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:37,274 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190357_4303, Size: $0.0907, Fill: 90.7%, P&L: $-0.000034, Slippage: 0.0016%, Price improvement: 0.0091%
+2026-04-14 14:12:37,794 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.590 (spread=0.860, confidence=0.160, liquidity=0.900, volatility=0.240, slippage=0.763)
+2026-04-14 14:12:38,250 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.701 (spread=1.000, confidence=0.520, liquidity=0.950, volatility=0.198, slippage=0.515)
+2026-04-14 14:12:38,250 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.701 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:38,250 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190358_2882, Size: $0.0944, Fill: 94.4%, P&L: $-0.000043, Slippage: 0.0021%, Price improvement: 0.0090%
+2026-04-14 14:12:38,678 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.592 (spread=0.456, confidence=0.560, liquidity=0.950, volatility=0.273, slippage=0.839)
+2026-04-14 14:12:39,419 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.702 (spread=1.000, confidence=0.640, liquidity=0.900, volatility=0.000, slippage=0.618)
+2026-04-14 14:12:39,420 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.702 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:39,420 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190359_2674, Size: $0.0929, Fill: 92.9%, P&L: $-0.000005, Slippage: 0.0024%, Price improvement: 0.0064%
+2026-04-14 14:12:39,993 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.400 (spread=0.213, confidence=0.280, liquidity=0.900, volatility=0.057, slippage=0.776)
+2026-04-14 14:12:40,632 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.584 (spread=0.477, confidence=0.640, liquidity=0.950, volatility=0.262, slippage=0.521)
+2026-04-14 14:12:41,264 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.588 (spread=1.000, confidence=0.200, liquidity=0.900, volatility=0.000, slippage=0.576)
+2026-04-14 14:12:42,066 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.695 (spread=1.000, confidence=0.480, liquidity=0.900, volatility=0.191, slippage=0.663)
+2026-04-14 14:12:42,066 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.695 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:42,066 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190362_5567, Size: $0.0809, Fill: 80.9%, P&L: $0.000029, Slippage: 0.0042%, Price improvement: 0.0023%
+2026-04-14 14:12:42,757 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.758 (spread=1.000, confidence=0.640, liquidity=0.950, volatility=0.265, slippage=0.680)
+2026-04-14 14:12:42,758 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.758 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:42,758 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190362_5332, Size: $0.0871, Fill: 87.1%, P&L: $-0.000031, Slippage: 0.0020%, Price improvement: 0.0086%
+2026-04-14 14:12:43,256 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.402 (spread=0.432, confidence=0.160, liquidity=0.850, volatility=0.000, slippage=0.623)
+2026-04-14 14:12:43,737 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.627 (spread=0.947, confidence=0.280, liquidity=0.900, volatility=0.159, slippage=0.693)
+2026-04-14 14:12:43,738 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.627 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:43,738 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190363_3636, Size: $0.0969, Fill: 96.9%, P&L: $-0.000016, Slippage: 0.0011%, Price improvement: 0.0042%
+2026-04-14 14:12:44,074 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.799 (spread=1.000, confidence=0.840, liquidity=0.850, volatility=0.246, slippage=0.825)
+2026-04-14 14:12:44,074 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.799 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:44,074 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190364_9390, Size: $0.0806, Fill: 80.6%, P&L: $-0.000005, Slippage: 0.0036%, Price improvement: 0.0071%
+2026-04-14 14:12:44,716 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.584 (spread=0.845, confidence=0.320, liquidity=0.850, volatility=0.070, slippage=0.701)
+2026-04-14 14:12:45,026 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.648 (spread=1.000, confidence=0.360, liquidity=0.850, volatility=0.220, slippage=0.546)
+2026-04-14 14:12:45,026 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.648 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:45,026 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190365_6290, Size: $0.0839, Fill: 83.9%, P&L: $-0.000036, Slippage: 0.0034%, Price improvement: 0.0056%
+2026-04-14 14:12:45,398 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.738 (spread=1.000, confidence=0.640, liquidity=0.950, volatility=0.103, slippage=0.728)
+2026-04-14 14:12:45,399 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.738 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:45,399 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190365_6042, Size: $0.0854, Fill: 85.4%, P&L: $-0.000044, Slippage: 0.0013%, Price improvement: 0.0077%
+2026-04-14 14:12:45,981 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.680 (spread=0.649, confidence=0.840, liquidity=0.850, volatility=0.145, slippage=0.833)
+2026-04-14 14:12:45,981 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.680 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:45,981 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190365_9965, Size: $0.0874, Fill: 87.4%, P&L: $-0.000055, Slippage: 0.0013%, Price improvement: 0.0095%
+2026-04-14 14:12:46,662 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.656 (spread=0.628, confidence=0.680, liquidity=0.950, volatility=0.230, slippage=0.735)
+2026-04-14 14:12:46,663 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.656 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:46,663 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190366_3059, Size: $0.0890, Fill: 89.0%, P&L: $-0.000070, Slippage: 0.0023%, Price improvement: 0.0059%
+2026-04-14 14:12:46,666 - quantumarb_gate3 - INFO - Progress: 100 trades executed, P&L: $-0.002202
+2026-04-14 14:12:46,666 - quantumarb_gate3 - INFO -   SOL-USD: 35 trades, P&L: $0.000164
+2026-04-14 14:12:46,666 - quantumarb_gate3 - INFO -   BTC-USD: 34 trades, P&L: $-0.001548
+2026-04-14 14:12:46,666 - quantumarb_gate3 - INFO -   ETH-USD: 31 trades, P&L: $-0.000818
+2026-04-14 14:12:47,258 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.720 (spread=1.000, confidence=0.520, liquidity=0.950, volatility=0.160, slippage=0.757)
+2026-04-14 14:12:47,259 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.720 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:47,259 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190367_5134, Size: $0.0992, Fill: 99.2%, P&L: $-0.000036, Slippage: 0.0021%, Price improvement: 0.0036%
+2026-04-14 14:12:47,690 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.772 (spread=0.949, confidence=0.800, liquidity=0.850, volatility=0.293, slippage=0.737)
+2026-04-14 14:12:47,691 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.772 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:47,691 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190367_8901, Size: $0.0834, Fill: 83.4%, P&L: $-0.000037, Slippage: 0.0017%, Price improvement: 0.0032%
+2026-04-14 14:12:48,377 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.701 (spread=1.000, confidence=0.560, liquidity=0.900, volatility=0.122, slippage=0.627)
+2026-04-14 14:12:48,378 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.701 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:48,378 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190368_9997, Size: $0.0836, Fill: 83.6%, P&L: $0.000023, Slippage: 0.0045%, Price improvement: 0.0030%
+2026-04-14 14:12:49,034 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.744 (spread=1.000, confidence=0.800, liquidity=0.950, volatility=0.000, slippage=0.539)
+2026-04-14 14:12:49,034 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.744 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:49,034 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190369_8679, Size: $0.0928, Fill: 92.8%, P&L: $-0.000062, Slippage: 0.0010%, Price improvement: 0.0075%
+2026-04-14 14:12:49,776 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.746 (spread=1.000, confidence=0.520, liquidity=0.950, volatility=0.336, slippage=0.761)
+2026-04-14 14:12:49,776 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.746 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:49,776 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190369_9128, Size: $0.0849, Fill: 84.9%, P&L: $-0.000024, Slippage: 0.0009%, Price improvement: 0.0048%
+2026-04-14 14:12:50,315 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.752 (spread=1.000, confidence=0.640, liquidity=0.850, volatility=0.284, slippage=0.794)
+2026-04-14 14:12:50,315 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.752 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:50,315 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190370_5210, Size: $0.0845, Fill: 84.5%, P&L: $-0.000011, Slippage: 0.0028%, Price improvement: 0.0068%
+2026-04-14 14:12:50,963 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.746 (spread=1.000, confidence=0.800, liquidity=0.850, volatility=0.000, slippage=0.760)
+2026-04-14 14:12:50,963 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.746 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:50,963 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190370_8229, Size: $0.0834, Fill: 83.4%, P&L: $-0.000025, Slippage: 0.0017%, Price improvement: 0.0018%
+2026-04-14 14:12:51,557 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.723 (spread=1.000, confidence=0.600, liquidity=0.900, volatility=0.121, slippage=0.751)
+2026-04-14 14:12:51,557 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.723 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:51,558 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190371_5598, Size: $0.0930, Fill: 93.0%, P&L: $0.000012, Slippage: 0.0030%, Price improvement: 0.0018%
+2026-04-14 14:12:52,179 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.761 (spread=1.000, confidence=0.680, liquidity=0.900, volatility=0.273, slippage=0.704)
+2026-04-14 14:12:52,180 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.761 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:52,180 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190372_7882, Size: $0.0849, Fill: 84.9%, P&L: $0.000022, Slippage: 0.0032%, Price improvement: 0.0097%
+2026-04-14 14:12:52,859 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.756 (spread=1.000, confidence=0.560, liquidity=0.950, volatility=0.309, slippage=0.799)
+2026-04-14 14:12:52,859 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.756 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:52,860 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190372_5389, Size: $0.0938, Fill: 93.8%, P&L: $-0.000051, Slippage: 0.0007%, Price improvement: 0.0072%
+2026-04-14 14:12:53,270 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.605 (spread=1.000, confidence=0.240, liquidity=0.900, volatility=0.043, slippage=0.585)
+2026-04-14 14:12:53,270 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.605 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:53,270 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190373_9023, Size: $0.0881, Fill: 88.1%, P&L: $0.000009, Slippage: 0.0037%, Price improvement: 0.0056%
+2026-04-14 14:12:53,840 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.557 (spread=0.398, confidence=0.800, liquidity=0.850, volatility=0.000, slippage=0.675)
+2026-04-14 14:12:54,457 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.685 (spread=0.818, confidence=0.560, liquidity=0.950, volatility=0.232, slippage=0.749)
+2026-04-14 14:12:54,457 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.685 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:54,457 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190374_5244, Size: $0.0863, Fill: 86.3%, P&L: $-0.000060, Slippage: 0.0027%, Price improvement: 0.0066%
+2026-04-14 14:12:55,083 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.486 (spread=0.470, confidence=0.320, liquidity=0.950, volatility=0.000, slippage=0.752)
+2026-04-14 14:12:55,543 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.677 (spread=1.000, confidence=0.480, liquidity=0.900, volatility=0.134, slippage=0.565)
+2026-04-14 14:12:55,543 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.677 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:55,543 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190375_1128, Size: $0.0965, Fill: 96.5%, P&L: $0.000015, Slippage: 0.0037%, Price improvement: 0.0009%
+2026-04-14 14:12:56,233 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.789 (spread=1.000, confidence=0.720, liquidity=0.950, volatility=0.242, slippage=0.823)
+2026-04-14 14:12:56,233 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.789 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:56,233 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190376_6856, Size: $0.0861, Fill: 86.1%, P&L: $-0.000036, Slippage: 0.0011%, Price improvement: 0.0058%
+2026-04-14 14:12:56,785 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.688 (spread=1.000, confidence=0.440, liquidity=0.950, volatility=0.046, slippage=0.811)
+2026-04-14 14:12:56,786 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.688 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:56,786 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190376_8202, Size: $0.0981, Fill: 98.1%, P&L: $-0.000047, Slippage: 0.0013%, Price improvement: 0.0012%
+2026-04-14 14:12:57,319 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.747 (spread=1.000, confidence=0.760, liquidity=0.950, volatility=0.000, slippage=0.672)
+2026-04-14 14:12:57,319 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.747 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:57,319 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190377_5319, Size: $0.0850, Fill: 85.0%, P&L: $-0.000056, Slippage: 0.0019%, Price improvement: 0.0006%
+2026-04-14 14:12:58,084 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.647 (spread=0.968, confidence=0.240, liquidity=0.950, volatility=0.230, slippage=0.716)
+2026-04-14 14:12:58,448 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.503 (spread=0.453, confidence=0.400, liquidity=0.950, volatility=0.010, slippage=0.752)
+2026-04-14 14:12:59,047 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.589 (spread=0.960, confidence=0.280, liquidity=0.900, volatility=0.000, slippage=0.512)
+2026-04-14 14:12:59,626 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.582 (spread=0.745, confidence=0.440, liquidity=0.850, volatility=0.000, slippage=0.781)
+2026-04-14 14:12:59,940 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.699 (spread=1.000, confidence=0.480, liquidity=0.900, volatility=0.216, slippage=0.668)
+2026-04-14 14:12:59,941 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.699 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:12:59,941 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190379_7772, Size: $0.0899, Fill: 89.9%, P&L: $0.000025, Slippage: 0.0040%, Price improvement: 0.0041%
+2026-04-14 14:13:00,674 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.497 (spread=0.320, confidence=0.680, liquidity=0.900, volatility=0.000, slippage=0.506)
+2026-04-14 14:13:01,207 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.714 (spread=1.000, confidence=0.520, liquidity=0.950, volatility=0.105, slippage=0.782)
+2026-04-14 14:13:01,208 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.714 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:01,208 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190381_8695, Size: $0.0969, Fill: 96.9%, P&L: $-0.000050, Slippage: 0.0022%, Price improvement: 0.0075%
+2026-04-14 14:13:01,974 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.758 (spread=1.000, confidence=0.840, liquidity=0.950, volatility=0.000, slippage=0.585)
+2026-04-14 14:13:01,974 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.758 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:01,974 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190381_9489, Size: $0.0959, Fill: 95.9%, P&L: $-0.000065, Slippage: 0.0011%, Price improvement: 0.0037%
+2026-04-14 14:13:02,466 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.635 (spread=0.842, confidence=0.320, liquidity=0.950, volatility=0.301, slippage=0.669)
+2026-04-14 14:13:03,056 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.618 (spread=1.000, confidence=0.200, liquidity=0.950, volatility=0.082, slippage=0.652)
+2026-04-14 14:13:03,693 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.736 (spread=1.000, confidence=0.640, liquidity=0.950, volatility=0.184, slippage=0.588)
+2026-04-14 14:13:03,693 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.736 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:03,693 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190383_2899, Size: $0.0861, Fill: 86.1%, P&L: $-0.000038, Slippage: 0.0022%, Price improvement: 0.0054%
+2026-04-14 14:13:03,694 - quantumarb_gate3 - INFO - Progress: 120 trades executed, P&L: $-0.002697
+2026-04-14 14:13:03,694 - quantumarb_gate3 - INFO -   SOL-USD: 41 trades, P&L: $0.000269
+2026-04-14 14:13:03,694 - quantumarb_gate3 - INFO -   BTC-USD: 45 trades, P&L: $-0.002075
+2026-04-14 14:13:03,694 - quantumarb_gate3 - INFO -   ETH-USD: 34 trades, P&L: $-0.000891
+2026-04-14 14:13:04,347 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.414 (spread=0.240, confidence=0.360, liquidity=0.900, volatility=0.000, slippage=0.725)
+2026-04-14 14:13:04,350 - quantumarb_gate3 - INFO - Progress: 120 trades executed, P&L: $-0.002697
+2026-04-14 14:13:04,350 - quantumarb_gate3 - INFO -   SOL-USD: 41 trades, P&L: $0.000269
+2026-04-14 14:13:04,350 - quantumarb_gate3 - INFO -   BTC-USD: 45 trades, P&L: $-0.002075
+2026-04-14 14:13:04,350 - quantumarb_gate3 - INFO -   ETH-USD: 34 trades, P&L: $-0.000891
+2026-04-14 14:13:05,089 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.697 (spread=1.000, confidence=0.520, liquidity=0.900, volatility=0.050, slippage=0.800)
+2026-04-14 14:13:05,090 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.697 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:05,090 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190385_4572, Size: $0.0896, Fill: 89.6%, P&L: $0.000015, Slippage: 0.0018%, Price improvement: 0.0006%
+2026-04-14 14:13:05,738 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.662 (spread=1.000, confidence=0.520, liquidity=0.900, volatility=0.000, slippage=0.523)
+2026-04-14 14:13:05,738 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.662 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:05,738 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190385_9284, Size: $0.0825, Fill: 82.5%, P&L: $0.000017, Slippage: 0.0013%, Price improvement: 0.0023%
+2026-04-14 14:13:06,517 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.762 (spread=1.000, confidence=0.640, liquidity=0.950, volatility=0.292, slippage=0.686)
+2026-04-14 14:13:06,517 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.762 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:06,517 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190386_2261, Size: $0.0938, Fill: 93.8%, P&L: $-0.000035, Slippage: 0.0012%, Price improvement: 0.0044%
+2026-04-14 14:13:07,165 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.610 (spread=1.000, confidence=0.200, liquidity=0.900, volatility=0.097, slippage=0.650)
+2026-04-14 14:13:07,166 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.610 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:07,166 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190387_9311, Size: $0.0821, Fill: 82.1%, P&L: $0.000014, Slippage: 0.0032%, Price improvement: 0.0050%
+2026-04-14 14:13:07,479 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.590 (spread=1.000, confidence=0.160, liquidity=0.900, volatility=0.063, slippage=0.607)
+2026-04-14 14:13:07,827 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.708 (spread=1.000, confidence=0.680, liquidity=0.900, volatility=0.000, slippage=0.581)
+2026-04-14 14:13:07,827 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.708 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:07,827 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190387_5768, Size: $0.0998, Fill: 99.8%, P&L: $-0.000014, Slippage: 0.0037%, Price improvement: 0.0074%
+2026-04-14 14:13:08,296 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.538 (spread=0.481, confidence=0.480, liquidity=0.850, volatility=0.259, slippage=0.651)
+2026-04-14 14:13:09,024 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.636 (spread=1.000, confidence=0.280, liquidity=0.950, volatility=0.000, slippage=0.759)
+2026-04-14 14:13:09,680 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.570 (spread=0.804, confidence=0.320, liquidity=0.900, volatility=0.000, slippage=0.686)
+2026-04-14 14:13:10,332 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.746 (spread=1.000, confidence=0.720, liquidity=0.950, volatility=0.062, slippage=0.671)
+2026-04-14 14:13:10,333 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.746 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:10,333 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190390_3693, Size: $0.0986, Fill: 98.6%, P&L: $-0.000047, Slippage: 0.0015%, Price improvement: 0.0011%
+2026-04-14 14:13:10,766 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.517 (spread=0.313, confidence=0.560, liquidity=0.850, volatility=0.283, slippage=0.705)
+2026-04-14 14:13:11,459 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.668 (spread=0.811, confidence=0.680, liquidity=0.900, volatility=0.089, slippage=0.612)
+2026-04-14 14:13:11,459 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.668 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:11,459 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190391_1380, Size: $0.0969, Fill: 96.9%, P&L: $-0.000030, Slippage: 0.0044%, Price improvement: 0.0098%
+2026-04-14 14:13:12,230 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.760 (spread=1.000, confidence=0.720, liquidity=0.900, volatility=0.116, slippage=0.829)
+2026-04-14 14:13:12,230 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.760 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:12,231 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190392_2259, Size: $0.0903, Fill: 90.3%, P&L: $0.000005, Slippage: 0.0048%, Price improvement: 0.0050%
+2026-04-14 14:13:12,691 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.441 (spread=0.309, confidence=0.320, liquidity=0.900, volatility=0.090, slippage=0.751)
+2026-04-14 14:13:13,003 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.640 (spread=1.000, confidence=0.240, liquidity=0.900, volatility=0.112, slippage=0.832)
+2026-04-14 14:13:13,004 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.640 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:13,004 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190393_8225, Size: $0.0832, Fill: 83.2%, P&L: $0.000031, Slippage: 0.0040%, Price improvement: 0.0011%
+2026-04-14 14:13:13,683 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.697 (spread=1.000, confidence=0.600, liquidity=0.900, volatility=0.071, slippage=0.561)
+2026-04-14 14:13:13,684 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.697 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:13,684 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190393_4271, Size: $0.0884, Fill: 88.4%, P&L: $0.000004, Slippage: 0.0029%, Price improvement: 0.0026%
+2026-04-14 14:13:14,363 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.630 (spread=1.000, confidence=0.360, liquidity=0.950, volatility=0.000, slippage=0.505)
+2026-04-14 14:13:14,773 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.580 (spread=0.484, confidence=0.720, liquidity=0.900, volatility=0.062, slippage=0.650)
+2026-04-14 14:13:15,353 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.728 (spread=0.993, confidence=0.720, liquidity=0.900, volatility=0.000, slippage=0.700)
+2026-04-14 14:13:15,354 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.728 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:15,354 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190395_8594, Size: $0.0888, Fill: 88.8%, P&L: $-0.000018, Slippage: 0.0048%, Price improvement: 0.0050%
+2026-04-14 14:13:16,039 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.713 (spread=0.949, confidence=0.640, liquidity=0.850, volatility=0.190, slippage=0.701)
+2026-04-14 14:13:16,039 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.713 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:16,040 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190396_5833, Size: $0.0877, Fill: 87.7%, P&L: $-0.000039, Slippage: 0.0015%, Price improvement: 0.0027%
+2026-04-14 14:13:16,806 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.807 (spread=1.000, confidence=0.880, liquidity=0.950, volatility=0.306, slippage=0.513)
+2026-04-14 14:13:16,807 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.807 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:16,807 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190396_6907, Size: $0.0987, Fill: 98.7%, P&L: $-0.000035, Slippage: 0.0027%, Price improvement: 0.0017%
+2026-04-14 14:13:17,597 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.500 (spread=0.281, confidence=0.720, liquidity=0.850, volatility=0.000, slippage=0.655)
+2026-04-14 14:13:18,240 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.416 (spread=0.042, confidence=0.600, liquidity=0.950, volatility=0.000, slippage=0.632)
+2026-04-14 14:13:18,564 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.605 (spread=1.000, confidence=0.160, liquidity=0.900, volatility=0.023, slippage=0.818)
+2026-04-14 14:13:18,564 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.605 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:18,564 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190398_3619, Size: $0.0985, Fill: 98.5%, P&L: $0.000023, Slippage: 0.0029%, Price improvement: 0.0079%
+2026-04-14 14:13:19,261 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.627 (spread=1.000, confidence=0.200, liquidity=0.900, volatility=0.185, slippage=0.694)
+2026-04-14 14:13:19,261 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.627 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:19,261 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190399_9351, Size: $0.0814, Fill: 81.4%, P&L: $0.000031, Slippage: 0.0026%, Price improvement: 0.0088%
+2026-04-14 14:13:19,784 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.445 (spread=0.460, confidence=0.160, liquidity=0.850, volatility=0.164, slippage=0.729)
+2026-04-14 14:13:20,325 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.526 (spread=0.364, confidence=0.720, liquidity=0.900, volatility=0.000, slippage=0.567)
+2026-04-14 14:13:20,844 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.563 (spread=0.449, confidence=0.720, liquidity=0.950, volatility=0.030, slippage=0.538)
+2026-04-14 14:13:21,502 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.834 (spread=1.000, confidence=0.880, liquidity=0.950, volatility=0.278, slippage=0.827)
+2026-04-14 14:13:21,502 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.834 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:21,502 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190401_2890, Size: $0.0848, Fill: 84.8%, P&L: $-0.000044, Slippage: 0.0017%, Price improvement: 0.0004%
+2026-04-14 14:13:22,225 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.747 (spread=1.000, confidence=0.520, liquidity=0.950, volatility=0.352, slippage=0.737)
+2026-04-14 14:13:22,225 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.747 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:22,225 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190402_2131, Size: $0.0864, Fill: 86.4%, P&L: $-0.000044, Slippage: 0.0017%, Price improvement: 0.0098%
+2026-04-14 14:13:22,597 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.653 (spread=0.885, confidence=0.520, liquidity=0.850, volatility=0.034, slippage=0.823)
+2026-04-14 14:13:22,598 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.653 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:22,598 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190402_4081, Size: $0.0868, Fill: 86.8%, P&L: $-0.000042, Slippage: 0.0027%, Price improvement: 0.0088%
+2026-04-14 14:13:23,307 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 138/120 trades
+2026-04-14 14:13:23,309 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.767 (spread=1.000, confidence=0.760, liquidity=0.900, volatility=0.207, slippage=0.656)
+2026-04-14 14:13:23,309 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.767 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:23,309 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190403_9460, Size: $0.0905, Fill: 90.5%, P&L: $0.000035, Slippage: 0.0034%, Price improvement: 0.0050%
+2026-04-14 14:13:24,071 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 139/120 trades
+2026-04-14 14:13:24,072 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.680 (spread=0.957, confidence=0.600, liquidity=0.900, volatility=0.000, slippage=0.632)
+2026-04-14 14:13:24,072 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.680 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:24,072 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190404_3913, Size: $0.0985, Fill: 98.5%, P&L: $-0.000020, Slippage: 0.0020%, Price improvement: 0.0030%
+2026-04-14 14:13:24,073 - quantumarb_gate3 - INFO - Progress: 140 trades executed, P&L: $-0.002891
+2026-04-14 14:13:24,073 - quantumarb_gate3 - INFO -   SOL-USD: 54 trades, P&L: $0.000362
+2026-04-14 14:13:24,073 - quantumarb_gate3 - INFO -   BTC-USD: 50 trades, P&L: $-0.002282
+2026-04-14 14:13:24,073 - quantumarb_gate3 - INFO -   ETH-USD: 36 trades, P&L: $-0.000972
+2026-04-14 14:13:24,831 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 140/120 trades
+2026-04-14 14:13:24,832 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.574 (spread=0.732, confidence=0.400, liquidity=0.850, volatility=0.179, slippage=0.575)
+2026-04-14 14:13:24,835 - quantumarb_gate3 - INFO - Progress: 140 trades executed, P&L: $-0.002891
+2026-04-14 14:13:24,836 - quantumarb_gate3 - INFO -   SOL-USD: 54 trades, P&L: $0.000362
+2026-04-14 14:13:24,836 - quantumarb_gate3 - INFO -   BTC-USD: 50 trades, P&L: $-0.002282
+2026-04-14 14:13:24,836 - quantumarb_gate3 - INFO -   ETH-USD: 36 trades, P&L: $-0.000972
+2026-04-14 14:13:25,482 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 140/120 trades
+2026-04-14 14:13:25,482 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.771 (spread=1.000, confidence=0.600, liquidity=0.950, volatility=0.336, slippage=0.808)
+2026-04-14 14:13:25,482 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.771 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:25,482 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190405_2246, Size: $0.0891, Fill: 89.1%, P&L: $-0.000025, Slippage: 0.0009%, Price improvement: 0.0041%
+2026-04-14 14:13:25,962 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 141/120 trades
+2026-04-14 14:13:25,962 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.675 (spread=1.000, confidence=0.320, liquidity=0.950, volatility=0.148, slippage=0.831)
+2026-04-14 14:13:25,962 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.675 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:25,962 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190405_3242, Size: $0.0972, Fill: 97.2%, P&L: $-0.000039, Slippage: 0.0025%, Price improvement: 0.0050%
+2026-04-14 14:13:26,405 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 142/120 trades
+2026-04-14 14:13:26,406 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.484 (spread=0.263, confidence=0.400, liquidity=0.950, volatility=0.387, slippage=0.573)
+2026-04-14 14:13:27,164 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 142/120 trades
+2026-04-14 14:13:27,165 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.586 (spread=1.000, confidence=0.120, liquidity=0.900, volatility=0.132, slippage=0.562)
+2026-04-14 14:13:27,535 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 142/120 trades
+2026-04-14 14:13:27,535 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.618 (spread=0.645, confidence=0.800, liquidity=0.850, volatility=0.000, slippage=0.545)
+2026-04-14 14:13:28,338 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 142/120 trades
+2026-04-14 14:13:28,339 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.740 (spread=1.000, confidence=0.680, liquidity=0.950, volatility=0.000, slippage=0.798)
+2026-04-14 14:13:28,339 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.740 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:28,339 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190408_5925, Size: $0.0924, Fill: 92.4%, P&L: $-0.000025, Slippage: 0.0011%, Price improvement: 0.0039%
+2026-04-14 14:13:28,660 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 143/120 trades
+2026-04-14 14:13:28,660 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.527 (spread=0.287, confidence=0.680, liquidity=0.850, volatility=0.229, slippage=0.664)
+2026-04-14 14:13:29,343 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 143/120 trades
+2026-04-14 14:13:29,344 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.600 (spread=0.544, confidence=0.600, liquidity=0.900, volatility=0.199, slippage=0.772)
+2026-04-14 14:13:29,344 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.600 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:29,344 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190409_8232, Size: $0.0962, Fill: 96.2%, P&L: $-0.000049, Slippage: 0.0018%, Price improvement: 0.0096%
+2026-04-14 14:13:30,141 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 144/120 trades
+2026-04-14 14:13:30,142 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.607 (spread=1.000, confidence=0.280, liquidity=0.900, volatility=0.000, slippage=0.570)
+2026-04-14 14:13:30,142 - quantumarb_gate3 - INFO - [SOL-USD] Risk score 0.607 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:30,142 - quantumarb_gate3 - INFO - [SOL-USD] Trade executed: trade_1776190410_9691, Size: $0.0981, Fill: 98.1%, P&L: $0.000030, Slippage: 0.0046%, Price improvement: 0.0063%
+2026-04-14 14:13:30,637 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 145/120 trades
+2026-04-14 14:13:30,638 - quantumarb_gate3 - INFO - [SOL-USD] Risk score: 0.492 (spread=0.259, confidence=0.640, liquidity=0.900, volatility=0.000, slippage=0.748)
+2026-04-14 14:13:31,303 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 145/120 trades
+2026-04-14 14:13:31,304 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.797 (spread=1.000, confidence=0.800, liquidity=0.850, volatility=0.307, slippage=0.806)
+2026-04-14 14:13:31,304 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.797 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:31,304 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190411_4711, Size: $0.0810, Fill: 81.0%, P&L: $-0.000015, Slippage: 0.0008%, Price improvement: 0.0022%
+2026-04-14 14:13:31,772 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 146/120 trades
+2026-04-14 14:13:31,772 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.762 (spread=0.881, confidence=0.760, liquidity=0.950, volatility=0.239, slippage=0.818)
+2026-04-14 14:13:31,772 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.762 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:31,772 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190411_3664, Size: $0.0901, Fill: 90.1%, P&L: $-0.000064, Slippage: 0.0016%, Price improvement: 0.0034%
+2026-04-14 14:13:32,177 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 147/120 trades
+2026-04-14 14:13:32,177 - quantumarb_gate3 - INFO - [ETH-USD] Risk score: 0.716 (spread=0.760, confidence=0.760, liquidity=0.850, volatility=0.297, slippage=0.831)
+2026-04-14 14:13:32,177 - quantumarb_gate3 - INFO - [ETH-USD] Risk score 0.716 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:32,177 - quantumarb_gate3 - INFO - [ETH-USD] Trade executed: trade_1776190412_8065, Size: $0.0840, Fill: 84.0%, P&L: $-0.000048, Slippage: 0.0016%, Price improvement: 0.0022%
+2026-04-14 14:13:32,538 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 148/120 trades
+2026-04-14 14:13:32,538 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.710 (spread=0.719, confidence=0.800, liquidity=0.950, volatility=0.169, slippage=0.792)
+2026-04-14 14:13:32,538 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.710 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:32,538 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190412_8007, Size: $0.0952, Fill: 95.2%, P&L: $-0.000072, Slippage: 0.0021%, Price improvement: 0.0080%
+2026-04-14 14:13:32,910 - quantumarb_gate3 - INFO - ✅ Minimum for success reached: 149/120 trades
+2026-04-14 14:13:32,910 - quantumarb_gate3 - INFO - [BTC-USD] Risk score: 0.760 (spread=1.000, confidence=0.800, liquidity=0.950, volatility=0.067, slippage=0.599)
+2026-04-14 14:13:32,910 - quantumarb_gate3 - INFO - [BTC-USD] Risk score 0.760 → Multiplier 0.2 → Size $0.10
+2026-04-14 14:13:32,910 - quantumarb_gate3 - INFO - [BTC-USD] Trade executed: trade_1776190412_8445, Size: $0.0879, Fill: 87.9%, P&L: $-0.000059, Slippage: 0.0029%, Price improvement: 0.0098%
+2026-04-14 14:13:33,639 - quantumarb_gate3 - INFO - ✅ All targets reached: 150/150 trades
+2026-04-14 14:13:33,639 - quantumarb_gate3 - INFO - Gate 3 session completed successfully!
+2026-04-14 14:13:33,647 - quantumarb_gate3 - INFO - Session summary saved: data/quantumarb_gate3/session_summary_gate3_1776190276.json
+2026-04-14 14:13:33,648 - quantumarb_gate3 - INFO - ✅ GATE 3 SUCCESS: 150/120 minimum trades executed
+
+======================================================================
+GATE 3 MULTI-MARKET SESSION SUMMARY
+======================================================================
+Session ID: gate3_1776190276
+Duration: 2.3 minutes
+Total Trades Executed: 150
+Total P&L: $-0.003256
+Opportunities Evaluated: 236
+
+----------------------------------------------------------------------
+SYMBOL PERFORMANCE:
+----------------------------------------------------------------------
+
+  SOL-USD:
+    Trades: 56
+    P&L: $0.000343
+    Avg Risk Score: 0.680
+    Avg Slippage: 0.0030%
+    Avg Fill: 89.8%
+    Avg Price Improvement: 0.0048%
+
+  BTC-USD:
+    Trades: 56
+    P&L: $-0.002565
+    Avg Risk Score: 0.739
+    Avg Slippage: 0.0018%
+    Avg Fill: 89.8%
+    Avg Price Improvement: 0.0053%
+
+  ETH-USD:
+    Trades: 38
+    P&L: $-0.001034
+    Avg Risk Score: 0.700
+    Avg Slippage: 0.0024%
+    Avg Fill: 89.1%
+    Avg Price Improvement: 0.0055%
+
+----------------------------------------------------------------------
+DECISION BREAKDOWN:
+----------------------------------------------------------------------
+  execute: 150
+  reject_risk: 86
+
+----------------------------------------------------------------------
+TARGETS STATUS:
+----------------------------------------------------------------------
+  Total Trades: 150/150
+  Minimum Trades: 150/120
+  SOL-USD: 56/48 ✅
+  BTC-USD: 56/36 ✅
+  ETH-USD: 38/36 ✅
+======================================================================

@@ -1,0 +1,32 @@
+{
+  "scan_result": {
+    "scan_id": "scan_20260412_070255",
+    "start_time": "2026-04-12T07:02:55.538321Z",
+    "end_time": "2026-04-12T07:03:00.834237Z",
+    "total_files_scanned": 1000,
+    "total_findings": 48,
+    "findings_by_severity": {
+      "critical": 30,
+      "high": 15,
+      "medium": 3,
+      "low": 0,
+      "info": 0
+    },
+    "findings_by_category": {
+      "vulnerability_command_injection": 14,
+      "vulnerability_xss": 1,
+      "vulnerability_insecure_random": 3,
+      "secret_password": 13,
+      "secret_api_key": 16,
+      "vulnerability_hardcoded_credentials": 1
+    },
+    "critical_findings": [
+      {
+        "id": "vuln_808fc74b",
+        "severity": "critical",
+        "category": "vulnerability_command_injection",
+        "location": "fine_tune_secbert_simplified.py",
+        "description": "Potential command injection vulnerability",
+        "evidence": "Line 262: model.eval()...",
+        "recommendation": "Use subprocess with shell=False and validate/sanitize inputs",
+        "timestamp": 

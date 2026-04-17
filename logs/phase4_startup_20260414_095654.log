@@ -1,0 +1,285 @@
+[0;34m[2026-04-14 09:56:54][0m =*60
+[0;34m[2026-04-14 09:56:54][0m Starting Phase 4 SIMP System
+[0;34m[2026-04-14 09:56:54][0m Timestamp: 20260414_095654
+[0;34m[2026-04-14 09:56:54][0m Log file: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/logs/phase4_startup_20260414_095654.log
+[0;34m[2026-04-14 09:56:54][0m =*60
+[0;34m[2026-04-14 09:56:54][0m Updating Obsidian documentation...
+============================================================
+SIMP Documentation Synchronization
+Started: 2026-04-14 09:56:54
+============================================================
+
+📦 Synchronizing module structure...
+  ✓ Module unchanged: compat
+  ✓ Module unchanged: transport
+  ✓ Module unchanged: memory
+  ✓ Module unchanged: financial
+  ✓ Module unchanged: security
+  ✓ Module unchanged: agents
+  ✓ Module unchanged: server
+  ✓ Module unchanged: organs
+  ✓ Module unchanged: models
+  ✓ Module unchanged: docs
+  ✓ Module unchanged: integrations
+  ✓ Module unchanged: audit
+  ✓ Module unchanged: orchestration
+  ✓ Module unchanged: skills
+  ✓ Module unchanged: data_acquisition
+  ✓ Module unchanged: projectx
+  ✓ Module unchanged: routing
+  ✓ Module unchanged: dashboard
+  ✓ Module unchanged: tests
+  ✓ Module unchanged: data
+  ✓ Module unchanged: config
+
+🤖 Synchronizing agent registry...
+
+🔗 Synchronizing API endpoints...
+  ✓ API endpoints unchanged
+
+⚙️ Synchronizing configuration files...
+  ↻ Config changed: data/inboxes/quantumarb_risk_simple/processed/routing_test_1776133099.json
+  ↻ Config changed: data/inboxes/quantumarb_risk_simple/processed/test_intent_001.json
+  ↻ Config changed: data/inboxes/quantumarb_risk_simple/processed/test_arb_004.json
+  ↻ Config changed: data/inboxes/quantumarb_risk_simple/processed/test_arb_003.json
+  ↻ Config changed: data/inboxes/quantumarb_risk_simple/processed/test_arb_002.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_5ebb50b4-6a51-464f-8bc4-99799a529528.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_73184209-2755-4f2e-800f-41ceda1c1063.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_e45c5ddf-f5dd-4b8c-a6c4-3d9544c68747.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_572fd194-e83e-4df2-852e-2ee46cacfd0b.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_4bc90d4b-92a8-422e-b6bc-8e423e1f9dbc.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_f19152a8-4c3c-4e62-bf0b-52bc76e7d090.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1b4cf233-5f43-40be-bbb9-757ea2889600.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a837475e-753b-46ae-b56b-da0cb44ad565.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_bd6dd16d-db6a-4a3a-b042-2353e9a11e8e.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_3bffb867-5b6a-4c74-93c2-ff0dde38db85.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_aec46c14-d4ae-4338-a1dd-cf5288485c02.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_0287ea92-989f-46c8-a226-67bc721f2f9a.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_cc8d9566-901f-4a46-a3f3-b18aa46e2eb2.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_79115fe0-9115-4328-8e76-4a7f569c66e2.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_d5de41f9-538b-4fa3-af7a-6bcc5b213261.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_08ad181d-522c-4d99-970b-d114e057b7c7.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_80913db1-40e9-4ba5-bba3-aca972ee7554.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1101ef55-1a89-45ba-a1e8-7490b9d07427.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_8589186f-67f0-4bb8-b387-318c102d8980.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_f21f9c1a-caea-4d54-8cbe-08afa17dd20f.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_30538ba5-d60c-4f15-bce3-611337d817a5.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_2dcec2e8-6064-436d-b009-1a7149ea8082.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_c94dcc51-84ad-4bd4-a3da-3353a0525b79.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_b8b3c734-26be-4d4f-9fa8-ad2b77f563e7.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_157f61cc-2ef2-4f99-a530-a16ef7dc55f2.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_26a48328-34dd-4a1e-bcc3-a532a191c207.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_eab0b071-dd43-40b8-a274-59b70b7d7161.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_149b205b-00cc-405f-9905-0ff9829ed767.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_38fb4ddd-6c35-4b7f-a86a-92b3399fa2b3.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_b07eae90-1f4b-4720-9b84-b2b1c5cdbba3.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_0773b8b0-35b5-4f06-918d-fdb9ed672d9b.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_fc2e5286-5fab-4a75-b575-223aea04a924.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_e4a08b83-6d47-4805-b587-7a9c97638db6.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_c578269c-3a05-41a6-88ca-9e5f33b5723b.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_b89149a8-49ec-4874-8849-29e26cf9cac5.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a94a434c-be39-4be9-b71e-2c6c7a454159.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_6fd66d0d-4308-4a47-9d60-b86488c44b2c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1a718d6e-0b09-46a9-9725-3a1a13930c92.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_6ba2fd99-a63d-4eb8-9f26-306b5e5b7f6c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_337c848e-b73f-48eb-82d3-59849686c012.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_4cc56ff8-b505-4b1f-9e71-88078dd41c23.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_de103236-8530-4183-8b26-18a7434c2ea2.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_4c2880f7-a60b-4e18-b801-48ff9514263b.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_fbe39b6e-919b-42bc-bbd8-cff679c74d0d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_fc4432a4-a75b-43ae-8044-e34dde57ff9f.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_15e498e8-fb77-4b91-9af0-5a07648fd40f.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_ac92e920-0afb-4e3d-be88-c98b711a58dc.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_4c986cf9-e990-487f-827a-4da9ffc3291c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_33ebc9d4-0210-45cb-b975-4009a0e99ab5.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_29303cc1-9e5a-4119-bbd3-12fee4d0ec9a.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a9193c4a-3f54-4455-8475-3a145675fffc.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1e07e8d9-ed9b-4eb6-a887-838f69045a62.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_2ed1696c-d2dc-41b7-bf80-5f19d28b0514.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_07831faf-cc66-4b5e-b1db-40d3d563a719.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_fa3a1b9b-504f-441c-b70f-043b72a9a82c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_16ddce81-de97-4ee2-8c73-f7ab2e59d2b0.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_7fdbbdb6-c5bf-400f-9b4c-f6b5749ba61e.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_d8cba1db-bc43-4511-ab37-f34ada0b4069.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_7cc06a0b-3590-4f55-8fe1-cbf749d7ce81.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_83d699f2-8ce8-4adf-8d1b-28bf3e352e17.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_09877bb4-9a87-477e-b472-6a35b8f43364.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_b83736c3-3fe5-4e78-bd70-2bb4bc559a74.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1a77d6f8-3e7f-4421-8595-22c57a8f5058.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_7780b3b4-c561-490f-ba88-c9361af530ba.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_0b4c64f4-1e8e-4d0e-ae8b-9bf3a74e0475.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_b9355954-c12c-4a1c-8fac-709d212ffb72.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a27b5ea3-0466-40cf-9f01-06d3bc980717.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_852679cd-c9d9-4ab0-93f7-0dcb4c528e7d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1c707dd6-46fd-4220-b791-55bc2fdb3666.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_3563adf8-51ca-4cdb-9361-628ce555b091.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a458b596-4df5-4a88-a6e5-82bccb51b45a.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_350a90a9-8ebc-4ae3-93c4-6202b109696b.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_76c20a9c-064c-46dc-a0df-ff795611add1.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_b78ecc0b-7bb8-49e8-baaf-465cc9657571.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_da41c739-ac70-4267-abd8-41a4b7a1e576.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_940edfb0-40cb-4c56-b388-4f292f6c7161.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_131202d2-a084-4084-af8b-5e5f628e0817.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_5ee67d25-d190-4fea-9eea-9ba4c01bfa18.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_47b181cd-9fa0-45b7-9e56-eedcd4cfb6be.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_361c360e-3c72-40a9-8764-c76022183378.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_148e757e-9f5f-4196-b296-f378034bf3eb.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_3c7bf120-fbcb-42c7-a87c-3b9f4a7f6620.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_80469f4b-b678-441a-9d27-bf06b6e8b3ca.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_613ca609-9994-4f33-aeb0-795fd86d29f6.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_abe19628-88eb-498b-b5ae-75321639768b.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_e95725ee-2e18-4fbb-814a-f52e822f5e3c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_24632fdb-ccaa-450d-8eee-6aa9d424085c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_45640003-5026-4f0f-b3eb-76c5ea2a0356.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_def88a72-f38e-4bae-ae17-46aec06bef51.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_fcdbf912-d265-414a-80de-104b9e5e5267.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_5d1cf912-bcc2-42fb-a221-5d49ddbef478.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_25e09afa-cf14-4884-8ac2-c1f2513fc0e5.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_4950064e-f9ed-4ec9-8d24-93e275405194.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1ec9b735-0a53-49c8-9a5f-b224921efd40.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_cfd7f78f-ad91-44c0-b02f-0571302dac18.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1d08ef10-e37e-4cef-ba47-62939107570c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_01de6ad2-7c4a-4cc6-af0d-33b2bf6d1037.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_159d7300-f7b3-493a-832e-903197478963.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_e51dabe3-55e6-44d0-a934-8f3ee39667fd.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_205616a7-9e2b-4dae-bfde-b6521f804982.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_8dd2f726-6d15-4cb4-8c4e-87576db99a2b.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_33139a91-292d-4dc2-b812-3257f9116863.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_400c8fe1-01e4-493c-a4ac-db93259d5919.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_f74d9231-ca61-489a-b9be-8c5dae196d7d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_5995a208-bfbc-4fba-9a60-65b7d38f1108.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_bac00ca0-16cd-46c4-9d8e-cc4c5fd1dd72.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_17287e07-1980-4ac1-83e3-641da7fb2e08.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_6af572c1-bb45-4f05-b735-b82e6b46f46a.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_f13c629c-0697-4f34-81d1-5279c8089e13.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_36ffdc7e-352b-4ff2-8cab-e4d808bc8aa8.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_9a80b8c4-7b3d-463f-a72a-31aab1f78f2e.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_26bbff71-8e13-4d90-b6cd-93044599bff3.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_42a30ec4-5ace-42aa-8030-25df1fa12356.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_d27ba8ee-8cae-469a-8996-b7933b9ac875.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a16bb8c2-5752-4c4a-b01c-96733a1ad6c4.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_318e3da3-d0c9-4ea0-a72e-b22f231bc2b4.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_2e283268-467d-4233-a633-084d6bab88ab.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_cb8d07f8-2d41-49bd-8ae3-3174231998f2.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_3247c3e7-ec73-4468-9b72-4fe1129d075d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_0e772478-97c1-4538-99d0-2082e78edbdb.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_918c751c-2d1e-4cc8-a679-0230a99be373.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a5966feb-2264-4563-8578-721498633be3.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_4b739608-b4bf-4e27-a85c-2651afbdcd42.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_9f09854d-60d6-46cd-80cf-5f49668b0d91.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_4547de85-7674-4ce6-8c78-8e336c2c4774.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_d0790c1f-bb45-4309-b89f-ce6aa833e5db.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_8442fb5c-34e7-46e1-b000-91aacd57634a.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_43ccece4-9354-42aa-8718-f7b638ef76f1.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_e909cc3e-5e2e-42c7-b53a-6f816e67194c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_82253d0c-31a3-44aa-a4b4-f073dffece4d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_0692cffb-0bd7-448b-8680-48f7c6ef5138.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_0dbbf982-b968-4928-96b3-3bc08f0764f9.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_d6d841da-f684-4ea0-86ce-05220165f570.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_9cbfc82c-8da1-4571-8235-6fa3d1e168aa.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1a5cede5-4242-49ff-9b18-63cafab7da81.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_e3eb0922-e437-4645-bcd5-20464216f822.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_66f624cf-8442-48e1-9501-13769c5be339.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_a7d583f3-a830-48f8-b985-8ed870f98f63.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_1bef3bea-cbe6-4e91-b0b2-0381ddcd860d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_53249f3c-1d2b-4902-b197-2e86477fbc8c.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_363ec977-2082-4c73-8e3d-aea29aef8b59.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_f64913c5-ecc2-4c22-9fc5-aab08cd80743.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_c0b18c94-b82c-47a0-8698-edbf320ad69d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_67d6205a-2ec8-45db-bf21-8c9fb334692e.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_c8e8c80c-eca2-4447-b6ab-d9db48a46c3f.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_23dc6b1c-011f-4d90-829b-6f3b6a18f9e0.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_e93129d7-bab2-4c05-ac92-83f0370cc712.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_b97bcc9f-927a-426e-af04-7adbca8a78b7.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_35bf3089-4949-4803-b6d1-56ce3526539d.json
+  ↻ Config changed: data/outboxes/quantumarb_risk_simple/arb_risk_0710d81d-b507-4634-aed1-7f8386a9b4ee.json
+
+🧪 Synchronizing test structure...
+  ✓ Test index generated
+
+📊 Synchronizing data schemas...
+
+🎨 Generating visualizations...
+  ✓ Visualizations generated successfully
+
+📝 Updating documentation...
+  ✓ Updated README.md
+
+============================================================
+Synchronization Complete!
+============================================================
+✅ Changes detected and documentation updated
+
+📊 Statistics:
+  - Files tracked: 53287
+  - Last sync: 2026-04-14T09:56:54.368520
+  - Current sync: 2026-04-14T09:56:54.368520
+
+📁 Documentation updated in:
+  - /Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs
+
+🔗 Next steps:
+  1. Review updated documentation
+  2. Commit changes to Git
+  3. Open in Obsidian to view visualizations
+
+============================================================
+[0;34m[2026-04-14 09:57:04][0m ✅ Obsidian documentation updated
+[0;34m[2026-04-14 09:57:04][0m Initializing Gate 1 Sandbox Testing...
+[0;34m[2026-04-14 09:57:04][0m ✅ Gate 1 progress tracker already exists
+[0;34m[2026-04-14 09:57:04][0m Starting core services...
+[0;34m[2026-04-14 09:57:04][0m Starting SIMP Broker...
+[0;34m[2026-04-14 09:57:04][0m ✅ SIMP Broker is already running on port 5555
+[0;34m[2026-04-14 09:57:04][0m Broker already running
+[0;34m[2026-04-14 09:57:04][0m Waiting for SIMP Broker to be ready...
+[0;34m[2026-04-14 09:57:04][0m ✅ SIMP Broker is responding
+[0;34m[2026-04-14 09:57:04][0m Broker status: 3 agents online
+[0;34m[2026-04-14 09:57:04][0m Starting Dashboard...
+[0;34m[2026-04-14 09:57:04][0m ✅ Dashboard is already running on port 8050
+[0;34m[2026-04-14 09:57:04][0m Dashboard already running
+[0;34m[2026-04-14 09:57:04][0m Waiting for Dashboard to be ready...
+[0;34m[2026-04-14 09:57:04][0m ✅ Dashboard is responding
+[0;34m[2026-04-14 09:57:04][0m Dashboard status: healthy
+[0;34m[2026-04-14 09:57:04][0m Starting QuantumArb Phase 4 Agent...
+[0;34m[2026-04-14 09:57:04][0m Stopping existing QuantumArb Agent...
+[0;34m[2026-04-14 09:57:08][0m ✅ QuantumArb Phase 4 agent started (PID: 7527)
+[0;34m[2026-04-14 09:57:08][0m Starting optional services...
+[0;34m[2026-04-14 09:57:08][0m Starting BullBear Agent...
+[0;34m[2026-04-14 09:57:08][0m ✅ BullBear Agent is already running on port 5559
+[0;34m[2026-04-14 09:57:08][0m BullBear already running
+[0;34m[2026-04-14 09:57:08][0m Starting ProjectX...
+[0;34m[2026-04-14 09:57:08][0m ✅ ProjectX is already running on port 8771
+[0;34m[2026-04-14 09:57:08][0m ProjectX already running
+[0;34m[2026-04-14 09:57:08][0m Checking system status...
+[0;34m[2026-04-14 09:57:09][0m 
+[0;34m[2026-04-14 09:57:09][0m =*60
+[0;34m[2026-04-14 09:57:09][0m PHASE 4 SYSTEM STARTUP COMPLETE
+[0;34m[2026-04-14 09:57:09][0m =*60
+[0;34m[2026-04-14 09:57:09][0m 
+[0;34m[2026-04-14 09:57:09][0m [0;32mAccess URLs:[0m
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• Dashboard:[0m http://127.0.0.1:8050
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• Broker:[0m http://127.0.0.1:5555
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• Broker UI:[0m http://127.0.0.1:5555/dashboard/ui
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• BullBear:[0m http://127.0.0.1:5559
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• ProjectX:[0m http://127.0.0.1:8771
+[0;34m[2026-04-14 09:57:09][0m 
+[0;34m[2026-04-14 09:57:09][0m [0;32mPhase 4 Status:[0m
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• Trading Mode:[0m Microscopic Sandbox (./start_phase4_system.sh.01-./start_phase4_system.sh.10)
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• Safety Gate:[0m Gate 1 (Sandbox Testing)
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• Target:[0m 100 successful sandbox trades
+[0;34m[2026-04-14 09:57:09][0m   [0;34m• Progress:[0m Check data/sandbox_test/progress.json
+[0;34m[2026-04-14 09:57:09][0m 
+[0;34m[2026-04-14 09:57:09][0m [0;32mMonitoring:[0m
+[0;34m[2026-04-14 09:57:09][0m   [1;33m• Agent Logs:[0m tail -f logs/quantumarb_*.log
+[0;34m[2026-04-14 09:57:09][0m   [1;33m• System Logs:[0m tail -f /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/logs/phase4_startup_20260414_095654.log
+[0;34m[2026-04-14 09:57:09][0m   [1;33m• Gate 1 Progress:[0m cat data/sandbox_test/progress.json
+[0;34m[2026-04-14 09:57:09][0m 
+[0;34m[2026-04-14 09:57:09][0m [0;32mDaily Operations:[0m
+[0;34m[2026-04-14 09:57:09][0m   1. Morning: Run this script to start system
+[0;34m[2026-04-14 09:57:09][0m   2. Monitor: Check dashboard and logs
+[0;34m[2026-04-14 09:57:09][0m   3. Evening: Update Obsidian documentation
+[0;34m[2026-04-14 09:57:09][0m   4. Review: Check Gate 1 progress daily
+[0;34m[2026-04-14 09:57:09][0m 
+[0;34m[2026-04-14 09:57:09][0m [0;32m✅ Phase 4 system is now operational[0m
+[0;34m[2026-04-14 09:57:09][0m =*60
+[0;34m[2026-04-14 09:57:09][0m Startup summary saved to: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/logs/startup_summary_20260414_095654.txt

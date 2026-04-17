@@ -1,0 +1,17 @@
+{
+  "gate_1_progress": {
+    "start_date": "2026-04-14",
+    "target_trades": 100,
+    "completed_trades": 100,
+    "successful_trades": 87,
+    "failed_trades": 13,
+    "total_pnl_usd": 0.0532799110768557,
+    "average_slippage_pct": 0.0,
+    "daily_progress": {
+      "2026-04-14": {
+        "trades": 100,
+        "pnl": 0.04976643999999998
+      }
+    }
+  }
+}

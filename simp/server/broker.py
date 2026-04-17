@@ -219,6 +219,28 @@ class SimpBroker:
         except Exception as e:
             self.logger.warning(f"[BRP-MESH] Gateway init failed (non-fatal): {e}")
 
+        # L5 MeshConsensusNode — trust-weighted distributed agent consensus
+        self.consensus_node = None
+        try:
+            from simp.mesh.consensus import MeshConsensusNode
+            self.consensus_node = MeshConsensusNode(
+                agent_id="simp_broker",
+                trust_graph=self.trust_graph,
+            )
+            self.consensus_node.start()
+            self.logger.info("[L5] MeshConsensusNode live — trust-weighted quorum (67%) active")
+        except Exception as e:
+            self.logger.warning(f"[L5] Consensus node init failed (non-fatal): {e}")
+
+        # KTC Mesh Agent — Keep The Change savings-to-investment agent
+        self.ktc_agent = None
+        try:
+            from simp.organs.ktc.mesh_agent import get_ktc_mesh_agent
+            self.ktc_agent = get_ktc_mesh_agent(autostart=True)
+            self.logger.info("[KTC] KTC mesh agent live — receipt→savings→crypto pipeline active")
+        except Exception as e:
+            self.logger.warning(f"[KTC] Mesh agent init failed (non-fatal): {e}")
+
         # Statistics
         self.stats = {
             "intents_received": 0,

@@ -1,0 +1,95 @@
+2026-04-13 20:38:50,111 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 20:38:50,112 - monitoring_alerting_system - INFO - Recorded intent: test_intent_001 -> trade_test_intent_001
+2026-04-13 20:38:50,112 - monitoring_alerting_system - WARNING - Trade test_intent_001 not found for BRP decision
+2026-04-13 20:39:33,831 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 20:39:33,832 - monitoring_alerting_system - INFO - Recorded intent: test_intent_001 -> trade_test_intent_001
+2026-04-13 20:39:33,832 - monitoring_alerting_system - WARNING - Trade test_intent_001 not found for BRP decision
+2026-04-13 22:10:43,401 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 22:10:43,402 - monitoring_alerting_system - INFO - Recorded intent: test_intent_001 -> trade_test_intent_001
+2026-04-13 22:10:43,402 - monitoring_alerting_system - WARNING - Trade test_intent_001 not found for BRP decision
+2026-04-13 22:18:19,198 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 22:18:19,198 - monitoring_alerting_system - INFO - Recorded intent: integration_test_001 -> trade_integration_test_001
+2026-04-13 22:18:19,198 - monitoring_alerting_system - WARNING - Trade integration_test_001 not found for BRP decision
+2026-04-13 22:18:19,271 - QuantumArbRiskSimple - INFO - ✅ Monitoring system available for import
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - ✅ Risk framework loaded from risk_config_conservative.json
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO -    Risk level: conservative
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO -    Account size: $1000.00
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO -    Max risk per trade: $100.00
+2026-04-13 22:18:19,283 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - ✅ Monitoring system: INITIALIZED
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - ============================================================
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - QUANTUMARB AGENT WITH RISK FRAMEWORK (SIMPLE)
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - ============================================================
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - Poll interval: 1.0s
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - Risk config: risk_config_conservative.json
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - Inbox: data/inboxes/quantumarb_risk_simple
+2026-04-13 22:18:19,283 - QuantumArbRiskSimple - INFO - Outbox: data/outboxes/quantumarb_risk_simple
+2026-04-13 22:18:19,284 - QuantumArbRiskSimple - INFO - ✅ Risk framework: ENABLED
+2026-04-13 22:18:19,284 - QuantumArbRiskSimple - INFO -    Account size: $1000.00
+2026-04-13 22:18:19,284 - QuantumArbRiskSimple - INFO -    Max risk/trade: $100.00
+2026-04-13 22:18:19,284 - QuantumArbRiskSimple - INFO -    Daily loss limit: $200.00
+2026-04-13 22:18:19,284 - QuantumArbRiskSimple - INFO - 📊 Monitoring: ENABLED
+2026-04-13 22:18:19,284 - QuantumArbRiskSimple - INFO - ============================================================
+2026-04-13 22:18:20,299 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 22:18:20,300 - monitoring_alerting_system - INFO - Recorded intent: reconstruction_test_1776133100 -> trade_reconstruction_test_1776133100
+2026-04-13 22:18:20,301 - monitoring_alerting_system - WARNING - Trade reconstruction_test_1776133100 not found for BRP decision
+2026-04-13 22:18:20,301 - monitoring_alerting_system - WARNING - Trade reconstruction_test_1776133100 not found for order execution
+2026-04-13 22:19:52,482 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 22:19:52,483 - monitoring_alerting_system - INFO - Recorded intent: phase3_test_001 -> trade_phase3_test_001
+2026-04-13 22:19:52,483 - monitoring_alerting_system - WARNING - Trade phase3_test_001 not found for BRP decision
+2026-04-13 22:19:52,575 - QuantumArbRiskSimple - INFO - ✅ Monitoring system available for import
+2026-04-13 22:19:52,586 - QuantumArbRiskSimple - INFO - ✅ Risk framework loaded from risk_config_conservative.json
+2026-04-13 22:19:52,586 - QuantumArbRiskSimple - INFO -    Risk level: conservative
+2026-04-13 22:19:52,586 - QuantumArbRiskSimple - INFO -    Account size: $1000.00
+2026-04-13 22:19:52,586 - QuantumArbRiskSimple - INFO -    Max risk per trade: $100.00
+2026-04-13 22:19:52,587 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - ✅ Monitoring system: INITIALIZED
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - ============================================================
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - QUANTUMARB AGENT WITH RISK FRAMEWORK (SIMPLE)
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - ============================================================
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - Poll interval: 1.0s
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - Risk config: risk_config_conservative.json
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - Inbox: data/inboxes/quantumarb_risk_simple
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - Outbox: data/outboxes/quantumarb_risk_simple
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - ✅ Risk framework: ENABLED
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO -    Account size: $1000.00
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO -    Max risk/trade: $100.00
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO -    Daily loss limit: $200.00
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - 📊 Monitoring: ENABLED
+2026-04-13 22:19:52,587 - QuantumArbRiskSimple - INFO - ============================================================
+2026-04-13 22:33:02,998 - ExchangeConnector - INFO - Initialized StubExchangeConnector (sandbox: True, rate limit: 60/min)
+2026-04-13 22:33:02,998 - ExchangeConnector - INFO - Stub exchange initialized with balances: {'USD': 10000.0, 'BTC': 1.0, 'ETH': 10.0}
+2026-04-13 22:33:02,998 - TradeExecutor - INFO - TradeExecutor initialized (max position: $50.00, max slippage: 10.0 bps)
+2026-04-13 22:33:03,102 - TradeExecutor - INFO - Executing trade trade_1776133983_0: buy 0.001 BTC-USD
+2026-04-13 22:33:04,103 - TradeExecutor - WARNING - Position size validation failed: Position size $64.98 exceeds Phase 4 limit of $50.00
+2026-04-13 22:33:04,103 - TradeExecutor - WARNING - Emergency stop set to: ACTIVE
+2026-04-13 22:33:05,112 - TradeExecutor - INFO - Cancelled 0 orders
+2026-04-13 22:33:05,112 - TradeExecutor - INFO - Executing trade trade_1776133985_0: buy 0.001 BTC-USD
+2026-04-13 22:33:05,112 - TradeExecutor - WARNING - ⚠️ Emergency stop active - trading halted
+2026-04-13 22:33:05,117 - PNLLedger - INFO - P&L Ledger initialized: 0 existing trades
+2026-04-13 22:33:05,117 - PNLLedger - INFO - Recorded P&L for trade phase4_test_001: net $-0.5850 (gross: $0.0650, fees: $0.6500)
+2026-04-13 22:33:05,117 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 22:33:05,117 - monitoring_alerting_system - INFO - Recorded intent: phase4_micro_intent -> trade_phase4_micro_intent
+2026-04-13 22:33:05,117 - monitoring_alerting_system - WARNING - Trade phase4_micro_intent not found for BRP decision
+2026-04-13 22:33:05,118 - monitoring_alerting_system - WARNING - Trade phase4_micro_intent not found for order execution
+2026-04-13 23:32:41,545 - ExchangeConnector - INFO - Initialized StubExchangeConnector (sandbox: True, rate limit: 60/min)
+2026-04-13 23:32:41,546 - ExchangeConnector - INFO - Stub exchange initialized with balances: {'USD': 10000.0, 'BTC': 1.0, 'ETH': 10.0}
+2026-04-13 23:32:41,546 - TradeExecutor - INFO - TradeExecutor initialized (max position: $50.00, max slippage: 10.0 bps)
+2026-04-13 23:32:41,651 - TradeExecutor - INFO - Executing trade trade_1776137561_0: buy 0.001 BTC-USD
+2026-04-13 23:32:42,652 - TradeExecutor - WARNING - Position size validation failed: Position size $65.06 exceeds Phase 4 limit of $50.00
+2026-04-13 23:32:42,653 - TradeExecutor - WARNING - Emergency stop set to: ACTIVE
+2026-04-13 23:32:43,654 - TradeExecutor - INFO - Cancelled 0 orders
+2026-04-13 23:32:43,655 - TradeExecutor - INFO - Executing trade trade_1776137563_0: buy 0.001 BTC-USD
+2026-04-13 23:32:43,655 - TradeExecutor - WARNING - ⚠️ Emergency stop active - trading halted
+2026-04-13 23:32:43,664 - PNLLedger - INFO - P&L Ledger initialized: 0 existing trades
+2026-04-13 23:32:43,665 - PNLLedger - INFO - Recorded P&L for trade phase4_test_001: net $-0.5850 (gross: $0.0650, fees: $0.6500)
+2026-04-13 23:32:43,666 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-13 23:32:43,666 - monitoring_alerting_system - INFO - Recorded intent: phase4_micro_intent -> trade_phase4_micro_intent
+2026-04-13 23:32:43,666 - monitoring_alerting_system - WARNING - Trade phase4_micro_intent not found for BRP decision
+2026-04-13 23:32:43,666 - monitoring_alerting_system - WARNING - Trade phase4_micro_intent not found for order execution
+2026-04-14 01:46:01,911 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-14 01:52:54,554 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-14 09:51:05,881 - monitoring_alerting_system - INFO - Monitoring system initialized with 0 existing alerts
+2026-04-16 00:37:41,437 - ExchangeConnector - INFO - Initialized StubExchangeConnector (sandbox: True, rate limit: 60/min)
+2026-04-16 00:37:41,437 - ExchangeConnector - INFO - Stub exchange initialized with balances: {'USD': 10000.0, 'BTC': 1.0, 'ETH': 10.0}
+2026-04-16 00:37:41,437 - TradeExecutor - INFO - TradeExecutor initialized (max position: $1000.00, max slippage: 20.0 bps)

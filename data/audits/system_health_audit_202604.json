@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-04-14T12:36:13.258924",
+  "components": {
+    "Dashboard": {
+      "healthy": false,
+      "checked_at": "2026-04-14T12:36:13.262238"
+    },
+    "Evolution Runner": {
+      "healthy": true,
+      "checked_at": "2026-04-14T12:36:13.262241"
+    },
+    "Data Storage": {
+      "healthy": true,
+      "checked_at": "2026-04-14T12:36:13.262250"
+    },
+    "Logging": {
+      "healthy": true,
+      "checked_at": "2026-04-14T12:36:13.262256"
+    },
+    "Backup System": {
+      "healthy": true,
+      "checked_at": "2026-04-14T12:36:13.262268"
+    }
+  },
+  "issues": [
+    "Dashboard not healthy"
+  ],
+  "recommendations": []
+}

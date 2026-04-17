@@ -13,7 +13,12 @@ echo "CPU Load:"
 uptime | awk -F'load average:' '{print $2}'
 echo
 echo "Memory Usage:"
-free -h | awk 'NR==2{printf "Used: %s/%s (%.1f%%)\n", $3, $2, $3/$2*100}'
+if command -v vm_stat &> /dev/null; then
+    # macOS memory check
+    vm_stat | head -3
+else
+    free -h 2>/dev/null || echo "  Memory info not available"
+fi
 echo
 echo "Disk Space:"
 df -h . | tail -1 | awk '{printf "Used: %s/%s (%s)\n", $3, $2, $5}'
@@ -29,8 +34,8 @@ check_proc() {
     fi
 }
 
-check_proc "simp.server.broker" "SIMP Broker"
-check_proc "dashboard/server.py" "Dashboard"
+check_proc "start_server.py" "SIMP Broker"
+check_proc "dashboard.server" "Dashboard"
 check_proc "projectx_guard_server" "ProjectX"
 check_proc "kashclaw_gemma_agent" "Gemma4 Agent"
 check_proc "gate4_scaled_microscopic_agent" "Gate 4 Agent"

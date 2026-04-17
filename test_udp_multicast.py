@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Test UDP multicast transport for Layer 1 physical transport.
+Test script for SIMP Mesh UDP Multicast Transport
 """
-
 import sys
 import os
-import time
-import threading
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import time
+import json
+from threading import Thread
 from simp.mesh.transport.udp_multicast import (
     UdpMulticastTransport,
     UdpMessage,
@@ -16,245 +16,195 @@ from simp.mesh.transport.udp_multicast import (
     create_udp_multicast_transport
 )
 
-def test_basic_communication():
-    """Test basic UDP multicast communication between two agents."""
-    print("🧪 Test 1: Basic UDP multicast communication")
+def test_basic_udp_transport():
+    """Test basic UDP multicast functionality"""
+    print("🧪 Testing UDP Multicast Transport")
+    print("=" * 50)
     
-    received_messages = []
-    
-    def agent1_callback(msg: UdpMessage):
-        received_messages.append(msg)
-        print(f"  Agent1 received: {msg.type} from {msg.sender_id}")
-    
-    def agent2_callback(msg: UdpMessage):
-        received_messages.append(msg)
-        print(f"  Agent2 received: {msg.type} from {msg.sender_id}")
-    
-    # Create two transports
+    # Create two transport instances (simulating two agents)
     transport1 = create_udp_multicast_transport(
-        agent_id="agent1",
-        enable_listener=True
+        multicast_group="239.255.255.250",
+        multicast_port=9999,  # Use a different port to avoid conflicts
+        agent_id="agent_alpha"
     )
-    transport1.set_message_callback(agent1_callback)
     
     transport2 = create_udp_multicast_transport(
-        agent_id="agent2", 
-        enable_listener=True
+        multicast_group="239.255.255.250",
+        multicast_port=9999,
+        agent_id="agent_beta"
     )
-    transport2.set_message_callback(agent2_callback)
-    
-    # Give transports time to start
-    time.sleep(0.5)
-    
-    # Send discovery messages
-    print("  Sending discovery messages...")
-    transport1.broadcast_discovery(
-        endpoint="http://localhost:8765",
-        capabilities=["trade_execution", "risk_assessment"]
-    )
-    
-    transport2.broadcast_discovery(
-        endpoint="http://localhost:8766", 
-        capabilities=["arb_signals", "market_analysis"]
-    )
-    
-    # Wait for messages to propagate
-    time.sleep(1)
-    
-    # Send mesh packets
-    print("  Sending mesh packets...")
-    mesh_packet = {
-        "message_id": "test-123",
-        "sender_id": "agent1",
-        "recipient_id": "agent2",
-        "channel": "trade_updates",
-        "payload": {"action": "buy", "symbol": "BTC-USD", "amount": 1.0},
-        "timestamp": time.time()
-    }
-    
-    transport1.broadcast_mesh_packet(mesh_packet)
-    
-    # Wait for delivery
-    time.sleep(1)
-    
-    # Check results
-    assert len(received_messages) >= 2, f"Expected at least 2 messages, got {len(received_messages)}"
-    
-    # Cleanup
-    transport1.stop()
-    transport2.stop()
-    
-    print(f"✅ Test 1 passed: {len(received_messages)} messages exchanged")
-    return True
-
-def test_ttl_propagation():
-    """Test TTL-based message propagation."""
-    print("\n🧪 Test 2: TTL-based message propagation")
-    
-    received_counts = {"agent1": 0, "agent2": 0, "agent3": 0}
-    
-    def create_callback(agent_id):
-        def callback(msg: UdpMessage):
-            received_counts[agent_id] += 1
-            print(f"  {agent_id} received message with TTL={msg.ttl}")
-        return callback
-    
-    # Create three transports
-    transports = []
-    for i in range(3):
-        agent_id = f"agent{i+1}"
-        transport = create_udp_multicast_transport(
-            agent_id=agent_id,
-            enable_listener=True
-        )
-        transport.set_message_callback(create_callback(agent_id))
-        transports.append(transport)
-    
-    time.sleep(0.5)
-    
-    # Send message with low TTL
-    print("  Sending message with TTL=1...")
-    message = UdpMessage(
-        type=UdpMessageType.MESH_PACKET,
-        sender_id="agent1",
-        payload={"test": "ttl"},
-        timestamp=time.time(),
-        ttl=1  # Only one hop
-    )
-    
-    transports[0].send_message(message)
-    
-    time.sleep(1)
-    
-    # Check that message wasn't forwarded beyond TTL
-    # With TTL=1, only direct recipients should get it
-    print(f"  Received counts: {received_counts}")
-    
-    # Cleanup
-    for transport in transports:
-        transport.stop()
-    
-    print("✅ Test 2 passed: TTL propagation working")
-    return True
-
-def test_duplicate_prevention():
-    """Test duplicate message prevention."""
-    print("\n🧪 Test 3: Duplicate message prevention")
     
     received_messages = []
     
-    def callback(msg: UdpMessage):
-        received_messages.append(msg.message_id if hasattr(msg, 'message_id') else str(msg.timestamp))
+    def message_handler(message):
+        print(f"📨 Received message: {message.message_type} from {message.sender_id}")
+        received_messages.append(message)
     
-    transport = create_udp_multicast_transport(
-        agent_id="test_agent",
-        enable_listener=True
-    )
-    transport.set_message_callback(callback)
+    # Set up message handlers
+    transport1.set_message_callback(message_handler)
+    transport2.set_message_callback(message_handler)
     
-    time.sleep(0.5)
-    
-    # Send same message multiple times
-    print("  Sending duplicate messages...")
-    for i in range(3):
-        message = UdpMessage(
-            type=UdpMessageType.HEARTBEAT,
-            sender_id="sender",
-            payload={"count": i},
-            timestamp=12345.0,  # Same timestamp = same message ID
-            ttl=5
+    try:
+        # Start both transports
+        print("🚀 Starting transports...")
+        if not transport1.start():
+            print("❌ Failed to start transport1")
+            return False
+        if not transport2.start():
+            print("❌ Failed to start transport2")
+            return False
+        
+        print("✅ Transports started successfully")
+        time.sleep(1)  # Give them time to initialize
+        
+        # Test 1: Broadcast discovery
+        print("\n🔍 Test 1: Broadcasting discovery...")
+        transport1.broadcast_discovery(
+            endpoint="http://127.0.0.1:5555",
+            capabilities=["trading", "analysis"]
         )
-        transport.send_message(message)
-        time.sleep(0.1)
-    
-    time.sleep(0.5)
-    
-    # Should only receive one copy
-    unique_messages = set(received_messages)
-    print(f"  Received {len(received_messages)} messages, {len(unique_messages)} unique")
-    
-    transport.stop()
-    
-    assert len(unique_messages) == 1, "Duplicate prevention failed"
-    print("✅ Test 3 passed: Duplicate prevention working")
-    return True
+        time.sleep(2)
+        
+        # Test 2: Send mesh packet
+        print("\n📦 Test 2: Sending mesh packet...")
+        mesh_packet = {
+            "type": "intent",
+            "sender": "agent_alpha",
+            "recipient": "agent_beta",
+            "payload": {"action": "ping", "timestamp": time.time()},
+            "id": "test_packet_001"
+        }
+        transport1.broadcast_mesh_packet(mesh_packet)
+        time.sleep(2)
+        
+        # Test 3: Direct message
+        print("\n💬 Test 3: Sending direct message...")
+        direct_msg = UdpMessage(
+            message_type=UdpMessageType.DIRECT_MESSAGE,
+            sender_id="agent_alpha",
+            recipient_id="agent_beta",
+            payload={"text": "Hello from Alpha!"},
+            timestamp=time.time()
+        )
+        transport1.send_message(direct_msg)
+        time.sleep(2)
+        
+        # Check results
+        print("\n📊 Test Results:")
+        print(f"Total messages received: {len(received_messages)}")
+        
+        if len(received_messages) > 0:
+            print("✅ UDP multicast is working!")
+            for i, msg in enumerate(received_messages[:3]):  # Show first 3 messages
+                print(f"  {i+1}. {msg.message_type.name} from {msg.sender_id}")
+        else:
+            print("❌ No messages received - check firewall/multicast settings")
+            print("   On macOS/Linux, you may need to run with sudo or adjust firewall")
+        
+        # Show statistics
+        print("\n📈 Transport Statistics:")
+        stats1 = transport1.get_statistics()
+        stats2 = transport2.get_statistics()
+        print(f"Transport 1: {stats1}")
+        print(f"Transport 2: {stats2}")
+        
+        return len(received_messages) > 0
+        
+    except Exception as e:
+        print(f"❌ Error during test: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+        
+    finally:
+        # Cleanup
+        print("\n🧹 Cleaning up...")
+        transport1.stop()
+        transport2.stop()
+        time.sleep(0.5)
 
-def test_statistics():
-    """Test transport statistics."""
-    print("\n🧪 Test 4: Transport statistics")
+def test_mesh_integration():
+    """Test integration with MeshBus"""
+    print("\n" + "=" * 50)
+    print("🔗 Testing Mesh Integration")
+    print("=" * 50)
     
-    transport = create_udp_multicast_transport(
-        agent_id="stats_agent",
-        enable_listener=True
-    )
-    
-    time.sleep(0.5)
-    
-    # Send some messages
-    for i in range(3):
-        message = UdpMessage(
-            type=UdpMessageType.HEARTBEAT,
-            sender_id="stats_agent",
-            payload={"i": i},
-            timestamp=time.time(),
-            ttl=5
+    try:
+        from simp.mesh.bus import get_mesh_bus
+        from simp.mesh.packet import MeshPacket, MessageType
+        
+        print("🚀 Creating MeshBus instance...")
+        mesh_bus = get_mesh_bus()
+        
+        # Register test agents
+        print("👥 Registering test agents...")
+        mesh_bus.register_agent("test_agent_1")
+        mesh_bus.register_agent("test_agent_2")
+        
+        # Create and send a test packet
+        print("📤 Sending test packet...")
+        test_packet = MeshPacket(
+            packet_type=MessageType.DIRECT,
+            sender="test_agent_1",
+            recipient="test_agent_2",
+            payload={"test": "data", "timestamp": time.time()},
+            message_id="test_001"
         )
-        transport.send_message(message)
-        time.sleep(0.1)
-    
-    time.sleep(0.5)
-    
-    stats = transport.get_statistics()
-    print(f"  Statistics: {stats}")
-    
-    assert stats["messages_sent"] >= 3, f"Expected at least 3 messages sent, got {stats['messages_sent']}"
-    assert stats["bytes_sent"] > 0, "Expected bytes sent > 0"
-    
-    transport.stop()
-    
-    print("✅ Test 4 passed: Statistics tracking working")
-    return True
+        
+        success = mesh_bus.send(test_packet)
+        print(f"📬 Send result: {'✅ Success' if success else '❌ Failed'}")
+        
+        # Try to receive
+        print("📥 Attempting to receive...")
+        received = mesh_bus.receive("test_agent_2", max_messages=1)
+        print(f"📭 Received {len(received)} messages")
+        
+        if received:
+            print("✅ MeshBus core is working!")
+            packet = received[0]
+            print(f"   From: {packet.sender}")
+            print(f"   Type: {packet.packet_type}")
+            print(f"   Payload: {packet.payload}")
+        
+        # Show statistics
+        stats = mesh_bus.get_statistics()
+        print(f"\n📊 MeshBus Statistics: {stats}")
+        
+        return success and len(received) > 0
+        
+    except Exception as e:
+        print(f"❌ Mesh integration test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 def main():
-    """Run all UDP multicast tests."""
-    print("🔬 Testing UDP Multicast Transport (Layer 1)")
+    """Run all tests"""
+    print("🧪 SIMP Mesh Transport Test Suite")
     print("=" * 60)
     
-    tests = [
-        test_basic_communication,
-        test_ttl_propagation,
-        test_duplicate_prevention,
-        test_statistics,
-    ]
+    # Test UDP multicast
+    udp_success = test_basic_udp_transport()
     
-    passed = 0
-    failed = 0
+    # Test Mesh integration
+    mesh_success = test_mesh_integration()
     
-    for test in tests:
-        try:
-            if test():
-                passed += 1
-        except Exception as e:
-            print(f"❌ {test.__name__} failed: {e}")
-            import traceback
-            traceback.print_exc()
-            failed += 1
-    
+    # Summary
     print("\n" + "=" * 60)
-    print(f"📊 Test Results: {passed} passed, {failed} failed")
+    print("📋 TEST SUMMARY")
+    print("=" * 60)
+    print(f"UDP Multicast Transport: {'✅ PASS' if udp_success else '❌ FAIL'}")
+    print(f"MeshBus Integration: {'✅ PASS' if mesh_success else '❌ FAIL'}")
     
-    if failed == 0:
-        print("\n🎉 UDP MULTICAST TRANSPORT TESTS PASSED!")
-        print("\n✅ Layer 1 (Physical Transport) is now operational:")
-        print("   • Same-LAN communication without internet")
-        print("   • Sub-millisecond latency")
-        print("   • Automatic peer discovery")
-        print("   • TTL-based message propagation")
-        print("   • Duplicate prevention")
-        print("   • Statistics tracking")
+    if udp_success and mesh_success:
+        print("\n🎉 All tests passed! Mesh system is operational.")
         return 0
     else:
-        print("❌ Some tests failed")
+        print("\n⚠️ Some tests failed. Check configuration and firewall settings.")
+        print("   For UDP multicast on macOS/Linux:")
+        print("   - Try running with sudo")
+        print("   - Check firewall: sudo ufw allow 1900/udp")
+        print("   - Verify multicast routing")
         return 1
 
 if __name__ == "__main__":

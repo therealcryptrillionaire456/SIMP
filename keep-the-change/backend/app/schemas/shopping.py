@@ -79,7 +79,7 @@ class ShoppingListResponse(ShoppingListBase):
     purchased_at: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @classmethod
     def from_orm(cls, obj):
@@ -127,7 +127,7 @@ class ListItemResponse(ListItemBase):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def total_cost(self) -> Optional[float]:
@@ -159,7 +159,7 @@ class PriceComparisonResponse(BaseModel):
     savings_vs_average: Optional[float]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def total_price(self) -> float:

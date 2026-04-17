@@ -29,7 +29,11 @@ from app.schemas.user import (
     UserLogin,
     TokenResponse,
     SocialAuthRequest,
-    UserStatsResponse
+    UserStatsResponse,
+    EmailVerificationRequest,
+    PasswordResetRequest,
+    PasswordResetConfirm,
+    TwoFactorSetupRequest
 )
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -607,3 +611,355 @@ async def revoke_user_session(
     await db.commit()
     
     return {"message": "Session revoked successfully"}
+
+
+@router.post("/auth/verify-email/request")
+async def request_email_verification(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Request email verification token
+    
+    In production, this would send an email with verification link
+    For now, we'll generate a token and return it (for testing)
+    """
+    if current_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already verified"
+        )
+    
+    # Generate verification token (in production, this would be sent via email)
+    from app.core.security import generate_secure_random_string
+    verification_token = generate_secure_random_string(32)
+    
+    # In production, you would:
+    # 1. Store the token in database with expiration
+    # 2. Send email with verification link
+    # 3. Return success message
+    
+    # For now, return the token for testing
+    return {
+        "message": "Verification email sent (in production)",
+        "verification_token": verification_token,  # Only for testing
+        "note": "In production, token would be sent via email"
+    }
+
+
+@router.post("/auth/verify-email/confirm")
+async def confirm_email_verification(
+    verification_data: EmailVerificationRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Confirm email verification with token
+    
+    In production, this would validate the token from email
+    For testing, any token will work
+    """
+    if current_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already verified"
+        )
+    
+    # In production, you would:
+    # 1. Validate the token against stored token
+    # 2. Check expiration
+    # 3. Mark email as verified
+    
+    # For testing, we'll accept any token
+    current_user.email_verified = True
+    current_user.updated_at = datetime.utcnow()
+    
+    # Create audit log
+    audit_log = UserAuditLog(
+        user_id=current_user.id,
+        action="verify_email",
+        resource_type="user",
+        resource_id=str(current_user.id)
+    )
+    db.add(audit_log)
+    
+    await db.commit()
+    
+    return {"message": "Email verified successfully"}
+
+
+@router.post("/auth/password-reset/request")
+async def request_password_reset(
+    reset_request: PasswordResetRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Request password reset token
+    
+    In production, this would send an email with reset link
+    For now, we'll generate a token and return it (for testing)
+    """
+    # Find user by email
+    result = await db.execute(
+        select(User).where(User.email == reset_request.email)
+    )
+    user = result.scalar_one_or_none()
+    
+    # For security, always return success even if user doesn't exist
+    if not user:
+        return {
+            "message": "If the email exists, a password reset link has been sent",
+            "note": "This prevents email enumeration attacks"
+        }
+    
+    # Generate reset token (in production, this would be sent via email)
+    from app.core.security import generate_secure_random_string
+    reset_token = generate_secure_random_string(32)
+    
+    # In production, you would:
+    # 1. Store the token in database with expiration
+    # 2. Send email with reset link
+    # 3. Return success message
+    
+    # For now, return the token for testing
+    return {
+        "message": "Password reset email sent (in production)",
+        "reset_token": reset_token,  # Only for testing
+        "note": "In production, token would be sent via email"
+    }
+
+
+@router.post("/auth/password-reset/confirm")
+async def confirm_password_reset(
+    reset_data: PasswordResetConfirm,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Confirm password reset with token
+    
+    In production, this would validate the token from email
+    For testing, any token will work
+    """
+    # In production, you would:
+    # 1. Validate the token against stored token
+    # 2. Check expiration
+    # 3. Find user associated with token
+    # 4. Update password
+    
+    # For testing, we need to find user by email or token
+    # Since we don't have token-user mapping in this simple implementation,
+    # we'll require the user to be logged in or provide additional info
+    
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Password reset confirmation requires proper token storage implementation"
+    )
+
+
+@router.post("/auth/2fa/setup")
+async def setup_two_factor(
+    twofa_data: TwoFactorSetupRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Setup two-factor authentication
+    
+    In production, this would generate QR code for TOTP
+    For now, we'll simulate the setup
+    """
+    if twofa_data.enable:
+        if current_user.two_factor_enabled:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="2FA is already enabled"
+            )
+        
+        # Generate 2FA secret (in production, use proper TOTP library)
+        from app.core.security import generate_2fa_secret
+        secret = generate_2fa_secret()
+        
+        # Store secret (in production, encrypt it)
+        current_user.two_factor_enabled = True
+        current_user.two_factor_secret = secret
+        current_user.updated_at = datetime.utcnow()
+        
+        # Create audit log
+        audit_log = UserAuditLog(
+            user_id=current_user.id,
+            action="enable_2fa",
+            resource_type="user",
+            resource_id=str(current_user.id),
+            details={"method": twofa_data.method}
+        )
+        db.add(audit_log)
+        
+        await db.commit()
+        
+        return {
+            "message": "2FA setup initiated",
+            "method": twofa_data.method,
+            "secret": secret,  # In production, only show QR code, not secret
+            "note": "In production, show QR code for TOTP app"
+        }
+    else:
+        # Disable 2FA
+        if not current_user.two_factor_enabled:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="2FA is not enabled"
+            )
+        
+        current_user.two_factor_enabled = False
+        current_user.two_factor_secret = None
+        current_user.updated_at = datetime.utcnow()
+        
+        # Create audit log
+        audit_log = UserAuditLog(
+            user_id=current_user.id,
+            action="disable_2fa",
+            resource_type="user",
+            resource_id=str(current_user.id)
+        )
+        db.add(audit_log)
+        
+        await db.commit()
+        
+        return {"message": "2FA disabled successfully"}
+
+
+@router.post("/auth/2fa/verify")
+async def verify_two_factor(
+    code: str = Body(..., embed=True),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Verify two-factor authentication code
+    
+    In production, this would validate TOTP code
+    For now, we'll accept any 6-digit code
+    """
+    if not current_user.two_factor_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="2FA is not enabled for this account"
+        )
+    
+    # In production, you would:
+    # 1. Validate the TOTP code using the stored secret
+    # 2. Check for code reuse (prevent replay attacks)
+    
+    # For testing, accept any 6-digit code
+    if not code or len(code) != 6 or not code.isdigit():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification code format"
+        )
+    
+    # Create audit log
+    audit_log = UserAuditLog(
+        user_id=current_user.id,
+        action="verify_2fa",
+        resource_type="user",
+        resource_id=str(current_user.id)
+    )
+    db.add(audit_log)
+    await db.commit()
+    
+    return {"message": "2FA verification successful"}
+
+
+@router.post("/auth/account-lockout/test")
+async def test_account_lockout(
+    email: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Test account lockout mechanism
+    
+    This endpoint simulates failed login attempts
+    WARNING: Only for testing purposes
+    """
+    # Find user by email
+    result = await db.execute(
+        select(User).where(User.email == email)
+    )
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Simulate failed login attempts
+    max_attempts = 5
+    user.failed_login_attempts += 1
+    
+    if user.failed_login_attempts >= max_attempts:
+        # Lock account for 15 minutes
+        lockout_duration = timedelta(minutes=15)
+        user.account_locked_until = datetime.utcnow() + lockout_duration
+        
+        # Create audit log
+        audit_log = UserAuditLog(
+            user_id=user.id,
+            action="account_locked",
+            resource_type="user",
+            resource_id=str(user.id),
+            details={
+                "reason": "too_many_failed_attempts",
+                "lockout_until": user.account_locked_until.isoformat()
+            }
+        )
+        db.add(audit_log)
+    
+    await db.commit()
+    
+    return {
+        "message": f"Failed attempt recorded. Attempt {user.failed_login_attempts} of {max_attempts}",
+        "account_locked": user.account_locked_until is not None,
+        "locked_until": user.account_locked_until,
+        "failed_attempts": user.failed_login_attempts
+    }
+
+
+@router.post("/auth/account-lockout/reset")
+async def reset_account_lockout(
+    email: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Reset account lockout (admin/testing only)
+    
+    WARNING: Only for testing purposes
+    """
+    # Find user by email
+    result = await db.execute(
+        select(User).where(User.email == email)
+    )
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Reset lockout
+    user.failed_login_attempts = 0
+    user.account_locked_until = None
+    
+    # Create audit log
+    audit_log = UserAuditLog(
+        user_id=user.id,
+        action="account_lockout_reset",
+        resource_type="user",
+        resource_id=str(user.id)
+    )
+    db.add(audit_log)
+    
+    await db.commit()
+    
+    return {"message": "Account lockout reset successfully"}

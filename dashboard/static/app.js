@@ -2103,3 +2103,8 @@
   startCountdown();
 
 })();
+
+// Agent Lightning Integration
+const agentLightningScript = document.createElement('script');
+agentLightningScript.src = '/static/agent_lightning_integration.js';
+document.head.appendChild(agentLightningScript);

@@ -79,7 +79,7 @@ class PaymentMethodResponse(PaymentMethodBase):
     last_used: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def masked_number(self) -> str:
@@ -119,7 +119,7 @@ class PurchaseResponse(BaseModel):
     purchased_at: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @classmethod
     def from_orm(cls, purchase):
@@ -163,7 +163,7 @@ class RefundResponse(BaseModel):
     completed_at: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @classmethod
     def from_orm(cls, refund):

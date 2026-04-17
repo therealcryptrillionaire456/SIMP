@@ -104,6 +104,13 @@
       "fallback_chain": [],
       "required_capability": "notifications",
       "description": "Alert and notification delivery"
+    },
+    {
+      "intent_type": "arbitrage_opportunity",
+      "primary_agent": "quantumarb_risk_simple",
+      "fallback_chain": ["quantumarb_enhanced", "quantumarb"],
+      "required_capability": "arbitrage",
+      "description": "Arbitrage opportunity detection and execution with risk framework"
     }
   ]
 }

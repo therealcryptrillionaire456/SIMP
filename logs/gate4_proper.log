@@ -1,0 +1,161 @@
+2026-04-15 07:24:16,582 - __main__ - INFO - ============================================================
+2026-04-15 07:24:16,582 - __main__ - INFO - Gate 4 Scaled Microscopic Agent Starting
+2026-04-15 07:24:16,582 - __main__ - INFO - Config: config/gate4_scaled_microscopic.json
+2026-04-15 07:24:16,582 - __main__ - INFO - ============================================================
+2026-04-15 07:24:16,583 - ExchangeConnector - INFO - Initialized StubExchangeConnector (sandbox: True, rate limit: 60/min)
+2026-04-15 07:24:16,583 - ExchangeConnector - INFO - Stub exchange initialized with balances: {'USD': 10000.0, 'BTC': 1.0, 'ETH': 10.0}
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part1 - INFO - Gate 4 Scaled Agent initialized: gate4_scaled_1776252256
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part1 - INFO - Mode: gate_4_scaled_microscopic
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part1 - INFO - Symbols: 5
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part1 - INFO - Position range: $1.0-$10.0
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part1 - INFO - Enhanced features: ['multi_market_arbitrage', 'cross_symbol_correlation', 'volatility_adjusted_sizing']
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part2a - INFO - TradeEngine initialized for coinbase
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part2b - INFO - OrderManager initialized
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part3 - INFO - Gate4ScaledMicroscopicAgent initialized
+2026-04-15 07:24:16,583 - gate4_scaled_agent_part3 - INFO - Starting Gate 4 Scaled Microscopic Agent
+2026-04-15 07:24:16,584 - SIMP.Broker - INFO - [BRP] Bill Russell Protocol active — mode=shadow, data_dir=/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/brp
+2026-04-15 07:24:16,584 - SIMP.Broker - INFO - [BRP] Bill Russell Protocol active — mode=shadow, data_dir=/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/brp
+2026-04-15 07:24:16,584 - SIMP.AgentRegistry - INFO - Loaded 1 agents from /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/agent_registry.jsonl
+2026-04-15 07:24:16,703 - SIMP.MeshBus - INFO - MeshBus initialized with log path: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/mesh_events.jsonl
+2026-04-15 07:24:16,703 - SIMP.MeshBus - INFO - MeshBus cleanup thread started
+2026-04-15 07:24:16,762 - SIMP.RoutingEngine - INFO - Loaded 16 routing rules from /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/docs/routing_policy.json
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO - 🚀 SIMP Broker initialized (v0.3.0)
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO - 🚀 SIMP Broker initialized (v0.3.0)
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO -    Config: 127.0.0.1:5555
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO -    Config: 127.0.0.1:5555
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO -    Max agents: 100
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO -    Max agents: 100
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO -    Intent timeout: 30.0s
+2026-04-15 07:24:16,762 - SIMP.Broker - INFO -    Intent timeout: 30.0s
+2026-04-15 07:24:16,762 - gate4_scaled_agent_part1 - INFO - Connected to SIMP broker at http://127.0.0.1:5555 with production features
+2026-04-15 07:24:16,762 - gate4_scaled_agent_part2b - INFO - OrderManager background tasks started
+2026-04-15 07:24:16,762 - gate4_scaled_agent_part3 - INFO - Registered with SIMP broker
+2026-04-15 07:24:16,762 - gate4_scaled_agent_part3 - INFO - Gate 4 agent started successfully
+2026-04-15 07:24:16,762 - gate4_scaled_agent_part3 - INFO - Starting trading loop
+2026-04-15 07:25:16,764 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 07:25:16,871 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 07:43:28,851 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 07:43:29,069 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 08:42:36,867 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 08:42:37,190 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 10:01:21,658 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 10:01:22,081 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 10:44:31,959 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 10:44:31,961 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 10:44:31,971 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 10:44:32,499 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 11:34:56,932 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 11:34:57,561 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 12:30:04,330 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 12:30:05,058 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 13:47:21,487 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 13:47:22,323 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 14:49:59,413 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 14:50:00,353 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 16:05:27,199 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 16:05:27,201 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 16:05:27,224 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 16:05:28,263 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:16:25,526 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:16:26,675 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:17:25,674 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:17:26,929 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:18:25,677 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:18:27,041 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:19:25,681 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:19:27,154 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:20:25,650 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 17:20:25,651 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 17:20:25,684 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:20:27,267 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:21:25,686 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:21:27,372 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:22:25,689 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:22:27,484 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:23:25,692 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:23:27,588 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:24:25,695 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:24:27,694 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:25:25,653 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 17:25:25,653 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 17:25:25,696 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:25:27,802 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:26:25,698 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:26:27,909 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:27:25,699 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:27:28,015 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:28:25,701 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:28:28,118 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:29:25,705 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:29:28,225 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:30:25,656 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 17:30:25,656 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 17:30:25,708 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:30:28,332 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:31:25,710 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:31:28,439 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:32:25,678 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:32:28,510 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:33:25,674 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:33:28,612 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:34:25,675 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:34:28,718 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:35:25,617 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 17:35:25,619 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 17:35:25,676 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:35:28,823 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:36:25,677 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:36:28,927 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:37:25,678 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:37:29,033 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:38:25,680 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:38:29,140 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:39:25,681 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:39:29,244 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:40:25,618 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 17:40:25,619 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 17:40:25,683 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:40:29,350 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:41:25,684 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:41:29,455 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:42:25,685 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:42:29,561 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:43:25,686 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:43:29,667 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:44:25,687 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:44:29,773 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:45:25,619 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 17:45:25,619 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 17:45:25,689 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:45:29,879 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:46:25,690 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:46:29,985 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:47:25,691 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:47:30,092 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:48:25,693 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:48:30,198 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:49:25,695 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:49:30,304 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:50:25,619 - gate4_scaled_agent_part2b - INFO - Running order reconciliation
+2026-04-15 17:50:25,620 - gate4_scaled_agent_part2b - INFO - Reconciliation complete: 0 orders checked
+2026-04-15 17:50:25,696 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:50:30,411 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:51:25,697 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:51:30,517 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:52:25,697 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:52:30,623 - gate4_scaled_agent_part3 - INFO - Alert created: error - Exchange connectivity issue
+2026-04-15 17:53:25,698 - gate4_scaled_agent_part2b - INFO - Best execution check completed
+2026-04-15 17:53:29,233 - gate4_scaled_agent_part3 - INFO - Received shutdown signal 15
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part3 - INFO - Stopping Gate 4 agent
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part2b - INFO - OrderManager background tasks stopped
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part2a - INFO - Closing all positions
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part2a - INFO - All positions closed
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part3 - INFO - Gate 4 agent stopped
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part3 - INFO - Stopping Gate 4 agent
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part2b - INFO - OrderManager background tasks stopped
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part2a - INFO - Closing all positions
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part2a - INFO - All positions closed
+2026-04-15 17:53:29,697 - gate4_scaled_agent_part3 - INFO - Gate 4 agent stopped
+2026-04-15 17:53:29,697 - __main__ - INFO - ============================================================
+2026-04-15 17:53:29,697 - __main__ - INFO - Gate 4 Scaled Microscopic Agent Stopped
+2026-04-15 17:53:29,697 - __main__ - INFO - ============================================================

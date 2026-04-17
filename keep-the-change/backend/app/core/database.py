@@ -50,11 +50,10 @@ async def init_db():
     """Initialize database (create tables)"""
     async with engine.begin() as conn:
         # Import models to ensure they're registered with Base
-        from app.models.user import User
-        from app.models.payment import PaymentMethod
-        from app.models.shopping import ShoppingList, ListItem
-        from app.models.purchase import Purchase, PurchaseItem
-        from app.models.crypto import CryptoInvestment, UserInvestment, AgentPortfolio
+        from app.models.user import User, UserSession, UserAuditLog
+        from app.models.payment import PaymentMethod, Purchase, PurchaseItem, Refund
+        from app.models.shopping import ShoppingList, ListItem, PriceComparison, ProductCatalog
+        from app.models.crypto import CryptoInvestment, UserInvestment, AgentPortfolio, ReturnsDistribution, CryptoTrade
         from app.models.subscription import Subscription, SubscriptionTier
         
         # Create all tables

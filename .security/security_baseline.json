@@ -1,0 +1,53 @@
+{
+  "created": "2026-04-12T07:04:40.594230Z",
+  "repository": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp",
+  "security_controls": {
+    "secret_management": {
+      "enabled": true,
+      "recommendation": "Use environment variables or secret vault",
+      "implementation": "os.getenv() for Python, process.env for Node.js"
+    },
+    "input_validation": {
+      "enabled": true,
+      "recommendation": "Validate and sanitize all user inputs",
+      "implementation": "Use validation libraries appropriate for language"
+    },
+    "command_execution": {
+      "enabled": true,
+      "recommendation": "Avoid shell=True, use list arguments",
+      "implementation": "subprocess.run(['cmd', 'arg1'], shell=False)"
+    },
+    "authentication": {
+      "enabled": true,
+      "recommendation": "Use strong passwords, MFA where possible",
+      "implementation": "bcrypt/scrypt for password hashing"
+    },
+    "encryption": {
+      "enabled": true,
+      "recommendation": "Use TLS/SSL for transport, strong encryption at rest",
+      "implementation": "AES-256 for data, TLS 1.3 for transport"
+    }
+  },
+  "monitoring": {
+    "security_scans": {
+      "frequency": "weekly",
+      "tool": "BRP Security Scanner",
+      "report_location": "security_reports/"
+    },
+    "dependency_checks": {
+      "frequency": "monthly",
+      "tool": "dependabot / snyk",
+      "report_location": "security_reports/dependencies/"
+    },
+    "code_review": {
+      "frequency": "per_commit",
+      "requirement": "security_focused_review",
+      "checklist": "OWASP Top 10"
+    }
+  },
+  "incident_response": {
+    "contact": "security@example.com",
+    "escalation": "24/7 on-call rotation",
+    "documentation": "INCIDENT_RESPONSE_PLAN.md"
+  }
+}

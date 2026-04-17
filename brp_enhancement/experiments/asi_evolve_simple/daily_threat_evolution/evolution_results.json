@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "experiment_name": "daily_threat_evolution",
+  "rounds_completed": 5,
+  "final_best_score": 0.6728726825248245,
+  "improvement_percent": 34.57453650496489,
+  "improvement_history": [
+    {
+      "round": 1,
+      "best_score": 0.6395058281011535,
+      "population_avg": 0.6034504886217839,
+      "population_size": 4
+    },
+    {
+      "round": 2,
+      "best_score": 0.6728726825248245,
+      "population_avg": 0.6409300749160394,
+      "population_size": 4
+    },
+    {
+      "round": 3,
+      "best_score": 0.6728726825248245,
+      "population_avg": 0.6569712807324481,
+      "population_size": 4
+    },
+    {
+      "round": 4,
+      "best_score": 0.6728726825248245,
+      "population_avg": 0.663527549956104,
+      "population_size": 4
+    },
+    {
+      "round": 5,
+      "best_score": 0.6728726825248245,
+      "population_avg": 0.6161904677988166,
+      "population_size": 4
+    }
+  ],
+  "best_candidate": {
+    "score": 0.6728726825248245,
+    "code_hash": "c4d4d97f",
+    "generation": 5
+  },
+  "timestamp": "2026-04-14T19:06:07.056551Z"
+}

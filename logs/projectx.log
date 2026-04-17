@@ -1,0 +1,5 @@
+HTTP request failed: HTTP error 400: {"error":"Failed to subscribe agent ProjectX to channel safety_alerts","status":"error"}
+
+Failed to start mesh monitor: HTTP error 400: {"error":"Failed to subscribe agent ProjectX to channel safety_alerts","status":"error"}
+
+./scripts/startup_all.sh: line 97: 75147 Terminated: 15          python3.10 /Users/kaseymarcelle/ProjectX/projectx_guard_server.py

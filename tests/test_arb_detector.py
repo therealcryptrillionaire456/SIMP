@@ -165,5 +165,5 @@ def test_scan_markets_with_opportunity():
 def test_exchange_connector_fees():
     """Test that ExchangeConnector returns the expected fee value."""
     # Test StubExchangeConnector
-    connector = StubExchangeConnector(prices={"BTC/USD": 100.0})
+    connector = StubExchangeConnector()
     assert connector.get_fees() == 0.001  # Default fee in StubExchangeConnector

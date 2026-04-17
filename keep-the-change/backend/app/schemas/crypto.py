@@ -37,7 +37,7 @@ class CryptoInvestmentResponse(CryptoInvestmentBase):
     completed_at: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def current_exchange_rate(self) -> Optional[float]:
@@ -85,7 +85,7 @@ class UserInvestmentResponse(BaseModel):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def is_active(self) -> bool:
@@ -129,7 +129,7 @@ class AgentPortfolioResponse(BaseModel):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def net_profit(self) -> float:
@@ -169,7 +169,7 @@ class ReturnsDistributionResponse(BaseModel):
     distributed_at: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def is_completed(self) -> bool:
@@ -197,7 +197,7 @@ class CryptoTradeResponse(BaseModel):
     filled_at: Optional[datetime]
     
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     @property
     def is_buy(self) -> bool:

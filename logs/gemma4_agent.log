@@ -1,0 +1,5 @@
+[19:24:48 kashclaw_gemma] WARNING Broker registration failed (broker down?): HTTP Error 400: BAD REQUEST
+[19:24:48 kashclaw_gemma] INFO Kashclaw Gemma4 Agent v1.0.0  http://127.0.0.1:8780
+[19:24:48 kashclaw_gemma] INFO   model=gemma4:e2b  broker=http://127.0.0.1:5555
+[19:24:48 kashclaw_gemma] INFO   handles: ['code_task', 'planning', 'research']
+./scripts/startup_all.sh: line 97: 75156 Terminated: 15          python3.10 /Users/kaseymarcelle/bullbear/agents/kashclaw_gemma_agent.py

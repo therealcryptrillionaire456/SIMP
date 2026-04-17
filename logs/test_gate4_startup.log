@@ -1,0 +1,48 @@
+2026-04-14 19:22:38,311 - __main__ - INFO - ============================================================
+2026-04-14 19:22:38,311 - __main__ - INFO - Gate 4 Scaled Microscopic Agent Starting
+2026-04-14 19:22:38,312 - __main__ - INFO - Config: config/gate4_scaled_microscopic.json
+2026-04-14 19:22:38,312 - __main__ - INFO - ============================================================
+2026-04-14 19:22:38,312 - ExchangeConnector - INFO - Initialized StubExchangeConnector (sandbox: True, rate limit: 60/min)
+2026-04-14 19:22:38,312 - ExchangeConnector - INFO - Stub exchange initialized with balances: {'USD': 10000.0, 'BTC': 1.0, 'ETH': 10.0}
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part1 - INFO - Gate 4 Scaled Agent initialized: gate4_scaled_1776208958
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part1 - INFO - Mode: gate_4_scaled_microscopic
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part1 - INFO - Symbols: 5
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part1 - INFO - Position range: $1.0-$10.0
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part1 - INFO - Enhanced features: ['multi_market_arbitrage', 'cross_symbol_correlation', 'volatility_adjusted_sizing']
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part2a - INFO - TradeEngine initialized for coinbase
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part2b - INFO - OrderManager initialized
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part3 - INFO - Gate4ScaledMicroscopicAgent initialized
+2026-04-14 19:22:38,312 - gate4_scaled_agent_part3 - INFO - Starting Gate 4 Scaled Microscopic Agent
+2026-04-14 19:22:38,313 - SIMP.Broker - INFO - [BRP] Bill Russell Protocol active — mode=shadow, data_dir=/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/brp
+2026-04-14 19:22:38,313 - SIMP.Broker - INFO - [BRP] Bill Russell Protocol active — mode=shadow, data_dir=/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/brp
+2026-04-14 19:22:38,313 - SIMP.AgentRegistry - INFO - Loaded 1 agents from /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/agent_registry.jsonl
+2026-04-14 19:22:38,374 - SIMP.MeshBus - INFO - MeshBus initialized with log path: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/mesh_events.jsonl
+2026-04-14 19:22:38,374 - SIMP.MeshBus - INFO - MeshBus cleanup thread started
+2026-04-14 19:22:38,435 - SIMP.RoutingEngine - INFO - Loaded 16 routing rules from /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/docs/routing_policy.json
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO - 🚀 SIMP Broker initialized (v0.3.0)
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO - 🚀 SIMP Broker initialized (v0.3.0)
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO -    Config: 127.0.0.1:5555
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO -    Config: 127.0.0.1:5555
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO -    Max agents: 100
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO -    Max agents: 100
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO -    Intent timeout: 30.0s
+2026-04-14 19:22:38,435 - SIMP.Broker - INFO -    Intent timeout: 30.0s
+2026-04-14 19:22:38,435 - gate4_scaled_agent_part1 - INFO - Connected to SIMP broker at http://127.0.0.1:5555 with production features
+2026-04-14 19:22:38,436 - gate4_scaled_agent_part2b - INFO - OrderManager background tasks started
+2026-04-14 19:22:38,436 - gate4_scaled_agent_part3 - INFO - Registered with SIMP broker
+2026-04-14 19:22:38,436 - gate4_scaled_agent_part3 - INFO - Gate 4 agent started successfully
+2026-04-14 19:22:38,436 - gate4_scaled_agent_part3 - INFO - Starting trading loop
+2026-04-14 19:22:47,739 - gate4_scaled_agent_part3 - INFO - Received shutdown signal 15
+2026-04-14 19:22:48,437 - gate4_scaled_agent_part3 - INFO - Stopping Gate 4 agent
+2026-04-14 19:22:48,437 - gate4_scaled_agent_part2b - INFO - OrderManager background tasks stopped
+2026-04-14 19:22:48,437 - gate4_scaled_agent_part2a - INFO - Closing all positions
+2026-04-14 19:22:48,437 - gate4_scaled_agent_part2a - INFO - All positions closed
+2026-04-14 19:22:48,437 - gate4_scaled_agent_part3 - INFO - Gate 4 agent stopped
+2026-04-14 19:22:48,446 - gate4_scaled_agent_part3 - INFO - Stopping Gate 4 agent
+2026-04-14 19:22:48,446 - gate4_scaled_agent_part2b - INFO - OrderManager background tasks stopped
+2026-04-14 19:22:48,446 - gate4_scaled_agent_part2a - INFO - Closing all positions
+2026-04-14 19:22:48,446 - gate4_scaled_agent_part2a - INFO - All positions closed
+2026-04-14 19:22:48,446 - gate4_scaled_agent_part3 - INFO - Gate 4 agent stopped
+2026-04-14 19:22:48,446 - __main__ - INFO - ============================================================
+2026-04-14 19:22:48,446 - __main__ - INFO - Gate 4 Scaled Microscopic Agent Stopped
+2026-04-14 19:22:48,446 - __main__ - INFO - ============================================================

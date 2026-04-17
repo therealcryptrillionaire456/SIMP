@@ -30,6 +30,7 @@ class QuantumArbDecision(str, Enum):
 
 
 @dataclass
+@dataclass
 class QuantumArbDecisionSummary:
     """
     QuantumArb's internal decision summary format.
@@ -46,16 +47,15 @@ class QuantumArbDecisionSummary:
     dry_run: bool                     # Safety flag
     confidence: float                 # 0-1 confidence score
     timesfm_used: bool                # Whether TimesFM was consulted
-    timesfm_rationale: Optional[str]  # TimesFM insight
     rationale_preview: str            # Abbreviated rationale
     
-    # Optional fields
+    # Optional fields (must come after required fields in dataclass)
+    timesfm_rationale: Optional[str] = None  # TimesFM insight
     venue_a: Optional[str] = None     # First exchange venue
     venue_b: Optional[str] = None     # Second exchange venue
     estimated_spread_bps: Optional[float] = None  # Estimated spread in basis points
 
 
-@dataclass
 class QuantumArbIntegrationContract:
     """
     Integration contract defining how QuantumArb maps to A2A systems.

@@ -1,0 +1,30 @@
+{
+  "trading_mode": "live",
+  "brp_mode": "enforced",
+  "safety_limits": {
+    "max_position_size_usd": 1000,
+    "max_daily_loss_usd": 100,
+    "max_slippage_bps": 50,
+    "min_spread_bps": 5
+  },
+  "markets": ["BTC-USD", "ETH-USD"],
+  "exchange": {
+    "type": "stub",
+    "name": "live_simulation",
+    "fee_rate": 0.001,
+    "prices": {
+      "BTC-USD": 50000,
+      "ETH-USD": 2500
+    },
+    "balances": {
+      "USD": 10000,
+      "BTC": 0.1,
+      "ETH": 1.0
+    }
+  },
+  "monitoring": {
+    "dashboard_url": "http://127.0.0.1:5555/dashboard/ui",
+    "brp_logs": "logs/quantumarb/brp",
+    "trade_logs": "logs/quantumarb/trades.jsonl"
+  }
+}

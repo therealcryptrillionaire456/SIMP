@@ -1,0 +1,18 @@
+2026-04-14 20:04:43,611 - obsidian_graphify_integration - INFO - Initialized integrator:
+2026-04-14 20:04:43,611 - obsidian_graphify_integration - INFO -   SIMP Root: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp
+2026-04-14 20:04:43,611 - obsidian_graphify_integration - INFO -   Obsidian Root: /Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs
+2026-04-14 20:04:43,611 - obsidian_graphify_integration - INFO -   Graphify Out: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/graphify-out
+2026-04-14 20:04:43,611 - obsidian_graphify_integration - INFO - Starting Obsidian + Graphify synchronization...
+2026-04-14 20:05:17,504 - obsidian_graphify_integration - WARNING - Backup creation failed: [('/Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs/Daily_Logs/Today.md', '/Users/kaseymarcelle/stray_goose/backup_20260414_200443/Daily_Logs/Today.md', "[Errno 2] No such file or directory: '/Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs/Daily_Logs/Today.md'")]
+2026-04-14 20:05:17,504 - obsidian_graphify_integration - INFO - Running Obsidian sync script: /Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs/sync_with_simp.py
+2026-04-14 20:06:16,240 - obsidian_graphify_integration - INFO - Obsidian sync completed successfully
+2026-04-14 20:06:16,241 - obsidian_graphify_integration - INFO - Generating diagrams: /Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs/Visualizations/System_Graphs/generate_graphs.py
+2026-04-14 20:06:18,271 - obsidian_graphify_integration - INFO - Diagram generation completed successfully
+2026-04-14 20:06:18,271 - obsidian_graphify_integration - INFO - Generated 26 diagrams
+2026-04-14 20:06:18,272 - obsidian_graphify_integration - INFO - Updated index file: /Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs/INDEX.md
+2026-04-14 20:06:18,272 - obsidian_graphify_integration - INFO - Running quality checks...
+2026-04-14 20:06:18,272 - obsidian_graphify_integration - INFO - ✓ broken_links: Link checking not implemented (use external tool)
+2026-04-14 20:06:18,272 - obsidian_graphify_integration - INFO - ✓ missing_docs: All key modules documented
+2026-04-14 20:06:18,272 - obsidian_graphify_integration - INFO - ✓ outdated_content: Content freshness check passed
+2026-04-14 20:06:19,112 - obsidian_graphify_integration - INFO - Saved sync report: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/reports/obsidian_graphify/sync_report_20260414_200619.json
+2026-04-14 20:06:19,112 - obsidian_graphify_integration - INFO - Synchronization completed successfully

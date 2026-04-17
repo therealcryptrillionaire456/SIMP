@@ -1,0 +1,92 @@
+{
+  "mode": "gate_3_5_enhanced_multi_market",
+  "exchange": "coinbase",
+  "symbols": ["SOL-USD", "BTC-USD", "ETH-USD", "AVAX-USD", "MATIC-USD"],
+  "position_sizing": {
+    "position_type": "enhanced_multi_market",
+    "min_notional": 0.50,
+    "max_notional": 5.00,
+    "base_allocation_per_symbol": 1.00,
+    "max_concurrent_positions": 3,
+    "risk_per_trade_percent": 0.5,
+    "max_daily_risk_percent": 2.0
+  },
+  "execution": {
+    "order_type": "market",
+    "time_in_force": "IOC",
+    "slippage_tolerance_percent": 0.5,
+    "max_retries": 3,
+    "retry_delay_ms": 1000,
+    "partial_fill_handling": "complete_or_cancel"
+  },
+  "monitoring": {
+    "heartbeat_interval_seconds": 30,
+    "health_check_interval_seconds": 60,
+    "performance_report_interval_minutes": 15,
+    "alert_thresholds": {
+      "max_drawdown_percent": 3.0,
+      "max_position_duration_minutes": 120,
+      "max_slippage_percent": 1.0,
+      "min_success_rate_percent": 60.0
+    }
+  },
+  "enhanced_features": {
+    "multi_market_arbitrage": true,
+    "cross_symbol_correlation": true,
+    "volatility_adjusted_sizing": true,
+    "time_of_day_optimization": true,
+    "news_sentiment_integration": false,
+    "market_maker_mode": false
+  },
+  "risk_management": {
+    "circuit_breakers": {
+      "max_daily_loss_percent": 5.0,
+      "max_consecutive_losses": 5,
+      "max_hourly_trades": 20,
+      "cool_down_period_minutes": 30
+    },
+    "position_limits": {
+      "max_exposure_per_symbol_percent": 40,
+      "max_total_exposure_percent": 100,
+      "min_liquidity_threshold_usd": 1000000
+    }
+  },
+  "reporting": {
+    "live_dashboard": true,
+    "telemetry_streaming": true,
+    "audit_logging": true,
+    "performance_metrics": {
+      "sharpe_ratio": true,
+      "sortino_ratio": true,
+      "max_drawdown": true,
+      "win_rate": true,
+      "profit_factor": true
+    }
+  },
+  "integration": {
+    "simp_broker_enabled": true,
+    "simp_broker_url": "http://127.0.0.1:5555",
+    "simp_agent_id": "gate3_5_enhanced",
+    "dashboard_integration": true,
+    "webhook_notifications": false
+  },
+  "advanced": {
+    "machine_learning_features": {
+      "pattern_recognition": true,
+      "anomaly_detection": true,
+      "predictive_sizing": false,
+      "reinforcement_learning": false
+    },
+    "backtesting": {
+      "enabled": true,
+      "lookback_days": 30,
+      "resolution_minutes": 5,
+      "commission_rate_percent": 0.1
+    },
+    "optimization": {
+      "genetic_algorithm_tuning": false,
+      "grid_search_parameters": false,
+      "real_time_adaptation": true
+    }
+  }
+}

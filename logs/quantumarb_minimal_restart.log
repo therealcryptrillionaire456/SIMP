@@ -1,0 +1,37 @@
+2026-04-14 10:35:04,921 - quantumarb_minimal - INFO - QuantumArbEngineMinimal initialized for Phase 4 microscopic trading
+2026-04-14 10:35:04,922 - quantumarb_minimal - INFO - QuantumArbAgentMinimal initialized with poll interval 2.0s
+2026-04-14 10:35:04,922 - quantumarb_minimal - INFO - Starting QuantumArbAgentMinimal...
+2026-04-14 10:35:58,974 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade1_1776177358
+2026-04-14 10:35:58,975 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade1_1776177358', 'spread_pct': 0.0715, 'decision': 'reject_risk', 'reason': 'Risk score 0.41 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.40974999999999995, 'timestamp': '2026-04-14T14:35:58.975452'}
+2026-04-14 10:35:58,977 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade1_1776177358, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade1_1776177358.json
+2026-04-14 10:36:00,981 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:36:06,988 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade2_1776177365
+2026-04-14 10:36:06,989 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade2_1776177365', 'spread_pct': 0.1496, 'decision': 'reject_risk', 'reason': 'Risk score 0.45 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.4518, 'timestamp': '2026-04-14T14:36:06.988963'}
+2026-04-14 10:36:06,991 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade2_1776177365, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade2_1776177365.json
+2026-04-14 10:36:12,997 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade3_1776177372
+2026-04-14 10:36:12,997 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade3_1776177372', 'spread_pct': 0.1082, 'decision': 'reject_risk', 'reason': 'Risk score 0.42 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.4190999999999999, 'timestamp': '2026-04-14T14:36:12.997841'}
+2026-04-14 10:36:12,999 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade3_1776177372, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade3_1776177372.json
+2026-04-14 10:39:37,192 - quantumarb_minimal - INFO - Evaluating arbitrage signal: spread_test_1_1776177575
+2026-04-14 10:39:37,194 - quantumarb_minimal - INFO - Decision: {'signal_id': 'spread_test_1_1776177575', 'spread_pct': 0.1, 'decision': 'reject_risk', 'reason': 'Risk score 0.44 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.44499999999999995, 'timestamp': '2026-04-14T14:39:37.194653'}
+2026-04-14 10:39:37,196 - quantumarb_minimal - INFO - Processed signal spread_test_1_1776177575, result: data/quantumarb_minimal/outbox/result_spread_test_1_1776177575.json
+2026-04-14 10:39:41,201 - quantumarb_minimal - INFO - Evaluating arbitrage signal: spread_test_2_1776177580
+2026-04-14 10:39:41,201 - quantumarb_minimal - INFO - Decision: {'signal_id': 'spread_test_2_1776177580', 'spread_pct': 0.2, 'decision': 'reject_risk', 'reason': 'Risk score 0.49 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.495, 'timestamp': '2026-04-14T14:39:41.201572'}
+2026-04-14 10:39:41,204 - quantumarb_minimal - INFO - Processed signal spread_test_2_1776177580, result: data/quantumarb_minimal/outbox/result_spread_test_2_1776177580.json
+2026-04-14 10:39:47,205 - quantumarb_minimal - INFO - Evaluating arbitrage signal: spread_test_3_1776177585
+2026-04-14 10:39:47,205 - quantumarb_minimal - INFO - Decision: {'signal_id': 'spread_test_3_1776177585', 'spread_pct': 0.3, 'decision': 'reject_risk', 'reason': 'Risk score 0.55 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.545, 'timestamp': '2026-04-14T14:39:47.205576'}
+2026-04-14 10:39:47,209 - quantumarb_minimal - INFO - Processed signal spread_test_3_1776177585, result: data/quantumarb_minimal/outbox/result_spread_test_3_1776177585.json
+2026-04-14 10:39:51,213 - quantumarb_minimal - INFO - Evaluating arbitrage signal: spread_test_4_1776177590
+2026-04-14 10:39:51,214 - quantumarb_minimal - INFO - Decision: {'signal_id': 'spread_test_4_1776177590', 'spread_pct': 0.4, 'decision': 'reject_risk', 'reason': 'Risk score 0.59 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.595, 'timestamp': '2026-04-14T14:39:51.214243'}
+2026-04-14 10:39:51,216 - quantumarb_minimal - INFO - Processed signal spread_test_4_1776177590, result: data/quantumarb_minimal/outbox/result_spread_test_4_1776177590.json
+2026-04-14 10:39:57,224 - quantumarb_minimal - INFO - Evaluating arbitrage signal: spread_test_5_1776177595
+2026-04-14 10:39:57,226 - quantumarb_minimal - INFO - Decision: {'signal_id': 'spread_test_5_1776177595', 'spread_pct': 0.5, 'decision': 'reject_risk', 'reason': 'Risk score 0.65 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.645, 'timestamp': '2026-04-14T14:39:57.225748'}
+2026-04-14 10:39:57,227 - quantumarb_minimal - INFO - Processed signal spread_test_5_1776177595, result: data/quantumarb_minimal/outbox/result_spread_test_5_1776177595.json
+2026-04-14 10:40:01,232 - quantumarb_minimal - INFO - Evaluating arbitrage signal: spread_test_6_1776177600
+2026-04-14 10:40:01,232 - quantumarb_minimal - INFO - Decision: {'signal_id': 'spread_test_6_1776177600', 'spread_pct': 0.6, 'decision': 'reject_risk', 'reason': 'Risk score 0.69 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.695, 'timestamp': '2026-04-14T14:40:01.232654'}
+2026-04-14 10:40:01,234 - quantumarb_minimal - INFO - Processed signal spread_test_6_1776177600, result: data/quantumarb_minimal/outbox/result_spread_test_6_1776177600.json
+2026-04-14 10:40:07,239 - quantumarb_minimal - INFO - Evaluating arbitrage signal: spread_test_7_1776177605
+2026-04-14 10:40:07,240 - quantumarb_minimal - INFO - Decision: {'signal_id': 'spread_test_7_1776177605', 'spread_pct': 0.7, 'decision': 'execute', 'reason': 'Approved: spread=0.7000%, risk=0.74', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0006499999999999999, 'risk_score': 0.745, 'timestamp': '2026-04-14T14:40:07.240173'}
+2026-04-14 10:40:07,242 - quantumarb_minimal - INFO - Processed signal spread_test_7_1776177605, result: data/quantumarb_minimal/outbox/result_spread_test_7_1776177605.json
+2026-04-14 10:40:11,250 - quantumarb_minimal - INFO - Evaluating arbitrage signal: adj_test_1_1776177610
+2026-04-14 10:40:11,250 - quantumarb_minimal - INFO - Decision: {'signal_id': 'adj_test_1_1776177610', 'spread_pct': 0.65, 'decision': 'execute', 'reason': 'Approved: spread=0.6500%, risk=0.73', 'position_size_usd': 0.1, 'expected_pnl_usd': 0.0006, 'risk_score': 0.735, 'timestamp': '2026-04-14T14:40:11.250634'}
+2026-04-14 10:40:11,251 - quantumarb_minimal - INFO - Processed signal adj_test_1_1776177610, result: data/quantumarb_minimal/outbox/result_adj_test_1_1776177610.json

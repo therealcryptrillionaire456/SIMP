@@ -1,0 +1,2 @@
+/opt/homebrew/Cellar/python@3.10/3.10.16/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py:126: RuntimeWarning: 'simp.server.broker' found in sys.modules after import of package 'simp.server', but prior to execution of 'simp.server.broker'; this may result in unpredictable behaviour
+  warn(RuntimeWarning(msg))

@@ -1,0 +1,340 @@
+[2026-04-14 12:03:53] 🚀 Starting daily evolution process
+[2026-04-14 12:03:53] 🏥 Checking system health...
+[2026-04-14 12:03:53] ✅ Broker is running
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+✅ ASI-Evolve module loaded: asi_evolve_simple
+   Version: 1.0.0
+   Capabilities: 4
+[2026-04-14 12:03:53] ✅ Disk space: 60% used
+[2026-04-14 12:03:53] 🧪 Starting evolution experiment for brp_threat_detection
+[2026-04-14 12:03:53]    Experiment: daily_threat_evolution
+[2026-04-14 12:03:53]    Rounds: 5
+Traceback (most recent call last):
+  File "<string>", line 16, in <module>
+NameError: name 'component' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 39, in <module>
+NameError: name 'component' is not defined
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+🚀 Starting threat detection evolution simulation
+   Rounds: 5, Population: 4
+  Round 1/5: New best! Score: 0.640 (+0.640)
+  Round 2/5: New best! Score: 0.653 (+0.014)
+  Round 3/5: New best! Score: 0.661 (+0.007)
+  Round 4/5: Best: 0.661
+  Round 5/5: New best! Score: 0.672 (+0.011)
+✅ Evolution completed: best_score=0.672
+[2026-04-14 12:03:53] 📊 Updating evolution dashboard...
+✅ Dashboard updated: 0 total experiments
+   Successful: 0
+   Failed: 0
+   Avg Improvement: 0.0%
+[2026-04-14 12:03:53] ======================================================
+[2026-04-14 12:03:53] 🧬 Daily Evolution Loop Complete
+[2026-04-14 12:03:53] 📁 Results saved in: data/evolution_results/
+[2026-04-14 12:03:53] 📈 Dashboard: data/evolution_dashboard.json
+[2026-04-14 12:03:53] ======================================================
+[2026-04-14 12:06:26] 🚀 Starting daily evolution process
+[2026-04-14 12:06:26] 🏥 Checking system health...
+[2026-04-14 12:06:26] ✅ Broker is running
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+✅ ASI-Evolve module loaded: asi_evolve_simple
+   Version: 1.0.0
+   Capabilities: 4
+[2026-04-14 12:06:26] ✅ Disk space: 60% used
+[2026-04-14 12:06:26] 🧪 Starting evolution experiment for brp_threat_detection
+[2026-04-14 12:06:26]    Experiment: daily_threat_evolution
+[2026-04-14 12:06:26]    Rounds: 5
+Traceback (most recent call last):
+  File "<string>", line 29, in <module>
+NameError: name 'experiment_name' is not defined
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+🚀 Starting threat detection evolution simulation
+   Rounds: 5, Population: 4
+  Round 1/5: New best! Score: 0.603 (+0.603)
+  Round 2/5: New best! Score: 0.612 (+0.008)
+  Round 3/5: Best: 0.612
+  Round 4/5: Best: 0.612
+  Round 5/5: New best! Score: 0.619 (+0.007)
+✅ Evolution completed: best_score=0.619
+✅ Evolution successful for brp_threat_detection
+   Best score: 0.619
+   Improvement: 23.8%
+   Rounds completed: 5
+❌ Error running evolution for brp_threat_detection: name 'experiment_name' is not defined
+[2026-04-14 12:06:26] 📊 Updating evolution dashboard...
+✅ Dashboard updated: 0 total experiments
+   Successful: 0
+   Failed: 0
+   Avg Improvement: 0.0%
+[2026-04-14 12:06:26] ======================================================
+[2026-04-14 12:06:26] 🧬 Daily Evolution Loop Complete
+[2026-04-14 12:06:26] 📁 Results saved in: data/evolution_results/
+[2026-04-14 12:06:26] 📈 Dashboard: data/evolution_dashboard.json
+[2026-04-14 12:06:26] ======================================================
+[2026-04-14 12:10:07] 🚀 Starting evolution process
+/Users/kaseymarcelle/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+🧬 Starting Daily ASI-Evolve Evolution Loop
+==================================================
+🏥 Checking system health...
+✅ Broker is running
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+✅ ASI-Evolve module loaded: asi_evolve_simple
+   Version: 1.0.0
+   Capabilities: 4
+✅ Disk space: 61.3% used
+
+🚀 Starting evolution experiments
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+🚀 Starting threat detection evolution simulation
+   Rounds: 5, Population: 4
+  Round 1/5: New best! Score: 0.665 (+0.665)
+  Round 2/5: New best! Score: 0.665 (+0.000)
+  Round 3/5: New best! Score: 0.684 (+0.018)
+  Round 4/5: Best: 0.684
+  Round 5/5: New best! Score: 0.685 (+0.001)
+✅ Evolution completed: best_score=0.685
+✅ Evolution successful for brp_threat_detection
+   Best score: 0.685
+   Improvement: 36.9%
+   Rounds completed: 5
+   Results saved to: data/evolution_results/brp_threat_detection_daily_threat_evolution_20260414.json
+
+📊 Updating evolution dashboard...
+✅ Dashboard updated: 1 total experiments
+   Successful: 1
+   Failed: 0
+   Avg Improvement: 36.9%
+
+==================================================
+🧬 Daily Evolution Loop Complete
+📁 Results saved in: data/evolution_results/
+📈 Dashboard: data/evolution_dashboard.json
+==================================================
+[2026-04-14 12:10:07] ✅ Evolution completed successfully
+[2026-04-14 12:10:07] ======================================================
+[2026-04-14 12:10:07] 🧬 Daily Evolution Loop Complete
+[2026-04-14 12:10:07] 📁 Results saved in: data/evolution_results/
+[2026-04-14 12:10:07] 📈 Dashboard: data/evolution_dashboard.json
+[2026-04-14 12:10:07] ======================================================
+[2026-04-14 12:12:55] 🚀 Starting evolution process
+/Users/kaseymarcelle/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+🧬 Starting Daily ASI-Evolve Evolution Loop
+==================================================
+🏥 Checking system health...
+✅ Broker is running
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+✅ ASI-Evolve module loaded: asi_evolve_simple
+   Version: 1.0.0
+   Capabilities: 4
+✅ Disk space: 61.3% used
+
+🚀 Starting evolution experiments
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+🚀 Starting threat detection evolution simulation
+   Rounds: 5, Population: 4
+  Round 1/5: New best! Score: 0.640 (+0.640)
+  Round 2/5: New best! Score: 0.656 (+0.017)
+  Round 3/5: New best! Score: 0.668 (+0.012)
+  Round 4/5: Best: 0.668
+  Round 5/5: Best: 0.668
+✅ Evolution completed: best_score=0.668
+✅ Evolution successful for brp_threat_detection
+   Best score: 0.668
+   Improvement: 33.6%
+   Rounds completed: 5
+   Results saved to: data/evolution_results/brp_threat_detection_daily_threat_evolution_20260414.json
+
+📊 Updating evolution dashboard...
+✅ Dashboard updated: 1 total experiments
+   Successful: 1
+   Failed: 0
+   Avg Improvement: 33.6%
+
+==================================================
+🧬 Daily Evolution Loop Complete
+📁 Results saved in: data/evolution_results/
+📈 Dashboard: data/evolution_dashboard.json
+==================================================
+[2026-04-14 12:12:55] ✅ Evolution completed successfully
+[2026-04-14 12:12:55] ======================================================
+[2026-04-14 12:12:55] 🧬 Daily Evolution Loop Complete
+[2026-04-14 12:12:55] 📁 Results saved in: data/evolution_results/
+[2026-04-14 12:12:55] 📈 Dashboard: data/evolution_dashboard.json
+[2026-04-14 12:12:55] ======================================================
+[2026-04-14 12:19:25] 🚀 Starting evolution process
+/Users/kaseymarcelle/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+🧬 Starting Daily ASI-Evolve Evolution Loop
+==================================================
+🏥 Checking system health...
+✅ Broker is running
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+✅ ASI-Evolve module loaded: asi_evolve_simple
+   Version: 1.0.0
+   Capabilities: 4
+✅ Disk space: 61.3% used
+
+🚀 Starting evolution experiments
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+🚀 Starting threat detection evolution simulation
+   Rounds: 5, Population: 4
+  Round 1/5: New best! Score: 0.681 (+0.681)
+  Round 2/5: New best! Score: 0.682 (+0.001)
+  Round 3/5: Best: 0.682
+  Round 4/5: Best: 0.682
+  Round 5/5: Best: 0.682
+✅ Evolution completed: best_score=0.682
+✅ Evolution successful for brp_threat_detection
+   Best score: 0.682
+   Improvement: 36.4%
+   Rounds completed: 5
+   Results saved to: data/evolution_results/brp_threat_detection_daily_threat_evolution_20260414.json
+
+📊 Updating evolution dashboard...
+✅ Dashboard updated: 1 total experiments
+   Successful: 1
+   Failed: 0
+   Avg Improvement: 36.4%
+
+==================================================
+🧬 Daily Evolution Loop Complete
+📁 Results saved in: data/evolution_results/
+📈 Dashboard: data/evolution_dashboard.json
+==================================================
+[2026-04-14 12:19:26] ✅ Evolution completed successfully
+[2026-04-14 12:19:26] ======================================================
+[2026-04-14 12:19:26] 🧬 Daily Evolution Loop Complete
+[2026-04-14 12:19:26] 📁 Results saved in: data/evolution_results/
+[2026-04-14 12:19:26] 📈 Dashboard: data/evolution_dashboard.json
+[2026-04-14 12:19:26] ======================================================
+[2026-04-14 14:07:48] 🔍 Checking system health...
+[2026-04-14 14:07:49] ✅ Using enhanced evolution runner
+[2026-04-14 14:07:49] ✅ QuantumArb evolution module available
+[2026-04-14 14:07:49] 🚀 Starting multi-component evolution process
+[2026-04-14 14:07:49] Components to evolve:
+[2026-04-14 14:07:49]   - BRP Threat Detection (always)
+[2026-04-14 14:07:49]   - QuantumArb Trading Algorithms
+2026-04-14 14:07:49,085 - __main__ - INFO - Starting daily evolution cycle
+2026-04-14 14:07:49,085 - __main__ - INFO - Running evolution for brp_threat_detection (rounds=5, population=4)
+2026-04-14 14:07:49,089 - __main__ - INFO - Evolution completed for brp_threat_detection: success=True
+2026-04-14 14:07:50,094 - __main__ - INFO - Running evolution for quantumarb_trading (rounds=5, population=4)
+2026-04-14 14:07:50,148 - evolution_quantumarb - WARNING - QuantumEnhancedArbDetector not available
+2026-04-14 14:07:50,148 - evolution_quantumarb - INFO - QuantumArb modules loaded successfully
+2026-04-14 14:07:50,148 - evolution_quantumarb - INFO - Starting QuantumArb evolution with population 4, rounds 5
+2026-04-14 14:07:50,148 - evolution_quantumarb - INFO - Round 1/5
+2026-04-14 14:07:50,148 - evolution_quantumarb - INFO -   New best algorithm found: score = 19423.39
+2026-04-14 14:07:50,149 - evolution_quantumarb - INFO - Round 2/5
+2026-04-14 14:07:50,149 - evolution_quantumarb - INFO - Round 3/5
+2026-04-14 14:07:50,149 - evolution_quantumarb - INFO - Round 4/5
+2026-04-14 14:07:50,149 - evolution_quantumarb - INFO - Round 5/5
+2026-04-14 14:07:50,149 - evolution_quantumarb - INFO -   New best algorithm found: score = 20353.35
+2026-04-14 14:07:50,150 - evolution_quantumarb - INFO - Results saved to data/evolution_results/quantumarb_trading_daily_quantumarb_evolution_20260414.json
+2026-04-14 14:07:50,150 - evolution_quantumarb - INFO - Evolution completed. Best score: 20353.35
+2026-04-14 14:07:50,150 - evolution_quantumarb - INFO - Best algorithm found:
+2026-04-14 14:07:50,150 - evolution_quantumarb - INFO - QuantumArb Trading Algorithm:
+  - Threshold: 6.7 bps
+  - Min Confidence: 0.72
+  - Max Position: $6183
+  - Risk Tolerance: 0.47
+  - Liquidity Weight: 0.75
+  - Execution Speed Weight: 0.45
+2026-04-14 14:07:50,150 - __main__ - INFO - Evolution completed for quantumarb_trading: success=True
+2026-04-14 14:07:51,159 - __main__ - INFO - Daily summary saved to data/daily_summaries/evolution_summary_20260414.json
+2026-04-14 14:07:51,159 - __main__ - INFO - Daily evolution completed: 2 components
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+🚀 Starting threat detection evolution simulation
+   Rounds: 5, Population: 4
+  Round 1/5: New best! Score: 0.665 (+0.665)
+  Round 2/5: New best! Score: 0.684 (+0.019)
+  Round 3/5: Best: 0.684
+  Round 4/5: Best: 0.684
+  Round 5/5: Best: 0.684
+✅ Evolution completed: best_score=0.684
+📊 Daily Evolution Results: 2/2 successful
+   ✅ brp_threat_detection: score=0.68
+   ✅ quantumarb_trading: score=20353.35
+[2026-04-14 14:07:51] ✅ Evolution completed successfully
+[2026-04-14 14:07:51] 📊 Generating daily evolution summary...
+[2026-04-14 14:07:51] ✅ Daily summary generated
+[2026-04-14 14:07:51] ==============================================================
+[2026-04-14 14:07:51] 🧬 Enhanced Daily Evolution Loop Complete
+[2026-04-14 14:07:51] 📁 Results saved in: data/evolution_results/
+[2026-04-14 14:07:51] 📈 Dashboard: data/evolution_dashboard.json
+[2026-04-14 14:07:51] 📊 Daily summaries: data/daily_summaries/
+[2026-04-14 14:07:51] 🔄 Next evolution: 04:00 tomorrow
+[2026-04-14 14:07:51] ==============================================================
+[2026-04-14 14:14:06] 🔍 Checking system health...
+[2026-04-14 14:14:06] ✅ Using enhanced evolution runner
+[2026-04-14 14:14:06] ✅ QuantumArb evolution module available
+[2026-04-14 14:14:06] 🚀 Starting multi-component evolution process
+[2026-04-14 14:14:06] Components to evolve:
+[2026-04-14 14:14:06]   - BRP Threat Detection (always)
+[2026-04-14 14:14:06]   - QuantumArb Trading Algorithms
+2026-04-14 14:14:06,246 - __main__ - INFO - Starting daily evolution cycle
+2026-04-14 14:14:06,246 - __main__ - INFO - Running evolution for brp_threat_detection (rounds=5, population=4)
+2026-04-14 14:14:06,251 - __main__ - INFO - Evolution completed for brp_threat_detection: success=True
+2026-04-14 14:14:07,256 - __main__ - INFO - Running evolution for quantumarb_trading (rounds=5, population=4)
+2026-04-14 14:14:07,363 - evolution_quantumarb - WARNING - QuantumEnhancedArbDetector not available
+2026-04-14 14:14:07,363 - evolution_quantumarb - INFO - QuantumArb modules loaded successfully
+2026-04-14 14:14:07,363 - evolution_quantumarb - INFO - Starting QuantumArb evolution with population 4, rounds 5
+2026-04-14 14:14:07,363 - evolution_quantumarb - INFO - Round 1/5
+2026-04-14 14:14:07,364 - evolution_quantumarb - INFO -   New best algorithm found: score = 23690.58
+2026-04-14 14:14:07,364 - evolution_quantumarb - INFO - Round 2/5
+2026-04-14 14:14:07,364 - evolution_quantumarb - INFO - Round 3/5
+2026-04-14 14:14:07,364 - evolution_quantumarb - INFO -   New best algorithm found: score = 24124.03
+2026-04-14 14:14:07,364 - evolution_quantumarb - INFO - Round 4/5
+2026-04-14 14:14:07,364 - evolution_quantumarb - INFO - Round 5/5
+2026-04-14 14:14:07,365 - evolution_quantumarb - INFO -   New best algorithm found: score = 24361.86
+2026-04-14 14:14:07,365 - evolution_quantumarb - INFO - Results saved to data/evolution_results/quantumarb_trading_daily_quantumarb_evolution_20260414.json
+2026-04-14 14:14:07,365 - evolution_quantumarb - INFO - Evolution completed. Best score: 24361.86
+2026-04-14 14:14:07,365 - evolution_quantumarb - INFO - Best algorithm found:
+2026-04-14 14:14:07,365 - evolution_quantumarb - INFO - QuantumArb Trading Algorithm:
+  - Threshold: 9.5 bps
+  - Min Confidence: 0.64
+  - Max Position: $13922
+  - Risk Tolerance: 0.14
+  - Liquidity Weight: 0.26
+  - Execution Speed Weight: 0.80
+2026-04-14 14:14:07,365 - __main__ - INFO - Evolution completed for quantumarb_trading: success=True
+2026-04-14 14:14:08,370 - __main__ - INFO - Daily summary saved to data/daily_summaries/evolution_summary_20260414.json
+2026-04-14 14:14:08,370 - __main__ - INFO - Daily evolution completed: 2 components
+✓ Initialized knowledge base with 4 items
+✓ ASI-Evolve Simple Module initialized: asi_evolve_simple v1.0.0
+🚀 Starting threat detection evolution simulation
+   Rounds: 5, Population: 4
+  Round 1/5: New best! Score: 0.606 (+0.606)
+  Round 2/5: New best! Score: 0.632 (+0.026)
+  Round 3/5: New best! Score: 0.632 (+0.001)
+  Round 4/5: Best: 0.632
+  Round 5/5: New best! Score: 0.634 (+0.002)
+✅ Evolution completed: best_score=0.634
+📊 Daily Evolution Results: 2/2 successful
+   ✅ brp_threat_detection: score=0.63
+   ✅ quantumarb_trading: score=24361.86
+[2026-04-14 14:14:08] ✅ Evolution completed successfully
+[2026-04-14 14:14:08] 📊 Generating daily evolution summary...
+[2026-04-14 14:14:08] ✅ Daily summary generated
+[2026-04-14 14:14:08] ==============================================================
+[2026-04-14 14:14:08] 🧬 Enhanced Daily Evolution Loop Complete
+[2026-04-14 14:14:08] 📁 Results saved in: data/evolution_results/
+[2026-04-14 14:14:08] 📈 Dashboard: data/evolution_dashboard.json
+[2026-04-14 14:14:08] 📊 Daily summaries: data/daily_summaries/
+[2026-04-14 14:14:08] 🔄 Next evolution: 04:00 tomorrow
+[2026-04-14 14:14:08] ==============================================================
