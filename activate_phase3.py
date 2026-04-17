@@ -22,6 +22,7 @@ import socket
 import json
 import urllib.request
 import urllib.error
+from typing import Dict, List, Optional, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -193,7 +194,9 @@ class QuantumIntelligenceBrokerAdapter:
         self.agent_id = agent.agent_id
         self.intent_handlers = {
             "health_check": self.handle_health_check,
+            "status_check": self.handle_get_deployment_status,
             "get_deployment_status": self.handle_get_deployment_status,
+            "market_analysis": self.handle_solve_quantum_problem,
             "solve_quantum_problem": self.handle_solve_quantum_problem,
             "optimize_portfolio": self.handle_optimize_portfolio,
             "evolve_quantum_skills": self.handle_evolve_quantum_skills,
@@ -237,6 +240,7 @@ class QuantumArbBrokerAdapter:
         self.agent_id = integration.agent_id
         self.intent_handlers = {
             "health_check": self.handle_health_check,
+            "status_check": self.handle_get_status,
             "get_status": self.handle_get_status,
             "get_statistics": self.handle_get_statistics,
         }
@@ -292,6 +296,18 @@ def wait_for_agent_health(endpoint: str, timeout_seconds: float = 5.0) -> bool:
     return False
 
 
+def wait_for_intent_result(client, intent_id: str, timeout_seconds: float = 10.0) -> Dict:
+    """Poll broker intent status until the routed intent completes or times out."""
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        status = client.get_intent_status(intent_id) or {}
+        intent = status.get("intent") or {}
+        if intent.get("status") in {"completed", "failed"}:
+            return intent
+        time.sleep(0.25)
+    return {}
+
+
 def register_embedded_agent(
     agent_id: str,
     agent_type: str,
@@ -339,6 +355,208 @@ def register_embedded_agent(
         metadata=metadata or {},
     )
     return bool(result and result.get("status") == "success")
+
+
+def _find_existing_open_channel(settler, initiator_id: str, counterparty_id: str) -> Optional[Dict]:
+    from simp.mesh.enhanced_bus import ChannelState
+
+    for channel in settler.list_channels(state_filter=ChannelState.OPEN):
+        if (
+            channel.get("initiator_id") == initiator_id
+            and channel.get("counterparty_id") == counterparty_id
+        ):
+            return channel
+    return None
+
+
+def automate_payment_lifecycle(
+    agent_pairs: List[Tuple[str, str]],
+    opening_balance: float = 5.0,
+    payment_amount: float = 0.25,
+    target_sequence: int = 1,
+) -> List[Dict[str, object]]:
+    """Open payment channels for active agents and advance them through real lifecycle APIs."""
+    from simp.mesh.enhanced_bus import PaymentSettler, get_enhanced_mesh_bus
+
+    bus = get_enhanced_mesh_bus()
+    results: List[Dict[str, object]] = []
+
+    for initiator_id, counterparty_id in agent_pairs:
+        settler = PaymentSettler(
+            agent_id=initiator_id,
+            db_path=str(bus.log_dir / "mesh_payments.db"),
+            shared_secret=bus._secret,
+        )
+        channel = _find_existing_open_channel(settler, initiator_id, counterparty_id)
+        created = False
+        if channel is None:
+            opened = bus.open_payment_channel(
+                initiator_id=initiator_id,
+                counterparty_id=counterparty_id,
+                my_balance=opening_balance,
+                their_balance=0.0,
+            )
+            if opened is None:
+                results.append({
+                    "initiator_id": initiator_id,
+                    "counterparty_id": counterparty_id,
+                    "status": "failed",
+                    "reason": "open_channel_failed",
+                })
+                continue
+            channel_id = opened.channel_id
+            sequence = opened.sequence
+            created = True
+        else:
+            channel_id = channel["channel_id"]
+            sequence = int(channel.get("sequence", 0))
+
+        desired_sequence = max(target_sequence, sequence + 1)
+
+        while sequence < desired_sequence:
+            if not settler.pay(
+                channel_id=channel_id,
+                amount=payment_amount,
+                description=f"phase3 lifecycle payment {sequence + 1}",
+            ):
+                results.append({
+                    "initiator_id": initiator_id,
+                    "counterparty_id": counterparty_id,
+                    "channel_id": channel_id,
+                    "status": "failed",
+                    "reason": "payment_failed",
+                    "sequence": sequence,
+                })
+                break
+            sequence += 1
+        else:
+            refreshed = settler.get_channel(channel_id)
+            results.append({
+                "initiator_id": initiator_id,
+                "counterparty_id": counterparty_id,
+                "channel_id": channel_id,
+                "status": "ok",
+                "created": created,
+                "sequence": refreshed.sequence if refreshed else sequence,
+                "initiator_balance": refreshed.initiator_balance if refreshed else None,
+                "counterparty_balance": refreshed.counterparty_balance if refreshed else None,
+            })
+
+    return results
+
+
+def verify_broker_routed_intents(broker_url: str) -> List[Tuple[str, bool, Dict]]:
+    """Send real intents through the broker to the live quantum endpoints."""
+    from simp.server.agent_http_client import SimpHttpClient
+
+    client = SimpHttpClient(
+        agent_id="phase3_verifier",
+        agent_type="ops",
+        broker_url=broker_url,
+        timeout=20.0,
+    )
+
+    checks: List[Tuple[str, bool, Dict]] = []
+
+    quantumarb_route = client.send_intent(
+        target_agent="quantumarb_primary",
+        intent_type="status_check",
+        params={},
+    ) or {}
+    quantumarb_status = wait_for_intent_result(
+        client,
+        quantumarb_route.get("intent_id", ""),
+    ) if quantumarb_route.get("intent_id") else {}
+    checks.append((
+        "quantumarb_primary.status_check",
+        quantumarb_status.get("status") == "completed"
+        and isinstance(quantumarb_status.get("response"), dict)
+        and (
+            quantumarb_status["response"].get("status") is not None
+            or quantumarb_status["response"].get("statistics") is not None
+            or quantumarb_status["response"].get("mesh_integration") is not None
+        ),
+        {
+            "route": quantumarb_route,
+            "intent": quantumarb_status,
+        },
+    ))
+
+    quantum_problem_route = client.send_intent(
+        target_agent="quantum_intelligence_prime",
+        intent_type="market_analysis",
+        params={
+            "problem_description": "Broker-routed quantum intent verification for portfolio optimization",
+            "problem_type": "optimization",
+            "qubits": 3,
+            "request_id": "phase3_broker_route_verify",
+            "metadata": {"source": "activate_phase3"},
+        },
+    ) or {}
+    quantum_problem = wait_for_intent_result(
+        client,
+        quantum_problem_route.get("intent_id", ""),
+        timeout_seconds=20.0,
+    ) if quantum_problem_route.get("intent_id") else {}
+    success = (
+        quantum_problem.get("status") == "completed"
+        and isinstance(quantum_problem.get("response"), dict)
+        and quantum_problem["response"].get("quantum_advantage") is not None
+    )
+    checks.append((
+        "quantum_intelligence_prime.market_analysis",
+        success,
+        {
+            "route": quantum_problem_route,
+            "intent": quantum_problem,
+        },
+    ))
+
+    return checks
+
+
+def verify_live_consensus(trust_graph) -> Optional[Dict]:
+    """Run a small trust-weighted L5 consensus round and return the result."""
+    from simp.mesh.consensus import MeshConsensusNode, VoteChoice
+
+    participant_ids = ["simp_broker", "quantumarb", "kashclaw"]
+    nodes = [MeshConsensusNode(agent_id=agent_id, trust_graph=trust_graph) for agent_id in participant_ids]
+
+    try:
+        for node in nodes:
+            node.start()
+
+        proposal = nodes[0].propose(
+            topic="phase3_live_consensus_verification",
+            payload={"verified_at": time.time()},
+            required_quorum=0.67,
+            ttl=30.0,
+            metadata={"source": "activate_phase3"},
+        )
+
+        time.sleep(0.5)
+        for node in nodes[1:]:
+            node._handle_incoming_proposal(proposal.to_dict())
+        votes = []
+        for node in nodes:
+            vote = node.vote(proposal.proposal_id, VoteChoice.APPROVE, rationale="phase3 verification")
+            if vote is not None:
+                votes.append(vote)
+        for node in nodes:
+            for vote in votes:
+                node._handle_incoming_vote(vote.to_dict())
+
+        time.sleep(1.0)
+        result = nodes[0].aggregate_now(proposal.proposal_id)
+        if not result:
+            return None
+        return result.to_dict()
+    finally:
+        for node in nodes:
+            try:
+                node.stop()
+            except Exception:
+                pass
 
 
 def check_broker(broker_url: str) -> bool:
@@ -416,6 +634,7 @@ def main():
 
     # QuantumArb Phase 3 — needs broker
     integration = None
+    quantumarb_registered = False
     if not args.no_quantumarb:
         integration = activate_quantumarb_mesh(args.broker)
         if integration:
@@ -439,6 +658,7 @@ def main():
             else:
                 registered = False
             if registered:
+                quantumarb_registered = True
                 print(f"  ✅ QuantumArb registered with broker at {quantumarb_endpoint}")
             else:
                 print(f"  ⚠️  QuantumArb HTTP endpoint started but broker registration failed at {quantumarb_endpoint}")
@@ -476,6 +696,47 @@ def main():
                 else:
                     registered = False
                 if registered:
+                    print("\n💸 Activating payment channel lifecycle...")
+                    payment_results = automate_payment_lifecycle(
+                        [
+                            ("quantumarb_primary", "ktc_agent"),
+                            ("quantumarb_primary", "quantum_intelligence_prime"),
+                            ("quantum_intelligence_prime", "ktc_agent"),
+                        ],
+                        target_sequence=1,
+                    )
+                    for item in payment_results:
+                        if item.get("status") == "ok":
+                            print(
+                                f"  ✅ Payment channel {item['channel_id']} "
+                                f"{item['initiator_id']} -> {item['counterparty_id']} "
+                                f"seq={item['sequence']}"
+                            )
+                        else:
+                            print(
+                                f"  ⚠️  Payment lifecycle issue for "
+                                f"{item['initiator_id']} -> {item['counterparty_id']}: {item.get('reason')}"
+                            )
+
+                    print("\n🗳️  Verifying L5 MeshConsensusNode...")
+                    consensus_result = verify_live_consensus(tg)
+                    if consensus_result:
+                        print(
+                            f"  ✅ Consensus verified — state={consensus_result['state']} "
+                            f"approval={consensus_result['approval_ratio']:.2f} "
+                            f"votes={consensus_result['vote_count']}"
+                        )
+                    else:
+                        print("  ⚠️  Consensus verification did not return a result")
+
+                    print("\n🔁 Verifying broker-routed quantum intents...")
+                    route_checks = verify_broker_routed_intents(args.broker)
+                    for label, ok, payload in route_checks:
+                        if ok:
+                            print(f"  ✅ Routed intent succeeded: {label}")
+                        else:
+                            print(f"  ⚠️  Routed intent failed: {label} -> {payload}")
+
                     print(f"  ✅ QuantumIntelligence registered with broker at {qi_endpoint}")
                 else:
                     print(f"  ⚠️  QuantumIntelligence HTTP endpoint started but broker registration failed at {qi_endpoint}")

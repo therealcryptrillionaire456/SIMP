@@ -56,6 +56,13 @@ INTENT_TYPE_REGISTRY = {
     "orchestration_command": {"task_type": "architecture", "description": "Orchestration command"},
     "check_status": {"task_type": "research", "description": "Status check request"},
     "status_check": {"task_type": "research", "description": "Diagnostic status check"},
+    "health_check": {"task_type": "research", "description": "Agent health check request"},
+    "get_status": {"task_type": "research", "description": "Structured runtime status query"},
+    "get_statistics": {"task_type": "analysis", "description": "Agent metrics and statistics query"},
+    "get_deployment_status": {"task_type": "research", "description": "Quantum deployment status query"},
+    "solve_quantum_problem": {"task_type": "analysis", "description": "Quantum-assisted problem solving request"},
+    "optimize_portfolio": {"task_type": "analysis", "description": "Quantum portfolio optimization request"},
+    "evolve_quantum_skills": {"task_type": "analysis", "description": "Quantum skill evolution request"},
     "replan": {"task_type": "architecture", "description": "Replanning request"},
 }
 

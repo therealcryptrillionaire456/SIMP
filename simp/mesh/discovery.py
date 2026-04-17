@@ -27,6 +27,13 @@ from .enhanced_bus import get_enhanced_mesh_bus
 logger = logging.getLogger(__name__)
 
 
+_FOREIGN_DISCOVERY_PREFIXES = (
+    b"M-SEARCH",
+    b"NOTIFY",
+    b"HTTP/1.1",
+)
+
+
 class DiscoveryMethod(Enum):
     """Methods for discovering peers."""
     MULTICAST = "multicast"
@@ -227,6 +234,14 @@ class MeshDiscoveryService:
     
     def _handle_multicast_message(self, data: bytes, address: Tuple[str, int]):
         """Handle incoming multicast message."""
+        payload = data.lstrip()
+        if payload.startswith(_FOREIGN_DISCOVERY_PREFIXES):
+            logger.debug(f"Ignoring foreign multicast traffic from {address}")
+            return
+        if b'"message_type"' not in payload[:256] and b'"agent_id"' not in payload[:256]:
+            logger.debug(f"Ignoring non-mesh multicast payload from {address}")
+            return
+
         try:
             message = json.loads(data.decode('utf-8'))
             agent_id = message.get("agent_id")
@@ -252,7 +267,7 @@ class MeshDiscoveryService:
                 logger.debug(f"Discovered peer via multicast: {agent_id} at {endpoint}")
             
         except json.JSONDecodeError:
-            logger.warning(f"Invalid JSON in multicast message from {address}")
+            logger.debug(f"Ignoring malformed multicast payload from {address}")
         except Exception as e:
             logger.error(f"Error handling multicast message: {e}")
     

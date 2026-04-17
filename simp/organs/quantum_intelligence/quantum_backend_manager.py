@@ -17,6 +17,20 @@ import json
 import os
 
 
+def _is_placeholder_token(token: str) -> bool:
+    """Return True for obviously non-real IBM token placeholders."""
+    if not token:
+        return True
+    lowered = token.strip().lower()
+    placeholders = {
+        "test_token_123",
+        "your_ibm_quantum_api_token",
+        "your_ibm_quantum_token",
+        "change_me",
+    }
+    return lowered in placeholders or lowered.startswith("test_")
+
+
 class QuantumBackendType(str, Enum):
     """Types of quantum computing backends."""
     IBM_QUANTUM = "ibm_quantum"
@@ -132,6 +146,19 @@ class QuantumBackendManager:
                 self.logger.info(f"Configuration file not found, using defaults: {self.config_path}")
         except Exception as e:
             self.logger.warning(f"Failed to load configuration: {str(e)}, using defaults")
+
+        # Environment variables override disk config for real hardware activation.
+        env_token = os.environ.get("IBM_QUANTUM_TOKEN", "").strip()
+        if env_token:
+            default_config.setdefault("ibm_quantum", {})
+            default_config["ibm_quantum"].update({
+                "enabled": True,
+                "api_token": env_token,
+                "hub": os.environ.get("IBM_QUANTUM_HUB", default_config["ibm_quantum"].get("hub", "ibm-q")),
+                "group": os.environ.get("IBM_QUANTUM_GROUP", default_config["ibm_quantum"].get("group", "open")),
+                "project": os.environ.get("IBM_QUANTUM_PROJECT", default_config["ibm_quantum"].get("project", "main")),
+            })
+            default_config["enable_real_hardware"] = True
         
         return default_config
     
@@ -205,8 +232,11 @@ class QuantumBackendManager:
             ibm_config = self.config.get("ibm_quantum", {})
             api_token = ibm_config.get("api_token", "")
             
-            if not api_token:
-                self.logger.warning("IBM Quantum API token not configured")
+            if _is_placeholder_token(api_token):
+                self.logger.warning(
+                    "IBM Quantum API token is missing or still set to a placeholder. "
+                    "Set IBM_QUANTUM_TOKEN or update ~/.simp/quantum_config.json with a real token."
+                )
                 return
             
             # Initialize service
