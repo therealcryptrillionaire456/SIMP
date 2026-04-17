@@ -54,18 +54,19 @@ def register_with_simp(agent_id: str, endpoint: str, simp_url: str = "http://loc
     
     registration_data = {
         "agent_id": agent_id,
+        "agent_type": "ktc",
         "endpoint": endpoint,
-        "capabilities": [
-            "receipt_processing",
-            "price_comparison",
-            "savings_calculation",
-            "crypto_investment",
-            "wallet_management"
-        ],
         "metadata": {
             "service": "Keep the Change (KTC)",
             "version": "1.0.0",
-            "description": "Grocery savings to crypto investment platform"
+            "description": "Grocery savings to crypto investment platform",
+            "capabilities": [
+                "receipt_processing",
+                "price_comparison",
+                "savings_calculation",
+                "crypto_investment",
+                "wallet_management"
+            ],
         }
     }
     
@@ -80,11 +81,24 @@ def register_with_simp(agent_id: str, endpoint: str, simp_url: str = "http://loc
             timeout=10
         )
         
-        if response.status_code == 200:
+        if response.status_code in (200, 201):
             logger.info(f"Successfully registered agent {agent_id}")
             logger.info(f"Response: {response.json()}")
             return True
         else:
+            if response.status_code == 400:
+                try:
+                    existing = requests.get(f"{simp_url}/agents", timeout=5)
+                    if existing.status_code == 200:
+                        agents = existing.json().get("agents", {})
+                        current = agents.get(agent_id)
+                        if current and current.get("endpoint") == endpoint:
+                            logger.info(
+                                f"Agent {agent_id} already registered at {endpoint}; treating as success"
+                            )
+                            return True
+                except Exception as lookup_err:
+                    logger.debug(f"Agent lookup after registration warning failed: {lookup_err}")
             logger.warning(f"Failed to register agent: {response.status_code} - {response.text}")
             return False
             

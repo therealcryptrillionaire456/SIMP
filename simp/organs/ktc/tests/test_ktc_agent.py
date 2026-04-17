@@ -6,10 +6,11 @@ import json
 import sys
 from pathlib import Path
 
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from agent.ktc_agent import create_ktc_agent
+try:
+    from simp.organs.ktc.agent.ktc_agent import create_ktc_agent
+except ModuleNotFoundError:
+    sys.path.append(str(Path(__file__).parent.parent.parent.parent.parent))
+    from simp.organs.ktc.agent.ktc_agent import create_ktc_agent
 
 
 def test_ktc_agent():

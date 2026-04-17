@@ -10,15 +10,21 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, Optional
 from pathlib import Path
+import requests
 
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import sqlite3
 
 # Import KTC agent
-import sys
-sys.path.append(str(Path(__file__).parent.parent))
-from agent.ktc_agent import KTCAgent, create_ktc_agent
+try:
+    from simp.organs.ktc.agent.ktc_agent import KTCAgent, create_ktc_agent
+except ModuleNotFoundError:
+    import sys
+
+    # Allow direct execution without relying on the ambiguous top-level `agent` name.
+    sys.path.append(str(Path(__file__).parent.parent.parent.parent.parent))
+    from simp.organs.ktc.agent.ktc_agent import KTCAgent, create_ktc_agent
 
 
 # Initialize Flask app
@@ -381,6 +387,52 @@ def route_to_simp():
         return jsonify({
             "status": "error",
             "error": f"Failed to route to SIMP: {str(e)}"
+        }), 500
+
+
+@app.route("/send", methods=["POST"])
+@app.route("/mesh/send", methods=["POST"])
+def proxy_mesh_send():
+    """Proxy mesh packet sends through the broker so port 8765 can act as a mesh HTTP endpoint."""
+    try:
+        packet = request.get_json(silent=True) or {}
+        if not packet:
+            return jsonify({
+                "status": "error",
+                "error": "JSON payload required"
+            }), 400
+
+        broker_response = requests.post(
+            f"{CONFIG['simp_broker_url'].rstrip('/')}/mesh/send",
+            json=packet,
+            headers={"Content-Type": "application/json"},
+            timeout=10,
+        )
+
+        content_type = broker_response.headers.get("Content-Type", "")
+        if "application/json" in content_type:
+            body = broker_response.json()
+            return jsonify(body), broker_response.status_code
+
+        return (
+            jsonify({
+                "status": "error",
+                "error": "Broker returned non-JSON response",
+                "body": broker_response.text[:500],
+            }),
+            502,
+        )
+    except requests.RequestException as e:
+        logger.error(f"Error proxying mesh send to SIMP broker: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": f"Failed to proxy mesh send: {str(e)}"
+        }), 502
+    except Exception as e:
+        logger.error(f"Unexpected mesh proxy error: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": f"Unexpected proxy error: {str(e)}"
         }), 500
 
 
