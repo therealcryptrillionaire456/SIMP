@@ -181,6 +181,43 @@ class SimpBroker:
         except FileNotFoundError:
             self.builder_pool = None
             self.logger.warning("Routing policy not found — builder pool disabled")
+        
+        # Mesh routing integration (Sprint 71+)
+        try:
+            from simp.server.mesh_routing import init_mesh_routing
+            self.mesh_routing = init_mesh_routing(
+                broker_id="simp_broker",
+                brp_bridge=self.brp_bridge,
+            )
+            self.logger.info("[MESH] Mesh routing initialized")
+        except ImportError as e:
+            self.logger.warning(f"[MESH] Mesh routing not available: {e}")
+            self.mesh_routing = None
+        except Exception as e:
+            self.logger.error(f"[MESH] Failed to initialize mesh routing: {e}")
+            self.mesh_routing = None
+
+        # L4 Trust Graph — live reputation scoring wired into mesh router
+        self.trust_graph = None
+        try:
+            from simp.mesh.trust_graph import get_trust_graph, patch_router_with_trust_graph
+            self.trust_graph = get_trust_graph(autostart=True)
+            if self.mesh_routing and hasattr(self.mesh_routing, 'router'):
+                patch_router_with_trust_graph(self.mesh_routing.router, self.trust_graph)
+                self.logger.info("[L4] TrustGraph live — L3 router now trust-weighted")
+            else:
+                self.logger.info("[L4] TrustGraph live — awaiting router attachment")
+        except Exception as e:
+            self.logger.warning(f"[L4] TrustGraph init failed (non-fatal): {e}")
+
+        # BRP Mesh Gateway — packet-level threat screening at mesh ingress
+        self.brp_mesh_gateway = None
+        try:
+            from simp.mesh.brp_mesh_gateway import get_brp_mesh_gateway
+            self.brp_mesh_gateway = get_brp_mesh_gateway()
+            self.logger.info("[BRP-MESH] BRP mesh gateway active — screening all inbound packets")
+        except Exception as e:
+            self.logger.warning(f"[BRP-MESH] Gateway init failed (non-fatal): {e}")
 
         # Statistics
         self.stats = {
@@ -373,6 +410,20 @@ class SimpBroker:
             except Exception as e:
                 self.logger.warning(f"Failed to register agent {agent_id} with MeshBus: {e}")
             
+            # Register agent mesh capabilities if mesh routing is available
+            if self.mesh_routing:
+                try:
+                    # Extract capabilities from metadata
+                    capabilities = metadata.get("capabilities", []) if metadata else []
+                    channel_capacity = metadata.get("channel_capacity", 1000.0) if metadata else 1000.0
+                    
+                    self.mesh_routing.register_agent_mesh_capabilities(
+                        agent_id, capabilities, channel_capacity
+                    )
+                    self.logger.debug(f"Agent {agent_id} mesh capabilities registered")
+                except Exception as e:
+                    self.logger.warning(f"Failed to register mesh capabilities for {agent_id}: {e}")
+            
             return True
 
     def deregister_agent(self, agent_id: str) -> bool:
@@ -392,6 +443,14 @@ class SimpBroker:
                 self.logger.debug(f"Agent {agent_id} deregistered from MeshBus")
             except Exception as e:
                 self.logger.warning(f"Failed to deregister agent {agent_id} from MeshBus: {e}")
+            
+            # Deregister agent mesh capabilities if mesh routing is available
+            if self.mesh_routing:
+                try:
+                    self.mesh_routing.unregister_agent_mesh(agent_id)
+                    self.logger.debug(f"Agent {agent_id} mesh capabilities deregistered")
+                except Exception as e:
+                    self.logger.warning(f"Failed to deregister mesh capabilities for {agent_id}: {e}")
             
             return True
 
@@ -729,6 +788,64 @@ class SimpBroker:
             if intent_id in self.intent_records:
                 self.intent_records[intent_id].dispatched_at = _utcnow_iso()
 
+        # Check if we can route via mesh (Sprint 71+)
+        mesh_routing_possible = False
+        mesh_routing_result = None
+        
+        if self.mesh_routing:
+            try:
+                can_route, reason = self.mesh_routing.can_route_via_mesh(
+                    source_agent, target_agent, intent_type
+                )
+                
+                if can_route:
+                    mesh_routing_possible = True
+                    self.logger.info(f"[MESH] Mesh routing possible for {intent_id}")
+                    
+                    # Try mesh routing based on configuration
+                    mesh_config = self.mesh_routing.config
+                    
+                    if mesh_config.mode.value in ["preferred", "exclusive"]:
+                        # Try mesh routing first
+                        mesh_routing_result = self.mesh_routing.route_via_mesh(
+                            source_agent, target_agent, intent_type, intent_data
+                        )
+                        
+                        if mesh_routing_result.get("success"):
+                            self.logger.info(f"[MESH] Intent {intent_id} routed via mesh")
+                            # Update intent record with mesh info
+                            with self.intent_lock:
+                                if intent_id in self.intent_records:
+                                    self.intent_records[intent_id].mesh_routed = True
+                                    self.intent_records[intent_id].mesh_intent_id = mesh_routing_result.get("mesh_intent_id")
+                            
+                            # If mesh routing succeeded and mode is exclusive, return early
+                            if mesh_config.mode.value == "exclusive":
+                                delivery_result = {
+                                    "delivery_status": "delivered",
+                                    "delivery_method": "mesh",
+                                    "mesh_intent_id": mesh_routing_result.get("mesh_intent_id"),
+                                    "message": "Intent routed via mesh"
+                                }
+                                # Skip HTTP delivery
+                                target_endpoint = ""
+                        else:
+                            self.logger.warning(f"[MESH] Mesh routing failed: {mesh_routing_result.get('error')}")
+                            if mesh_config.mode.value == "exclusive":
+                                # Exclusive mode but mesh failed
+                                delivery_result = {
+                                    "delivery_status": "failed",
+                                    "delivery_method": "mesh",
+                                    "error": f"Mesh routing failed: {mesh_routing_result.get('error')}"
+                                }
+                                target_endpoint = ""
+                
+                else:
+                    self.logger.debug(f"[MESH] Mesh routing not possible: {reason}")
+                    
+            except Exception as e:
+                self.logger.error(f"[MESH] Error checking mesh routing: {e}")
+        
         # Actually deliver the intent to the target agent
         target_endpoint = target.get("endpoint", "")
         retry_count = 0
@@ -773,11 +890,34 @@ class SimpBroker:
                             delivery_result["fallback_agent"] = fallback
                             fallback_succeeded = delivery_result.get("delivery_status") != "failed"
 
-                # If HTTP delivery and fallback both failed, write to file
-                # inbox so the agent's file poller can pick it up
+                # If HTTP delivery and fallback both failed, try mesh routing as fallback
+                if not fallback_succeeded and delivery_result.get("delivery_status") == "failed":
+                    if self.mesh_routing and self.mesh_routing.config.mode.value != "disabled":
+                        try:
+                            # Try mesh routing as final fallback
+                            mesh_fallback_result = self.mesh_routing.route_via_mesh(
+                                source_agent, target_agent, intent_type, intent_data
+                            )
+                            
+                            if mesh_fallback_result.get("success"):
+                                self.logger.info(f"[MESH] Fallback mesh routing succeeded for {intent_id}")
+                                delivery_result = {
+                                    "delivery_status": "delivered",
+                                    "delivery_method": "mesh_fallback",
+                                    "mesh_intent_id": mesh_fallback_result.get("mesh_intent_id"),
+                                    "message": "Intent routed via mesh fallback",
+                                    "fallback_agent": target_agent
+                                }
+                                fallback_succeeded = True
+                            else:
+                                self.logger.warning(f"[MESH] Fallback mesh routing failed: {mesh_fallback_result.get('error')}")
+                        except Exception as e:
+                            self.logger.error(f"[MESH] Error in fallback mesh routing: {e}")
+                
+                # If all delivery methods failed, write to file inbox as last resort
                 if not fallback_succeeded and delivery_result.get("delivery_status") == "failed":
                     self.logger.info(
-                        f"📂 HTTP delivery failed for '{target_agent}', "
+                        f"📂 All delivery methods failed for '{target_agent}', "
                         f"falling back to file-based inbox delivery"
                     )
                     delivery_result = self._deliver_file_based(
@@ -833,6 +973,13 @@ class SimpBroker:
             "intent_id": intent_id,
             "target_agent": target_agent,
             "task_id": task_id,
+            "mesh_routing": {
+                "enabled": self.mesh_routing is not None,
+                "mode": self.mesh_routing.config.mode.value if self.mesh_routing else "disabled",
+                "mesh_routed": mesh_routing_result.get("success") if mesh_routing_result else False,
+                "mesh_intent_id": mesh_routing_result.get("mesh_intent_id") if mesh_routing_result else None,
+                "delivery_method": delivery_result.get("delivery_method", "http")
+            },
             "delivery_status": delivery_status,
             "delivery_latency_ms": delivery_result.get("delivery_latency_ms"),
             "retry_count": retry_count,

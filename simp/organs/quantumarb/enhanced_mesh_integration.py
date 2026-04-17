@@ -171,6 +171,7 @@ class EnhancedQuantumArbMeshIntegration:
         self._mesh_message_handlers: List[Callable] = []
         
         # State
+        self._start_time = time.time()  # set early to avoid race with processing thread
         self._running = False
         self._mesh_thread: Optional[threading.Thread] = None
         self._last_heartbeat = 0

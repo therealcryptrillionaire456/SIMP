@@ -74,6 +74,11 @@ class QuantumIntelligentAgent:
         constraints: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """Solve a quantum problem using integrated intelligence."""
+        # Coerce string → enum (callers often pass raw strings like "optimization" / "hybrid")
+        if isinstance(problem_type, str):
+            problem_type = QuantumProblemType(problem_type)
+        if isinstance(strategy, str):
+            strategy = CircuitDesignStrategy(strategy)
         self.logger.info(f"Solving {problem_type.value} problem: {problem_description[:50]}...")
         
         # Step 1: Get skill recommendation
