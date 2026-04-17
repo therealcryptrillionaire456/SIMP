@@ -17,6 +17,11 @@ import os
 import time
 import argparse
 import logging
+import threading
+import socket
+import json
+import urllib.request
+import urllib.error
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -181,6 +186,161 @@ def activate_quantum_intelligence(pennylane_adapter=None):
         return None
 
 
+class QuantumIntelligenceBrokerAdapter:
+    """Thin HTTP adapter so the broker can monitor and route to the quantum intelligence agent."""
+
+    def __init__(self, agent):
+        self.agent_id = agent.agent_id
+        self.intent_handlers = {
+            "health_check": self.handle_health_check,
+            "get_deployment_status": self.handle_get_deployment_status,
+            "solve_quantum_problem": self.handle_solve_quantum_problem,
+            "optimize_portfolio": self.handle_optimize_portfolio,
+            "evolve_quantum_skills": self.handle_evolve_quantum_skills,
+        }
+        self._agent = agent
+
+    def handle_health_check(self, _params):
+        return self._agent.get_deployment_status()
+
+    def handle_get_deployment_status(self, _params):
+        return self._agent.get_deployment_status()
+
+    def handle_solve_quantum_problem(self, params):
+        return self._agent.solve_quantum_problem_with_rollout(
+            problem_description=params.get("problem_description", "Solve a generic optimization problem"),
+            problem_type=params.get("problem_type", "optimization"),
+            qubits=int(params.get("qubits", 3)),
+            request_id=params.get("request_id"),
+            metadata=params.get("metadata"),
+        )
+
+    def handle_optimize_portfolio(self, params):
+        return self._agent.optimize_portfolio_with_quantum(
+            opportunities=params.get("opportunities", []),
+            capital=float(params.get("capital", 0.0)),
+            risk_tolerance=float(params.get("risk_tolerance", 0.3)),
+            request_id=params.get("request_id"),
+        )
+
+    def handle_evolve_quantum_skills(self, params):
+        return self._agent.evolve_quantum_skills(
+            focus_area=params.get("focus_area"),
+            request_id=params.get("request_id"),
+        )
+
+
+class QuantumArbBrokerAdapter:
+    """Thin HTTP adapter so the broker can monitor and query QuantumArb mesh state."""
+
+    def __init__(self, integration):
+        self.agent_id = integration.agent_id
+        self.intent_handlers = {
+            "health_check": self.handle_health_check,
+            "get_status": self.handle_get_status,
+            "get_statistics": self.handle_get_statistics,
+        }
+        self._integration = integration
+
+    def handle_health_check(self, _params):
+        return self._integration.get_status()
+
+    def handle_get_status(self, _params):
+        return self._integration.get_status()
+
+    def handle_get_statistics(self, _params):
+        return self._integration.get_statistics()
+
+
+def start_embedded_agent_server(agent, port: int):
+    """Start a lightweight HTTP wrapper for a live in-process agent."""
+    from simp.server.agent_server import SimpAgentServer
+
+    server = SimpAgentServer(agent=agent, host="127.0.0.1", port=port)
+    thread = threading.Thread(
+        target=server.run,
+        kwargs={"threaded": True},
+        daemon=True,
+        name=f"{agent.agent_id}-http-server",
+    )
+    thread.start()
+    return server, thread
+
+
+def find_available_port(preferred_port: int, max_tries: int = 25) -> int:
+    """Return the preferred port if free, otherwise the next available port."""
+    for offset in range(max_tries):
+        port = preferred_port + offset
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if sock.connect_ex(("127.0.0.1", port)) != 0:
+                return port
+    raise RuntimeError(f"No available port found near {preferred_port}")
+
+
+def wait_for_agent_health(endpoint: str, timeout_seconds: float = 5.0) -> bool:
+    """Poll /health until the agent endpoint is live or timeout expires."""
+    deadline = time.time() + timeout_seconds
+    health_url = f"{endpoint.rstrip('/')}/health"
+    while time.time() < deadline:
+        try:
+            with urllib.request.urlopen(health_url, timeout=2.0) as response:
+                if response.status == 200:
+                    return True
+        except (urllib.error.URLError, ConnectionError, TimeoutError):
+            time.sleep(0.2)
+    return False
+
+
+def register_embedded_agent(
+    agent_id: str,
+    agent_type: str,
+    endpoint: str,
+    broker_url: str,
+    capabilities,
+    metadata=None,
+) -> bool:
+    """Register a live in-process agent with the broker."""
+    from simp.server.agent_http_client import SimpHttpClient
+
+    agents_url = f"{broker_url.rstrip('/')}/agents"
+    try:
+        with urllib.request.urlopen(agents_url, timeout=5.0) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+            existing = payload.get("agents", {}).get(agent_id)
+    except Exception:
+        existing = None
+
+    if existing:
+        existing_endpoint = existing.get("endpoint")
+        if existing_endpoint == endpoint and wait_for_agent_health(endpoint):
+            return True
+
+        try:
+            delete_request = urllib.request.Request(
+                f"{broker_url.rstrip('/')}/agents/{agent_id}",
+                method="DELETE",
+            )
+            with urllib.request.urlopen(delete_request, timeout=5.0) as response:
+                if response.status not in (200, 204):
+                    return False
+        except Exception:
+            return False
+
+    client = SimpHttpClient(
+        agent_id=agent_id,
+        agent_type=agent_type,
+        broker_url=broker_url,
+        timeout=10.0,
+    )
+    result = client.register(
+        endpoint=endpoint,
+        capabilities=capabilities,
+        metadata=metadata or {},
+    )
+    return bool(result and result.get("status") == "success")
+
+
 def check_broker(broker_url: str) -> bool:
     """Verify broker is live before activation."""
     try:
@@ -231,6 +391,8 @@ def main():
     parser.add_argument("--quantum", action="store_true", help="Activate PennyLane quantum simulation")
     parser.add_argument("--verbose", action="store_true", help="Debug logging")
     parser.add_argument("--no-quantumarb", action="store_true", help="Skip QuantumArb activation")
+    parser.add_argument("--quantumarb-port", type=int, default=8770, help="HTTP port for QuantumArb broker-visible endpoint")
+    parser.add_argument("--quantum-intelligence-port", type=int, default=8771, help="HTTP port for QuantumIntelligence broker-visible endpoint")
     args = parser.parse_args()
 
     setup_logging(args.verbose)
@@ -256,13 +418,67 @@ def main():
     integration = None
     if not args.no_quantumarb:
         integration = activate_quantumarb_mesh(args.broker)
+        if integration:
+            print("\n🌐 Exposing QuantumArb HTTP endpoint...")
+            quantumarb_adapter = QuantumArbBrokerAdapter(integration)
+            quantumarb_port = find_available_port(args.quantumarb_port)
+            quantumarb_endpoint = f"http://127.0.0.1:{quantumarb_port}"
+            start_embedded_agent_server(quantumarb_adapter, quantumarb_port)
+            if wait_for_agent_health(quantumarb_endpoint):
+                registered = register_embedded_agent(
+                    agent_id="quantumarb_primary",
+                    agent_type="quantumarb",
+                    endpoint=quantumarb_endpoint,
+                    broker_url=args.broker,
+                    capabilities=["health_check", "get_status", "get_statistics"],
+                    metadata={
+                        "service": "QuantumArb Embedded Endpoint",
+                        "mesh_enabled": True,
+                    },
+                )
+            else:
+                registered = False
+            if registered:
+                print(f"  ✅ QuantumArb registered with broker at {quantumarb_endpoint}")
+            else:
+                print(f"  ⚠️  QuantumArb HTTP endpoint started but broker registration failed at {quantumarb_endpoint}")
 
     # Optional quantum backends
     pennylane_adapter = None
     if args.quantum:
         pennylane_adapter = activate_pennylane()
         if pennylane_adapter:
-            activate_quantum_intelligence(pennylane_adapter)
+            quantum_agent = activate_quantum_intelligence(pennylane_adapter)
+            if quantum_agent:
+                print("\n🌐 Exposing QuantumIntelligence HTTP endpoint...")
+                qi_adapter = QuantumIntelligenceBrokerAdapter(quantum_agent)
+                qi_port = find_available_port(args.quantum_intelligence_port)
+                qi_endpoint = f"http://127.0.0.1:{qi_port}"
+                start_embedded_agent_server(qi_adapter, qi_port)
+                if wait_for_agent_health(qi_endpoint):
+                    registered = register_embedded_agent(
+                        agent_id="quantum_intelligence_prime",
+                        agent_type="quantum_intelligence",
+                        endpoint=qi_endpoint,
+                        broker_url=args.broker,
+                        capabilities=[
+                            "health_check",
+                            "get_deployment_status",
+                            "solve_quantum_problem",
+                            "optimize_portfolio",
+                            "evolve_quantum_skills",
+                        ],
+                        metadata={
+                            "service": "Quantum Intelligence Embedded Endpoint",
+                            "quantum_backend": "pennylane" if pennylane_adapter else "unknown",
+                        },
+                    )
+                else:
+                    registered = False
+                if registered:
+                    print(f"  ✅ QuantumIntelligence registered with broker at {qi_endpoint}")
+                else:
+                    print(f"  ⚠️  QuantumIntelligence HTTP endpoint started but broker registration failed at {qi_endpoint}")
     else:
         print("\n⚛️  Quantum simulation: pass --quantum flag to activate PennyLane")
 
