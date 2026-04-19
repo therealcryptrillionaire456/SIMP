@@ -1,0 +1,1 @@
+Constitutional AI focuses on making AI systems helpful, harmless, and honest through alignment.

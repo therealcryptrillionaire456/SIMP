@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2026-04-12T02:04:54.572296",
+    "agent_id": "governance_agent_001",
+    "action": "manage_board",
+    "details": {
+      "member_id": "board_20260412_020454",
+      "name": "Dr. Sarah Johnson",
+      "title": "Independent Director",
+      "independence_status": "independent",
+      "committee_count": 2
+    },
+    "compliance_standard": "ISO 37000:2021 (Governance of Organizations)",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T02:04:54.572771",
+    "agent_id": "governance_agent_001",
+    "action": "schedule_meeting",
+    "details": {
+      "meeting_id": "meeting_20260412_020454",
+      "meeting_type": "board",
+      "date": "2026-04-12T02:04:54.572739",
+      "chairperson": "Chairperson Smith",
+      "attendee_count": 3
+    },
+    "compliance_standard": "ISO 37000:2021 (Governance of Organizations)",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T02:04:54.573079",
+    "agent_id": "governance_agent_001",
+    "action": "create_policy",
+    "details": {
+      "policy_id": "policy_20260412_020454",
+      "policy_type": "code_of_conduct",
+      "title": "Code of Business Conduct and Ethics",
+      "version": "2.0",
+      "compliance_areas": 2
+    },
+    "compliance_standard": "ISO 37000:2021 (Governance of Organizations)",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T02:04:54.573315",
+    "agent_id": "governance_agent_001",
+    "action": "track_compliance",
+    "details": {
+      "record_id": "comp_20260412_020454",
+      "compliance_area": "sec",
+      "requirement": "Form 10-K Annual Report Filing",
+      "due_date": "2026-06-11T02:04:54.573297",
+      "responsible_party": "Corporate Secretary"
+    },
+    "compliance_standard": "ISO 37000:2021 (Governance of Organizations)",
+    "security_level": "confidential"
+  }
+]

@@ -25,3 +25,29 @@ env/
 *.db
 .pytest_cache/
 *.egg-info/
+
+# Dashboard runtime artifacts
+dashboard/activity_log.jsonl
+
+# Task ledger data
+data/task_ledger.jsonl
+
+# Agent inboxes (keep the directory structure via .gitkeep)
+data/inboxes/*
+!data/inboxes/.gitkeep
+
+# Memory context packs (generated, not tracked)
+memory/context_packs/*.json
+!memory/context_packs/.gitkeep
+
+# BRP data directories
+data/brp/
+data/security_datasets/
+data/outboxes/
+logs/brp/
+*.pid
+
+# Claude/MCP local config
+.claude/
+.mcp.json
+CLAUDE.md

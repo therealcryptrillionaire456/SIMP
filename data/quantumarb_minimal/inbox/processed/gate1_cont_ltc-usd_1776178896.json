@@ -1,0 +1,23 @@
+{
+  "intent_type": "arbitrage_signal",
+  "source_agent": "gate1_continuer",
+  "target_agent": "quantumarb_minimal",
+  "timestamp": "2026-04-14T15:01:36.711292",
+  "payload": {
+    "signal_id": "gate1_cont_ltc-usd_1776178896",
+    "arb_type": "cross_venue",
+    "symbol_a": "LTC-USD",
+    "symbol_b": "LTC-USD",
+    "venue_a": "coinbase_sandbox",
+    "venue_b": "coinbase_sandbox",
+    "spread_pct": 0.2569,
+    "expected_return_pct": 0.2311,
+    "confidence": 0.71,
+    "metadata": {
+      "gate": 1,
+      "batch": "continued",
+      "realistic": true,
+      "microscopic": true
+    }
+  }
+}

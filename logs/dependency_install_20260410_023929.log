@@ -1,0 +1,123 @@
+2026-04-10 02:39:29,543 - INFO - ============================================================
+2026-04-10 02:39:29,543 - INFO - BILL RUSSELL PROTOCOL - ML DEPENDENCIES INSTALLATION
+2026-04-10 02:39:29,543 - INFO - ============================================================
+2026-04-10 02:39:29,543 - INFO - Phase 1: Installing dependencies for production deployment
+2026-04-10 02:39:29,543 - INFO - Defending against: Anthropic, Meta, OpenAI, Enterprise threats
+2026-04-10 02:39:29,544 - INFO - ============================================================
+2026-04-10 02:39:29,544 - INFO - Checking Python version...
+2026-04-10 02:39:29,544 - INFO - ✓ Python 3.9.6 meets requirements
+2026-04-10 02:39:29,544 - INFO - Checking GPU availability...
+2026-04-10 02:39:30,395 - WARNING - ⚠ No GPU available - will use CPU (training will be slower)
+2026-04-10 02:39:30,395 - INFO - 
+============================================================
+2026-04-10 02:39:30,395 - INFO - INSTALLATION PROCESS
+2026-04-10 02:39:30,395 - INFO - ============================================================
+2026-04-10 02:39:30,395 - INFO - 
+Step: Core Dependencies
+2026-04-10 02:39:30,395 - INFO - ----------------------------------------
+2026-04-10 02:39:30,395 - INFO - Installing core dependencies...
+2026-04-10 02:39:30,395 - INFO - Starting: Install pandas
+2026-04-10 02:39:30,395 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet pandas>=2.0.0
+2026-04-10 02:39:43,223 - INFO - ✓ Success: Install pandas
+2026-04-10 02:39:43,223 - INFO - Starting: Install scikit-learn
+2026-04-10 02:39:43,223 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet scikit-learn>=1.3.0
+2026-04-10 02:40:22,073 - INFO - ✓ Success: Install scikit-learn
+2026-04-10 02:40:22,073 - INFO - Starting: Install numpy
+2026-04-10 02:40:22,073 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet numpy>=1.24.0
+2026-04-10 02:40:22,377 - INFO - ✓ Success: Install numpy
+2026-04-10 02:40:22,377 - INFO - Starting: Install pyyaml
+2026-04-10 02:40:22,377 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet pyyaml>=6.0
+2026-04-10 02:40:22,973 - INFO - ✓ Success: Install pyyaml
+2026-04-10 02:40:22,973 - INFO - Starting: Install requests
+2026-04-10 02:40:22,973 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet requests>=2.31.0
+2026-04-10 02:40:23,958 - INFO - ✓ Success: Install requests
+2026-04-10 02:40:23,959 - INFO - Starting: Install urllib3
+2026-04-10 02:40:23,959 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet urllib3>=2.0.0
+2026-04-10 02:40:24,246 - INFO - ✓ Success: Install urllib3
+2026-04-10 02:40:24,246 - INFO - Starting: Install psutil
+2026-04-10 02:40:24,246 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet psutil>=5.9.0
+2026-04-10 02:40:24,654 - INFO - ✓ Success: Install psutil
+2026-04-10 02:40:24,654 - INFO - Starting: Install tqdm
+2026-04-10 02:40:24,654 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet tqdm>=4.65.0
+2026-04-10 02:40:25,053 - INFO - ✓ Success: Install tqdm
+2026-04-10 02:40:25,054 - INFO - Starting: Install python-dotenv
+2026-04-10 02:40:25,054 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet python-dotenv>=1.0.0
+2026-04-10 02:40:25,511 - INFO - ✓ Success: Install python-dotenv
+2026-04-10 02:40:25,511 - INFO - Core dependencies: 9/9 installed
+2026-04-10 02:40:25,511 - INFO - ✓ Core Dependencies completed
+2026-04-10 02:40:25,511 - INFO - 
+Step: ML Dependencies
+2026-04-10 02:40:25,511 - INFO - ----------------------------------------
+2026-04-10 02:40:25,511 - INFO - Installing ML dependencies...
+2026-04-10 02:40:25,511 - INFO - Starting: Install torch
+2026-04-10 02:40:25,511 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet torch torchvision torchaudio
+2026-04-10 02:40:34,369 - INFO - ✓ Success: Install torch
+2026-04-10 02:40:34,371 - INFO - Starting: Install transformers
+2026-04-10 02:40:34,371 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet transformers>=4.35.0
+2026-04-10 02:40:44,130 - INFO - ✓ Success: Install transformers
+2026-04-10 02:40:44,131 - INFO - Starting: Install datasets
+2026-04-10 02:40:44,131 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet datasets>=2.14.0
+2026-04-10 02:41:15,866 - INFO - ✓ Success: Install datasets
+2026-04-10 02:41:15,866 - INFO - Starting: Install accelerate
+2026-04-10 02:41:15,866 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet accelerate>=0.24.0
+2026-04-10 02:41:17,260 - INFO - ✓ Success: Install accelerate
+2026-04-10 02:41:17,260 - INFO - Starting: Install bitsandbytes
+2026-04-10 02:41:17,260 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet bitsandbytes>=0.41.0
+2026-04-10 02:42:47,272 - INFO - ✓ Success: Install bitsandbytes
+2026-04-10 02:42:47,273 - INFO - Starting: Install peft
+2026-04-10 02:42:47,273 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet peft>=0.7.0
+2026-04-10 02:42:48,601 - INFO - ✓ Success: Install peft
+2026-04-10 02:42:48,601 - INFO - Starting: Install sentence-transformers
+2026-04-10 02:42:48,601 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet sentence-transformers>=2.2.0
+2026-04-10 02:42:49,898 - INFO - ✓ Success: Install sentence-transformers
+2026-04-10 02:42:49,898 - INFO - ML dependencies: 7/7 installed
+2026-04-10 02:42:49,898 - INFO - ✓ ML Dependencies completed
+2026-04-10 02:42:49,898 - INFO - 
+Step: Telegram Dependencies
+2026-04-10 02:42:49,898 - INFO - ----------------------------------------
+2026-04-10 02:42:49,898 - INFO - Installing Telegram dependencies...
+2026-04-10 02:42:49,898 - INFO - Starting: Install python-telegram-bot
+2026-04-10 02:42:49,898 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet python-telegram-bot>=20.0
+2026-04-10 02:42:51,489 - INFO - ✓ Success: Install python-telegram-bot
+2026-04-10 02:42:51,489 - INFO - Starting: Install aiohttp
+2026-04-10 02:42:51,489 - INFO - Command: /Library/Developer/CommandLineTools/usr/bin/python3 -m pip install --quiet aiohttp>=3.9.0
+2026-04-10 02:42:52,014 - INFO - ✓ Success: Install aiohttp
+2026-04-10 02:42:52,014 - INFO - Telegram dependencies: 2/2 installed
+2026-04-10 02:42:52,014 - INFO - ✓ Telegram Dependencies completed
+2026-04-10 02:42:52,014 - INFO - 
+Step: Verification
+2026-04-10 02:42:52,014 - INFO - ----------------------------------------
+2026-04-10 02:42:52,014 - INFO - Verifying installations...
+2026-04-10 02:42:52,014 - INFO - ✓ torch imports successfully
+2026-04-10 02:42:54,428 - INFO - ✓ transformers imports successfully
+2026-04-10 02:43:05,243 - INFO - ✓ datasets imports successfully
+2026-04-10 02:43:05,243 - INFO - ✓ pandas imports successfully
+2026-04-10 02:43:05,243 - INFO - ✓ numpy imports successfully
+2026-04-10 02:43:17,725 - INFO - ✓ sklearn imports successfully
+2026-04-10 02:43:17,725 - INFO - ✓ yaml imports successfully
+2026-04-10 02:43:17,725 - INFO - ✓ requests imports successfully
+2026-04-10 02:43:17,725 - INFO - ✓ psutil imports successfully
+2026-04-10 02:43:17,725 - INFO - ✓ tqdm imports successfully
+2026-04-10 02:43:17,729 - INFO - ✓ dotenv imports successfully
+2026-04-10 02:43:17,769 - INFO - ✓ accelerate imports successfully
+2026-04-10 02:43:22,788 - INFO - ✓ peft imports successfully
+2026-04-10 02:43:22,856 - INFO - ✓ sentence_transformers imports successfully
+2026-04-10 02:43:23,007 - INFO - ✓ telegram imports successfully
+2026-04-10 02:43:23,007 - INFO - Verification: 15/15 packages working
+2026-04-10 02:43:23,007 - INFO - ✓ Verification completed
+2026-04-10 02:43:23,007 - INFO - 
+Step: Requirements File
+2026-04-10 02:43:23,007 - INFO - ----------------------------------------
+2026-04-10 02:43:23,007 - INFO - Creating requirements.txt file...
+2026-04-10 02:43:23,008 - INFO - ✓ Created requirements.txt
+2026-04-10 02:43:23,008 - INFO - ✓ Requirements File completed
+2026-04-10 02:43:23,008 - INFO - 
+============================================================
+2026-04-10 02:43:23,008 - INFO - INSTALLATION SUMMARY
+2026-04-10 02:43:23,008 - INFO - ============================================================
+2026-04-10 02:43:23,008 - INFO - Steps completed: 5/5
+2026-04-10 02:43:23,008 - INFO - ✅ ALL DEPENDENCIES INSTALLED SUCCESSFULLY
+2026-04-10 02:43:23,008 - INFO - Phase 1 complete - Ready for dataset acquisition
+2026-04-10 02:43:23,008 - INFO - 
+Log file: logs/dependency_install_20260410_023929.log
+2026-04-10 02:43:23,008 - INFO - ============================================================

@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-04-16T05:20:41.627433",
+  "total_tests": 7,
+  "passed_tests": 7,
+  "failed_tests": 0,
+  "elapsed_seconds": 29.329636096954346,
+  "test_results": {
+    "Test 1: Enhanced Mesh Bus": {
+      "passed": true,
+      "result": {
+        "agents_registered": 1,
+        "messages_sent": 1,
+        "messages_received": 1,
+        "channels_created": 1
+      },
+      "timestamp": "2026-04-16T05:20:12.388942"
+    },
+    "Test 2: Smart Mesh Client": {
+      "passed": true,
+      "result": {
+        "client_created": true,
+        "transports_checked": 4,
+        "direct_mesh_available": true
+      },
+      "timestamp": "2026-04-16T05:20:17.440453"
+    },
+    "Test 3: Mesh Discovery Service": {
+      "passed": true,
+      "result": {
+        "service_started": true,
+        "peers_added": 1,
+        "topology_generated": true,
+        "statistics_collected": true
+      },
+      "timestamp": "2026-04-16T05:20:24.458917"
+    },
+    "Test 4: Mesh Security Layer": {
+      "passed": true,
+      "result": {
+        "skipped": "'str' object has no attribute 'value'"
+      },
+      "timestamp": "2026-04-16T05:20:24.507807"
+    },
+    "Test 5: QuantumArb Mesh Integration": {
+      "passed": true,
+      "result": {
+        "integration_started": true,
+        "trade_event_created": true,
+        "statistics_collected": true,
+        "status_checked": true
+      },
+      "timestamp": "2026-04-16T05:20:34.525836"
+    },
+    "Test 6: Port Routing System": {
+      "passed": true,
+      "result": {
+        "free_port_found": 9000,
+        "port_utils_working": true
+      },
+      "timestamp": "2026-04-16T05:20:36.487933"
+    },
+    "Test 7: Dashboard Integration": {
+      "passed": true,
+      "result": {
+        "dashboard_created": true,
+        "data_fetching_working": true,
+        "html_generated": true
+      },
+      "timestamp": "2026-04-16T05:20:41.626356"
+    }
+  }
+}

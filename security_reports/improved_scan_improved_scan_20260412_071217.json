@@ -1,0 +1,21 @@
+{
+  "scan_result": {
+    "scan_id": "improved_scan_20260412_071217",
+    "start_time": "2026-04-12T07:12:17.969417Z",
+    "end_time": "2026-04-12T07:12:20.049103Z",
+    "duration_seconds": 2.079686,
+    "total_files_scanned": 500,
+    "total_findings": 0,
+    "findings_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "info": 0
+    },
+    "findings_by_category": {},
+    "security_score": 100,
+    "timestamp": "2026-04-12T07:12:20.049103Z"
+  },
+  "findings": []
+}

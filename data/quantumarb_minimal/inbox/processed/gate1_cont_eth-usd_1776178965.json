@@ -1,0 +1,23 @@
+{
+  "intent_type": "arbitrage_signal",
+  "source_agent": "gate1_continuer",
+  "target_agent": "quantumarb_minimal",
+  "timestamp": "2026-04-14T15:02:45.806214",
+  "payload": {
+    "signal_id": "gate1_cont_eth-usd_1776178965",
+    "arb_type": "cross_venue",
+    "symbol_a": "ETH-USD",
+    "symbol_b": "ETH-USD",
+    "venue_a": "coinbase_sandbox",
+    "venue_b": "coinbase_sandbox",
+    "spread_pct": 0.1219,
+    "expected_return_pct": 0.101,
+    "confidence": 0.76,
+    "metadata": {
+      "gate": 1,
+      "batch": "continued",
+      "realistic": true,
+      "microscopic": true
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "proxy_url": "http://localhost:8235",
+  "store_url": "http://localhost:43887",
+  "model": "glm-4-plus",
+  "enable_apo": true,
+  "trace_agent": true,
+  "agent_id": "kashclaw_gemma",
+  "agent_type": "planning",
+  "llm_methods_to_trace": [
+    "generate_plan",
+    "analyze_task",
+    "optimize_workflow"
+  ],
+  "optimization_focus_areas": [
+    "plan_generation",
+    "task_decomposition"
+  ]
+}

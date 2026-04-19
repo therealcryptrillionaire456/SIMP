@@ -1,0 +1,4 @@
+2026-04-14 09:56:06,038 - quantumarb_minimal - INFO - QuantumArbEngineMinimal initialized for Phase 4 microscopic trading
+2026-04-14 09:56:06,038 - quantumarb_minimal - INFO - QuantumArbAgentMinimal initialized with poll interval 2.0s
+2026-04-14 09:56:06,038 - quantumarb_minimal - INFO - Starting QuantumArbAgentMinimal...
+2026-04-14 09:57:00,086 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading

@@ -1,0 +1,1947 @@
+INFO:__main__:Starting SIMPLE SIMP Dashboard on http://localhost:8050
+INFO:     Started server process [8141]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8050 (Press CTRL+C to quit)
+INFO:     127.0.0.1:60523 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60526 - "GET /api/intents/recent HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60567 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60567 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60567 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60575 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60576 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60577 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60567 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60575 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60576 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60577 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60567 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60575 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60576 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60577 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60567 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60575 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60576 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60577 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60569 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60567 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60573 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60708 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60708 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60716 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60716 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60718 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60718 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60716 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60718 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60716 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60710 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60717 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60718 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60716 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60708 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60716 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60718 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60718 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60710 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60718 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60718 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60718 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60710 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60714 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60718 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60716 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60710 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60718 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET / HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 60751) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     127.0.0.1:60717 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60710 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     connection closed
+INFO:     127.0.0.1:60710 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60710 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60717 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60710 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:60717 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60708 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60718 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60716 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60710 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60714 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     ('127.0.0.1', 60760) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 60780) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 60795) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 60817) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 60871) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 60942) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 60992) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61054) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61112) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61194) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:61214 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61214 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61224 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61218 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61218 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61224 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61223 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61223 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61214 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61223 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61224 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61214 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61223 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61224 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61214 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61214 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61222 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61222 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61218 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61218 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61216 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61223 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61222 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61214 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61216 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61223 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61224 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61218 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61216 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61222 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61223 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61216 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61214 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61224 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61320 - "GET /api/intents/recent HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61340 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61340 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61347 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61340 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61349 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61347 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61350 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61349 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61340 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61347 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61350 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61349 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61340 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61347 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61349 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61350 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61347 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61340 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61349 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61343 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61345 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61488 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61488 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61495 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61488 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61497 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61495 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61498 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61497 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61488 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61498 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61495 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61497 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61488 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61498 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61495 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61497 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61488 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61492 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61498 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61495 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61494 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61615 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61615 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61621 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61617 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61624 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61621 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61615 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61623 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61624 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61623 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61617 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61621 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET / HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 61646) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     127.0.0.1:61623 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61621 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61617 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     connection closed
+INFO:     127.0.0.1:61621 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61617 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61617 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61617 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61620 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61624 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 61654) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:61624 - "GET / HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 61658) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     127.0.0.1:61624 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     connection closed
+INFO:     127.0.0.1:61617 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61617 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61621 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61624 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61617 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:61621 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61623 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61624 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61615 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61620 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61617 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61621 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     ('127.0.0.1', 61667) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61678) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61696) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61725) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61756) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61802) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61872) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 61954) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 62025) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 62106) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:62119 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62123 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62127 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62122 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62122 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62127 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62125 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62120 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62125 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62127 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62122 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62123 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62127 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62123 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62123 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62123 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62127 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62120 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62123 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62127 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62122 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62120 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62122 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62127 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62119 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62127 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62119 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62127 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62123 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62125 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62119 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62120 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62122 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62127 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62245 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62245 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62245 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62253 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62254 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62255 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62253 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62245 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62254 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62255 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62253 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62254 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62245 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62255 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62253 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62254 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62245 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62247 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62253 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62255 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62251 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62422 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62422 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62430 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62431 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62422 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62430 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62432 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62431 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62432 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62430 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62422 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62431 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62432 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62430 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62431 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62422 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62432 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62424 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62430 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62431 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62426 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62566 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62573 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62566 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62575 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62576 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62573 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62566 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62575 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62576 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62573 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62566 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62576 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62575 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62573 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62576 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62566 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62570 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62573 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62575 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62572 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62576 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62707 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62714 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62716 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62714 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62717 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62716 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62717 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62714 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62716 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62717 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62714 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62716 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62707 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62717 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62714 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62711 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62713 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62807 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62814 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62807 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62816 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62814 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62817 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62807 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62816 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62814 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62817 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62816 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62807 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62814 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62817 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62816 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62807 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62814 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62817 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62816 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62811 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62813 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62936 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62936 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62936 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62944 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62945 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62946 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62936 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62944 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62945 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62946 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62936 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62944 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62945 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62946 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62936 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:62944 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62945 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62938 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62936 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62946 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62942 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63112 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63112 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63120 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63112 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63121 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63120 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63122 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63121 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63112 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63120 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63122 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63121 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63112 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63120 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63122 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63121 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63112 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63114 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63120 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63122 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63118 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63146 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63146 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63151 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63153 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63146 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63154 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63151 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63153 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63154 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63146 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63151 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63153 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63146 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63154 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63151 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63153 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63154 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63146 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63148 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63151 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63149 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63172 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63172 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63176 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63178 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63180 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63181 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63172 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63180 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63172 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63176 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63176 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63181 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63178 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63180 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63180 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63182 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63176 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63182 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63181 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63176 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63180 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63181 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63178 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63180 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63172 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63181 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63176 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63178 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63182 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63256 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63256 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63261 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63256 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63263 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63261 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63264 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63263 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63256 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63261 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63264 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63256 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63263 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63261 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63264 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63256 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63263 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63261 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63264 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63259 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63257 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63257 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63282 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63281 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63259 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63279 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63282 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63257 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63281 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63283 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63259 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63279 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63279 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63281 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63279 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63279 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63281 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63279 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63281 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63279 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63257 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63282 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63259 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63283 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63281 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63329 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63338 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63338 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63338 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63338 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63339 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63331 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63336 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63338 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63336 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63336 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63336 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63336 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63336 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63338 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63331 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63331 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63336 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63331 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63336 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63331 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63336 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63331 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63339 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63338 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63336 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63331 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63339 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63329 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63340 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63338 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63336 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63495 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63495 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63495 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63502 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63504 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63505 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63502 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63495 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63504 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63505 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63502 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63504 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63495 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63505 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63502 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63504 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63497 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63505 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63495 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63500 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63502 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63637 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63637 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63637 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63643 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63646 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63647 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63637 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63643 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63646 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63647 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63637 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63643 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63646 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63647 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63637 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63643 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63639 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63642 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63647 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63646 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63637 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63784 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63791 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63784 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63793 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63794 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63784 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63791 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63793 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63794 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63784 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63793 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63791 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63794 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63784 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63793 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63791 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63794 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63788 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63784 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63793 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63789 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63989 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63989 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63996 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63989 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63997 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63996 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63999 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63997 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63989 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63999 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63996 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63997 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63989 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63999 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63996 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63997 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63989 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:63991 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63999 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63996 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63994 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64162 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64162 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64162 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64170 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64171 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64172 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64170 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64162 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64171 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64172 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64170 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64171 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64162 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64172 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64170 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64171 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64162 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64164 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64168 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64170 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64172 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64289 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64295 - "GET /api/intents/recent?limit=3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64326 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64326 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64333 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64335 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64326 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64336 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64333 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64335 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64336 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64326 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64333 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64335 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64336 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64326 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64333 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64335 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64336 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64326 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64333 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64330 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64332 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64494 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64501 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64503 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64494 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64504 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64494 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64503 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64501 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64504 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64494 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64503 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64504 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64501 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64494 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64503 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64504 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64494 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64498 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64501 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64494 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64500 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64625 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64625 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64633 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64625 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64634 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64633 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64635 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64634 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64625 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64633 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64635 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64634 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64625 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64633 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64635 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64634 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64625 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64633 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64635 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64627 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64629 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64717 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64717 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64725 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64726 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64717 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64725 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64727 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64726 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64717 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64727 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64725 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64726 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64717 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64727 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64725 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64726 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64717 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64727 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64725 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64719 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64723 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64867 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64867 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64874 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64876 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64877 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64867 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64874 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64876 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64877 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64876 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64867 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64874 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64877 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64876 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64867 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:64876 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64871 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64877 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64874 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64867 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64873 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65001 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65001 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65007 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65003 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65009 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65005 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65007 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65007 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65009 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65005 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65009 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65001 - "GET / HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 65025) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     127.0.0.1:65001 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65010 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65007 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     connection closed
+INFO:     127.0.0.1:65007 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65007 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65005 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65001 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65010 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65007 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65005 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65009 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65007 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65003 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65001 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     ('127.0.0.1', 65035) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65051) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65063) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65099) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65135) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65195) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65272) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     ('127.0.0.1', 65343) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:65377 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65383 - "GET /api/intents/recent?limit=3 HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 65395) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:65425 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65431 - "GET /api/intents/recent?limit=3 HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 65450) - "WebSocket /ws" 403
+INFO:     connection rejected (403 Forbidden)
+INFO:     connection closed
+INFO:     127.0.0.1:65460 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65460 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65469 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65469 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65469 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65460 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65469 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65463 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65460 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65463 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65469 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65463 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65469 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65463 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65469 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65463 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65467 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65469 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65465 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65467 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65463 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65469 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65461 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65461 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65461 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65509 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65509 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65509 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65511 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65509 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65510 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65461 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65509 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65507 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65461 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65507 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65509 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65511 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65510 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65461 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65460 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65509 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65510 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65460 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65509 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65510 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65460 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65510 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65511 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65507 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:65460 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65461 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65509 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49222 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49222 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49222 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49230 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49231 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49232 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49230 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49222 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49231 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49232 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49222 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49230 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49232 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49231 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49230 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49222 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49224 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49232 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49231 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49222 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49228 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49334 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49334 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49341 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49341 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49341 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49341 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49334 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49338 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49339 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49341 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49344 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49334 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49341 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49343 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49334 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49338 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49341 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49341 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49338 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49338 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49341 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49338 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49341 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49343 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49344 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49338 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49341 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49343 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49339 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49344 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49334 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49366 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49376 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49368 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49366 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49376 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49375 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49366 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49370 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49375 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49375 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49376 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49368 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49366 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49368 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49376 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49368 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49368 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49375 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49375 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49366 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49366 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49370 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49370 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49444 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49446 - "GET /api/intents/recent?limit=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49366 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49370 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49372 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49370 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49370 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49372 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49368 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49473 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49368 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49375 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49375 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49366 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49376 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49375 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49368 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49366 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49372 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49370 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49582 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49589 - "GET /api/activity HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49591 - "GET /api/intents/failed HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49582 - "GET /api/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49592 - "GET /api/capabilities HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49589 - "GET /api/routing HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49591 - "GET /api/agents/smoke HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49582 - "GET /api/flows HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49592 - "GET /api/memory/tasks HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49589 - "GET /api/memory/conversations HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49591 - "GET /api/logs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49582 - "GET /api/topology HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49592 - "GET /api/tasks/queue HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49589 - "GET /api/orchestration HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49591 - "GET /api/computer-use HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/health "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49592 - "GET /api/projectx/system HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49582 - "GET /api/projectx/processes HTTP/1.1" 404 Not Found
+INFO:httpx:HTTP Request: GET http://127.0.0.1:5555/agents "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:49589 - "GET /api/projectx/actions HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49591 - "GET /api/projectx/protocol-facts HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49586 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49588 - "GET /api/agents HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8141]

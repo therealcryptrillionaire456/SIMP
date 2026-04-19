@@ -1,0 +1,50 @@
+# Keep the Change (KTC) Requirements
+# Python 3.10+
+
+# Web Framework
+Flask==2.3.3
+flask-cors==4.0.0
+
+# Database
+SQLAlchemy==2.0.23
+alembic==1.13.1
+
+# SIMP Integration (already in main SIMP requirements)
+# simp-protocol (local package)
+
+# Image Processing (for receipt OCR)
+Pillow==10.1.0
+pytesseract==0.3.10
+opencv-python-headless==4.9.0.80
+
+# Web3/Crypto Integration
+web3==6.11.1
+solana==0.30.1
+base58==2.1.1
+
+# Price Comparison APIs (mock for now)
+requests==2.31.0
+
+# Environment Management
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Development
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.0
+
+# Optional: Retailer API SDKs
+# walmart-api-client==1.0.0  # If available
+# target-api-client==1.0.0   # If available
+
+# Optional: Cloud OCR Services
+# google-cloud-vision==3.4.6
+# azure-cognitiveservices-vision-computervision==0.9.1
+
+# Note: Some packages may need system dependencies:
+# - tesseract-ocr (for pytesseract)
+# - libgl1 (for opencv)

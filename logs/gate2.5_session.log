@@ -1,0 +1,193 @@
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Configuration loaded from config/gate2.5_enhanced_sol.json
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Gate 2.5 Agent initialized with session ID: gate2.5_1776189761
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Config loaded: gate_2.5_enhanced_sol
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Target trades: 50
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Starting Gate 2.5 trading session...
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Target: 50 trades
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Minimum for success: 40 trades
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.560, liquidity=0.900, volatility=0.833, slippage=0.690, total=0.808
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Risk score 0.808 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:41,604 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189761_5783, Size: $0.3665, Fill: 73.3%, P&L: $0.000045, Slippage: 0.0037%, Price improvement: 0.0017%
+2026-04-14 14:02:42,577 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.240, liquidity=0.900, volatility=0.819, slippage=0.598, total=0.703
+2026-04-14 14:02:42,578 - quantumarb_gate2.5 - INFO - Risk score 0.703 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:42,578 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189762_1967, Size: $0.4170, Fill: 83.4%, P&L: $-0.000081, Slippage: 0.0047%, Price improvement: 0.0037%
+2026-04-14 14:02:43,599 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.320, liquidity=0.900, volatility=0.847, slippage=0.690, total=0.738
+2026-04-14 14:02:43,599 - quantumarb_gate2.5 - INFO - Risk score 0.738 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:43,599 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189763_8229, Size: $0.3694, Fill: 73.9%, P&L: $0.000129, Slippage: 0.0039%, Price improvement: 0.0097%
+2026-04-14 14:02:44,583 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.800, liquidity=0.900, volatility=0.858, slippage=0.425, total=0.862
+2026-04-14 14:02:44,584 - quantumarb_gate2.5 - INFO - Risk score 0.862 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:44,584 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189764_8331, Size: $0.3780, Fill: 75.6%, P&L: $-0.000004, Slippage: 0.0026%, Price improvement: 0.0078%
+2026-04-14 14:02:45,667 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.823, confidence=0.480, liquidity=0.900, volatility=0.817, slippage=0.675, total=0.719
+2026-04-14 14:02:45,668 - quantumarb_gate2.5 - INFO - Risk score 0.719 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:45,668 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189765_5110, Size: $0.4487, Fill: 89.7%, P&L: $-0.000140, Slippage: 0.0048%, Price improvement: 0.0055%
+2026-04-14 14:02:46,190 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.347, confidence=0.760, liquidity=0.900, volatility=0.862, slippage=0.619, total=0.638
+2026-04-14 14:02:46,191 - quantumarb_gate2.5 - INFO - Risk score 0.638 → Tier tier_3 → Size $0.25
+2026-04-14 14:02:46,191 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189766_3358, Size: $0.2340, Fill: 93.6%, P&L: $-0.000154, Slippage: 0.0022%, Price improvement: 0.0068%
+2026-04-14 14:02:46,899 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.283, confidence=0.800, liquidity=0.900, volatility=0.879, slippage=0.419, total=0.613
+2026-04-14 14:02:46,899 - quantumarb_gate2.5 - INFO - Risk score 0.613 → Tier tier_3 → Size $0.25
+2026-04-14 14:02:46,900 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189766_5382, Size: $0.2276, Fill: 91.0%, P&L: $-0.000151, Slippage: 0.0022%, Price improvement: 0.0090%
+2026-04-14 14:02:47,408 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.480, liquidity=0.900, volatility=0.827, slippage=0.609, total=0.777
+2026-04-14 14:02:47,408 - quantumarb_gate2.5 - INFO - Risk score 0.777 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:47,408 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189767_6649, Size: $0.3937, Fill: 78.7%, P&L: $-0.000039, Slippage: 0.0032%, Price improvement: 0.0055%
+2026-04-14 14:02:48,198 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.200, liquidity=0.900, volatility=0.845, slippage=0.336, total=0.673
+2026-04-14 14:02:48,199 - quantumarb_gate2.5 - INFO - Risk score 0.673 → Tier tier_2 → Size $0.35
+2026-04-14 14:02:48,199 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189768_4931, Size: $0.2831, Fill: 80.9%, P&L: $0.000034, Slippage: 0.0047%, Price improvement: 0.0061%
+2026-04-14 14:02:49,248 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.270, confidence=0.680, liquidity=0.900, volatility=0.816, slippage=0.571, total=0.577
+2026-04-14 14:02:49,248 - quantumarb_gate2.5 - INFO - Risk score 0.577 → Tier tier_4 → Size $0.15
+2026-04-14 14:02:49,249 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189769_5725, Size: $0.1282, Fill: 85.4%, P&L: $-0.000093, Slippage: 0.0017%, Price improvement: 0.0077%
+2026-04-14 14:02:49,251 - quantumarb_gate2.5 - INFO - Progress: 10 trades executed, P&L: $-0.000452
+2026-04-14 14:02:50,527 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.949, confidence=0.440, liquidity=0.900, volatility=0.837, slippage=0.703, total=0.756
+2026-04-14 14:02:50,527 - quantumarb_gate2.5 - INFO - Risk score 0.756 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:50,527 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189770_3727, Size: $0.4298, Fill: 86.0%, P&L: $-0.000112, Slippage: 0.0039%, Price improvement: 0.0013%
+2026-04-14 14:02:51,860 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.986, confidence=0.320, liquidity=0.900, volatility=0.812, slippage=0.683, total=0.728
+2026-04-14 14:02:51,861 - quantumarb_gate2.5 - INFO - Risk score 0.728 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:51,861 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189771_2556, Size: $0.3611, Fill: 72.2%, P&L: $-0.000085, Slippage: 0.0028%, Price improvement: 0.0085%
+2026-04-14 14:02:52,444 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.160, liquidity=0.900, volatility=0.809, slippage=0.829, total=0.696
+2026-04-14 14:02:52,445 - quantumarb_gate2.5 - INFO - Risk score 0.696 → Tier tier_2 → Size $0.35
+2026-04-14 14:02:52,445 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189772_9401, Size: $0.3324, Fill: 95.0%, P&L: $-0.000056, Slippage: 0.0046%, Price improvement: 0.0035%
+2026-04-14 14:02:53,127 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.560, liquidity=0.900, volatility=0.840, slippage=0.513, total=0.795
+2026-04-14 14:02:53,127 - quantumarb_gate2.5 - INFO - Risk score 0.795 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:53,127 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189773_3822, Size: $0.4037, Fill: 80.7%, P&L: $0.000122, Slippage: 0.0047%, Price improvement: 0.0023%
+2026-04-14 14:02:54,157 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.199, confidence=0.360, liquidity=0.900, volatility=0.858, slippage=0.824, total=0.481
+2026-04-14 14:02:54,865 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.939, confidence=0.520, liquidity=0.900, volatility=0.843, slippage=0.413, total=0.754
+2026-04-14 14:02:54,866 - quantumarb_gate2.5 - INFO - Risk score 0.754 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:54,866 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189774_7308, Size: $0.3844, Fill: 76.9%, P&L: $-0.000092, Slippage: 0.0029%, Price improvement: 0.0055%
+2026-04-14 14:02:55,889 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.320, liquidity=0.900, volatility=0.825, slippage=0.344, total=0.707
+2026-04-14 14:02:55,889 - quantumarb_gate2.5 - INFO - Risk score 0.707 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:55,890 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189775_4535, Size: $0.4552, Fill: 91.0%, P&L: $0.000147, Slippage: 0.0014%, Price improvement: 0.0059%
+2026-04-14 14:02:57,267 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.580, confidence=0.800, liquidity=0.900, volatility=0.873, slippage=0.341, total=0.710
+2026-04-14 14:02:57,267 - quantumarb_gate2.5 - INFO - Risk score 0.710 → Tier tier_1 → Size $0.50
+2026-04-14 14:02:57,267 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189777_8799, Size: $0.3549, Fill: 71.0%, P&L: $-0.000168, Slippage: 0.0012%, Price improvement: 0.0074%
+2026-04-14 14:02:58,634 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.244, confidence=0.240, liquidity=0.900, volatility=0.862, slippage=0.694, total=0.452
+2026-04-14 14:03:00,105 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.863, confidence=0.800, liquidity=0.900, volatility=0.845, slippage=0.513, total=0.819
+2026-04-14 14:03:00,106 - quantumarb_gate2.5 - INFO - Risk score 0.819 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:00,106 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189780_5469, Size: $0.3614, Fill: 72.3%, P&L: $-0.000094, Slippage: 0.0033%, Price improvement: 0.0048%
+2026-04-14 14:03:00,832 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.600, liquidity=0.900, volatility=0.867, slippage=0.630, total=0.819
+2026-04-14 14:03:00,832 - quantumarb_gate2.5 - INFO - Risk score 0.819 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:00,832 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189780_2795, Size: $0.3757, Fill: 75.1%, P&L: $0.000080, Slippage: 0.0025%, Price improvement: 0.0058%
+2026-04-14 14:03:02,250 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.977, confidence=0.560, liquidity=0.900, volatility=0.831, slippage=0.363, total=0.774
+2026-04-14 14:03:02,250 - quantumarb_gate2.5 - INFO - Risk score 0.774 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:02,250 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189782_2332, Size: $0.4140, Fill: 82.8%, P&L: $-0.000087, Slippage: 0.0044%, Price improvement: 0.0027%
+2026-04-14 14:03:02,253 - quantumarb_gate2.5 - INFO - Progress: 20 trades executed, P&L: $-0.000796
+2026-04-14 14:03:02,980 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.760, liquidity=0.900, volatility=0.827, slippage=0.367, total=0.842
+2026-04-14 14:03:02,981 - quantumarb_gate2.5 - INFO - Risk score 0.842 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:02,981 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189782_9657, Size: $0.3997, Fill: 79.9%, P&L: $0.000041, Slippage: 0.0036%, Price improvement: 0.0094%
+2026-04-14 14:03:04,275 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.400, liquidity=0.900, volatility=0.870, slippage=0.804, total=0.774
+2026-04-14 14:03:04,276 - quantumarb_gate2.5 - INFO - Risk score 0.774 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:04,276 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189784_6188, Size: $0.4568, Fill: 91.4%, P&L: $-0.000084, Slippage: 0.0033%, Price improvement: 0.0037%
+2026-04-14 14:03:05,144 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.720, liquidity=0.900, volatility=0.823, slippage=0.466, total=0.837
+2026-04-14 14:03:05,144 - quantumarb_gate2.5 - INFO - Risk score 0.837 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:05,145 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189785_9193, Size: $0.3938, Fill: 78.8%, P&L: $0.000050, Slippage: 0.0012%, Price improvement: 0.0080%
+2026-04-14 14:03:06,181 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.416, confidence=0.800, liquidity=0.900, volatility=0.874, slippage=0.428, total=0.660
+2026-04-14 14:03:06,182 - quantumarb_gate2.5 - INFO - Risk score 0.660 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:06,182 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189786_3691, Size: $0.2610, Fill: 74.6%, P&L: $-0.000159, Slippage: 0.0013%, Price improvement: 0.0091%
+2026-04-14 14:03:07,619 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.879, confidence=0.320, liquidity=0.900, volatility=0.837, slippage=0.657, total=0.691
+2026-04-14 14:03:07,620 - quantumarb_gate2.5 - INFO - Risk score 0.691 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:07,620 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189787_7770, Size: $0.3198, Fill: 91.4%, P&L: $-0.000102, Slippage: 0.0040%, Price improvement: 0.0028%
+2026-04-14 14:03:08,451 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.400, liquidity=0.900, volatility=0.829, slippage=0.350, total=0.732
+2026-04-14 14:03:08,452 - quantumarb_gate2.5 - INFO - Risk score 0.732 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:08,452 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189788_8509, Size: $0.4700, Fill: 94.0%, P&L: $0.000102, Slippage: 0.0017%, Price improvement: 0.0035%
+2026-04-14 14:03:08,989 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.520, liquidity=0.900, volatility=0.834, slippage=0.712, total=0.798
+2026-04-14 14:03:08,989 - quantumarb_gate2.5 - INFO - Risk score 0.798 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:08,989 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189788_2340, Size: $0.3818, Fill: 76.4%, P&L: $-0.000033, Slippage: 0.0031%, Price improvement: 0.0063%
+2026-04-14 14:03:09,854 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.367, confidence=0.640, liquidity=0.900, volatility=0.831, slippage=0.457, total=0.592
+2026-04-14 14:03:09,854 - quantumarb_gate2.5 - INFO - Risk score 0.592 → Tier tier_4 → Size $0.15
+2026-04-14 14:03:09,855 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189789_2047, Size: $0.1089, Fill: 72.6%, P&L: $-0.000073, Slippage: 0.0014%, Price improvement: 0.0069%
+2026-04-14 14:03:11,300 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.264, confidence=0.160, liquidity=0.900, volatility=0.849, slippage=0.347, total=0.405
+2026-04-14 14:03:12,111 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.981, confidence=0.160, liquidity=0.900, volatility=0.864, slippage=0.791, total=0.693
+2026-04-14 14:03:12,111 - quantumarb_gate2.5 - INFO - Risk score 0.693 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:12,111 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189792_7017, Size: $0.3270, Fill: 93.4%, P&L: $-0.000056, Slippage: 0.0048%, Price improvement: 0.0074%
+2026-04-14 14:03:13,613 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.280, liquidity=0.900, volatility=0.823, slippage=0.801, total=0.732
+2026-04-14 14:03:13,613 - quantumarb_gate2.5 - INFO - Risk score 0.732 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:13,613 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189793_6159, Size: $0.4235, Fill: 84.7%, P&L: $0.000084, Slippage: 0.0045%, Price improvement: 0.0062%
+2026-04-14 14:03:13,614 - quantumarb_gate2.5 - INFO - Progress: 30 trades executed, P&L: $-0.001025
+2026-04-14 14:03:14,995 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.996, confidence=0.720, liquidity=0.900, volatility=0.879, slippage=0.727, total=0.863
+2026-04-14 14:03:14,995 - quantumarb_gate2.5 - INFO - Risk score 0.863 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:14,996 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189794_4723, Size: $0.4683, Fill: 93.7%, P&L: $-0.000082, Slippage: 0.0035%, Price improvement: 0.0014%
+2026-04-14 14:03:16,365 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.160, liquidity=0.900, volatility=0.804, slippage=0.753, total=0.690
+2026-04-14 14:03:16,365 - quantumarb_gate2.5 - INFO - Risk score 0.690 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:16,365 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189796_4428, Size: $0.2612, Fill: 74.6%, P&L: $-0.000007, Slippage: 0.0019%, Price improvement: 0.0071%
+2026-04-14 14:03:17,745 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.827, confidence=0.320, liquidity=0.900, volatility=0.807, slippage=0.663, total=0.670
+2026-04-14 14:03:17,746 - quantumarb_gate2.5 - INFO - Risk score 0.670 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:17,746 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189797_8818, Size: $0.2708, Fill: 77.4%, P&L: $-0.000085, Slippage: 0.0017%, Price improvement: 0.0019%
+2026-04-14 14:03:19,073 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.160, liquidity=0.900, volatility=0.829, slippage=0.819, total=0.698
+2026-04-14 14:03:19,073 - quantumarb_gate2.5 - INFO - Risk score 0.698 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:19,073 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189799_5800, Size: $0.3319, Fill: 94.8%, P&L: $0.000043, Slippage: 0.0040%, Price improvement: 0.0051%
+2026-04-14 14:03:20,329 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.773, confidence=0.360, liquidity=0.900, volatility=0.825, slippage=0.811, total=0.677
+2026-04-14 14:03:20,329 - quantumarb_gate2.5 - INFO - Risk score 0.677 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:20,330 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189800_7208, Size: $0.2753, Fill: 78.6%, P&L: $-0.000095, Slippage: 0.0025%, Price improvement: 0.0013%
+2026-04-14 14:03:21,488 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.627, confidence=0.240, liquidity=0.900, volatility=0.833, slippage=0.731, total=0.585
+2026-04-14 14:03:21,488 - quantumarb_gate2.5 - INFO - Risk score 0.585 → Tier tier_4 → Size $0.15
+2026-04-14 14:03:21,488 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189801_8524, Size: $0.1109, Fill: 73.9%, P&L: $-0.000047, Slippage: 0.0015%, Price improvement: 0.0083%
+2026-04-14 14:03:22,208 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.643, confidence=0.560, liquidity=0.900, volatility=0.879, slippage=0.832, total=0.700
+2026-04-14 14:03:22,208 - quantumarb_gate2.5 - INFO - Risk score 0.700 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:22,208 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189802_3147, Size: $0.4482, Fill: 89.6%, P&L: $-0.000219, Slippage: 0.0042%, Price improvement: 0.0090%
+2026-04-14 14:03:22,806 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.549, confidence=0.600, liquidity=0.900, volatility=0.833, slippage=0.354, total=0.635
+2026-04-14 14:03:22,806 - quantumarb_gate2.5 - INFO - Risk score 0.635 → Tier tier_3 → Size $0.25
+2026-04-14 14:03:22,807 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189802_1342, Size: $0.2196, Fill: 87.8%, P&L: $-0.000119, Slippage: 0.0025%, Price improvement: 0.0055%
+2026-04-14 14:03:24,136 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.600, liquidity=0.900, volatility=0.813, slippage=0.373, total=0.792
+2026-04-14 14:03:24,136 - quantumarb_gate2.5 - INFO - Risk score 0.792 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:24,137 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189804_6764, Size: $0.3738, Fill: 74.8%, P&L: $0.000082, Slippage: 0.0014%, Price improvement: 0.0035%
+2026-04-14 14:03:25,059 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.679, confidence=0.560, liquidity=0.900, volatility=0.807, slippage=0.653, total=0.690
+2026-04-14 14:03:25,060 - quantumarb_gate2.5 - INFO - Risk score 0.690 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:25,060 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189805_5700, Size: $0.3023, Fill: 86.4%, P&L: $-0.000121, Slippage: 0.0012%, Price improvement: 0.0086%
+2026-04-14 14:03:25,062 - quantumarb_gate2.5 - INFO - Progress: 40 trades executed, P&L: $-0.001674
+2026-04-14 14:03:26,436 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 40/40 trades
+2026-04-14 14:03:26,437 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.120, liquidity=0.900, volatility=0.826, slippage=0.370, total=0.650
+2026-04-14 14:03:26,437 - quantumarb_gate2.5 - INFO - Risk score 0.650 → Tier tier_3 → Size $0.25
+2026-04-14 14:03:26,438 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189806_9214, Size: $0.2447, Fill: 97.9%, P&L: $-0.000027, Slippage: 0.0045%, Price improvement: 0.0025%
+2026-04-14 14:03:27,636 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 41/40 trades
+2026-04-14 14:03:27,636 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.819, confidence=0.400, liquidity=0.900, volatility=0.835, slippage=0.468, total=0.679
+2026-04-14 14:03:27,636 - quantumarb_gate2.5 - INFO - Risk score 0.679 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:27,636 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189807_6718, Size: $0.3247, Fill: 92.8%, P&L: $-0.000096, Slippage: 0.0017%, Price improvement: 0.0003%
+2026-04-14 14:03:29,063 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 42/40 trades
+2026-04-14 14:03:29,064 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.456, confidence=0.440, liquidity=0.900, volatility=0.848, slippage=0.553, total=0.573
+2026-04-14 14:03:29,064 - quantumarb_gate2.5 - INFO - Risk score 0.573 → Tier tier_4 → Size $0.15
+2026-04-14 14:03:29,064 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189809_2636, Size: $0.1217, Fill: 81.2%, P&L: $-0.000069, Slippage: 0.0050%, Price improvement: 0.0066%
+2026-04-14 14:03:30,206 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 43/40 trades
+2026-04-14 14:03:30,206 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.684, confidence=0.560, liquidity=0.900, volatility=0.851, slippage=0.824, total=0.711
+2026-04-14 14:03:30,206 - quantumarb_gate2.5 - INFO - Risk score 0.711 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:30,207 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189810_2782, Size: $0.4858, Fill: 97.2%, P&L: $-0.000213, Slippage: 0.0031%, Price improvement: 0.0091%
+2026-04-14 14:03:31,044 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 44/40 trades
+2026-04-14 14:03:31,045 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.470, confidence=0.400, liquidity=0.900, volatility=0.852, slippage=0.551, total=0.566
+2026-04-14 14:03:31,045 - quantumarb_gate2.5 - INFO - Risk score 0.566 → Tier tier_4 → Size $0.15
+2026-04-14 14:03:31,045 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189811_7319, Size: $0.1095, Fill: 73.0%, P&L: $-0.000066, Slippage: 0.0040%, Price improvement: 0.0077%
+2026-04-14 14:03:32,179 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 45/40 trades
+2026-04-14 14:03:32,180 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.200, liquidity=0.900, volatility=0.850, slippage=0.397, total=0.679
+2026-04-14 14:03:32,180 - quantumarb_gate2.5 - INFO - Risk score 0.679 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:32,180 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189812_5955, Size: $0.2820, Fill: 80.6%, P&L: $0.000089, Slippage: 0.0015%, Price improvement: 0.0011%
+2026-04-14 14:03:33,336 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 46/40 trades
+2026-04-14 14:03:33,337 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.680, liquidity=0.900, volatility=0.840, slippage=0.714, total=0.847
+2026-04-14 14:03:33,337 - quantumarb_gate2.5 - INFO - Risk score 0.847 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:33,337 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189813_4170, Size: $0.3925, Fill: 78.5%, P&L: $0.000069, Slippage: 0.0024%, Price improvement: 0.0065%
+2026-04-14 14:03:34,719 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 47/40 trades
+2026-04-14 14:03:34,720 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=0.587, confidence=0.600, liquidity=0.900, volatility=0.845, slippage=0.671, total=0.676
+2026-04-14 14:03:34,720 - quantumarb_gate2.5 - INFO - Risk score 0.676 → Tier tier_2 → Size $0.35
+2026-04-14 14:03:34,720 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189814_4027, Size: $0.2587, Fill: 73.9%, P&L: $-0.000129, Slippage: 0.0049%, Price improvement: 0.0013%
+2026-04-14 14:03:35,490 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 48/40 trades
+2026-04-14 14:03:35,490 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.320, liquidity=0.900, volatility=0.847, slippage=0.630, total=0.733
+2026-04-14 14:03:35,490 - quantumarb_gate2.5 - INFO - Risk score 0.733 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:35,491 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189815_9427, Size: $0.3709, Fill: 74.2%, P&L: $0.000068, Slippage: 0.0031%, Price improvement: 0.0035%
+2026-04-14 14:03:36,469 - quantumarb_gate2.5 - INFO - ✅ Minimum for success reached: 49/40 trades
+2026-04-14 14:03:36,469 - quantumarb_gate2.5 - INFO - Risk score breakdown: spread=1.000, confidence=0.400, liquidity=0.900, volatility=0.872, slippage=0.674, total=0.764
+2026-04-14 14:03:36,470 - quantumarb_gate2.5 - INFO - Risk score 0.764 → Tier tier_1 → Size $0.50
+2026-04-14 14:03:36,470 - quantumarb_gate2.5 - INFO - Trade executed: trade_1776189816_6885, Size: $0.4659, Fill: 93.2%, P&L: $0.000132, Slippage: 0.0026%, Price improvement: 0.0035%
+2026-04-14 14:03:36,472 - quantumarb_gate2.5 - INFO - Progress: 50 trades executed, P&L: $-0.001916
+2026-04-14 14:03:37,048 - quantumarb_gate2.5 - INFO - ✅ Target reached: 50/50 trades
+2026-04-14 14:03:37,049 - quantumarb_gate2.5 - INFO - Gate 2.5 session completed successfully!
+2026-04-14 14:03:37,051 - quantumarb_gate2.5 - INFO - Session summary saved: data/quantumarb_gate2.5/session_summary_gate2.5_1776189761.json
+2026-04-14 14:03:37,051 - quantumarb_gate2.5 - INFO - ✅ GATE 2.5 SUCCESS: 50/40 minimum trades executed
+
+============================================================
+GATE 2.5 SESSION SUMMARY
+============================================================
+Session ID: gate2.5_1776189761
+Duration: 0.9 minutes
+Trades Executed: 50
+Total P&L: $-0.001916
+Opportunities Evaluated: 53
+
+Decision Breakdown:
+  execute: 50
+  reject_risk: 3
+============================================================

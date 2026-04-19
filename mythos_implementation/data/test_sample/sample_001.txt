@@ -1,0 +1,1 @@
+Large language models like GPT and Claude can understand and generate human-like text.

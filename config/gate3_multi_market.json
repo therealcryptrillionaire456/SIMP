@@ -1,0 +1,222 @@
+{
+  "mode": "gate_3_multi_market",
+  "exchange": "coinbase",
+  "symbols": ["SOL-USD", "BTC-USD", "ETH-USD"],
+  "position_sizing": {
+    "position_type": "symbol_scaled",
+    "min_notional": 0.10,
+    "max_notional": 1.00,
+    "default_notional": 0.50,
+    "size_by_symbol": {
+      "SOL-USD": 0.50,
+      "BTC-USD": 0.30,
+      "ETH-USD": 0.20
+    },
+    "size_tiers": {
+      "tier_1": {"risk_score": 0.75, "size_multiplier": 1.0},
+      "tier_2": {"risk_score": 0.70, "size_multiplier": 0.8},
+      "tier_3": {"risk_score": 0.65, "size_multiplier": 0.6},
+      "tier_4": {"risk_score": 0.60, "size_multiplier": 0.4},
+      "tier_5": {"risk_score": 0.55, "size_multiplier": 0.2}
+    }
+  },
+  "risk_limits": {
+    "max_risk_per_trade_dollar": 1.00,
+    "max_session_loss_dollar": 10.00,
+    "max_open_positions": 3,
+    "max_concurrent_orders": 5,
+    "max_daily_trades": 150
+  },
+  "risk_management": {
+    "multi_factor_scoring": true,
+    "factors": {
+      "spread": {
+        "weight": 0.30,
+        "min_by_symbol": {
+          "SOL-USD": 0.02,
+          "BTC-USD": 0.01,
+          "ETH-USD": 0.015
+        },
+        "max_by_symbol": {
+          "SOL-USD": 0.30,
+          "BTC-USD": 0.20,
+          "ETH-USD": 0.25
+        },
+        "normalization_by_symbol": {
+          "SOL-USD": 0.25,
+          "BTC-USD": 0.15,
+          "ETH-USD": 0.20
+        }
+      },
+      "confidence": {
+        "weight": 0.25,
+        "min": 0.75
+      },
+      "liquidity": {
+        "weight": 0.20,
+        "scores_by_symbol": {
+          "SOL-USD": 0.9,
+          "BTC-USD": 0.95,
+          "ETH-USD": 0.85
+        }
+      },
+      "volatility": {
+        "weight": 0.15,
+        "max_by_symbol": {
+          "SOL-USD": 0.25,
+          "BTC-USD": 0.20,
+          "ETH-USD": 0.22
+        }
+      },
+      "slippage": {
+        "weight": 0.10,
+        "max_by_symbol": {
+          "SOL-USD": 0.03,
+          "BTC-USD": 0.02,
+          "ETH-USD": 0.025
+        }
+      }
+    },
+    "minimum_score_by_symbol": {
+      "SOL-USD": 0.60,
+      "BTC-USD": 0.65,
+      "ETH-USD": 0.62
+    },
+    "size_adjustment": true
+  },
+  "execution": {
+    "order_types": ["limit", "market"],
+    "default_order_type": "limit",
+    "time_in_force": "GTC",
+    "max_slippage_bps_by_symbol": {
+      "SOL-USD": 10,
+      "BTC-USD": 8,
+      "ETH-USD": 9
+    },
+    "allow_partial_fills": true,
+    "min_fill_percentage": 80,
+    "price_improvement_target": 0.005,
+    "retry_on_partial": true,
+    "max_retries": 2
+  },
+  "monitoring": {
+    "enhanced_alerts": true,
+    "alert_triggers": [
+      "risk_score < minimum_by_symbol",
+      "slippage > max_by_symbol",
+      "partial_fill < 80%",
+      "latency > 100ms",
+      "price_improvement < 0",
+      "symbol_concentration > 50%"
+    ],
+    "real_time_dashboard": true,
+    "performance_tracking": true,
+    "metrics_to_track": [
+      "risk_score_distribution_by_symbol",
+      "slippage_distribution_by_symbol",
+      "fill_rate_by_symbol",
+      "price_improvement_by_symbol",
+      "latency_by_symbol",
+      "pnl_by_symbol"
+    ]
+  },
+  "targets": {
+    "total_trades": 150,
+    "min_for_success": 120,
+    "trades_by_symbol": {
+      "SOL-USD": 60,
+      "BTC-USD": 45,
+      "ETH-USD": 45
+    },
+    "min_trades_per_symbol": {
+      "SOL-USD": 48,
+      "BTC-USD": 36,
+      "ETH-USD": 36
+    },
+    "execution_success_rate": 90,
+    "max_slippage_average": 8,
+    "risk_score_stability": 0.15
+  },
+  "session_structure": {
+    "session_1": {
+      "symbols": ["SOL-USD"],
+      "target_trades": 30,
+      "focus": "multi_market_validation_sol"
+    },
+    "session_2": {
+      "symbols": ["SOL-USD", "BTC-USD", "ETH-USD"],
+      "target_trades": 60,
+      "focus": "multi_market_concurrent"
+    },
+    "session_3": {
+      "symbols": ["SOL-USD", "BTC-USD", "ETH-USD"],
+      "target_trades": 60,
+      "focus": "edge_cases_performance"
+    }
+  },
+  "symbol_characteristics": {
+    "SOL-USD": {
+      "min_spread_pct": 0.02,
+      "typical_spread_pct": 0.05,
+      "liquidity": "very_high",
+      "volatility_profile": "high",
+      "typical_order_size_usd": 0.50,
+      "price_range": [80, 120],
+      "tick_size": 0.01,
+      "risk_profile": "aggressive"
+    },
+    "BTC-USD": {
+      "min_spread_pct": 0.01,
+      "typical_spread_pct": 0.02,
+      "liquidity": "extreme",
+      "volatility_profile": "medium",
+      "typical_order_size_usd": 0.30,
+      "price_range": [60000, 70000],
+      "tick_size": 0.10,
+      "risk_profile": "conservative"
+    },
+    "ETH-USD": {
+      "min_spread_pct": 0.015,
+      "typical_spread_pct": 0.03,
+      "liquidity": "high",
+      "volatility_profile": "medium_high",
+      "typical_order_size_usd": 0.20,
+      "price_range": [3000, 4000],
+      "tick_size": 0.01,
+      "risk_profile": "balanced"
+    }
+  },
+  "enhanced_features": {
+    "multi_market_support": true,
+    "symbol_specific_risk": true,
+    "concurrent_trading": true,
+    "advanced_execution": true,
+    "comprehensive_monitoring": true,
+    "performance_analytics": true
+  },
+  "safety_gates": {
+    "gate_1_complete": true,
+    "gate_2_complete": true,
+    "gate_2.5_complete": true,
+    "gate_3_active": true,
+    "gate_4_pending": false,
+    "emergency_stop_enabled": true,
+    "auto_fallback_to_gate2.5": true
+  },
+  "logging": {
+    "decision_log_path": "data/gate3_decisions.jsonl",
+    "performance_log_path": "data/gate3_performance.jsonl",
+    "alert_log_path": "data/gate3_alerts.jsonl",
+    "session_summary_path": "data/gate3_session_summary.json",
+    "symbol_performance_path": "data/gate3_symbol_performance.json"
+  },
+  "microscopic_trading": {
+    "enabled": true,
+    "gate": "3",
+    "description": "Multi-market microscopic trading with enhanced risk management",
+    "position_size_range": "$0.10-$1.00",
+    "markets": 3,
+    "risk_scoring_complexity": "advanced",
+    "execution_sophistication": "advanced"
+  }
+}

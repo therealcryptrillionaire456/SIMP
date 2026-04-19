@@ -1,0 +1,17 @@
+{
+  "prompt_id": "test_prompt_001",
+  "goal_id": "test_goal_001",
+  "cycle_number": 1,
+  "task_summary": "Create a simple test module for the self-compiler",
+  "prompt_text": "Write a Python module called test_hello.py that prints 'Hello from self-compiler v2!'",
+  "expected_artifacts": [
+    "test_hello.py"
+  ],
+  "execution_mode": "python",
+  "evaluation_requirements": {
+    "schema_validation": true,
+    "syntax_check": true,
+    "policy_check": "basic"
+  },
+  "max_recursion_depth": 1
+}

@@ -1,0 +1,136 @@
+{
+  "quantum_mode": {
+    "version": "1.0.0",
+    "description": "Configuration for Stray Goose Quantum Mode",
+    "last_updated": "2024-04-13"
+  },
+  
+  "detection": {
+    "quantum_keywords": [
+      "quantum", "qubit", "qbit", "superposition", "entanglement",
+      "quantum algorithm", "quantum computing", "quantum circuit",
+      "quantum gate", "hadamard", "cnot", "toffoli", "grover",
+      "shor", "quantum fourier", "quantum teleportation",
+      "bell state", "quantum error", "quantum simulation"
+    ],
+    "confidence_thresholds": {
+      "low": 0.3,
+      "medium": 0.5,
+      "high": 0.7,
+      "very_high": 0.9
+    },
+    "false_positive_penalty": 0.2
+  },
+  
+  "retrieval": {
+    "max_examples": 5,
+    "min_similarity_score": 0.3,
+    "cache_enabled": true,
+    "cache_size": 1000,
+    "confidence_mapping": {
+      "low": 0.3,
+      "medium": 0.5,
+      "high": 0.7,
+      "very_high": 0.9
+    }
+  },
+  
+  "verification": {
+    "passing_threshold": 0.8,
+    "partial_threshold": 0.5,
+    "escalation_threshold": 0.6,
+    "required_checks": ["framework_check", "safety_check"]
+  },
+  
+  "execution": {
+    "modes": ["explanation_only", "simulation", "sandboxed"],
+    "default_mode": "simulation",
+    "max_execution_time": 30,
+    "sandbox_enabled": true,
+    "resource_limits": {
+      "cpu_time": 10,
+      "memory_mb": 100,
+      "output_chars": 1000
+    }
+  },
+  
+  "safety": {
+    "dangerous_patterns": {
+      "system_calls": [
+        "os.system", "subprocess.run", "subprocess.call", "subprocess.Popen",
+        "exec(", "eval(", "compile(", "__import__"
+      ],
+      "file_operations": [
+        "open(", "write(", "read(", "remove(", "delete(",
+        "shutil.", "pathlib.Path.unlink"
+      ],
+      "network_operations": [
+        "requests.", "urllib.", "socket.", "http.client",
+        "websocket.", "aiohttp."
+      ],
+      "hardware_access": [
+        "real_hardware", "backend=", "device=", "quantum_processor",
+        "ibmq_", "rigetti_", "ionq_"
+      ]
+    },
+    "allowed_imports": {
+      "qiskit": ["qiskit", "numpy", "matplotlib", "scipy", "typing", "math", "random"],
+      "cirq": ["cirq", "numpy", "matplotlib", "sympy", "typing", "math", "random"],
+      "pennylane": ["pennylane", "numpy", "torch", "tensorflow", "matplotlib", "typing", "math"],
+      "general": ["numpy", "matplotlib", "typing", "math", "random", "datetime"]
+    }
+  },
+  
+  "risk_scoring": {
+    "factors": {
+      "query_complexity": {"weight": 0.2, "threshold": 0.7},
+      "framework_maturity": {"weight": 0.15, "threshold": 0.6},
+      "safety_indicators": {"weight": 0.25, "threshold": 0.8},
+      "verification_confidence": {"weight": 0.2, "threshold": 0.7},
+      "historical_patterns": {"weight": 0.1, "threshold": 0.5},
+      "context_risk": {"weight": 0.1, "threshold": 0.6}
+    },
+    "risk_bands": {
+      "LOW": 0.3,
+      "MEDIUM": 0.5,
+      "HIGH": 0.7,
+      "CRITICAL": 0.9
+    },
+    "blocking_threshold": "HIGH"
+  },
+  
+  "learning": {
+    "enabled": true,
+    "positive_reward": 0.1,
+    "negative_penalty": 0.05,
+    "dataset_update_threshold": 0.8,
+    "max_examples_per_type": 1000
+  },
+  
+  "projectx_integration": {
+    "enabled": true,
+    "endpoint": "http://localhost:8771/judgment",
+    "timeout": 30,
+    "cache_enabled": true,
+    "cache_size": 1000,
+    "fallback_approval_rate": 0.3
+  },
+  
+  "tracing": {
+    "enabled": true,
+    "log_directory": "data/quantum_traces",
+    "retention_days": 7,
+    "export_enabled": true,
+    "export_directory": "data/quantum_training"
+  },
+  
+  "monitoring": {
+    "metrics_enabled": true,
+    "alert_thresholds": {
+      "error_rate": 0.1,
+      "high_risk_rate": 0.2,
+      "verification_failure_rate": 0.3
+    },
+    "dashboard_enabled": true
+  }
+}

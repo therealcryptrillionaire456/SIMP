@@ -1,0 +1,37 @@
+{
+  "threat_actor": "apt41",
+  "capabilities": [
+    "T1190",
+    "T1059",
+    "T1021"
+  ],
+  "ttp_patterns": [
+    "T1190",
+    "T1059",
+    "T1021"
+  ],
+  "objectives": [
+    "Establish initial access to perimeter",
+    "Gain domain administrator privileges",
+    "Extract sensitive intellectual property",
+    "Test detection and response capabilities"
+  ],
+  "infrastructure": {
+    "c2_channels": [
+      "HTTPS",
+      "DNS"
+    ],
+    "malware_type": "Living-off-the-land",
+    "persistence": [
+      "Scheduled tasks",
+      "Startup items"
+    ]
+  },
+  "timeline": {
+    "planning": "Day 1",
+    "reconnaissance": "Day 1-2",
+    "exploitation": "Day 2-3",
+    "post_exploitation": "Day 3-4",
+    "reporting": "Day 5"
+  }
+}

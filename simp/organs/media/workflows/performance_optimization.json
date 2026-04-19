@@ -1,0 +1,490 @@
+{
+  "name": "Content Performance Optimization",
+  "nodes": [
+    {
+      "name": "Schedule Trigger (Daily)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "minutesInterval": 24
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fetch Performance Data",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [450, 200],
+      "parameters": {
+        "batchSize": 1
+      }
+    },
+    {
+      "name": "Platform Performance Router",
+      "type": "n8n-nodes-base.switch",
+      "position": [650, 200],
+      "parameters": {
+        "dataPropertyName": "platform",
+        "rules": [
+          {
+            "value": "twitter"
+          },
+          {
+            "value": "linkedin"
+          },
+          {
+            "value": "youtube"
+          },
+          {
+            "value": "tiktok"
+          },
+          {
+            "value": "instagram"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Fetch Twitter Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 100],
+      "parameters": {
+        "url": "={{$env.TWITTER_API_URL || 'https://api.twitter.com/2/tweets'}}/{{$json.tweet_id}}",
+        "method": "GET",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.TWITTER_BEARER_TOKEN}}"
+            }
+          ]
+        },
+        "options": {
+          "query": {
+            "parameters": [
+              {
+                "name": "tweet.fields",
+                "value": "public_metrics,non_public_metrics,organic_metrics,promoted_metrics"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Fetch LinkedIn Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 200],
+      "parameters": {
+        "url": "={{$env.LINKEDIN_API_URL || 'https://api.linkedin.com/v2/organizationalEntityShareStatistics'}}",
+        "method": "GET",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.LINKEDIN_ACCESS_TOKEN}}"
+            }
+          ]
+        },
+        "options": {
+          "query": {
+            "parameters": [
+              {
+                "name": "q",
+                "value": "organizationalEntity"
+              },
+              {
+                "name": "organizationalEntity",
+                "value": "urn:li:organization:{{$env.LINKEDIN_ORG_ID}}"
+              },
+              {
+                "name": "timeIntervals.timeGranularityType",
+                "value": "DAY"
+              },
+              {
+                "name": "timeIntervals.timeRange.start",
+                "value": "={{new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()}}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Fetch YouTube Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300],
+      "parameters": {
+        "url": "={{$env.YOUTUBE_API_URL || 'https://youtubeanalytics.googleapis.com/v2/reports'}}",
+        "method": "GET",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.YOUTUBE_ACCESS_TOKEN}}"
+            }
+          ]
+        },
+        "options": {
+          "query": {
+            "parameters": [
+              {
+                "name": "ids",
+                "value": "channel=={{$env.YOUTUBE_CHANNEL_ID}}"
+              },
+              {
+                "name": "startDate",
+                "value": "={{new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}}"
+              },
+              {
+                "name": "endDate",
+                "value": "={{new Date().toISOString().split('T')[0]}}"
+              },
+              {
+                "name": "metrics",
+                "value": "views,estimatedMinutesWatched,averageViewDuration,likes,subscribersGained"
+              },
+              {
+                "name": "dimensions",
+                "value": "day,video"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Normalize Performance Data",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 200],
+      "parameters": {
+        "jsCode": "// Normalize performance data from different platforms\nconst performanceData = $input.all();\nconst normalizedData = [];\n\nfor (const data of performanceData) {\n  const raw = data.json;\n  const platform = data.json._platform || 'unknown';\n  \n  let normalized = {\n    platform: platform,\n    timestamp: new Date().toISOString(),\n    raw_data: raw\n  };\n  \n  switch(platform) {\n    case 'twitter':\n      const metrics = raw.data?.public_metrics || {};\n      normalized = {\n        ...normalized,\n        content_id: raw.data?.id,\n        impressions: metrics.impression_count || 0,\n        engagements: metrics.like_count + metrics.reply_count + metrics.retweet_count + metrics.quote_count,\n        likes: metrics.like_count || 0,\n        retweets: metrics.retweet_count || 0,\n        replies: metrics.reply_count || 0,\n        engagement_rate: metrics.impression_count > 0 ? \n          ((metrics.like_count + metrics.reply_count + metrics.retweet_count + metrics.quote_count) / metrics.impression_count) * 100 : 0,\n        reach: metrics.impression_count || 0\n      };\n      break;\n      \n    case 'linkedin':\n      const stats = raw.elements?.[0] || {};\n      normalized = {\n        ...normalized,\n        content_id: stats.share,\n        impressions: stats.impressionCount || 0,\n        engagements: stats.clickCount + stats.likeCount + stats.commentCount + stats.shareCount,\n        likes: stats.likeCount || 0,\n        comments: stats.commentCount || 0,\n        shares: stats.shareCount || 0,\n        clicks: stats.clickCount || 0,\n        engagement_rate: stats.impressionCount > 0 ? \n          ((stats.clickCount + stats.likeCount + stats.commentCount + stats.shareCount) / stats.impressionCount) * 100 : 0,\n        reach: stats.uniqueImpressions || 0\n      };\n      break;\n      \n    case 'youtube':\n      const rows = raw.rows || [];\n      const videoStats = rows.reduce((acc, row) => {\n        const videoId = row[1];\n        if (!acc[videoId]) {\n          acc[videoId] = {\n            views: 0,\n            watch_time: 0,\n            likes: 0,\n            subscribers: 0\n          };\n        }\n        acc[videoId].views += parseInt(row[2]) || 0;\n        acc[videoId].watch_time += parseInt(row[3]) || 0;\n        acc[videoId].likes += parseInt(row[4]) || 0;\n        acc[videoId].subscribers += parseInt(row[5]) || 0;\n        return acc;\n      }, {});\n      \n      // Convert to array of video performances\n      for (const [videoId, stats] of Object.entries(videoStats)) {\n        normalizedData.push({\n          platform: 'youtube',\n          content_id: videoId,\n          timestamp: new Date().toISOString(),\n          views: stats.views,\n          watch_time_minutes: Math.round(stats.watch_time / 60),\n          likes: stats.likes,\n          subscribers_gained: stats.subscribers,\n          average_view_duration: stats.views > 0 ? Math.round(stats.watch_time / stats.views) : 0,\n          engagement_rate: stats.views > 0 ? (stats.likes / stats.views) * 100 : 0\n        });\n      }\n      continue; // Skip the push below since we already pushed\n  }\n  \n  normalizedData.push(normalized);\n}\n\nreturn normalizedData;"
+      }
+    },
+    {
+      "name": "Calculate Performance Metrics",
+      "type": "n8n-nodes-base.code",
+      "position": [1250, 200],
+      "parameters": {
+        "jsCode": "// Calculate advanced performance metrics and scores\nconst performances = $input.all();\nconst analyzedPerformances = [];\n\n// Get historical data for comparison (simulated)\nconst historicalAverages = {\n  twitter: { engagement_rate: 2.5, avg_impressions: 5000 },\n  linkedin: { engagement_rate: 3.2, avg_impressions: 3000 },\n  youtube: { engagement_rate: 4.1, avg_views: 1000 }\n};\n\nfor (const perf of performances) {\n  const data = perf.json;\n  const platform = data.platform;\n  const historical = historicalAverages[platform] || {};\n  \n  // Calculate performance score (0-100)\n  let performanceScore = 0;\n  const breakdown = {};\n  \n  // Engagement rate component (0-40 points)\n  const engagementRate = data.engagement_rate || 0;\n  const targetEngagement = historical.engagement_rate || 2.0;\n  const engagementRatio = engagementRate / targetEngagement;\n  breakdown.engagement_score = Math.min(engagementRatio * 20, 40);\n  \n  // Volume component (0-30 points)\n  let volumeMetric = data.impressions || data.views || data.reach || 0;\n  let targetVolume = historical.avg_impressions || historical.avg_views || 1000;\n  const volumeRatio = Math.log10(volumeMetric + 1) / Math.log10(targetVolume + 1);\n  breakdown.volume_score = Math.min(volumeRatio * 15, 30);\n  \n  // Growth component (0-20 points) - compare with previous period\n  const growthRate = data.growth_rate || 0;\n  breakdown.growth_score = Math.min(Math.max(growthRate * 10, 0), 20);\n  \n  // Quality component (0-10 points)\n  const hasVideo = data.has_video || false;\n  const hasImage = data.has_image || false;\n  const wordCount = data.word_count || 0;\n  breakdown.quality_score = (hasVideo ? 4 : 0) + (hasImage ? 3 : 0) + (wordCount > 100 ? 3 : 0);\n  \n  // Calculate total\n  performanceScore = Object.values(breakdown).reduce((a, b) => a + b, 0);\n  \n  // Determine performance tier\n  let performanceTier = 'low';\n  if (performanceScore >= 80) performanceTier = 'excellent';\n  else if (performanceScore >= 65) performanceTier = 'good';\n  else if (performanceScore >= 50) performanceTier = 'average';\n  \n  // Identify optimization opportunities\n  const optimizations = [];\n  if (engagementRate < targetEngagement * 0.7) {\n    optimizations.push('low_engagement');\n  }\n  if (volumeMetric < targetVolume * 0.5) {\n    optimizations.push('low_reach');\n  }\n  if (data.engagement_rate > targetEngagement * 1.5) {\n    optimizations.push('high_performing');\n  }\n  \n  analyzedPerformances.push({\n    ...data,\n    performance_score: performanceScore,\n    performance_breakdown: breakdown,\n    performance_tier: performanceTier,\n    optimization_opportunities: optimizations,\n    historical_comparison: {\n      engagement_vs_target: engagementRate - targetEngagement,\n      volume_vs_target: volumeMetric - targetVolume\n    }\n  });\n}\n\nreturn analyzedPerformances;"
+      }
+    },
+    {
+      "name": "Identify Top Performers",
+      "type": "n8n-nodes-base.filter",
+      "position": [1450, 100],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.performance_score}}",
+              "operation": "largerEqual",
+              "value2": "80"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "name": "Identify Underperformers",
+      "type": "n8n-nodes-base.filter",
+      "position": [1450, 300],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.performance_score}}",
+              "operation": "smaller",
+              "value2": "50"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "name": "Generate Optimization Recommendations",
+      "type": "n8n-nodes-base.code",
+      "position": [1650, 200],
+      "parameters": {
+        "jsCode": "// Generate optimization recommendations based on performance analysis\nconst performances = $input.all();\nconst recommendations = [];\n\nfor (const perf of performances) {\n  const data = perf.json;\n  const platform = data.platform;\n  const optimizations = data.optimization_opportunities || [];\n  \n  let platformRecommendations = [];\n  \n  // Platform-specific recommendations\n  switch(platform) {\n    case 'twitter':\n      if (optimizations.includes('low_engagement')) {\n        platformRecommendations.push({\n          type: 'content',\n          action: 'add_visuals',\n          priority: 'high',\n          description: 'Add images or videos to increase engagement',\n          expected_impact: '+15-25% engagement'\n        });\n        platformRecommendations.push({\n          type: 'timing',\n          action: 'optimize_post_time',\n          priority: 'medium',\n          description: 'Post during peak engagement hours (9-11 AM, 1-3 PM)',\n          expected_impact: '+10-20% reach'\n        });\n      }\n      if (optimizations.includes('low_reach')) {\n        platformRecommendations.push({\n          type: 'hashtag',\n          action: 'add_trending_hashtags',\n          priority: 'high',\n          description: 'Include 2-3 trending hashtags',\n          expected_impact: '+20-30% impressions'\n        });\n      }\n      break;\n      \n    case 'linkedin':\n      if (optimizations.includes('low_engagement')) {\n        platformRecommendations.push({\n          type: 'format',\n          action: 'use_carousel',\n          priority: 'high',\n          description: 'Use carousel format for multiple points',\n          expected_impact: '+25-35% engagement'\n        });\n        platformRecommendations.push({\n          type: 'content',\n          action: 'add_industry_insights',\n          priority: 'medium',\n          description: 'Include data or industry insights',\n          expected_impact: '+15-25% comments'\n        });\n      }\n      break;\n      \n    case 'youtube':\n      if (optimizations.includes('low_engagement')) {\n        platformRecommendations.push({\n          type: 'thumbnail',\n          action: 'optimize_thumbnail',\n          priority: 'high',\n          description: 'Use high-contrast, text-heavy thumbnails',\n          expected_impact: '+20-30% CTR'\n        });\n        platformRecommendations.push({\n          type: 'content',\n          action: 'add_chapters',\n          priority: 'medium',\n          description: 'Add timestamps and chapters',\n          expected_impact': '+15-25% watch_time'\n        });\n      }\n      break;\n  }\n  \n  // General recommendations for high performers\n  if (optimizations.includes('high_performing')) {\n    platformRecommendations.push({\n      type: 'amplification',\n      action: 'boost_or_repurpose',\n      priority: 'high',\n      description: 'Boost this content or repurpose for other platforms',\n      expected_impact: '+30-50% additional reach'\n    });\n  }\n  \n  if (platformRecommendations.length > 0) {\n    recommendations.push({\n      content_id: data.content_id,\n      platform: platform,\n      performance_score: data.performance_score,\n      performance_tier: data.performance_tier,\n      recommendations: platformRecommendations,\n      estimated_impact: platformRecommendations.reduce((sum, rec) => {\n        const impact = parseInt(rec.expected_impact) || 0;\n        return sum + impact;\n      }, 0) / platformRecommendations.length\n    });\n  }\n}\n\n// Sort by estimated impact\nrecommendations.sort((a, b) => b.estimated_impact - a.estimated_impact);\n\nreturn recommendations;"
+      }
+    },
+    {
+      "name": "Generate Performance Report",
+      "type": "n8n-nodes-base.code",
+      "position": [1850, 200],
+      "parameters": {
+        "jsCode": "// Generate comprehensive performance report\nconst allData = $input.all();\n\nconst report = {\n  timestamp: new Date().toISOString(),\n  period: 'daily',\n  summary: {\n    total_content_analyzed: allData.length,\n    average_performance_score: 0,\n    top_performers: 0,\n    underperformers: 0,\n    by_platform: {},\n    by_tier: {}\n  },\n  top_performers: [],\n  key_insights: [],\n  recommendations: []\n};\n\nlet totalScore = 0;\n\nfor (const data of allData) {\n  const perf = data.json;\n  totalScore += perf.performance_score || 0;\n  \n  // Count by platform\n  const platform = perf.platform;\n  if (!report.summary.by_platform[platform]) {\n    report.summary.by_platform[platform] = 0;\n  }\n  report.summary.by_platform[platform]++;\n  \n  // Count by tier\n  const tier = perf.performance_tier || 'unknown';\n  if (!report.summary.by_tier[tier]) {\n    report.summary.by_tier[tier] = 0;\n  }\n  report.summary.by_tier[tier]++;\n  \n  // Track top performers\n  if (perf.performance_score >= 80) {\n    report.summary.top_performers++;\n    report.top_performers.push({\n      content_id: perf.content_id,\n      platform: platform,\n      score: perf.performance_score,\n      key_metric: perf.impressions || perf.views || 0\n    });\n  }\n  \n  // Track underperformers\n  if (perf.performance_score < 50) {\n    report.summary.underperformers++;\n  }\n}\n\nreport.summary.average_performance_score = allData.length > 0 ? \n  Math.round(totalScore / allData.length) : 0;\n\n// Generate insights\nif (report.summary.top_performers > 0) {\n  report.key_insights.push({\n    type: 'positive',\n    message: `${report.summary.top_performers} pieces of content are performing exceptionally well`,\n    action: 'Consider boosting or repurposing these assets'\n  });\n}\n\nif (report.summary.underperformers > 0) {\n  report.key_insights.push({\n    type: 'attention',\n    message: `${report.summary.underperformers} pieces of content need optimization`,\n    action: 'Review optimization recommendations'\n  });\n}\n\n// Find best performing platform\nconst platforms = Object.entries(report.summary.by_platform);\nif (platforms.length > 0) {\n  const bestPlatform = platforms.reduce((a, b) => a[1] > b[1] ? a : b);\n  report.key_insights.push({\n    type: 'insight',\n    message: `${bestPlatform[0]} has the most content analyzed (${bestPlatform[1]} pieces)`,\n    action: 'Consider allocating more resources to this platform'\n  });\n}\n\n// Send to SIMP broker\nconst reportPayload = {\n  intent_type: 'performance_optimization_report',\n  source_agent: 'n8n_workflow',\n  target_agent: 'base_media_agent',\n  payload: report\n};\n\nreturn {\n  json: {\n    report: report,\n    report_payload: reportPayload,\n    should_send_report: true\n  }\n};"
+      }
+    },
+    {
+      "name": "Store Performance Data",
+      "type": "n8n-nodes-base.postgres",
+      "position": [2050, 200],
+      "parameters": {
+        "operation": "insert",
+        "schema": "media",
+        "table": "content_performance",
+        "columns": {
+          "parameters": [
+            {
+              "column": "content_id",
+              "value": "={{$json.content_id}}"
+            },
+            {
+              "column": "platform",
+              "value": "={{$json.platform}}"
+            },
+            {
+              "column": "performance_score",
+              "value": "={{$json.performance_score}}"
+            },
+            {
+              "column": "performance_tier",
+              "value": "={{$json.performance_tier}}"
+            },
+            {
+              "column": "impressions",
+              "value": "={{$json.impressions || $json.views || 0}}"
+            },
+            {
+              "column": "engagements",
+              "value": "={{$json.engagements || 0}}"
+            },
+            {
+              "column": "engagement_rate",
+              "value": "={{$json.engagement_rate || 0}}"
+            },
+            {
+              "column": "analyzed_at",
+              "value": "={{new Date().toISOString()}}"
+            },
+            {
+              "column": "raw_data",
+              "value": "={{JSON.stringify($json.raw_data)}}"
+            }
+          ]
+        },
+        "additionalFields": {},
+        "options": {}
+      }
+    },
+    {
+      "name": "Send Optimization Alerts",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1850, 400],
+      "parameters": {
+        "fromEmail": "={{$env.NOTIFICATION_EMAIL}}",
+        "toEmail": "={{$env.OPTIMIZATION_TEAM_EMAIL}}",
+        "subject": "Content Optimization Recommendations - {{new Date().toLocaleDateString()}}",
+        "text": "Content Performance Optimization Report\\n\\nDate: {{new Date().toLocaleDateString()}}\\nTotal Content Analyzed: {{$json.report.summary.total_content_analyzed}}\\nAverage Score: {{$json.report.summary.average_performance_score}}/100\\n\\nTop Performers: {{$json.report.summary.top_performers}}\\nUnderperformers: {{$json.report.summary.underperformers}}\\n\\nKey Insights:\\n{{$json.report.key_insights.map(i => `• ${i.message}`).join('\\n')}}\\n\\nFull report available in the dashboard.\\n\\nBest performing platform: {{Object.keys($json.report.summary.by_platform)[0]}}\\n\\n---\\nThis is an automated report from the Content Performance Optimization workflow.",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (Daily)": {
+      "main": [
+        [
+          {
+            "node": "Fetch Performance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Performance Data": {
+      "main": [
+        [
+          {
+            "node": "Platform Performance Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Performance Router": {
+      "main": [
+        [
+          {
+            "node": "Fetch Twitter Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch LinkedIn Analytics",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Fetch YouTube Analytics",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch Twitter Analytics": {
+      "main": [
+        [
+          {
+            "node": "Normalize Performance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch LinkedIn Analytics": {
+      "main": [
+        [
+          {
+            "node": "Normalize Performance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch YouTube Analytics": {
+      "main": [
+        [
+          {
+            "node": "Normalize Performance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Performance Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Performance Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Performance Metrics": {
+      "main": [
+        [
+          {
+            "node": "Identify Top Performers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Identify Underperformers",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Generate Optimization Recommendations",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Identify Top Performers": {
+      "main": [
+        [
+          {
+            "node": "Generate Optimization Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identify Underperformers": {
+      "main": [
+        [
+          {
+            "node": "Generate Optimization Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Optimization Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Generate Performance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Performance Report": {
+      "main": [
+        [
+          {
+            "node": "Store Performance Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Optimization Alerts",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Store Performance Data": {
+      "main": [
+        []
+      ]
+    },
+    "Send Optimization Alerts": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "timezone": "America/New_York",
+    "executionTimeout": 5400,
+    "maxExecutionTime": 5400
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "1.0",
+  "tags": ["performance", "analytics", "optimization", "reporting", "content"],
+  "webhook": null,
+  "triggerCount": 0,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "description": "Content performance optimization workflow for KashClaw Media Grid. Analyzes performance data from multiple platforms, calculates performance scores, identifies optimization opportunities, and generates actionable recommendations and reports."
+}

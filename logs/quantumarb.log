@@ -1,0 +1,7 @@
+2026-04-14T20:07:09 [QuantumArb] WARNING Could not register with SIMP: HTTP Error 400: BAD REQUEST
+2026-04-14T20:07:09 [QuantumArb] INFO QuantumArb Agent 1.0.0-scaffold starting
+2026-04-14T20:07:09 [QuantumArb] INFO   DRY_RUN  : True  ← hardcoded True until Day 4 verification
+2026-04-14T20:07:09 [QuantumArb] INFO   Inbox    : /Users/kaseymarcelle/bullbear/signals/quantumarb_inbox
+2026-04-14T20:07:09 [QuantumArb] INFO   Outbox   : /Users/kaseymarcelle/bullbear/signals/quantumarb_outbox
+2026-04-14T20:07:09 [QuantumArb] INFO   Poll     : every 2.0s
+2026-04-14T20:07:09 [QuantumArb] INFO Press Ctrl+C to stop

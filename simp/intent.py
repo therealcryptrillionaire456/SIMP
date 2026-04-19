@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass, field, asdict
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 @dataclass
@@ -16,7 +16,7 @@ class Intent:
     """SIMP Intent - request from one agent to another"""
     simp_version: str = "1.0"
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     source_agent: Optional[Agent] = None
     intent_type: str = ""
     params: Dict[str, Any] = field(default_factory=dict)

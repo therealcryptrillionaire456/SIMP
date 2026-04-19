@@ -1,0 +1,43 @@
+{
+  "engagement": "full_integration_test",
+  "execution_summary": {
+    "start_time": "2026-04-12T06:38:33.120182Z",
+    "end_time": "2026-04-12T06:38:36.140136Z",
+    "duration_seconds": 3.019954,
+    "total_techniques_attempted": 2,
+    "techniques_completed": 1,
+    "techniques_pending": 1,
+    "success_rate": 0.5,
+    "phases_completed": [
+      "reconnaissance"
+    ],
+    "final_phase": "resource_development"
+  },
+  "state_summary": {
+    "access_level": "none",
+    "persistence_established": false,
+    "c2_established": false,
+    "lateral_systems_accessed": 0,
+    "lateral_systems": []
+  },
+  "technique_details": {
+    "completed": [
+      "T1595"
+    ],
+    "pending": [
+      "T1595"
+    ],
+    "findings_count": 1
+  },
+  "key_findings": [
+    "T1595"
+  ],
+  "recommendations": [
+    "Implement network segmentation to limit lateral movement",
+    "Enable multi-factor authentication for all privileged accounts",
+    "Regularly patch and update all systems and applications",
+    "Implement application allowlisting to prevent unauthorized execution",
+    "Enable detailed logging and monitoring for suspicious activities"
+  ],
+  "timestamp": "2026-04-12T06:38:36.140136Z"
+}

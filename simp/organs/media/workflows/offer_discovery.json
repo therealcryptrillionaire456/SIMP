@@ -1,0 +1,558 @@
+{
+  "name": "Offer Discovery & Scoring",
+  "nodes": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "parameters": {
+        "path": "offer-discovery",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "offer-discovery-webhook"
+    },
+    {
+      "name": "Fetch Affiliate Networks",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [450, 200],
+      "parameters": {
+        "batchSize": 1
+      }
+    },
+    {
+      "name": "Network Router",
+      "type": "n8n-nodes-base.switch",
+      "position": [650, 200],
+      "parameters": {
+        "dataPropertyName": "network",
+        "rules": [
+          {
+            "value": "impact_radius"
+          },
+          {
+            "value": "shareasale"
+          },
+          {
+            "value": "cj_affiliate"
+          },
+          {
+            "value": "rakuten"
+          },
+          {
+            "value": "awin"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Fetch Impact Radius Offers",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 100],
+      "parameters": {
+        "url": "={{$env.IMPACT_RADIUS_API_URL || 'https://api.impactradius.com/Mediapartners'}}/{{$env.IMPACT_RADIUS_ACCOUNT_SID}}/Campaigns",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Basic {{$env.IMPACT_RADIUS_API_KEY}}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "query": {
+            "parameters": [
+              {
+                "name": "Status",
+                "value": "Active"
+              },
+              {
+                "name": "Category",
+                "value": "={{$json.category || 'All'}}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Fetch ShareASale Offers",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 200],
+      "parameters": {
+        "url": "={{$env.SHAREASALE_API_URL || 'https://api.shareasale.com/x.cfm'}}",
+        "method": "GET",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "query": {
+            "parameters": [
+              {
+                "name": "action",
+                "value": "getMerchantSearch"
+              },
+              {
+                "name": "affiliateId",
+                "value": "={{$env.SHAREASALE_AFFILIATE_ID}}"
+              },
+              {
+                "name": "token",
+                "value": "={{$env.SHAREASALE_API_TOKEN}}"
+              },
+              {
+                "name": "version",
+                "value": "2.8"
+              },
+              {
+                "name": "category",
+                "value": "={{$json.category || ''}}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Fetch CJ Affiliate Offers",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300],
+      "parameters": {
+        "url": "={{$env.CJ_AFFILIATE_API_URL || 'https://advertiser-lookup.api.cj.com/v3/advertiser-lookup'}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.CJ_AFFILIATE_API_KEY}}"
+            }
+          ]
+        },
+        "options": {
+          "query": {
+            "parameters": [
+              {
+                "name": "advertiser-ids",
+                "value": "={{$json.advertiser_ids || ''}}"
+              },
+              {
+                "name": "records-per-page",
+                "value": "50"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Normalize Offer Data",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 200],
+      "parameters": {
+        "jsCode": "// Normalize offer data from different networks\nconst offers = $input.all();\nconst normalizedOffers = [];\n\nfor (const offer of offers) {\n  const data = offer.json;\n  const network = offer.json._network || 'unknown';\n  \n  // Extract common fields based on network\n  let normalized = {\n    network: network,\n    raw_data: data,\n    extracted_at: new Date().toISOString()\n  };\n  \n  switch(network) {\n    case 'impact_radius':\n      normalized = {\n        ...normalized,\n        offer_id: data.CampaignId,\n        advertiser: data.AdvertiserName,\n        name: data.CampaignName,\n        description: data.Description,\n        category: data.Category,\n        commission_type: data.CommissionType,\n        commission_rate: data.DefaultCommission,\n        cookie_duration: data.CookieDuration,\n        status: data.Status,\n        tracking_url: data.TrackingLink,\n        terms_url: data.TermsAndConditions\n      };\n      break;\n      \n    case 'shareasale':\n      normalized = {\n        ...normalized,\n        offer_id: data.merchantId,\n        advertiser: data.merchantname,\n        name: data.merchantname,\n        description: data.description,\n        category: data.category,\n        commission_type: 'percentage',\n        commission_rate: data.commission,\n        cookie_duration: data.cookielength,\n        status: data.status,\n        tracking_url: data.linkurl,\n        terms_url: data.terms\n      };\n      break;\n      \n    case 'cj_affiliate':\n      normalized = {\n        ...normalized,\n        offer_id: data.advertiserId,\n        advertiser: data.advertiserName,\n        name: data.advertiserName,\n        description: data.description,\n        category: data.category,\n        commission_type: data.commissionType,\n        commission_rate: data.commission,\n        cookie_duration: data.cookieLength,\n        status: data.status,\n        tracking_url: data.trackingUrl,\n        terms_url: data.termsUrl\n      };\n      break;\n  }\n  \n  normalizedOffers.push(normalized);\n}\n\nreturn normalizedOffers;"
+      }
+    },
+    {
+      "name": "Score Offers",
+      "type": "n8n-nodes-base.code",
+      "position": [1250, 200],
+      "parameters": {
+        "jsCode": "// Score offers based on multiple criteria\nconst offers = $input.all();\nconst scoredOffers = [];\n\nfor (const offer of offers) {\n  const score = calculateOfferScore(offer.json);\n  \n  scoredOffers.push({\n    ...offer.json,\n    score: score.total,\n    score_breakdown: score.breakdown,\n    recommendation: getRecommendation(score.total),\n    priority: getPriority(score.total)\n  });\n}\n\nfunction calculateOfferScore(offer) {\n  const breakdown = {\n    commission_score: 0,\n    relevance_score: 0,\n    competition_score: 0,\n    trust_score: 0,\n    volume_score: 0\n  };\n  \n  // Commission score (0-30 points)\n  const commission = parseFloat(offer.commission_rate) || 0;\n  breakdown.commission_score = Math.min(commission * 2, 30);\n  \n  // Relevance score based on category match (0-25 points)\n  const targetCategories = $env.TARGET_CATEGORIES ? $env.TARGET_CATEGORIES.split(',') : [];\n  if (targetCategories.includes(offer.category)) {\n    breakdown.relevance_score = 25;\n  } else if (offer.category && offer.category.length > 0) {\n    breakdown.relevance_score = 15;\n  } else {\n    breakdown.relevance_score = 5;\n  }\n  \n  // Competition score (0-20 points) - lower competition = higher score\n  const competition = offer.competition_level || 'medium';\n  switch(competition) {\n    case 'low': breakdown.competition_score = 20; break;\n    case 'medium': breakdown.competition_score = 12; break;\n    case 'high': breakdown.competition_score = 5; break;\n    default: breakdown.competition_score = 10;\n  }\n  \n  // Trust score based on network and advertiser (0-15 points)\n  const networkTrust = {\n    'impact_radius': 8,\n    'shareasale': 7,\n    'cj_affiliate': 9,\n    'rakuten': 8,\n    'awin': 7\n  };\n  breakdown.trust_score = networkTrust[offer.network] || 5;\n  \n  // Volume score based on estimated traffic (0-10 points)\n  const volume = offer.estimated_volume || 'low';\n  switch(volume) {\n    case 'high': breakdown.volume_score = 10; break;\n    case 'medium': breakdown.volume_score = 7; break;\n    case 'low': breakdown.volume_score = 3; break;\n    default: breakdown.volume_score = 5;\n  }\n  \n  const total = Object.values(breakdown).reduce((a, b) => a + b, 0);\n  \n  return {\n    total: total,\n    breakdown: breakdown\n  };\n}\n\nfunction getRecommendation(score) {\n  if (score >= 80) return 'highly_recommended';\n  if (score >= 65) return 'recommended';\n  if (score >= 50) return 'consider';\n  return 'not_recommended';\n}\n\nfunction getPriority(score) {\n  if (score >= 80) return 'p1_immediate';\n  if (score >= 65) return 'p2_high';\n  if (score >= 50) return 'p3_medium';\n  return 'p4_low';\n}\n\nreturn scoredOffers;"
+      }
+    },
+    {
+      "name": "Filter Top Offers",
+      "type": "n8n-nodes-base.filter",
+      "position": [1450, 200],
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.score}}",
+              "operation": "largerEqual",
+              "value2": "65"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      }
+    },
+    {
+      "name": "Check Compliance",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1650, 200],
+      "parameters": {
+        "url": "={{$env.SIMP_BROKER_URL || 'http://localhost:5555'}}/intents/route",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "={{$env.SIMP_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "contentType": "json",
+          "parameterType": "keyvalue",
+          "parameters": [
+            {
+              "name": "intent_type",
+              "value": "compliance_check"
+            },
+            {
+              "name": "source_agent",
+              "value": "n8n_workflow"
+            },
+            {
+              "name": "target_agent",
+              "value": "compliance_agent"
+            },
+            {
+              "name": "payload",
+              "value": "={{JSON.stringify($json)}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Human Approval Gate",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [1850, 200],
+      "parameters": {
+        "mode": "once"
+      }
+    },
+    {
+      "name": "Send Approval Request",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [2050, 200],
+      "parameters": {
+        "fromEmail": "={{$env.NOTIFICATION_EMAIL}}",
+        "toEmail": "={{$env.APPROVAL_EMAIL}}",
+        "subject": "Offer Approval Required: {{$json.name}}",
+        "text": "An offer requires your approval:\\n\\nOffer: {{$json.name}}\\nAdvertiser: {{$json.advertiser}}\\nNetwork: {{$json.network}}\\nScore: {{$json.score}}/100\\nCommission: {{$json.commission_rate}}%\\n\\nPlease review and approve or reject this offer.\\n\\nOffer Details:\\n{{JSON.stringify($json, null, 2)}}",
+        "options": {}
+      }
+    },
+    {
+      "name": "Wait for Approval",
+      "type": "n8n-nodes-base.wait",
+      "position": [2250, 200],
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      }
+    },
+    {
+      "name": "Approval Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [2450, 200],
+      "parameters": {
+        "path": "offer-approval",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "offer-approval-webhook"
+    },
+    {
+      "name": "Process Approved Offers",
+      "type": "n8n-nodes-base.code",
+      "position": [2650, 200],
+      "parameters": {
+        "jsCode": "// Process approved offers and send to SIMP broker\nconst approvalData = $input.first().json;\nconst offer = approvalData.offer;\nconst decision = approvalData.decision;\nconst notes = approvalData.notes || '';\n\nif (decision === 'approved') {\n  // Send to SIMP broker for activation\n  const activationPayload = {\n    intent_type: 'offer_activation',\n    source_agent: 'n8n_workflow',\n    target_agent: 'base_media_agent',\n    payload: {\n      offer: offer,\n      approved_at: new Date().toISOString(),\n      approved_by: approvalData.approver || 'human',\n      notes: notes\n    }\n  };\n  \n  return {\n    json: {\n      status: 'approved',\n      offer_id: offer.offer_id,\n      activation_payload: activationPayload,\n      should_activate: true\n    }\n  };\n} else {\n  // Log rejection\n  const rejectionPayload = {\n    intent_type: 'offer_rejection',\n    source_agent: 'n8n_workflow',\n    target_agent: 'base_media_agent',\n    payload: {\n      offer: offer,\n      rejected_at: new Date().toISOString(),\n      reason: decision,\n      notes: notes\n    }\n  };\n  \n  return {\n    json: {\n      status: 'rejected',\n      offer_id: offer.offer_id,\n      rejection_payload: rejectionPayload\n    }\n  };\n}"
+      }
+    },
+    {
+      "name": "Store Offer Database",
+      "type": "n8n-nodes-base.postgres",
+      "position": [2850, 200],
+      "parameters": {
+        "operation": "insert",
+        "schema": "media",
+        "table": "affiliate_offers",
+        "columns": {
+          "parameters": [
+            {
+              "column": "offer_id",
+              "value": "={{$json.offer_id}}"
+            },
+            {
+              "column": "network",
+              "value": "={{$json.network}}"
+            },
+            {
+              "column": "advertiser",
+              "value": "={{$json.advertiser}}"
+            },
+            {
+              "column": "name",
+              "value": "={{$json.name}}"
+            },
+            {
+              "column": "score",
+              "value": "={{$json.score}}"
+            },
+            {
+              "column": "status",
+              "value": "={{$json.status || 'discovered'}}"
+            },
+            {
+              "column": "discovered_at",
+              "value": "={{new Date().toISOString()}}"
+            },
+            {
+              "column": "raw_data",
+              "value": "={{JSON.stringify($json.raw_data)}}"
+            }
+          ]
+        },
+        "additionalFields": {},
+        "options": {}
+      }
+    },
+    {
+      "name": "Generate Discovery Report",
+      "type": "n8n-nodes-base.code",
+      "position": [1650, 400],
+      "parameters": {
+        "jsCode": "// Generate discovery report\nconst allOffers = $input.all();\nconst stats = {\n  timestamp: new Date().toISOString(),\n  total_discovered: allOffers.length,\n  high_scoring: allOffers.filter(o => o.json.score >= 80).length,\n  recommended: allOffers.filter(o => o.json.score >= 65).length,\n  by_network: {},\n  by_category: {},\n  top_offers: allOffers\n    .map(o => ({\n      name: o.json.name,\n      network: o.json.network,\n      score: o.json.score,\n      commission: o.json.commission_rate,\n      category: o.json.category\n    }))\n    .sort((a, b) => b.score - a.score)\n    .slice(0, 10)\n};\n\n// Group by network\nfor (const offer of allOffers) {\n  const network = offer.json.network;\n  if (!stats.by_network[network]) {\n    stats.by_network[network] = 0;\n  }\n  stats.by_network[network]++;\n  \n  // Group by category\n  const category = offer.json.category || 'uncategorized';\n  if (!stats.by_category[category]) {\n    stats.by_category[category] = 0;\n  }\n  stats.by_category[category]++;\n}\n\n// Send report to SIMP broker\nconst reportPayload = {\n  intent_type: 'offer_discovery_report',\n  source_agent: 'n8n_workflow',\n  target_agent: 'base_media_agent',\n  payload: stats\n};\n\nreturn {\n  json: {\n    report: stats,\n    report_payload: reportPayload,\n    should_send_report: true\n  }\n};"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Affiliate Networks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Affiliate Networks": {
+      "main": [
+        [
+          {
+            "node": "Network Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Network Router": {
+      "main": [
+        [
+          {
+            "node": "Fetch Impact Radius Offers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch ShareASale Offers",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Fetch CJ Affiliate Offers",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch Impact Radius Offers": {
+      "main": [
+        [
+          {
+            "node": "Normalize Offer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch ShareASale Offers": {
+      "main": [
+        [
+          {
+            "node": "Normalize Offer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch CJ Affiliate Offers": {
+      "main": [
+        [
+          {
+            "node": "Normalize Offer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Offer Data": {
+      "main": [
+        [
+          {
+            "node": "Score Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Offers": {
+      "main": [
+        [
+          {
+            "node": "Filter Top Offers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Discovery Report",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Filter Top Offers": {
+      "main": [
+        [
+          {
+            "node": "Check Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Compliance": {
+      "main": [
+        [
+          {
+            "node": "Human Approval Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Approval Gate": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "Approval Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Approved Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Approved Offers": {
+      "main": [
+        [
+          {
+            "node": "Store Offer Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Offer Database": {
+      "main": [
+        []
+      ]
+    },
+    "Generate Discovery Report": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "timezone": "America/New_York",
+    "executionTimeout": 7200,
+    "maxExecutionTime": 7200
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "1.0",
+  "tags": ["affiliate", "offers", "discovery", "scoring", "compliance", "approval"],
+  "webhook": null,
+  "triggerCount": 0,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "description": "Affiliate offer discovery and scoring workflow for KashClaw Media Grid. Discovers offers from multiple networks, scores them based on commission, relevance, and competition, and routes top offers through compliance checks and human approval gates."
+}

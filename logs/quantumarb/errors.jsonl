@@ -1,0 +1,6 @@
+{"timestamp": 1775752860.76712, "message": "Error detecting cross-exchange arb for BTC-USD: unsupported operand type(s) for +: 'Mock' and 'Mock'"}
+{"timestamp": 1775752860.768615, "message": "Error detecting cross-exchange arb for BTC-USD: unsupported operand type(s) for +: 'Mock' and 'Mock'"}
+{"timestamp": 1775756674.713326, "message": "Error detecting cross-exchange arb for BTC-USD: unsupported operand type(s) for +: 'Mock' and 'Mock'"}
+{"timestamp": 1775756674.7144299, "message": "Error detecting cross-exchange arb for BTC-USD: unsupported operand type(s) for +: 'Mock' and 'Mock'"}
+{"timestamp": 1776104382.031044, "message": "Error detecting cross-exchange arb for BTC-USD: '<=' not supported between instances of 'Ticker' and 'int'"}
+{"timestamp": 1776107172.294092, "message": "Error detecting cross-exchange arb for BTC-USD: '<=' not supported between instances of 'Ticker' and 'int'"}

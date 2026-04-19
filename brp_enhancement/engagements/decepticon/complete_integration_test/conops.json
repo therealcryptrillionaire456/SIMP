@@ -1,0 +1,38 @@
+{
+  "threat_actor": "apt29",
+  "capabilities": [
+    "T1190",
+    "T1059",
+    "T1082",
+    "T1003"
+  ],
+  "ttp_patterns": [
+    "T1190",
+    "T1059",
+    "T1082",
+    "T1003"
+  ],
+  "objectives": [
+    "Test complete kill chain execution",
+    "Validate C2 integration",
+    "Generate comprehensive security report"
+  ],
+  "infrastructure": {
+    "c2_channels": [
+      "HTTPS",
+      "DNS"
+    ],
+    "malware_type": "Living-off-the-land",
+    "persistence": [
+      "Scheduled tasks",
+      "Startup items"
+    ]
+  },
+  "timeline": {
+    "planning": "Day 1",
+    "reconnaissance": "Day 1-2",
+    "exploitation": "Day 2-3",
+    "post_exploitation": "Day 3-4",
+    "reporting": "Day 5"
+  }
+}

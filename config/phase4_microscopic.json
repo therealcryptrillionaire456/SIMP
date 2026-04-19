@@ -1,0 +1,204 @@
+{
+  "phase4_configuration": {
+    "version": "1.0.0",
+    "description": "Phase 4: Microscopic Real-Money Experiment Configuration",
+    "activation_date": "2026-04-14",
+    "status": "sandbox_testing"
+  },
+  
+  "exchanges": {
+    "coinbase_sandbox": {
+      "type": "sandbox",
+      "api_key": "${COINBASE_SANDBOX_API_KEY}",
+      "api_secret": "${COINBASE_SANDBOX_API_SECRET}",
+      "passphrase": "${COINBASE_SANDBOX_PASSPHRASE}",
+      "base_url": "https://api-public.sandbox.pro.coinbase.com",
+      "timeout_seconds": 30,
+      "retry_attempts": 3
+    },
+    "coinbase_live": {
+      "type": "live",
+      "api_key": "${COINBASE_LIVE_API_KEY}",
+      "api_secret": "${COINBASE_LIVE_API_SECRET}",
+      "passphrase": "${COINBASE_LIVE_PASSPHRASE}",
+      "base_url": "https://api.pro.coinbase.com",
+      "timeout_seconds": 30,
+      "retry_attempts": 3,
+      "enabled": false
+    }
+  },
+  
+  "risk_parameters": {
+    "microscopic_trading": {
+      "max_position_size_usd": 0.10,
+      "min_position_size_usd": 0.01,
+      "max_daily_loss_usd": 1.00,
+      "max_daily_trades": 10,
+      "cooldown_seconds_after_loss": 300
+    },
+    
+    "spread_thresholds": {
+      "min_spread_pct": 0.01,
+      "target_spread_pct": 0.05,
+      "max_spread_pct": 0.50
+    },
+    
+    "slippage_limits": {
+      "max_slippage_pct": 0.05,
+      "slippage_alert_threshold": 0.10,
+      "slippage_cancel_threshold": 0.20
+    },
+    
+    "risk_scoring": {
+      "min_risk_score": 0.7,
+      "confidence_weight": 0.3,
+      "liquidity_weight": 0.2,
+      "volatility_weight": 0.2,
+      "slippage_weight": 0.3
+    }
+  },
+  
+  "execution_parameters": {
+    "order_types": {
+      "primary": "market",
+      "fallback": "limit",
+      "limit_price_offset_pct": 0.01
+    },
+    
+    "timing": {
+      "max_execution_time_seconds": 30,
+      "min_time_between_trades_seconds": 10,
+      "market_hours_only": false
+    },
+    
+    "retry_logic": {
+      "max_retries": 3,
+      "retry_delay_seconds": 1,
+      "exponential_backoff": true
+    }
+  },
+  
+  "monitoring": {
+    "enabled": true,
+    "alert_channels": ["log", "dashboard"],
+    
+    "alert_thresholds": {
+      "slippage_alert_pct": 0.10,
+      "latency_alert_seconds": 5.0,
+      "error_rate_alert_pct": 1.0,
+      "balance_alert_pct": 10.0
+    },
+    
+    "metrics_collection": {
+      "trade_metrics": true,
+      "performance_metrics": true,
+      "system_metrics": true,
+      "retention_days": 30
+    }
+  },
+  
+  "pnl_tracking": {
+    "ledger_path": "data/phase4_pnl_ledger.jsonl",
+    "backup_frequency": "daily",
+    "reconciliation_frequency": "hourly",
+    
+    "reporting": {
+      "daily_report": true,
+      "weekly_summary": true,
+      "monthly_analysis": true
+    }
+  },
+  
+  "safety_gates": {
+    "gate_1_sandbox": {
+      "description": "Sandbox testing with simulated funds",
+      "requirements": [
+        "100_successful_sandbox_trades",
+        "slippage_below_0.05_pct",
+        "no_system_errors"
+      ],
+      "enabled": true
+    },
+    
+    "gate_2_microscopic_live": {
+      "description": "Microscopic live trading ($0.01-$0.10)",
+      "requirements": [
+        "gate_1_completed",
+        "manual_approval",
+        "live_api_keys_configured",
+        "emergency_stop_configured"
+      ],
+      "enabled": false
+    },
+    
+    "gate_3_scaled_live": {
+      "description": "Scaled live trading (up to $10.00)",
+      "requirements": [
+        "gate_2_completed",
+        "30_days_profitable",
+        "risk_review_approved",
+        "insurance_coverage"
+      ],
+      "enabled": false
+    }
+  },
+  
+  "operational_parameters": {
+    "log_level": "INFO",
+    "data_retention_days": 90,
+    "auto_restart_on_crash": true,
+    "health_check_interval_seconds": 60,
+    
+    "maintenance": {
+      "daily_cleanup": true,
+      "weekly_optimization": true,
+      "monthly_audit": true
+    }
+  },
+  
+  "symbols": {
+    "primary_pairs": ["BTC-USD", "ETH-USD", "LTC-USD"],
+    "secondary_pairs": ["BCH-USD", "ETC-USD", "XRP-USD"],
+    "excluded_pairs": [],
+    
+    "pair_characteristics": {
+      "BTC-USD": {
+        "min_spread_pct": 0.01,
+        "typical_liquidity": "high",
+        "volatility_class": "medium"
+      },
+      "ETH-USD": {
+        "min_spread_pct": 0.02,
+        "typical_liquidity": "high",
+        "volatility_class": "medium"
+      },
+      "LTC-USD": {
+        "min_spread_pct": 0.03,
+        "typical_liquidity": "medium",
+        "volatility_class": "low"
+      }
+    }
+  },
+  
+  "environment_variables": {
+    "required": [
+      "COINBASE_SANDBOX_API_KEY",
+      "COINBASE_SANDBOX_API_SECRET",
+      "COINBASE_SANDBOX_PASSPHRASE"
+    ],
+    "optional": [
+      "COINBASE_LIVE_API_KEY",
+      "COINBASE_LIVE_API_SECRET",
+      "COINBASE_LIVE_PASSPHRASE",
+      "SIMP_API_KEY",
+      "MONITORING_WEBHOOK_URL"
+    ]
+  },
+  
+  "documentation": {
+    "setup_guide": "OBSIDIAN_GRAPHIFY_SETUP_GUIDE.md",
+    "operational_runbook": "docs/PHASE4_OPERATIONAL_RUNBOOK.md",
+    "troubleshooting": "docs/PHASE4_TROUBLESHOOTING.md",
+    "contact": "goose_agent@simp.system"
+  }
+}

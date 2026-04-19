@@ -1,0 +1,40 @@
+{
+  "signal_id": "gate1_cont_ltc-usd_1776178632",
+  "processing_time": "2026-04-14T14:57:14.394982",
+  "opportunity": {
+    "opportunity_id": "fb4b41e7-8f11-4334-bcf5-dfb33bde75c4",
+    "signal": {
+      "signal_id": "gate1_cont_ltc-usd_1776178632",
+      "arb_type": "cross_venue",
+      "symbol_a": "LTC-USD",
+      "symbol_b": "LTC-USD",
+      "venue_a": "coinbase_sandbox",
+      "venue_b": "coinbase_sandbox",
+      "spread_pct": 0.2924,
+      "expected_return_pct": 0.2654,
+      "timestamp": "2026-04-14T14:57:14.393709",
+      "confidence": 0.84,
+      "metadata": {
+        "gate": 1,
+        "batch": "continued",
+        "realistic": true,
+        "microscopic": true
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: spread=0.2924%, risk=0.74",
+    "position_size_usd": 0.1,
+    "expected_pnl_usd": 0.00023540000000000006,
+    "max_slippage_pct": 0.03,
+    "risk_score": 0.73992,
+    "timestamp": "2026-04-14T14:57:14.394208"
+  },
+  "engine_state": {
+    "status": "operational",
+    "phase": 4,
+    "trading_mode": "microscopic",
+    "max_position_usd": 0.1,
+    "min_spread_pct": 0.01,
+    "timestamp": "2026-04-14T14:57:14.395204"
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/therealcryptrillionaire456/SIMP/simp/models/peer_intent_schema.json",
+  "title": "SIMP Peer Intent Schema",
+  "description": "Locked schema for intents exchanged between perplexity_research and claude_cowork agents. Version: 1.0.0",
+  "version": "1.0.0",
+  "definitions": {
+    "PeerIntentRequest": {
+      "type": "object",
+      "required": [
+        "intent_type",
+        "source_agent",
+        "target_agent",
+        "task_id",
+        "topic",
+        "prompt"
+      ],
+      "properties": {
+        "intent_type": {
+          "type": "string",
+          "enum": [
+            "capability_query",
+            "code_task",
+            "coordination",
+            "ping",
+            "planning",
+            "status_check"
+          ]
+        },
+        "source_agent": {
+          "type": "string",
+          "enum": [
+            "claude_cowork",
+            "kloutbot",
+            "perplexity_research",
+            "simp_router"
+          ]
+        },
+        "target_agent": {
+          "type": "string",
+          "enum": [
+            "claude_cowork",
+            "kloutbot",
+            "perplexity_research",
+            "simp_router"
+          ]
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "topic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "schema_version": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "context": {
+          "type": "object"
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
+        },
+        "requires_response": {
+          "type": "boolean"
+        },
+        "timeout_seconds": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "dry_run": {
+          "type": "boolean",
+          "const": true
+        },
+        "params": {
+          "type": "object"
+        }
+      },
+      "not": {
+        "properties": {
+          "intent_type": {
+            "enum": [
+              "arbitrage_execute",
+              "cancel_order",
+              "dry_run_trade",
+              "execute_trade",
+              "kashclaw_execute",
+              "organ_execute",
+              "place_order",
+              "position_sizing",
+              "prediction_signal",
+              "trade_signal"
+            ]
+          }
+        }
+      }
+    },
+    "PeerIntentResult": {
+      "type": "object",
+      "required": [
+        "intent_type",
+        "source_agent",
+        "target_agent",
+        "task_id",
+        "status"
+      ],
+      "properties": {
+        "intent_type": {
+          "type": "string",
+          "enum": [
+            "capability_query_result",
+            "code_task_result",
+            "coordination_result",
+            "intent_rejected",
+            "planning_result",
+            "pong",
+            "status_check_result"
+          ]
+        },
+        "source_agent": {
+          "type": "string",
+          "enum": [
+            "claude_cowork",
+            "kloutbot",
+            "perplexity_research",
+            "simp_router"
+          ]
+        },
+        "target_agent": {
+          "type": "string",
+          "enum": [
+            "claude_cowork",
+            "kloutbot",
+            "perplexity_research",
+            "simp_router"
+          ]
+        },
+        "task_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "error",
+            "ok",
+            "queued",
+            "rejected"
+          ]
+        },
+        "intent_id": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "schema_version": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        },
+        "error_message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dry_run": {
+          "type": "boolean",
+          "const": true
+        },
+        "params": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "forbidden_intent_types": [
+    "arbitrage_execute",
+    "cancel_order",
+    "dry_run_trade",
+    "execute_trade",
+    "kashclaw_execute",
+    "organ_execute",
+    "place_order",
+    "position_sizing",
+    "prediction_signal",
+    "trade_signal"
+  ],
+  "peer_agents": [
+    "claude_cowork",
+    "kloutbot",
+    "perplexity_research",
+    "simp_router"
+  ],
+  "allowed_request_types": [
+    "capability_query",
+    "code_task",
+    "coordination",
+    "ping",
+    "planning",
+    "status_check"
+  ],
+  "allowed_result_types": [
+    "capability_query_result",
+    "code_task_result",
+    "coordination_result",
+    "intent_rejected",
+    "planning_result",
+    "pong",
+    "status_check_result"
+  ]
+}

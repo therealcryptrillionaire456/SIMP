@@ -1,0 +1,230 @@
+# SIMP Mesh Configuration
+# Copy this file to config/mesh_config.yaml and update values for your environment
+
+# Mesh Network Configuration
+mesh:
+  enabled: true
+  mode: "hybrid"  # hybrid, mesh-only, http-only
+  
+  # Network Settings
+  network:
+    multicast_group: "239.255.255.250"
+    multicast_port: 9999  # Alternative to 8888 if in use
+    ttl: 2
+    buffer_size: 65536
+    
+    # Alternative transport options
+    enable_udp: true
+    enable_tcp_fallback: true
+    tcp_port: 8889
+    
+    # Network discovery
+    discovery_interval: 30  # seconds
+    heartbeat_interval: 10  # seconds
+  
+  # Security Settings
+  security:
+    encryption_enabled: true
+    require_authentication: true
+    
+    # Encryption settings
+    encryption_algorithm: "chacha20poly1305"
+    key_rotation_interval: 86400  # seconds (24 hours)
+    
+    # Authentication
+    auth_method: "shared_secret"  # shared_secret, certificates, oauth2
+    shared_secret_path: "/etc/simp/mesh_secret"
+    
+    # Rate limiting
+    max_messages_per_second: 1000
+    max_connections_per_agent: 10
+  
+  # Performance Settings
+  performance:
+    # Message handling
+    max_message_size: 1048576  # 1MB
+    default_ttl_seconds: 3600  # 1 hour
+    default_ttl_hops: 10
+    
+    # Queue settings
+    priority_queues:
+      low:
+        max_size: 10000
+        timeout_seconds: 86400  # 24 hours
+      normal:
+        max_size: 5000
+        timeout_seconds: 3600   # 1 hour
+      high:
+        max_size: 1000
+        timeout_seconds: 300    # 5 minutes
+    
+    # Offline storage
+    offline_storage:
+      enabled: true
+      db_path: "/var/lib/simp/mesh_offline.db"
+      max_size_mb: 1024  # 1GB
+      cleanup_interval: 3600  # seconds
+  
+  # Payment Channels (FinancialOps integration)
+  payment_channels:
+    enabled: true
+    default_capacity: 1000.0  # Default channel capacity
+    settlement_interval: 3600  # Auto-settle every hour
+    min_channel_amount: 0.01   # Minimum channel amount
+    
+    # Risk limits
+    max_open_channels: 10
+    max_total_capacity: 10000.0
+  
+  # Agent Migration Settings
+  migration:
+    # Phased migration schedule
+    phases:
+      phase1:
+        enabled: true
+        agents: ["quantumarb"]
+        features: ["basic_messaging"]
+        start_date: "2026-04-20"
+      
+      phase2:
+        enabled: false
+        agents: ["kashclaw_gemma", "bullbear_predictor"]
+        features: ["basic_messaging", "priority_queues"]
+        start_date: "2026-04-27"
+      
+      phase3:
+        enabled: false
+        agents: ["kloutbot", "gate4_http"]
+        features: ["all"]
+        start_date: "2026-05-04"
+    
+    # Fallback settings
+    fallback_to_http: true
+    fallback_timeout: 5  # seconds before falling back to HTTP
+    automatic_rollback: true
+  
+  # Monitoring & Observability
+  monitoring:
+    # Metrics collection
+    enable_metrics: true
+    metrics_port: 9090
+    metrics_path: "/metrics"
+    
+    # Health checks
+    health_check_interval: 30
+    health_check_timeout: 5
+    
+    # Alerting
+    alerts:
+      enabled: true
+      # Alert thresholds
+      high_latency_ms: 1000
+      high_error_rate: 0.01  # 1%
+      low_delivery_rate: 0.99  # 99%
+      
+      # Notification channels
+      slack_webhook: ""
+      email_recipients: []
+      pagerduty_key: ""
+    
+    # Logging
+    log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    log_file: "/var/log/simp/mesh.log"
+    log_rotation: "daily"
+    log_retention_days: 30
+  
+  # Bridge Configuration (Broker-Mesh integration)
+  bridge:
+    enabled: true
+    broker_url: "http://127.0.0.1:5555"
+    
+    # Message forwarding
+    forward_to_mesh: true
+    forward_to_broker: true
+    
+    # Transformation rules
+    intent_mapping:
+      "ping": "heartbeat"
+      "analysis_request": "event"
+      "trade_execution": "command"
+    
+    # Performance
+    batch_size: 100
+    batch_timeout: 1.0  # seconds
+  
+  # Advanced Features
+  features:
+    # Delivery receipts
+    delivery_receipts:
+      enabled: true
+      timeout: 30.0  # seconds
+      require_receipt: false  # Only for critical messages
+    
+    # Message compression
+    compression:
+      enabled: true
+      algorithm: "zlib"
+      min_size: 1024  # Compress messages >1KB
+    
+    # Message deduplication
+    deduplication:
+      enabled: true
+      window_seconds: 300  # 5 minutes
+    
+    # Gossip routing
+    gossip:
+      enabled: true
+      fanout: 3
+      interval: 60  # seconds
+
+# Agent-specific overrides
+agents:
+  quantumarb:
+    mesh_id: "mesh_quantumarb"
+    features: ["basic_messaging", "priority_queues", "payment_channels"]
+    priority: "high"
+    
+  kashclaw_gemma:
+    mesh_id: "mesh_kashclaw_gemma"
+    features: ["basic_messaging", "compression"]
+    priority: "normal"
+    
+  bullbear_predictor:
+    mesh_id: "mesh_bullbear_predictor"
+    features: ["basic_messaging", "deduplication"]
+    priority: "normal"
+
+# Environment-specific settings
+# Override these in production deployment
+production: &production
+  mesh:
+    security:
+      encryption_enabled: true
+      require_authentication: true
+    monitoring:
+      log_level: "WARNING"
+      alerts:
+        enabled: true
+
+development: &development
+  mesh:
+    security:
+      encryption_enabled: false
+      require_authentication: false
+    monitoring:
+      log_level: "DEBUG"
+      alerts:
+        enabled: false
+
+staging: &staging
+  mesh:
+    security:
+      encryption_enabled: true
+      require_authentication: true
+    monitoring:
+      log_level: "INFO"
+      alerts:
+        enabled: true
+
+# Select environment
+environment: "development"  # development, staging, production

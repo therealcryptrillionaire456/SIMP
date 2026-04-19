@@ -1,0 +1,17 @@
+{
+  "integration_id": "court_listener_default",
+  "integration_type": "court_listener",
+  "base_url": "https://www.courtlistener.com/api",
+  "api_key": null,
+  "username": null,
+  "password": null,
+  "rate_limit": 100,
+  "timeout_seconds": 30,
+  "retry_attempts": 3,
+  "retry_delay": 5,
+  "cache_enabled": true,
+  "cache_ttl": 3600,
+  "enabled": true,
+  "created_at": "2026-04-12T02:08:43.473749",
+  "updated_at": "2026-04-12T02:08:43.473750"
+}

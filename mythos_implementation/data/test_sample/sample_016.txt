@@ -1,0 +1,1 @@
+Robotics combines AI with physical systems to create intelligent machines that can interact with the environment.

@@ -1,0 +1,40 @@
+{
+  "signal_id": "gate1_cont_eth-usd_1776178784",
+  "processing_time": "2026-04-14T14:59:44.615367",
+  "opportunity": {
+    "opportunity_id": "d4e35760-f778-4eb9-a2b5-fa2847633d8c",
+    "signal": {
+      "signal_id": "gate1_cont_eth-usd_1776178784",
+      "arb_type": "cross_venue",
+      "symbol_a": "ETH-USD",
+      "symbol_b": "ETH-USD",
+      "venue_a": "coinbase_sandbox",
+      "venue_b": "coinbase_sandbox",
+      "spread_pct": 0.1236,
+      "expected_return_pct": 0.1013,
+      "timestamp": "2026-04-14T14:59:44.613752",
+      "confidence": 0.78,
+      "metadata": {
+        "gate": 1,
+        "batch": "continued",
+        "realistic": true,
+        "microscopic": true
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: spread=0.1236%, risk=0.58",
+    "position_size_usd": 0.1,
+    "expected_pnl_usd": 7.130000000000001e-05,
+    "max_slippage_pct": 0.03,
+    "risk_score": 0.5808800000000001,
+    "timestamp": "2026-04-14T14:59:44.614400"
+  },
+  "engine_state": {
+    "status": "operational",
+    "phase": 4,
+    "trading_mode": "microscopic",
+    "max_position_usd": 0.1,
+    "min_spread_pct": 0.01,
+    "timestamp": "2026-04-14T14:59:44.615565"
+  }
+}

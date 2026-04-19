@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-04-13T19:06:12.295073Z",
+  "status": {
+    "broker": true,
+    "dashboard": true,
+    "quantumarb_agent": true,
+    "trade_execution": true,
+    "pnl_tracking": false,
+    "safety_checks": false
+  },
+  "summary": {
+    "total_components": 6,
+    "operational_components": 4,
+    "system_ready": true
+  },
+  "broker_url": "http://127.0.0.1:5555",
+  "dashboard_url": "http://127.0.0.1:8050"
+}

@@ -1,0 +1,17 @@
+{
+  "integration_id": "uspto_default",
+  "integration_type": "uspto",
+  "base_url": "https://developer.uspto.gov",
+  "api_key": null,
+  "username": null,
+  "password": null,
+  "rate_limit": 1000,
+  "timeout_seconds": 30,
+  "retry_attempts": 3,
+  "retry_delay": 5,
+  "cache_enabled": true,
+  "cache_ttl": 3600,
+  "enabled": true,
+  "created_at": "2026-04-12T02:08:43.473748",
+  "updated_at": "2026-04-12T02:08:43.473748"
+}

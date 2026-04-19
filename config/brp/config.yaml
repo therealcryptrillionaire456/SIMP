@@ -1,0 +1,51 @@
+brp:
+  version: 1.0.0
+  enabled: true
+  protocol:
+    threat_confidence_threshold: 0.7
+    max_reasoning_depth: 5
+    memory_retention_days: 90
+    correlation_window_days: 7
+  pattern_recognition:
+    enabled: true
+    min_confidence: 0.6
+    max_patterns_per_event: 10
+    pcap_analysis: true
+    sysmon_analysis: true
+  reasoning:
+    enabled: true
+    chain_depth: 5
+    auto_escalation_threshold: 0.9
+    require_human_review_above: 0.95
+  memory:
+    db_path: data/brp/threat_memory.db
+    retention_days: 90
+    weekly_correlation: true
+  alerts:
+    telegram_enabled: false
+    telegram_bot_token: ''
+    telegram_chat_id: ''
+    email_enabled: false
+    slack_enabled: false
+  ml:
+    model_name: jackaduma/SecBERT
+    fine_tuned_model_path: models/brp/secbert-finetuned
+    training_epochs: 3
+    batch_size: 16
+    learning_rate: 2.0e-05
+  sigma:
+    rules_directory: config/brp/sigma_rules
+    custom_rules_enabled: true
+  logging:
+    level: INFO
+    log_file: logs/brp/brp.log
+    max_log_size_mb: 100
+    backup_count: 5
+agent_lightning:
+  enabled: true
+  integration_time: '2026-04-14T14:33:00.246795'
+  rules_count: 3
+  rules_source: trace_analysis
+  sigma_rules_dir: sigma_rules/agent_lightning_*.yml
+  auto_update: true
+  update_frequency: daily

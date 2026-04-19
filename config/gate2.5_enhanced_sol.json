@@ -1,0 +1,176 @@
+{
+  "mode": "gate_2.5_enhanced_sol",
+  "exchange": "coinbase",
+  "symbols": ["SOL-USD"],
+  "position_sizing": {
+    "position_type": "enhanced_dollar",
+    "min_notional": 0.10,
+    "max_notional": 0.50,
+    "default_notional": 0.25,
+    "size_tiers": {
+      "tier_1": {"risk_score": 0.70, "size": 0.50},
+      "tier_2": {"risk_score": 0.65, "size": 0.35},
+      "tier_3": {"risk_score": 0.60, "size": 0.25},
+      "tier_4": {"risk_score": 0.55, "size": 0.15},
+      "tier_5": {"risk_score": 0.50, "size": 0.10}
+    }
+  },
+  "risk_limits": {
+    "max_risk_per_trade_dollar": 0.50,
+    "max_session_loss_dollar": 5.00,
+    "max_open_positions": 2,
+    "max_concurrent_orders": 3,
+    "max_daily_trades": 50
+  },
+  "risk_management": {
+    "multi_factor_scoring": true,
+    "factors": {
+      "spread": {
+        "weight": 0.35,
+        "min": 0.02,
+        "max": 0.30,
+        "normalization": 0.25
+      },
+      "confidence": {
+        "weight": 0.30,
+        "min": 0.75
+      },
+      "liquidity": {
+        "weight": 0.15,
+        "score": 0.9
+      },
+      "volatility": {
+        "weight": 0.12,
+        "max": 0.25
+      },
+      "slippage": {
+        "weight": 0.08,
+        "max": 0.03
+      }
+    },
+    "minimum_score": 0.55,
+    "size_adjustment": true,
+    "symbol_specific": {
+      "SOL-USD": {
+        "liquidity_score": 0.9,
+        "volatility_factor": 0.8,
+        "spread_normalization": 0.25
+      }
+    }
+  },
+  "execution": {
+    "order_types": ["limit"],
+    "default_order_type": "limit",
+    "time_in_force": "IOC",
+    "max_slippage_bps": 10,
+    "allow_partial_fills": true,
+    "min_fill_percentage": 70,
+    "price_improvement_target": 0.005,
+    "retry_on_partial": true,
+    "max_retries": 2
+  },
+  "brp": {
+    "mode": "ENFORCED",
+    "min_confidence": 0.75,
+    "require_for_all_trades": true,
+    "elevation_threshold": 0.85
+  },
+  "projectx": {
+    "advisory_enabled": true,
+    "require_for": ["trading_intent", "config_change", "risk_override"],
+    "auto_escalate_threshold": 0.90
+  },
+  "agent_lightning": {
+    "enabled": true,
+    "trace_all_trades": true,
+    "record_full_decision_chain": true,
+    "performance_metrics": true
+  },
+  "monitoring": {
+    "enhanced_alerts": true,
+    "alert_triggers": [
+      "risk_score < 0.55",
+      "slippage > 5bps",
+      "partial_fill < 70%",
+      "latency > 50ms",
+      "price_improvement < 0"
+    ],
+    "real_time_dashboard": true,
+    "performance_tracking": true,
+    "metrics_to_track": [
+      "risk_score_distribution",
+      "slippage_distribution",
+      "fill_rate",
+      "price_improvement",
+      "latency"
+    ]
+  },
+  "targets": {
+    "total_trades": 50,
+    "min_for_success": 40,
+    "execution_success_rate": 90,
+    "max_slippage_average": 5,
+    "risk_score_stability": 0.1,
+    "price_improvement_rate": 70
+  },
+  "session_structure": {
+    "phase_1": {
+      "trades": 15,
+      "focus": "risk_scoring_validation",
+      "metrics": ["risk_score_stability", "size_tier_adherence"]
+    },
+    "phase_2": {
+      "trades": 20,
+      "focus": "execution_testing",
+      "metrics": ["slippage", "fill_rate", "price_improvement"]
+    },
+    "phase_3": {
+      "trades": 15,
+      "focus": "monitoring_validation",
+      "metrics": ["alert_triggers", "real_time_tracking", "performance_data"]
+    }
+  },
+  "logging": {
+    "decision_log_path": "data/gate2.5_decisions.jsonl",
+    "performance_log_path": "data/gate2.5_performance.jsonl",
+    "alert_log_path": "data/gate2.5_alerts.jsonl",
+    "session_summary_path": "data/gate2.5_session_summary.json"
+  },
+  "symbol_characteristics": {
+    "SOL-USD": {
+      "min_spread_pct": 0.02,
+      "typical_spread_pct": 0.05,
+      "high_spread_pct": 0.15,
+      "liquidity": "very_high",
+      "volatility_profile": "high",
+      "typical_order_size_usd": 0.25,
+      "price_range": [80, 120],
+      "tick_size": 0.01
+    }
+  },
+  "enhanced_features": {
+    "multi_factor_risk": true,
+    "size_tier_adjustment": true,
+    "limit_order_execution": true,
+    "partial_fill_handling": true,
+    "price_improvement_tracking": true,
+    "enhanced_monitoring": true,
+    "performance_analytics": true
+  },
+  "safety_gates": {
+    "gate_1_complete": true,
+    "gate_2_complete": true,
+    "gate_2.5_active": true,
+    "gate_3_pending": true,
+    "emergency_stop_enabled": true,
+    "auto_fallback_to_gate2": true
+  },
+  "microscopic_trading": {
+    "enabled": true,
+    "gate": "2.5",
+    "description": "Enhanced SOL microscopic with multi-factor risk scoring",
+    "position_size_multiplier": 5,
+    "risk_scoring_complexity": "enhanced",
+    "execution_sophistication": "intermediate"
+  }
+}

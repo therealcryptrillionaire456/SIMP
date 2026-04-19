@@ -1,0 +1,297 @@
+{
+  "central_nodes": [
+    {
+      "node": "a2a_schema_side",
+      "centrality": 0.04243993669975543
+    },
+    {
+      "node": "a2a_schema_agentdecisionsummary",
+      "centrality": 0.041289023162134945
+    },
+    {
+      "node": "a2a_schema_riskposture",
+      "centrality": 0.030355344554740326
+    },
+    {
+      "node": "brp_bridge_brpbridge",
+      "centrality": 0.029636023593727523
+    },
+    {
+      "node": "brp_models_brpmode",
+      "centrality": 0.0293482952093224
+    },
+    {
+      "node": "brp_models_brpeventtype",
+      "centrality": 0.0293482952093224
+    },
+    {
+      "node": "brp_models_brpevent",
+      "centrality": 0.02920443101711984
+    },
+    {
+      "node": "brp_models_brpobservation",
+      "centrality": 0.02920443101711984
+    },
+    {
+      "node": "a2a_schema_a2aplan",
+      "centrality": 0.028916702632714716
+    },
+    {
+      "node": "a2a_schema_portfolioposture",
+      "centrality": 0.028197381671701913
+    },
+    {
+      "node": "trading_organ_organtype",
+      "centrality": 0.02589555459646094
+    },
+    {
+      "node": "a2a_schema_executionmode",
+      "centrality": 0.022730542368004605
+    },
+    {
+      "node": "http_server_simphttpserver",
+      "centrality": 0.0220112214069918
+    },
+    {
+      "node": "broker_simpbroker",
+      "centrality": 0.02186735721478924
+    },
+    {
+      "node": "quantumarb_agent_arbdecision",
+      "centrality": 0.020860307869371313
+    },
+    {
+      "node": "brp_models_brpplan",
+      "centrality": 0.020428715292763633
+    },
+    {
+      "node": "reasoning_engine_threatassessment",
+      "centrality": 0.02028485110056107
+    },
+    {
+      "node": "reasoning_engine_threatlevel",
+      "centrality": 0.0187023449863329
+    },
+    {
+      "node": "timesfm_policy_engine_policyengine",
+      "centrality": 0.01855848079413034
+    },
+    {
+      "node": "pattern_recognition_patterntype",
+      "centrality": 0.01827075240972522
+    },
+    {
+      "node": "kashclaw_shim_kashclawsimpagent",
+      "centrality": 0.017983024025320097
+    },
+    {
+      "node": "intent_intent",
+      "centrality": 0.017119838872104734
+    },
+    {
+      "node": "broker_brokerconfig",
+      "centrality": 0.016256653718889368
+    },
+    {
+      "node": "timesfm_service_forecastrequest",
+      "centrality": 0.015537332757876565
+    },
+    {
+      "node": "quantumarb_agent_arbitragesignal",
+      "centrality": 0.014530283412458638
+    },
+    {
+      "node": "quantumarb_agent_arbtype",
+      "centrality": 0.014386419220256078
+    },
+    {
+      "node": "str",
+      "centrality": 0.014242555028053518
+    },
+    {
+      "node": "quantumarb_agent_quantumarbengine",
+      "centrality": 0.014242555028053518
+    },
+    {
+      "node": "computer_projectxcomputer",
+      "centrality": 0.013954826643648395
+    },
+    {
+      "node": "knowledge_index_knowledgeindex",
+      "centrality": 0.013810962451445835
+    },
+    {
+      "node": "routing_engine_routingengine",
+      "centrality": 0.013667098259243275
+    },
+    {
+      "node": "executor_tradeexecutor",
+      "centrality": 0.013523234067040714
+    },
+    {
+      "node": "task_ledger_taskledger",
+      "centrality": 0.013523234067040714
+    },
+    {
+      "node": "sigma_engine_sigmaengine",
+      "centrality": 0.013379369874838152
+    },
+    {
+      "node": "init_rationale_1",
+      "centrality": 0.013235505682635592
+    },
+    {
+      "node": "agent_simpagent",
+      "centrality": 0.01294777729823047
+    },
+    {
+      "node": "exchange_connector_orderbook",
+      "centrality": 0.01294777729823047
+    },
+    {
+      "node": "enum",
+      "centrality": 0.012803913106027909
+    },
+    {
+      "node": "trading_organ_executionstatus",
+      "centrality": 0.012660048913825349
+    },
+    {
+      "node": "intent_simpresponse",
+      "centrality": 0.012660048913825349
+    },
+    {
+      "node": "exchange_connector_exchangeconnector",
+      "centrality": 0.012516184721622789
+    },
+    {
+      "node": "spot_trading_organ_spottradingorgan",
+      "centrality": 0.012516184721622789
+    },
+    {
+      "node": "bill_russel_protocol_enhanced_mythosmemorysystem",
+      "centrality": 0.012372320529420227
+    },
+    {
+      "node": "web_scraper_securitydatasetscraper",
+      "centrality": 0.012084592145015106
+    },
+    {
+      "node": "bill_russel_protocol_enhanced_mythospatternrecognizer",
+      "centrality": 0.012084592145015106
+    },
+    {
+      "node": "bill_russel_protocol_enhanced_mythosreasoningengine",
+      "centrality": 0.012084592145015106
+    },
+    {
+      "node": "brp_models_brpdecision",
+      "centrality": 0.012084592145015106
+    },
+    {
+      "node": "config_simpconfig",
+      "centrality": 0.011796863760609984
+    },
+    {
+      "node": "executor_tradeside",
+      "centrality": 0.011796863760609984
+    },
+    {
+      "node": "executor_tradestatus",
+      "centrality": 0.011796863760609984
+    }
+  ],
+  "graph_stats": {
+    "nodes": 6952,
+    "edges": 19179,
+    "density": 0.0007937777164133813,
+    "connected_components": 118
+  },
+  "top_modules": [
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/tests",
+      2514
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/agents",
+      488
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/compat",
+      392
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/server",
+      331
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp",
+      282
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/security/brp",
+      222
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/organs/quantumarb",
+      209
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/integrations/brp",
+      196
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/transport",
+      195
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/pentagram_legal/agents",
+      178
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/integrations",
+      169
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/mythos_implementation/src",
+      139
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/mythos_implementation",
+      121
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/dashboard",
+      117
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/orchestration",
+      116
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/examples/brp",
+      108
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/financial",
+      96
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp",
+      92
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/memory",
+      89
+    ],
+    [
+      "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/tests/security",
+      89
+    ]
+  ],
+  "file_types": {
+    "code": 4301,
+    "rationale": 2651
+  },
+  "timestamp": "2026-04-11T09:00:57.965145"
+}

@@ -1,0 +1,409 @@
+{
+  "name": "Daily Content Pipeline",
+  "nodes": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [250, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "minutesInterval": 60
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fetch Trending Topics",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300],
+      "parameters": {
+        "url": "={{$env.SIMP_BROKER_URL || 'http://localhost:5555'}}/intents/route",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "={{$env.SIMP_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "contentType": "json",
+          "parameterType": "keyvalue",
+          "parameters": [
+            {
+              "name": "intent_type",
+              "value": "media_trend_analysis"
+            },
+            {
+              "name": "source_agent",
+              "value": "n8n_workflow"
+            },
+            {
+              "name": "target_agent",
+              "value": "trend_harvester"
+            },
+            {
+              "name": "payload",
+              "value": "{\"analysis_type\": \"daily_trends\", \"platforms\": [\"twitter\", \"reddit\", \"news\"]}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "name": "Generate Content Ideas",
+      "type": "n8n-nodes-base.code",
+      "position": [650, 200],
+      "parameters": {
+        "jsCode": "// Process trending topics and generate content ideas\nconst trends = $input.first().json.trends || [];\nconst contentIdeas = [];\n\nfor (const trend of trends.slice(0, 5)) {\n  contentIdeas.push({\n    topic: trend.topic,\n    engagement_score: trend.engagement_score || 0,\n    content_type: determineContentType(trend),\n    target_platforms: determinePlatforms(trend),\n    estimated_time: estimateCreationTime(trend),\n    priority: calculatePriority(trend)\n  });\n}\n\nfunction determineContentType(trend) {\n  if (trend.media_type === 'video') return 'video_script';\n  if (trend.word_count > 500) return 'long_form';\n  return 'short_form';\n}\n\nfunction determinePlatforms(trend) {\n  const platforms = [];\n  if (trend.source.includes('twitter')) platforms.push('twitter');\n  if (trend.source.includes('reddit')) platforms.push('reddit');\n  if (trend.source.includes('news')) platforms.push('linkedin', 'newsletter');\n  return platforms.length > 0 ? platforms : ['twitter', 'linkedin'];\n}\n\nfunction estimateCreationTime(trend) {\n  const baseTime = 30; // minutes\n  const complexity = trend.complexity || 1;\n  return baseTime * complexity;\n}\n\nfunction calculatePriority(trend) {\n  const engagement = trend.engagement_score || 0;\n  const velocity = trend.velocity || 0;\n  return (engagement * 0.6 + velocity * 0.4) * 100;\n}\n\nreturn contentIdeas;"
+      }
+    },
+    {
+      "name": "Create Content Scripts",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 200],
+      "parameters": {
+        "url": "={{$env.SIMP_BROKER_URL || 'http://localhost:5555'}}/intents/route",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "={{$env.SIMP_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "contentType": "json",
+          "parameterType": "keyvalue",
+          "parameters": [
+            {
+              "name": "intent_type",
+              "value": "media_script_generation"
+            },
+            {
+              "name": "source_agent",
+              "value": "n8n_workflow"
+            },
+            {
+              "name": "target_agent",
+              "value": "script_agent"
+            },
+            {
+              "name": "payload",
+              "value": "={{JSON.stringify($json)}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Generate Multimedia Assets",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 400],
+      "parameters": {
+        "jsCode": "// Generate asset creation tasks based on content scripts\nconst scripts = $input.first().json.scripts || [];\nconst assetTasks = [];\n\nfor (const script of scripts) {\n  if (script.content_type === 'video_script') {\n    assetTasks.push({\n      script_id: script.id,\n      asset_type: 'thumbnail',\n      requirements: {\n        dimensions: '1280x720',\n        style: 'engaging',\n        include_text: true\n      }\n    });\n    assetTasks.push({\n      script_id: script.id,\n      asset_type: 'video',\n      requirements: {\n        duration: '60-90s',\n        format: 'mp4',\n        include_subtitles: true\n      }\n    });\n  } else {\n    assetTasks.push({\n      script_id: script.id,\n      asset_type: 'featured_image',\n      requirements: {\n        dimensions: '1200x630',\n        style: 'professional'\n      }\n    });\n  }\n}\n\nreturn assetTasks;"
+      }
+    },
+    {
+      "name": "Schedule Content Publishing",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [1050, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Publish to Platforms",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [1250, 300],
+      "parameters": {
+        "batchSize": 1
+      }
+    },
+    {
+      "name": "Platform Router",
+      "type": "n8n-nodes-base.if",
+      "position": [1450, 300],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.platform}}",
+              "operation": "equals",
+              "value2": "twitter"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Publish to Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1650, 200],
+      "parameters": {
+        "url": "={{$env.TWITTER_API_URL || 'https://api.twitter.com/2/tweets'}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.TWITTER_BEARER_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "contentType": "json",
+          "parameterType": "keyvalue",
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{$json.content}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Publish to LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1650, 400],
+      "parameters": {
+        "url": "={{$env.LINKEDIN_API_URL || 'https://api.linkedin.com/v2/ugcPosts'}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$env.LINKEDIN_ACCESS_TOKEN}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "contentType": "json",
+          "parameterType": "keyvalue",
+          "parameters": [
+            {
+              "name": "author",
+              "value": "urn:li:person:{{$env.LINKEDIN_PERSON_URN}}"
+            },
+            {
+              "name": "lifecycleState",
+              "value": "PUBLISHED"
+            },
+            {
+              "name": "specificContent",
+              "value": "={{\"com.linkedin.ugc.ShareContent\": {\"shareCommentary\": {\"text\": $json.content}, \"shareMediaCategory\": \"NONE\"}}}"
+            },
+            {
+              "name": "visibility",
+              "value": "{\"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Track Performance",
+      "type": "n8n-nodes-base.code",
+      "position": [1850, 300],
+      "parameters": {
+        "jsCode": "// Track publishing results and log performance\nconst results = $input.all();\nconst performanceLog = {\n  timestamp: new Date().toISOString(),\n  total_published: results.length,\n  successful: results.filter(r => r.json.success).length,\n  failed: results.filter(r => !r.json.success).length,\n  platforms: {},\n  details: results.map(r => ({\n    platform: r.json.platform,\n    success: r.json.success,\n    content_id: r.json.content_id,\n    timestamp: r.json.timestamp\n  }))\n};\n\n// Group by platform\nfor (const result of results) {\n  const platform = result.json.platform;\n  if (!performanceLog.platforms[platform]) {\n    performanceLog.platforms[platform] = {\n      total: 0,\n      successful: 0,\n      failed: 0\n    };\n  }\n  performanceLog.platforms[platform].total++;\n  if (result.json.success) {\n    performanceLog.platforms[platform].successful++;\n  } else {\n    performanceLog.platforms[platform].failed++;\n  }\n}\n\n// Send to SIMP broker for logging\nconst simpPayload = {\n  intent_type: 'media_performance_log',\n  source_agent: 'n8n_workflow',\n  target_agent: 'base_media_agent',\n  payload: performanceLog\n};\n\nreturn [\n  {\n    json: performanceLog,\n    pairedItem: {\n      item: 0\n    }\n  },\n  {\n    json: {\n      simp_payload: simpPayload,\n      should_send_to_broker: true\n    }\n  }\n];"
+      }
+    },
+    {
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "position": [1050, 500],
+      "parameters": {
+        "jsCode": "// Global error handler for the workflow\nconst errors = $input.all().filter(item => item.json.error);\n\nif (errors.length > 0) {\n  const errorSummary = {\n    timestamp: new Date().toISOString(),\n    total_errors: errors.length,\n    errors: errors.map(e => ({\n      node: e.json.node_name,\n      error: e.json.error,\n      timestamp: e.json.timestamp\n    }))\n  };\n  \n  // Send error alert via SIMP broker\n  const alertPayload = {\n    intent_type: 'media_workflow_error',\n    source_agent: 'n8n_workflow',\n    target_agent: 'base_media_agent',\n    payload: {\n      severity: 'high',\n      workflow: 'daily_pipeline',\n      error_summary: errorSummary\n    }\n  };\n  \n  return {\n    json: {\n      alert_payload: alertPayload,\n      error_summary: errorSummary,\n      requires_human_intervention: errors.length > 3\n    }\n  };\n}\n\nreturn null;"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Trending Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Trending Topics": {
+      "main": [
+        [
+          {
+            "node": "Generate Content Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Content Ideas": {
+      "main": [
+        [
+          {
+            "node": "Create Content Scripts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Content Scripts": {
+      "main": [
+        [
+          {
+            "node": "Generate Multimedia Assets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Schedule Content Publishing",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate Multimedia Assets": {
+      "main": [
+        [
+          {
+            "node": "Schedule Content Publishing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Content Publishing": {
+      "main": [
+        [
+          {
+            "node": "Publish to Platforms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to Platforms": {
+      "main": [
+        [
+          {
+            "node": "Platform Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Router": {
+      "main": [
+        [
+          {
+            "node": "Publish to Twitter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish to LinkedIn",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Publish to Twitter": {
+      "main": [
+        [
+          {
+            "node": "Track Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Track Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Performance": {
+      "main": [
+        []
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "timezone": "America/New_York",
+    "executionTimeout": 3600,
+    "maxExecutionTime": 3600,
+    "errorWorkflow": "Error Handler"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "1.0",
+  "tags": ["media", "content", "pipeline", "daily", "automation"],
+  "webhook": null,
+  "triggerCount": 0,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "description": "Daily content creation and distribution pipeline for KashClaw Media Grid. Automates trend analysis, content generation, asset creation, and multi-platform publishing with performance tracking."
+}

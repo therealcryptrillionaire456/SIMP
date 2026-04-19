@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "experiment_name": "daily_brp_threat_detection_evolution",
+  "rounds_completed": 5,
+  "final_best_score": 0.634245204364975,
+  "improvement_percent": 26.849040872995,
+  "improvement_history": [
+    {
+      "round": 1,
+      "best_score": 0.6057239741328568,
+      "population_avg": 0.5642403649616207,
+      "population_size": 4
+    },
+    {
+      "round": 2,
+      "best_score": 0.6315390725348154,
+      "population_avg": 0.6118138097354038,
+      "population_size": 4
+    },
+    {
+      "round": 3,
+      "best_score": 0.632204162912184,
+      "population_avg": 0.6193406855335682,
+      "population_size": 4
+    },
+    {
+      "round": 4,
+      "best_score": 0.632204162912184,
+      "population_avg": 0.5960672144119438,
+      "population_size": 4
+    },
+    {
+      "round": 5,
+      "best_score": 0.634245204364975,
+      "population_avg": 0.6190985435102101,
+      "population_size": 4
+    }
+  ],
+  "best_candidate": {
+    "score": 0.634245204364975,
+    "code_hash": "835c7a69",
+    "generation": 5
+  },
+  "timestamp": "2026-04-14T18:14:06.250580Z"
+}

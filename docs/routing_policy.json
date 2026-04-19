@@ -1,0 +1,116 @@
+{
+  "rules": [
+    {
+      "intent_type": "planning",
+      "primary_agent": "reasoning:001",
+      "fallback_chain": ["grok:001", "vision:001"],
+      "required_capability": "planning",
+      "description": "Strategic and operational planning tasks"
+    },
+    {
+      "intent_type": "research",
+      "primary_agent": "grok:001",
+      "fallback_chain": ["reasoning:001"],
+      "required_capability": "research",
+      "description": "Research and information gathering"
+    },
+    {
+      "intent_type": "code_task",
+      "primary_agent": "coder:001",
+      "fallback_chain": ["reasoning:001", "grok:001"],
+      "required_capability": "code_generation",
+      "description": "Code generation, review, and debugging"
+    },
+    {
+      "intent_type": "native_agent_trade",
+      "primary_agent": "kashclaw:001",
+      "fallback_chain": ["kashclaw:002"],
+      "required_capability": "trading",
+      "description": "Native trading operations via KashClaw organs"
+    },
+    {
+      "intent_type": "native_agent_monitor",
+      "primary_agent": "monitor:001",
+      "fallback_chain": ["vision:001"],
+      "required_capability": "monitoring",
+      "description": "Market and system monitoring"
+    },
+    {
+      "intent_type": "native_agent_vision",
+      "primary_agent": "vision:001",
+      "fallback_chain": [],
+      "required_capability": "vision",
+      "description": "Vision and image analysis tasks"
+    },
+    {
+      "intent_type": "analysis",
+      "primary_agent": "grok:001",
+      "fallback_chain": ["reasoning:001", "vision:001"],
+      "required_capability": "analysis",
+      "description": "Data analysis and reporting"
+    },
+    {
+      "intent_type": "prediction_signal",
+      "primary_agent": "grok:001",
+      "fallback_chain": ["reasoning:001"],
+      "required_capability": "prediction",
+      "description": "Market predictions and signal generation"
+    },
+    {
+      "intent_type": "small_purchase",
+      "primary_agent": "kashclaw:001",
+      "fallback_chain": [],
+      "required_capability": "trading",
+      "description": "Small-value purchase execution"
+    },
+    {
+      "intent_type": "orchestration",
+      "primary_agent": "orchestrator:001",
+      "fallback_chain": ["reasoning:001"],
+      "required_capability": "orchestration",
+      "description": "Multi-step orchestrated workflows"
+    },
+    {
+      "intent_type": "ping",
+      "primary_agent": "",
+      "fallback_chain": [],
+      "required_capability": "",
+      "description": "Health-check ping — any agent can respond"
+    },
+    {
+      "intent_type": "generate_strategy",
+      "primary_agent": "grok:001",
+      "fallback_chain": ["reasoning:001"],
+      "required_capability": "strategy",
+      "description": "Strategy generation for trading or operations"
+    },
+    {
+      "intent_type": "risk_assessment",
+      "primary_agent": "reasoning:001",
+      "fallback_chain": ["grok:001"],
+      "required_capability": "risk_analysis",
+      "description": "Risk evaluation and assessment"
+    },
+    {
+      "intent_type": "portfolio_rebalance",
+      "primary_agent": "kashclaw:001",
+      "fallback_chain": ["kashclaw:002"],
+      "required_capability": "trading",
+      "description": "Portfolio rebalancing operations"
+    },
+    {
+      "intent_type": "notification",
+      "primary_agent": "monitor:001",
+      "fallback_chain": [],
+      "required_capability": "notifications",
+      "description": "Alert and notification delivery"
+    },
+    {
+      "intent_type": "arbitrage_opportunity",
+      "primary_agent": "quantumarb_risk_simple",
+      "fallback_chain": ["quantumarb_enhanced", "quantumarb"],
+      "required_capability": "arbitrage",
+      "description": "Arbitrage opportunity detection and execution with risk framework"
+    }
+  ]
+}

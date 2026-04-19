@@ -1,0 +1,32 @@
+{
+  "judgment_id": "px-20260414_021641-3c4fc8d0",
+  "timestamp": "2026-04-14T02:16:41.675186Z",
+  "system_component": "SIMP.QuantumGoose",
+  "action_type": "quantum_task",
+  "proposed_action": {
+    "action_type": "quantum_task",
+    "algorithm": "deutsch algorithm",
+    "framework": "qiskit",
+    "qubits": 3,
+    "require_verification": false
+  },
+  "context_summary": "Quantum task: deutsch algorithm in qiskit (3 qubits)",
+  "recommendation": "ESCALATE",
+  "confidence": 0.7,
+  "reasons": [
+    "Algorithm 'deutsch algorithm' not explicitly in scope",
+    "Requires manual review"
+  ],
+  "referenced_rules": [
+    "quantum-in-scope"
+  ],
+  "block_cause": null,
+  "escalation_reason": "Algorithm 'deutsch algorithm' not explicitly in scope",
+  "assumptions": [],
+  "metadata": {
+    "algorithm": "deutsch algorithm",
+    "framework": "qiskit",
+    "qubits": 3,
+    "require_verification": false
+  }
+}

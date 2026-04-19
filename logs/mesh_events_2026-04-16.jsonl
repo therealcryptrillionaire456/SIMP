@@ -1,0 +1,553 @@
+{"timestamp": "2026-04-16T08:00:23.073355", "event_type": "agent_registered", "agent_id": "test_client", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:02:17.707819", "event_type": "agent_registered", "agent_id": "test_client", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:03:10.170605", "event_type": "agent_registered", "agent_id": "test_client", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:03:47.383246", "event_type": "agent_registered", "agent_id": "test_client", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:04:26.668836", "event_type": "agent_registered", "agent_id": "test_client", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:46:08.745512", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:46:08.747299", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message 28e6f343-112c-4f0c-b5cc-1e683a6520eb sent", "data": {}}
+{"timestamp": "2026-04-16T08:46:08.747503", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message d73e16cd-0f88-422c-8f69-8ac9f3246204 sent", "data": {}}
+{"timestamp": "2026-04-16T08:46:08.749577", "event_type": "agent_registered", "agent_id": "reputation_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:46:08.749791", "event_type": "message_sent", "agent_id": "reputation_test", "channel": "capability_ads", "message": "Message 3e5d8ea1-b014-4984-9da9-dad510f02414 sent", "data": {}}
+{"timestamp": "2026-04-16T08:46:08.749975", "event_type": "agent_registered", "agent_id": "selection_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:46:08.750117", "event_type": "message_sent", "agent_id": "selection_test", "channel": "capability_ads", "message": "Message 78036d4a-f8b4-4edd-8428-d36952e31b34 sent", "data": {}}
+{"timestamp": "2026-04-16T08:46:48.174188", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:46:48.174862", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message 9d5a8f7d-747f-4fe6-bf29-721ea158c356 sent", "data": {}}
+{"timestamp": "2026-04-16T08:46:48.175061", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message 9ad0af09-2943-4bd6-abe0-32479699e73c sent", "data": {}}
+{"timestamp": "2026-04-16T08:46:48.177147", "event_type": "agent_registered", "agent_id": "reputation_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:46:48.177367", "event_type": "message_sent", "agent_id": "reputation_test", "channel": "capability_ads", "message": "Message b3751642-efe0-45f4-a87d-9138467565f7 sent", "data": {}}
+{"timestamp": "2026-04-16T08:46:48.177540", "event_type": "agent_registered", "agent_id": "selection_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:46:48.177667", "event_type": "message_sent", "agent_id": "selection_test", "channel": "capability_ads", "message": "Message bf410a4a-3618-4204-b9e0-60a9bf88554b sent", "data": {}}
+{"timestamp": "2026-04-16T08:47:21.795470", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:47:21.796148", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message 291f01bb-870c-4dc9-b114-70be70954008 sent", "data": {}}
+{"timestamp": "2026-04-16T08:47:21.796632", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message d5b39004-a666-4cc7-865c-ca6f887cff9a sent", "data": {}}
+{"timestamp": "2026-04-16T08:47:21.798507", "event_type": "agent_registered", "agent_id": "reputation_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:47:21.798739", "event_type": "message_sent", "agent_id": "reputation_test", "channel": "capability_ads", "message": "Message 3b7f2c86-dfa2-492e-8062-8c1482b5cd71 sent", "data": {}}
+{"timestamp": "2026-04-16T08:47:21.798963", "event_type": "agent_registered", "agent_id": "selection_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:47:21.799126", "event_type": "message_sent", "agent_id": "selection_test", "channel": "capability_ads", "message": "Message 6579d245-1142-415a-978f-504ac5867c91 sent", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.793934", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.794316", "event_type": "agent_registered", "agent_id": "test_agent_2", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.794753", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "test_channel", "message": "Message e39194fe-5767-4bab-a91f-187c9fad95e4 sent", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.795992", "event_type": "agent_registered", "agent_id": "quantumarb_mesh", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.796110", "event_type": "agent_registered", "agent_id": "kashclaw_mesh", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.796191", "event_type": "message_sent", "agent_id": "kashclaw_mesh", "channel": "capability_ads", "message": "Message dfe18056-5428-42fa-81cb-69ddf70a5905 sent", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.796272", "event_type": "message_sent", "agent_id": "quantumarb_mesh", "channel": "capability_ads", "message": "Message 824636d2-bbc5-4453-8711-d12e13cbbb86 sent", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.796347", "event_type": "message_sent", "agent_id": "quantumarb_mesh", "channel": "capability_ads", "message": "Message 3039a4a3-6dde-40fb-93fa-032c904e0408 sent", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.796420", "event_type": "message_sent", "agent_id": "kashclaw_mesh", "channel": "capability_ads", "message": "Message c5634393-14a5-450c-a462-0e0ab90bcb70 sent", "data": {}}
+{"timestamp": "2026-04-16T08:49:34.796490", "event_type": "message_sent", "agent_id": "kashclaw_mesh", "channel": "capability_ads", "message": "Message 8d15fbe4-445b-48cd-84ef-1ce8d00dcb2e sent", "data": {}}
+{"timestamp": "2026-04-16T08:49:35.805279", "event_type": "message_sent", "agent_id": "quantumarb_mesh", "channel": "intent_requests", "message": "Message 7cf918cc-aa97-4586-ba0b-7d01156d0569 sent", "data": {}}
+{"timestamp": "2026-04-16T08:58:13.737963", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:58:13.738300", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:59:18.697699", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T08:59:18.698076", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:00:19.906279", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:00:19.906690", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:00:19.907365", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 9b84bca3-3e0f-48f1-9bc1-b16024423535 sent", "data": {}}
+{"timestamp": "2026-04-16T09:00:21.913576", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message daa3ae81-0f0d-4689-9d94-1df317e45808 sent", "data": {}}
+{"timestamp": "2026-04-16T09:00:21.915181", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message b4d3f5d4-5b4a-4cc2-b526-e3225dccef46 sent", "data": {}}
+{"timestamp": "2026-04-16T09:00:22.921594", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 3f374969-0cb4-4720-a8a5-a0ed757d78c3 sent", "data": {}}
+{"timestamp": "2026-04-16T09:00:22.923510", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message 5c7b75aa-ce80-4976-81de-22d28f01e5cf sent", "data": {}}
+{"timestamp": "2026-04-16T09:00:23.929568", "event_type": "agent_registered", "agent_id": "analyst", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:00:23.932659", "event_type": "message_sent", "agent_id": "analyst", "channel": "capability_ads", "message": "Message d0dbfc92-4c0c-43b3-be52-46a34c75e981 sent", "data": {}}
+{"timestamp": "2026-04-16T09:00:23.933437", "event_type": "message_sent", "agent_id": "analyst", "channel": "capability_ads", "message": "Message 402408c7-562c-419e-86fe-d818137fa121 sent", "data": {}}
+{"timestamp": "2026-04-16T09:00:24.940294", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 0bee3029-3e64-4288-b3c2-794db7d323e0 sent", "data": {}}
+{"timestamp": "2026-04-16T09:11:48.545999", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:11:48.546729", "event_type": "message_sent", "agent_id": "test_sender", "channel": "broadcast", "message": "Message 2cede805-643c-4ca3-ace5-1c220ffadb51 sent", "data": {}}
+{"timestamp": "2026-04-16T09:11:48.547582", "event_type": "agent_deregistered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:11:48.575742", "event_type": "agent_registered", "agent_id": "test_client_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:11:53.581264", "event_type": "agent_deregistered", "agent_id": "test_client_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:00.651742", "event_type": "agent_registered", "agent_id": "test_quantumarb_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:06.662548", "event_type": "agent_deregistered", "agent_id": "test_quantumarb_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:12.752599", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:12.753135", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message a0a62f28-d531-410c-8326-38b5c2483ba5 sent", "data": {}}
+{"timestamp": "2026-04-16T09:12:12.753228", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message 21ef606a-a9bf-4705-ac86-5867842568c4 sent", "data": {}}
+{"timestamp": "2026-04-16T09:12:12.754168", "event_type": "agent_registered", "agent_id": "reputation_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:12.754254", "event_type": "message_sent", "agent_id": "reputation_test", "channel": "capability_ads", "message": "Message 607bf314-bfdc-4427-94a2-b18998da378c sent", "data": {}}
+{"timestamp": "2026-04-16T09:12:12.754336", "event_type": "agent_registered", "agent_id": "selection_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:12.754417", "event_type": "message_sent", "agent_id": "selection_test", "channel": "capability_ads", "message": "Message 86a32825-1974-4a42-8364-50419c997142 sent", "data": {}}
+{"timestamp": "2026-04-16T09:12:13.016097", "event_type": "agent_registered", "agent_id": "test_client", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:13.241893", "event_type": "agent_registered", "agent_id": "qa", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:13.242235", "event_type": "agent_registered", "agent_id": "kc", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:13.242377", "event_type": "message_sent", "agent_id": "qa", "channel": "ch", "message": "Message 803bf436-c79c-47b5-ab9e-9088d11a480e sent", "data": {}}
+{"timestamp": "2026-04-16T09:12:13.376232", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:12:13.376605", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message 6adc720c-68a5-4f07-826e-b888714f1403 sent", "data": {}}
+{"timestamp": "2026-04-16T09:12:13.376702", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message f7ed9471-1103-407b-beba-1d3681546593 sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:12.252472", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:12.252925", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message 0c2d26aa-b52a-43c4-a794-532690a1f4dd sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:12.253018", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message a561f55d-38e9-4bea-95f1-7875edc14b63 sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:12.387064", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:12.387500", "event_type": "message_sent", "agent_id": "test_sender", "channel": "broadcast", "message": "Message 9c2cfca1-5fe3-4b5d-a1e4-8bfe1b347b90 sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:12.388824", "event_type": "agent_deregistered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:12.432700", "event_type": "agent_registered", "agent_id": "test_client_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:17.438969", "event_type": "agent_deregistered", "agent_id": "test_client_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:24.514913", "event_type": "agent_registered", "agent_id": "test_quantumarb_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:34.523689", "event_type": "agent_deregistered", "agent_id": "test_quantumarb_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:41.825731", "event_type": "agent_registered", "agent_id": "test_agent_1", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:41.826227", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message 79719737-c225-4394-b0d1-648a20ce6bfe sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:41.826624", "event_type": "message_sent", "agent_id": "test_agent_1", "channel": "capability_ads", "message": "Message 281ee444-1cc3-4638-9318-a5e33d278a32 sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:41.827825", "event_type": "agent_registered", "agent_id": "reputation_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:41.827931", "event_type": "message_sent", "agent_id": "reputation_test", "channel": "capability_ads", "message": "Message 1f17af22-6ff5-46de-a2bb-281d18c9ee62 sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:41.828024", "event_type": "agent_registered", "agent_id": "selection_test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:20:41.828117", "event_type": "message_sent", "agent_id": "selection_test", "channel": "capability_ads", "message": "Message 48296171-6881-44ef-ba05-351c712fb347 sent", "data": {}}
+{"timestamp": "2026-04-16T09:20:42.005676", "event_type": "agent_registered", "agent_id": "test_client", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:26:32.832343", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:26:32.832765", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:26:32.833103", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 282f8c97-5152-46c2-ae30-dfa8a97a90f9 sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:32.833203", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message b198dc0e-f8b4-45a5-8998-f66093e49fab sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:34.839749", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message 26eb291e-e280-40d9-be50-bfde9c20c348 sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:34.840919", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 595604ae-6040-45c1-bb37-058bd36732e4 sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:35.846025", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 83dbb048-372f-4105-a2f4-8f5a22f0a644 sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:35.847840", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message 9d228abd-b969-46b6-b65d-60d9aaaf532d sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:36.851419", "event_type": "agent_registered", "agent_id": "analyst", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:26:36.854990", "event_type": "message_sent", "agent_id": "analyst", "channel": "capability_ads", "message": "Message 04c2e7ac-edaa-4108-9760-14a069585425 sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:36.855489", "event_type": "message_sent", "agent_id": "analyst", "channel": "capability_ads", "message": "Message 874daff0-1867-4427-9033-031b17aa9f4a sent", "data": {}}
+{"timestamp": "2026-04-16T09:26:37.862188", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 2d491ac3-ad6b-415c-9856-55feecb6121b sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:21.976334", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:30:21.976709", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:30:21.977391", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 93168abe-122d-41cd-9b07-14e4a59c01b4 sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:23.983621", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "capability_ads", "message": "Message 4ec8c20c-fd4a-499c-bd6b-6b3a91c1cf97 sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:23.985447", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 5b5317b9-0120-4ae0-9cf1-7820aef1d3d6 sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:24.990281", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 4ca31ddb-39da-46ca-bf34-582713ba4d71 sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:24.995081", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message 9bce578d-e57a-44aa-8220-4aca81daa887 sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:26.001610", "event_type": "agent_registered", "agent_id": "analyst", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:30:26.004102", "event_type": "message_sent", "agent_id": "analyst", "channel": "capability_ads", "message": "Message 31525af0-ace3-4014-9e94-15ba7fc59188 sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:26.004619", "event_type": "message_sent", "agent_id": "analyst", "channel": "capability_ads", "message": "Message 589ae575-66ef-4cd4-9eeb-6651e3ff3f51 sent", "data": {}}
+{"timestamp": "2026-04-16T09:30:27.017306", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_analyst_1776331827 opened", "data": {"channel_id": "ch_quantuma_analyst_1776331827"}}
+{"timestamp": "2026-04-16T09:30:27.017843", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message af66e879-8135-4431-ba73-b0316b54b89c sent", "data": {}}
+{"timestamp": "2026-04-16T09:33:08.213064", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:33:08.213467", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:33:08.214082", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 11b613c4-8578-4deb-a847-59f19679996c sent", "data": {}}
+{"timestamp": "2026-04-16T09:35:43.450436", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:35:43.450811", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T09:35:43.451443", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message a10d9607-7d18-4f13-956e-69cc1f49f4ee sent", "data": {}}
+{"timestamp": "2026-04-16T09:35:44.462670", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776332144 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776332144"}}
+{"timestamp": "2026-04-16T09:35:44.463388", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 12c56bcf-4619-40c9-9c20-fa9989fab5da sent", "data": {}}
+{"timestamp": "2026-04-16T10:42:05.052812", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:42:05.053427", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:42:05.053815", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 4eda66bd-2d17-4a8d-82a9-54ba8bbeeef6 sent", "data": {}}
+{"timestamp": "2026-04-16T10:42:06.065516", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336126 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336126"}}
+{"timestamp": "2026-04-16T10:42:06.066240", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message ca491c17-4bbd-4bf6-9af3-e96e86944454 sent", "data": {}}
+{"timestamp": "2026-04-16T10:43:41.342040", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:43:41.343076", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:43:41.343389", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 224d8420-719e-4094-acae-5ed4d5e1200e sent", "data": {}}
+{"timestamp": "2026-04-16T10:43:42.355760", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336222 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336222"}}
+{"timestamp": "2026-04-16T10:43:42.356266", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 706e813d-bde4-428c-9661-66f2ae5e24d8 sent", "data": {}}
+{"timestamp": "2026-04-16T10:43:42.389755", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message 8bedbd85-b597-4ccd-84b1-459d6b6a5421 sent", "data": {}}
+{"timestamp": "2026-04-16T10:44:01.206203", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:44:01.206562", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:44:01.206899", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 436ef903-f531-41a9-b9ec-baa244ec93b6 sent", "data": {}}
+{"timestamp": "2026-04-16T10:44:02.217779", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336242 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336242"}}
+{"timestamp": "2026-04-16T10:44:02.218307", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 03ba0ef5-e734-4e39-a2f4-df8ea2830eaf sent", "data": {}}
+{"timestamp": "2026-04-16T10:44:02.237175", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message 48fc7fbb-d125-4450-abdc-20afdf72774c sent", "data": {}}
+{"timestamp": "2026-04-16T10:46:33.894249", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:46:33.894880", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:46:33.895239", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message bb19d6e2-4ee2-4e3d-9a45-3570468e8ac9 sent", "data": {}}
+{"timestamp": "2026-04-16T10:46:34.905788", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336394 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336394"}}
+{"timestamp": "2026-04-16T10:46:34.906267", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message f06b2c6d-c552-4305-a38b-e3f26639f10b sent", "data": {}}
+{"timestamp": "2026-04-16T10:46:34.909757", "event_type": "payment_channel_opened", "agent_id": "kashclaw", "channel": "payment_settlement", "message": "Channel ch_kashclaw_quantuma_1776336394 opened", "data": {"channel_id": "ch_kashclaw_quantuma_1776336394"}}
+{"timestamp": "2026-04-16T10:46:34.910044", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message e6d4e71b-cf39-4969-901e-0206b2fb7377 sent", "data": {}}
+{"timestamp": "2026-04-16T10:46:34.938087", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message 6bff587a-219f-45d3-bb1c-283a960bee27 sent", "data": {}}
+{"timestamp": "2026-04-16T10:46:34.938712", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_responses", "message": "Message 0b09ae5f-4920-4fa4-8d22-7818004b5d53 sent", "data": {}}
+{"timestamp": "2026-04-16T10:46:49.116935", "event_type": "agent_registered", "agent_id": "test", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:47:12.725893", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:47:12.726264", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:47:12.726965", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message 2dbd19ff-17ad-4020-949c-ad6c1dee9bec sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:13.738980", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336433 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336433"}}
+{"timestamp": "2026-04-16T10:47:13.739460", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message eaf96dfd-d2e0-4cdc-95db-e6656212322c sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:13.741190", "event_type": "payment_channel_opened", "agent_id": "kashclaw", "channel": "payment_settlement", "message": "Channel ch_kashclaw_quantuma_1776336433 opened", "data": {"channel_id": "ch_kashclaw_quantuma_1776336433"}}
+{"timestamp": "2026-04-16T10:47:13.741502", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message 44af0258-1ec1-4ea5-865e-4d6d7388b176 sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:13.767514", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message 56235d66-a405-47fe-b0ca-b63d4d92ca82 sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:13.770891", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_responses", "message": "Message a783692a-80b9-422f-9452-fbd27028dd4b sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:54.789597", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:47:54.789999", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:47:54.790622", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message cc202d7d-bc8d-45d5-aeb0-85ebfab056f6 sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:55.801919", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336475 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336475"}}
+{"timestamp": "2026-04-16T10:47:55.802507", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 0d5c4834-b284-44b8-8cdc-5432675ce8c8 sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:55.804322", "event_type": "payment_channel_opened", "agent_id": "kashclaw", "channel": "payment_settlement", "message": "Channel ch_kashclaw_quantuma_1776336475 opened", "data": {"channel_id": "ch_kashclaw_quantuma_1776336475"}}
+{"timestamp": "2026-04-16T10:47:55.804646", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message a414be47-9f7f-4ee6-9f19-15e9cfe73fda sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:55.828275", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message 56a33b89-2e34-4c52-9c8f-3c768cea94b7 sent", "data": {}}
+{"timestamp": "2026-04-16T10:47:55.838130", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_responses", "message": "Message f44d90c1-f327-4635-9dc1-215cbf059564 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.413078", "event_type": "agent_registered", "agent_id": "quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.413485", "event_type": "agent_registered", "agent_id": "kashclaw", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.413911", "event_type": "agent_registered", "agent_id": "kloutbot", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.414280", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "capability_ads", "message": "Message aae5ec12-2d59-4e55-b77d-24334caa01c3 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.414552", "event_type": "message_sent", "agent_id": "kloutbot", "channel": "capability_ads", "message": "Message 32921408-4c4f-42dc-8a37-ee37436ee792 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.415416", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336615 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336615"}}
+{"timestamp": "2026-04-16T10:50:15.415559", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 8010265c-6282-4763-9ede-a223fc35acb8 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.416199", "event_type": "payment_channel_opened", "agent_id": "kashclaw", "channel": "payment_settlement", "message": "Channel ch_kashclaw_quantuma_1776336615 opened", "data": {"channel_id": "ch_kashclaw_quantuma_1776336615"}}
+{"timestamp": "2026-04-16T10:50:15.416324", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message 47eed021-f8e6-4ad6-9f66-a54c2a4692e0 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.417498", "event_type": "payment_channel_opened", "agent_id": "kloutbot", "channel": "payment_settlement", "message": "Channel ch_kloutbot_quantuma_1776336615 opened", "data": {"channel_id": "ch_kloutbot_quantuma_1776336615"}}
+{"timestamp": "2026-04-16T10:50:15.417601", "event_type": "message_sent", "agent_id": "kloutbot", "channel": "intent_requests", "message": "Message f6b0c70e-f616-493b-ac57-6dae3ddcf88a sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:15.828114", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message 9b20dedc-5178-4fe5-b4eb-5e1f05ac6b02 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:16.027261", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_responses", "message": "Message e332c70b-e0e3-4f7c-89fc-ab6cdfada55c sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:16.028194", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_responses", "message": "Message 8136dd23-30e0-4970-857d-8a9f222a7116 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:17.431843", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336617 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336617"}}
+{"timestamp": "2026-04-16T10:50:17.432302", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message a11b559b-4543-4b02-8f8b-1a4cecf20e8a sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:17.434237", "event_type": "payment_channel_opened", "agent_id": "kashclaw", "channel": "payment_settlement", "message": "Channel ch_kashclaw_quantuma_1776336617 opened", "data": {"channel_id": "ch_kashclaw_quantuma_1776336617"}}
+{"timestamp": "2026-04-16T10:50:17.434565", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message b3dc6649-d7dd-49b2-bff3-bdf1e00a28bb sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:17.436183", "event_type": "payment_channel_opened", "agent_id": "kloutbot", "channel": "payment_settlement", "message": "Channel ch_kloutbot_quantuma_1776336617 opened", "data": {"channel_id": "ch_kloutbot_quantuma_1776336617"}}
+{"timestamp": "2026-04-16T10:50:17.436402", "event_type": "message_sent", "agent_id": "kloutbot", "channel": "intent_requests", "message": "Message f157184c-b6ad-4471-a999-5d713bca433c sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:17.800146", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message d45f7faa-a138-4273-ba9a-38e658174bf5 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:17.983923", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_responses", "message": "Message e27fed27-f43d-4162-afe6-0e071c23b083 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:17.985666", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_responses", "message": "Message c5572c37-ce5d-42ef-816a-982f2a9aee66 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:19.444547", "event_type": "payment_channel_opened", "agent_id": "quantumarb", "channel": "payment_settlement", "message": "Channel ch_quantuma_kashclaw_1776336619 opened", "data": {"channel_id": "ch_quantuma_kashclaw_1776336619"}}
+{"timestamp": "2026-04-16T10:50:19.444881", "event_type": "message_sent", "agent_id": "quantumarb", "channel": "intent_requests", "message": "Message 2d481911-cb93-4afb-9cb2-451f870decb9 sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:19.446420", "event_type": "payment_channel_opened", "agent_id": "kashclaw", "channel": "payment_settlement", "message": "Channel ch_kashclaw_quantuma_1776336619 opened", "data": {"channel_id": "ch_kashclaw_quantuma_1776336619"}}
+{"timestamp": "2026-04-16T10:50:19.446632", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_requests", "message": "Message 23476187-8812-490c-9888-0a366ea700cb sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:19.447414", "event_type": "payment_channel_opened", "agent_id": "kloutbot", "channel": "payment_settlement", "message": "Channel ch_kloutbot_quantuma_1776336619 opened", "data": {"channel_id": "ch_kloutbot_quantuma_1776336619"}}
+{"timestamp": "2026-04-16T10:50:19.447518", "event_type": "message_sent", "agent_id": "kloutbot", "channel": "intent_requests", "message": "Message c6bf21ac-84be-48e9-8eee-e1ccd39a3b1d sent", "data": {}}
+{"timestamp": "2026-04-16T10:50:19.762261", "event_type": "message_sent", "agent_id": "kashclaw", "channel": "intent_responses", "message": "Message a1009dd9-161f-4182-a991-9b4a9b46f10a sent", "data": {}}
+{"timestamp": "2026-04-16T10:53:28.512920", "event_type": "agent_registered", "agent_id": "enhanced_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:54:09.382905", "event_type": "agent_registered", "agent_id": "enhanced_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:57:40.740757", "event_type": "agent_registered", "agent_id": "simp_bridge", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:57:40.741975", "event_type": "agent_registered", "agent_id": "mesh_quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:57:40.742074", "event_type": "agent_registered", "agent_id": "mesh_kashclaw_gemma", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:57:40.742148", "event_type": "agent_registered", "agent_id": "mesh_bullbear_predictor", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:57:40.742214", "event_type": "agent_registered", "agent_id": "mesh_kloutbot", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:58:56.862283", "event_type": "agent_registered", "agent_id": "simp_bridge", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:58:56.862659", "event_type": "agent_registered", "agent_id": "mesh_quantumarb", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:58:56.863102", "event_type": "agent_registered", "agent_id": "mesh_kashclaw_gemma", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:58:56.863205", "event_type": "agent_registered", "agent_id": "mesh_bullbear_predictor", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:58:56.863279", "event_type": "agent_registered", "agent_id": "mesh_kloutbot", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T10:58:56.863377", "event_type": "message_sent", "agent_id": "mesh_quantumarb", "channel": "broadcast", "message": "Message 970d0f79-ec58-4075-8e89-a7c840118f98 sent", "data": {}}
+{"timestamp": "2026-04-16T10:58:57.869086", "event_type": "message_sent", "agent_id": "mesh_bullbear_predictor", "channel": "broadcast", "message": "Message c94d88b4-5224-4545-90cf-a63871737b7c sent", "data": {}}
+{"timestamp": "2026-04-16T10:58:58.874594", "event_type": "message_sent", "agent_id": "mesh_quantumarb", "channel": "broadcast", "message": "Message 1139ff19-ef2d-43bb-a8fd-201cb9745dc7 sent", "data": {}}
+{"timestamp": "2026-04-16T11:03:14.829987", "event_type": "agent_registered", "agent_id": "enhanced_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:17:03.991806", "event_type": "agent_registered", "agent_id": "test_broker", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:19:12.479472", "event_type": "agent_registered", "agent_id": "deploy_check", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:19:12.482163", "event_type": "agent_registered", "agent_id": "chk", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:19:12.482592", "event_type": "message_sent", "agent_id": "chk", "channel": "capability_ads", "message": "Message 39031e54-dd9d-4f93-8eac-a01c3211341f sent", "data": {}}
+{"timestamp": "2026-04-16T11:19:12.660184", "event_type": "agent_registered", "agent_id": "mesh_bridge", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:19:23.109013", "event_type": "agent_registered", "agent_id": "demo_broker", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:19:23.109613", "event_type": "agent_registered", "agent_id": "quantumarb_demo", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:19:23.109891", "event_type": "agent_registered", "agent_id": "kashclaw_demo", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:19:23.110134", "event_type": "message_sent", "agent_id": "quantumarb_demo", "channel": "capability_ads", "message": "Message 9553c920-ccc3-4fa5-adf7-c43104da2a00 sent", "data": {}}
+{"timestamp": "2026-04-16T11:19:23.110419", "event_type": "message_sent", "agent_id": "kashclaw_demo", "channel": "capability_ads", "message": "Message 5a1e48c9-48d9-4261-ab1c-948015f7b4eb sent", "data": {}}
+{"timestamp": "2026-04-16T11:19:23.112257", "event_type": "payment_channel_opened", "agent_id": "demo_broker", "channel": "payment_settlement", "message": "Channel ch_demo_bro_kashclaw_1776338363 opened", "data": {"channel_id": "ch_demo_bro_kashclaw_1776338363"}}
+{"timestamp": "2026-04-16T11:19:23.112382", "event_type": "message_sent", "agent_id": "demo_broker", "channel": "intent_requests", "message": "Message 2f6ac849-04d1-420f-82dd-430fb0586f8b sent", "data": {}}
+{"timestamp": "2026-04-16T11:19:23.217056", "event_type": "message_sent", "agent_id": "kashclaw_demo", "channel": "intent_responses", "message": "Message 021e12fb-65a4-4c52-abae-2237bdbe6adb sent", "data": {}}
+{"timestamp": "2026-04-16T11:20:40.696655", "event_type": "agent_registered", "agent_id": "test_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:21:16.274091", "event_type": "agent_registered", "agent_id": "test_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:21:23.659328", "event_type": "agent_registered", "agent_id": "test_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:33:49.825756", "event_type": "agent_registered", "agent_id": "test_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:35:38.162524", "event_type": "agent_registered", "agent_id": "test_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T11:36:07.653016", "event_type": "agent_registered", "agent_id": "test_agent", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T12:00:25.944211", "event_type": "agent_registered", "agent_id": "simp_broker", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T12:00:55.951132", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 08e4f55d-2cf1-44b4-82ef-07b08b869e91 sent", "data": {}}
+{"timestamp": "2026-04-16T12:01:25.957358", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3d2874a0-6a22-4fb1-b0f1-f13109502a1e sent", "data": {}}
+{"timestamp": "2026-04-16T12:01:55.965137", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c1e9f92b-4b16-4320-a6b9-ddd5cf58f8d6 sent", "data": {}}
+{"timestamp": "2026-04-16T12:02:25.972953", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 2fbd0f45-8bdc-40c7-9a54-02f9f1dffc02 sent", "data": {}}
+{"timestamp": "2026-04-16T12:02:55.978315", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1762e780-c134-4961-836f-a1ea3337b0d3 sent", "data": {}}
+{"timestamp": "2026-04-16T12:03:25.986158", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 336e05fa-b944-4ac3-b432-db8e14c42734 sent", "data": {}}
+{"timestamp": "2026-04-16T12:03:55.988311", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6c10cbd1-12f8-467c-93ce-d477932cf4e6 sent", "data": {}}
+{"timestamp": "2026-04-16T12:04:25.991365", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5168f0a3-f708-49b1-ad36-8516f181230d sent", "data": {}}
+{"timestamp": "2026-04-16T12:04:55.996200", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 58e23901-7a01-4223-bc4d-d47b2dafd12c sent", "data": {}}
+{"timestamp": "2026-04-16T12:05:26.000343", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1daaecc8-dd0c-4020-9607-f3851b3bf21e sent", "data": {}}
+{"timestamp": "2026-04-16T12:05:56.007828", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b5f7dff2-952d-408b-9dfc-51111dd0ac37 sent", "data": {}}
+{"timestamp": "2026-04-16T12:06:26.013398", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 8b5e7b62-fc10-42a7-81c7-8adc532ee0d3 sent", "data": {}}
+{"timestamp": "2026-04-16T12:06:56.019932", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b7251c12-7ee0-432e-8104-33fdec9544a2 sent", "data": {}}
+{"timestamp": "2026-04-16T12:07:26.025654", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e275cc6e-e023-4de1-98a4-4f1108492725 sent", "data": {}}
+{"timestamp": "2026-04-16T12:07:56.032086", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9bfa7d1d-e0f4-4b8a-b17f-ae1ee41596fd sent", "data": {}}
+{"timestamp": "2026-04-16T12:08:26.039654", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ef07e753-46d4-4a70-b3cd-0cf09aee718b sent", "data": {}}
+{"timestamp": "2026-04-16T12:08:56.047339", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ca9f27ff-cd82-468e-8911-eeece802bb50 sent", "data": {}}
+{"timestamp": "2026-04-16T12:09:26.054874", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d2648e8a-000c-4bec-b487-c6f935b8735f sent", "data": {}}
+{"timestamp": "2026-04-16T12:09:56.062131", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 663ea252-a155-4cc3-9dfb-90d7963a7377 sent", "data": {}}
+{"timestamp": "2026-04-16T12:10:26.066103", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f0d5996a-7d2a-49ef-8ebd-849ad034fe3b sent", "data": {}}
+{"timestamp": "2026-04-16T12:10:56.068588", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6c854ee8-a23a-4a0a-ac86-56097131f957 sent", "data": {}}
+{"timestamp": "2026-04-16T12:11:26.074179", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 2a175528-f2e9-4bd2-b9b4-89fd36198a58 sent", "data": {}}
+{"timestamp": "2026-04-16T12:11:56.077887", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message add8ea3c-66ad-40ca-bcf0-8b65dc2d1785 sent", "data": {}}
+{"timestamp": "2026-04-16T12:12:26.082878", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 76ce5b13-2ac6-4d8a-9c1c-02e86b8b9e54 sent", "data": {}}
+{"timestamp": "2026-04-16T12:12:56.088260", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 23a97c9a-10a4-44c7-a713-3e201b5d5f74 sent", "data": {}}
+{"timestamp": "2026-04-16T12:13:26.091189", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 572a7d02-e2a7-4fa7-9a96-5816bd678286 sent", "data": {}}
+{"timestamp": "2026-04-16T12:13:56.096708", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d94d4d90-6828-4ffa-ae0a-2da5967f1e09 sent", "data": {}}
+{"timestamp": "2026-04-16T12:14:26.103772", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d43cb1ce-afef-4475-b9f5-69d732125d70 sent", "data": {}}
+{"timestamp": "2026-04-16T12:14:56.110384", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 52875593-9d54-4d87-8aee-5eafd3933682 sent", "data": {}}
+{"timestamp": "2026-04-16T12:15:26.115839", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7dc7cdc9-de56-484b-8fbc-d818fced1b93 sent", "data": {}}
+{"timestamp": "2026-04-16T12:15:56.123109", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 4e5a7b9b-6748-4549-b408-33d70c6170d4 sent", "data": {}}
+{"timestamp": "2026-04-16T12:16:26.129508", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 516b0d32-d58d-49fd-afe7-9c37a3aa4303 sent", "data": {}}
+{"timestamp": "2026-04-16T12:16:56.136939", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 0ae0dd32-a3b6-4cc6-a877-a089dca9ad36 sent", "data": {}}
+{"timestamp": "2026-04-16T12:17:26.145305", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 603816e4-ba0d-48e8-8a57-f7439755d530 sent", "data": {}}
+{"timestamp": "2026-04-16T12:17:56.151893", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c80221b3-0b67-4fb0-83fb-af309ea93d04 sent", "data": {}}
+{"timestamp": "2026-04-16T12:18:26.157522", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 8ebf7de8-38f0-4423-8898-673be397f37a sent", "data": {}}
+{"timestamp": "2026-04-16T12:18:56.165375", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 15238e08-fa23-4ea0-8502-4e6ccd718426 sent", "data": {}}
+{"timestamp": "2026-04-16T12:19:26.173480", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a9b14287-8a04-45d9-96e7-9c3f85f8bab3 sent", "data": {}}
+{"timestamp": "2026-04-16T12:19:56.178813", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e4aaf4f1-ab83-456e-8ae5-d1c5196645c0 sent", "data": {}}
+{"timestamp": "2026-04-16T12:20:26.186535", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d3fb1d92-db11-45a9-9a8a-3e190f20bcdf sent", "data": {}}
+{"timestamp": "2026-04-16T12:20:56.190122", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e60bfdd0-239a-4e11-8669-0fe2e7d371ce sent", "data": {}}
+{"timestamp": "2026-04-16T12:21:26.198526", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message adff1557-58ff-4b01-bead-4838ed14d2ac sent", "data": {}}
+{"timestamp": "2026-04-16T12:21:56.201242", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1f0addac-13c5-4452-b576-769d650c71f7 sent", "data": {}}
+{"timestamp": "2026-04-16T12:22:26.203320", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a18c5c2f-450e-45b6-952c-c5469e38fd03 sent", "data": {}}
+{"timestamp": "2026-04-16T12:22:56.209220", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7a1c982b-897a-4446-af0c-cc572974bd26 sent", "data": {}}
+{"timestamp": "2026-04-16T12:23:26.215064", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9894d97e-0455-4e56-9531-68f3fd0c3395 sent", "data": {}}
+{"timestamp": "2026-04-16T12:23:56.217366", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3088e10c-3571-4b07-b19b-bc8e5a3dccb1 sent", "data": {}}
+{"timestamp": "2026-04-16T12:24:26.223144", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 358e4dad-d241-425e-b065-a0e09e45aa82 sent", "data": {}}
+{"timestamp": "2026-04-16T12:24:56.228619", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6382f856-c3c9-464f-b4dd-9640fa17cddc sent", "data": {}}
+{"timestamp": "2026-04-16T12:25:26.235070", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 0f31d5b6-8238-433b-a545-0bda01a88448 sent", "data": {}}
+{"timestamp": "2026-04-16T12:25:56.243142", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d7d1fc74-dcdc-443e-b529-07703b7ed53f sent", "data": {}}
+{"timestamp": "2026-04-16T12:26:26.253145", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7087fc1c-a993-4507-8f63-e32ab5fe8701 sent", "data": {}}
+{"timestamp": "2026-04-16T12:26:56.264632", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message befda67c-77e9-4a5e-b1ba-20e38bb96d72 sent", "data": {}}
+{"timestamp": "2026-04-16T12:27:26.270063", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 8a6cb488-e238-4a23-92d1-976dd4c87c30 sent", "data": {}}
+{"timestamp": "2026-04-16T12:27:56.277459", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 2aaffe27-0e7c-4d36-bbf7-f4ff2b071824 sent", "data": {}}
+{"timestamp": "2026-04-16T12:28:26.283799", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d1b69499-117b-4914-950c-6811af21edf6 sent", "data": {}}
+{"timestamp": "2026-04-16T12:28:56.299930", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message fc56e943-8055-4265-a216-ac298b34e0a9 sent", "data": {}}
+{"timestamp": "2026-04-16T12:29:26.306561", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1139f06c-fc9b-48eb-8db6-25e2be854514 sent", "data": {}}
+{"timestamp": "2026-04-16T12:29:32.377883", "event_type": "agent_registered", "agent_id": "simp_broker", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T12:29:32.494430", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3466aaaa-0957-42c7-8778-a2579d1e48f3 sent", "data": {}}
+{"timestamp": "2026-04-16T12:29:56.314912", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 410a6ced-1a40-4ffd-bd35-fe0251c9dfa4 sent", "data": {}}
+{"timestamp": "2026-04-16T12:30:26.330635", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6c6ebb42-f044-41c6-bee3-48e39f3008a8 sent", "data": {}}
+{"timestamp": "2026-04-16T12:30:56.337570", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9ac8ef36-b5ae-497a-99ed-2884dfa147cc sent", "data": {}}
+{"timestamp": "2026-04-16T12:31:03.293784", "event_type": "agent_registered", "agent_id": "simp_broker", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T12:31:03.414109", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 62b854a2-7f04-410b-a73c-48d560f844a0 sent", "data": {}}
+{"timestamp": "2026-04-16T12:31:26.340156", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d3608620-9e1b-436f-bd61-a38f136c0254 sent", "data": {}}
+{"timestamp": "2026-04-16T12:34:36.108579", "event_type": "agent_registered", "agent_id": "simp_broker", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T12:35:06.114045", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 458cbe9b-208f-45e6-89fb-3dc2e366d928 sent", "data": {}}
+{"timestamp": "2026-04-16T12:35:36.118485", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f8d46a20-dca8-4c00-b9b0-ceff353143b4 sent", "data": {}}
+{"timestamp": "2026-04-16T12:36:06.122403", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3d778d98-7a0f-4c6c-b387-c39f29404480 sent", "data": {}}
+{"timestamp": "2026-04-16T12:36:36.128418", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message efdbcbb2-32c1-4b6a-8f3b-2a7c79ee1a13 sent", "data": {}}
+{"timestamp": "2026-04-16T12:37:06.133074", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b50e2305-3e70-4d04-b405-a696097662f7 sent", "data": {}}
+{"timestamp": "2026-04-16T12:37:36.139076", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 66f6eeaf-e6e1-4319-9308-6bd9e796a10d sent", "data": {}}
+{"timestamp": "2026-04-16T12:38:06.145997", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ceb14fb3-c550-46be-b97a-c31f3e2101f2 sent", "data": {}}
+{"timestamp": "2026-04-16T12:38:36.148072", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7ad108e5-db54-42df-b841-355e91f06ea7 sent", "data": {}}
+{"timestamp": "2026-04-16T12:39:06.150747", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message fe9ba1be-2060-4ba7-afa6-6a72ff668cfc sent", "data": {}}
+{"timestamp": "2026-04-16T12:39:36.152687", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9a73b9cc-e31b-4fb1-a1c6-cf13c54c42b9 sent", "data": {}}
+{"timestamp": "2026-04-16T12:40:06.161076", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 32da022f-584e-44d9-b98a-40a83a1a224b sent", "data": {}}
+{"timestamp": "2026-04-16T12:40:36.166846", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 66dc09de-1079-492f-a9ff-eb61e49b0831 sent", "data": {}}
+{"timestamp": "2026-04-16T12:41:06.171931", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5d6f0728-9b29-42c6-8ef4-d4af774e8a34 sent", "data": {}}
+{"timestamp": "2026-04-16T12:41:36.176313", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 42a91f0e-5404-4356-8d39-77c57e924b92 sent", "data": {}}
+{"timestamp": "2026-04-16T12:42:06.182608", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ea948e14-9d5f-4e04-956f-4f8fc346ccfe sent", "data": {}}
+{"timestamp": "2026-04-16T12:42:36.184349", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 05277ba3-553c-43e6-b099-9946008774cc sent", "data": {}}
+{"timestamp": "2026-04-16T12:43:06.189614", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 646557f7-e0ce-4462-95e7-e174f2c4d568 sent", "data": {}}
+{"timestamp": "2026-04-16T12:43:36.194134", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3c636eb2-8e0b-4248-8428-09126d0183b9 sent", "data": {}}
+{"timestamp": "2026-04-16T12:44:06.196722", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f71225f2-84b8-4860-9b44-1708297ba184 sent", "data": {}}
+{"timestamp": "2026-04-16T12:44:36.202949", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 95c9f743-1084-4009-815a-9f7186158a4f sent", "data": {}}
+{"timestamp": "2026-04-16T12:45:06.209773", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c9639c19-4eaa-4952-817c-4b83294ff56e sent", "data": {}}
+{"timestamp": "2026-04-16T12:45:36.212237", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 2ff68327-68b1-4edf-9813-0fe6cb00d833 sent", "data": {}}
+{"timestamp": "2026-04-16T12:46:06.217030", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 0b906f4e-59bc-40d3-8a85-837d4d44514c sent", "data": {}}
+{"timestamp": "2026-04-16T12:46:36.222981", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 19554d08-0950-4cde-ac7c-b6e9d1b13415 sent", "data": {}}
+{"timestamp": "2026-04-16T12:47:06.228940", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 36f6a4a7-0322-4b7c-a891-032689d61330 sent", "data": {}}
+{"timestamp": "2026-04-16T12:47:36.235227", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c5a06e0e-d907-4d77-a4f0-1fceef6e7972 sent", "data": {}}
+{"timestamp": "2026-04-16T12:48:06.240568", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 414fd1a9-fb63-4a95-b580-92ede9a9c27b sent", "data": {}}
+{"timestamp": "2026-04-16T12:48:36.243612", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6aa7a50b-ca58-4ed3-bbae-1bec48c6d0ce sent", "data": {}}
+{"timestamp": "2026-04-16T12:49:06.246504", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e5eddab3-3d14-4ea2-8643-5a75e7768f85 sent", "data": {}}
+{"timestamp": "2026-04-16T12:49:36.248229", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f72d5f8a-4376-4201-b1ff-1abea5946c67 sent", "data": {}}
+{"timestamp": "2026-04-16T12:50:06.254662", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 52f27790-3d4e-45a5-b6cd-9bbe57543f7c sent", "data": {}}
+{"timestamp": "2026-04-16T12:50:36.256473", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 392dbcbe-445c-4b1a-9e00-8bd077eaf164 sent", "data": {}}
+{"timestamp": "2026-04-16T12:51:06.259306", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5d39dcdc-014f-43b2-9b88-ff128be8ba98 sent", "data": {}}
+{"timestamp": "2026-04-16T12:51:36.265523", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e7157d22-2321-4591-b425-e01d111e3f18 sent", "data": {}}
+{"timestamp": "2026-04-16T12:52:06.266903", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message eb2f7bf2-3a88-45d6-9a35-96fb4170c74d sent", "data": {}}
+{"timestamp": "2026-04-16T12:52:36.272869", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5eab4336-508c-4531-b2a3-c7d299c03303 sent", "data": {}}
+{"timestamp": "2026-04-16T12:53:06.275207", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 44dca90b-1160-42f5-b9a2-8bb7076ee970 sent", "data": {}}
+{"timestamp": "2026-04-16T12:53:36.277168", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c4b093f2-14d5-4693-93e1-c5dc09cdffb0 sent", "data": {}}
+{"timestamp": "2026-04-16T12:54:06.279851", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 4bff36f8-6017-418d-bde8-3742cb7566c3 sent", "data": {}}
+{"timestamp": "2026-04-16T12:54:36.283432", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 8056b14f-a0f3-4c27-b50b-ccbe7631826f sent", "data": {}}
+{"timestamp": "2026-04-16T12:55:06.290835", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7e97facd-98d4-47f7-8dab-269af5313e15 sent", "data": {}}
+{"timestamp": "2026-04-16T12:55:36.296184", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f90d5816-a759-428a-bf9f-04255a624bfa sent", "data": {}}
+{"timestamp": "2026-04-16T12:56:06.303932", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1a3619c9-c1a8-48fa-9e64-db4e7403a849 sent", "data": {}}
+{"timestamp": "2026-04-16T12:56:36.312239", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 06c9c91c-34f7-43bb-96e1-a0db1efb72e0 sent", "data": {}}
+{"timestamp": "2026-04-16T12:57:06.318518", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3dc38e31-b7cc-4754-8b73-6546bf5a49e1 sent", "data": {}}
+{"timestamp": "2026-04-16T12:57:36.325590", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 64b47e8c-aa88-47ae-a2c5-d233af48ff4f sent", "data": {}}
+{"timestamp": "2026-04-16T12:58:06.330641", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9c4ca5ad-ef61-4f16-8e8e-5d5ddb8dd800 sent", "data": {}}
+{"timestamp": "2026-04-16T12:58:36.335739", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b32c6e66-97a6-4e67-a83e-efdeb0a0c88c sent", "data": {}}
+{"timestamp": "2026-04-16T12:59:06.339714", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c471b2c6-a34f-4f53-b50a-5dc183c2f9b8 sent", "data": {}}
+{"timestamp": "2026-04-16T12:59:36.346910", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 30f0b464-610e-4e4f-938c-b8b372c2f58b sent", "data": {}}
+{"timestamp": "2026-04-16T13:00:06.349665", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f7b44a8b-69b0-4ade-ba2b-6fe5fc30852f sent", "data": {}}
+{"timestamp": "2026-04-16T13:00:36.351659", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b93eb284-53aa-4b94-93e4-9582cb0f4356 sent", "data": {}}
+{"timestamp": "2026-04-16T13:01:06.356362", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1df21373-a3e0-4013-9927-e04f3541ab58 sent", "data": {}}
+{"timestamp": "2026-04-16T13:01:36.361173", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d9e99698-54ab-4f69-9a8b-f68c4791d367 sent", "data": {}}
+{"timestamp": "2026-04-16T13:02:06.363724", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f970f96e-1cbf-4051-a58d-d6201c73b336 sent", "data": {}}
+{"timestamp": "2026-04-16T13:02:36.368326", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 09c02f9c-2a08-49cc-b9a5-1ce2427de93a sent", "data": {}}
+{"timestamp": "2026-04-16T13:03:06.374805", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 41da3db8-f597-4eef-bae5-0df41dbcc1f8 sent", "data": {}}
+{"timestamp": "2026-04-16T13:03:36.377959", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d5382950-6689-40f7-97d8-50b9f9853ba3 sent", "data": {}}
+{"timestamp": "2026-04-16T13:04:06.382916", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 8230aafe-6aa7-4ccd-af64-c3a6d2c8d324 sent", "data": {}}
+{"timestamp": "2026-04-16T13:04:36.387984", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1f87780e-edaf-4e49-b1b2-305bc9740d23 sent", "data": {}}
+{"timestamp": "2026-04-16T13:05:06.390698", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 77219fe5-3043-4eea-a66b-6cd078b7d730 sent", "data": {}}
+{"timestamp": "2026-04-16T13:05:36.392802", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7c54a72a-496e-47b5-bb80-01933e085ef9 sent", "data": {}}
+{"timestamp": "2026-04-16T13:06:06.398293", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 31948d45-3327-4b2a-9ac2-b9de8f3c8b01 sent", "data": {}}
+{"timestamp": "2026-04-16T13:06:36.404673", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 17a4ed0c-f3a9-4682-967c-05124b05cf46 sent", "data": {}}
+{"timestamp": "2026-04-16T13:07:06.406620", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5b882910-f9b2-4b00-87f2-fc4144d5d561 sent", "data": {}}
+{"timestamp": "2026-04-16T13:07:36.411916", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 4d8b4b73-d211-46f1-95c7-ae8cb2390a2c sent", "data": {}}
+{"timestamp": "2026-04-16T13:08:06.417746", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c99a1616-aac2-4937-b7e1-55d855932cfa sent", "data": {}}
+{"timestamp": "2026-04-16T13:08:36.424398", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b4746dd9-dfd1-4241-b046-80bd00c505ea sent", "data": {}}
+{"timestamp": "2026-04-16T13:09:06.430017", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f287171f-fea8-4cde-9659-bcc96ffca8b7 sent", "data": {}}
+{"timestamp": "2026-04-16T13:09:36.434580", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c99d1465-b940-4495-8ca4-43990a618449 sent", "data": {}}
+{"timestamp": "2026-04-16T13:10:06.440971", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message af106659-9821-4bbb-a294-2110ba54b023 sent", "data": {}}
+{"timestamp": "2026-04-16T13:10:36.444704", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e5b7830e-a46f-4c79-8f4e-870685f2f090 sent", "data": {}}
+{"timestamp": "2026-04-16T13:11:06.449937", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 20c4e293-3c44-4780-b784-0756d13837b4 sent", "data": {}}
+{"timestamp": "2026-04-16T13:11:36.451890", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c4caa36b-4450-43af-8ad4-b1aa51403086 sent", "data": {}}
+{"timestamp": "2026-04-16T13:12:06.455203", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6f6b369f-38ca-4341-9ef0-2608df4e2060 sent", "data": {}}
+{"timestamp": "2026-04-16T13:12:36.460546", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message bb85468e-3fb9-4c52-918b-79568a82326f sent", "data": {}}
+{"timestamp": "2026-04-16T13:13:06.462455", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b4907208-e14f-4724-a8c2-022302ada050 sent", "data": {}}
+{"timestamp": "2026-04-16T13:13:36.465622", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5d1b3a42-162a-4b23-9054-a3552c8dfa11 sent", "data": {}}
+{"timestamp": "2026-04-16T13:14:06.469148", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 121c07fb-21ed-40f3-abca-a47be5cb86cd sent", "data": {}}
+{"timestamp": "2026-04-16T13:14:36.475618", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 11e57a1e-65bb-43d7-84fe-f2548357fafc sent", "data": {}}
+{"timestamp": "2026-04-16T13:15:06.483576", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 573324d5-7d4d-49f4-8342-c548092f0b2c sent", "data": {}}
+{"timestamp": "2026-04-16T13:15:36.489551", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message effb8538-d004-4d30-aacd-b57c6202ff1f sent", "data": {}}
+{"timestamp": "2026-04-16T13:16:06.493060", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1ac9339e-b940-4374-af2c-21b097facdc2 sent", "data": {}}
+{"timestamp": "2026-04-16T13:16:36.496909", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 58af19d2-cfc4-4b2b-856e-603eb6310a07 sent", "data": {}}
+{"timestamp": "2026-04-16T13:17:06.499354", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e6f453f3-a8de-4d36-8ea5-3da284f91457 sent", "data": {}}
+{"timestamp": "2026-04-16T13:17:36.503765", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b77ad04d-4d7e-4349-94ec-7e9e535aa0a3 sent", "data": {}}
+{"timestamp": "2026-04-16T13:18:06.510130", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message aff24ee7-22dc-41c5-9631-b7c6aab20127 sent", "data": {}}
+{"timestamp": "2026-04-16T13:18:36.513435", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b37feb77-cfc6-4f37-8811-24a84e5a077a sent", "data": {}}
+{"timestamp": "2026-04-16T13:19:06.517210", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c81db23e-ef02-4c9c-b946-e9aacb0e912a sent", "data": {}}
+{"timestamp": "2026-04-16T13:19:36.520766", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 880677e9-25eb-438c-8733-ef2328d33926 sent", "data": {}}
+{"timestamp": "2026-04-16T13:20:06.523882", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9c7b8532-98aa-486e-b65e-41ef4197d3c4 sent", "data": {}}
+{"timestamp": "2026-04-16T13:20:36.525364", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a3ccc6f5-10e9-439d-9ae4-c209c349cf8c sent", "data": {}}
+{"timestamp": "2026-04-16T13:21:06.531458", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d4bd4555-cda5-437e-a8e5-baf5866ee4e5 sent", "data": {}}
+{"timestamp": "2026-04-16T13:21:36.539285", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 598d1de2-8c42-40fa-ba78-252cfd7dfd5a sent", "data": {}}
+{"timestamp": "2026-04-16T13:22:06.545510", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 302303ad-e294-47fa-8910-98c8f9eafb83 sent", "data": {}}
+{"timestamp": "2026-04-16T13:22:36.551164", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 878f6de1-24cf-499c-aed0-a18db1e7235d sent", "data": {}}
+{"timestamp": "2026-04-16T13:23:06.557547", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ba584892-2b2a-49ed-97e6-4bbfa059eba3 sent", "data": {}}
+{"timestamp": "2026-04-16T13:23:36.560533", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 8d50e85d-e3ce-463b-bf35-ef619b365f85 sent", "data": {}}
+{"timestamp": "2026-04-16T13:24:06.568630", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 30cc0957-0a90-4027-8371-7098d36c2407 sent", "data": {}}
+{"timestamp": "2026-04-16T13:24:36.571896", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6fc12d8a-9515-4e02-bbfe-a5eda6d429c8 sent", "data": {}}
+{"timestamp": "2026-04-16T13:25:06.574754", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 93c550bb-1668-4077-8087-9a5acbbd1fe8 sent", "data": {}}
+{"timestamp": "2026-04-16T13:25:36.576795", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b1d5b636-4e14-4444-9a76-8cd6f0294280 sent", "data": {}}
+{"timestamp": "2026-04-16T13:26:06.581106", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 0bd7c319-3ca9-4a96-ae9c-a42dd8fb11d1 sent", "data": {}}
+{"timestamp": "2026-04-16T13:26:36.587093", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b3b82ea4-02a5-4a9c-b075-489c98f23702 sent", "data": {}}
+{"timestamp": "2026-04-16T13:27:06.591876", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 14b74742-7e2a-4ba0-a38d-71f4903978b3 sent", "data": {}}
+{"timestamp": "2026-04-16T13:27:36.593426", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c6f41b1b-d7ae-4556-b517-9753c26f57e8 sent", "data": {}}
+{"timestamp": "2026-04-16T13:28:06.565483", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1f00c963-cb21-4553-9c9d-ea44ae10775a sent", "data": {}}
+{"timestamp": "2026-04-16T13:28:36.565681", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 93b10d90-de48-4e5d-88f4-b2a675ef9a4b sent", "data": {}}
+{"timestamp": "2026-04-16T13:29:06.570205", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 779e9054-823b-48e2-b00b-12deae614694 sent", "data": {}}
+{"timestamp": "2026-04-16T13:29:36.571891", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 62df088b-848f-41c8-b16b-b07a2e814543 sent", "data": {}}
+{"timestamp": "2026-04-16T13:30:06.577251", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message efa69e19-4916-450b-bb2c-851ed42281d6 sent", "data": {}}
+{"timestamp": "2026-04-16T13:30:36.580886", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d5ed90ba-38de-41e1-b271-8aae0e8f424a sent", "data": {}}
+{"timestamp": "2026-04-16T13:31:06.587903", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f40bf1ad-20d9-4c7c-a89e-d5433c16d74e sent", "data": {}}
+{"timestamp": "2026-04-16T13:31:36.588780", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6e9d9dcc-64e6-40dd-8853-154db0e98ddf sent", "data": {}}
+{"timestamp": "2026-04-16T13:32:06.594948", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e9046520-7464-414c-8546-e471709a439c sent", "data": {}}
+{"timestamp": "2026-04-16T13:32:36.599783", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 05358f95-187f-45b1-90f5-87f1d14732fa sent", "data": {}}
+{"timestamp": "2026-04-16T13:33:06.602214", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b08cdeab-1504-4e10-869c-ae0d72854eb3 sent", "data": {}}
+{"timestamp": "2026-04-16T13:33:36.608508", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message dbfbef43-702e-4154-876e-5d2ce1e1f250 sent", "data": {}}
+{"timestamp": "2026-04-16T13:34:06.613510", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f3ec0715-e41a-41a2-b803-efa934c8646a sent", "data": {}}
+{"timestamp": "2026-04-16T13:34:36.619159", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 24355f32-94e7-4424-bab4-815e8131c6d6 sent", "data": {}}
+{"timestamp": "2026-04-16T13:35:06.625507", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9846005f-65b5-42b5-9bf1-35dcaea80676 sent", "data": {}}
+{"timestamp": "2026-04-16T13:35:36.628578", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ee8cc1eb-a04f-44ac-bade-463a571975b4 sent", "data": {}}
+{"timestamp": "2026-04-16T13:36:06.633653", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c267f18b-103e-4a4f-8b56-08fbd91743cd sent", "data": {}}
+{"timestamp": "2026-04-16T13:36:36.638358", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message eb6392c9-9eb9-45b3-a28c-fb640e265b0d sent", "data": {}}
+{"timestamp": "2026-04-16T13:37:06.640811", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e17c69c5-e8f6-49eb-83d9-22bc958fbabe sent", "data": {}}
+{"timestamp": "2026-04-16T13:37:36.647284", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message fe2ce4f4-f346-4365-bf5d-569e3c300186 sent", "data": {}}
+{"timestamp": "2026-04-16T13:38:06.653430", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 06cd7725-3370-4902-98d3-7df92a0c3a3d sent", "data": {}}
+{"timestamp": "2026-04-16T13:38:36.659925", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e3b05713-3565-4a97-9250-35f297d24a4b sent", "data": {}}
+{"timestamp": "2026-04-16T13:39:06.663223", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 990d3571-6ee0-4406-b37c-1186db8ea53a sent", "data": {}}
+{"timestamp": "2026-04-16T13:39:36.670205", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a8aac3a6-e85e-4f66-8822-d2a58b5cd0d0 sent", "data": {}}
+{"timestamp": "2026-04-16T13:40:06.677524", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 79cdc570-7128-4575-b7a3-6c31449361b7 sent", "data": {}}
+{"timestamp": "2026-04-16T13:40:36.683096", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message cbf29200-fc47-47e3-965c-39dce5984188 sent", "data": {}}
+{"timestamp": "2026-04-16T13:41:06.685417", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 35d06b66-c92c-4928-a14b-a84ab6d5b9b0 sent", "data": {}}
+{"timestamp": "2026-04-16T13:41:36.691524", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9d34b745-8f23-49a9-bd9c-d8577da6467a sent", "data": {}}
+{"timestamp": "2026-04-16T13:42:06.692948", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 902a747f-e6e7-41f5-8c02-5b5fa5e8067e sent", "data": {}}
+{"timestamp": "2026-04-16T13:42:36.698155", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 28bbe5ee-61ad-4c42-97b9-4271946e36c3 sent", "data": {}}
+{"timestamp": "2026-04-16T13:43:06.705359", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 56ab17cf-8d7b-4219-9b45-d1447d8d65c8 sent", "data": {}}
+{"timestamp": "2026-04-16T13:43:36.711835", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 61ee9807-f92d-4e9b-8d39-3648bc2d4963 sent", "data": {}}
+{"timestamp": "2026-04-16T13:44:08.027974", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 38ba3470-198e-476d-8375-2960022158dc sent", "data": {}}
+{"timestamp": "2026-04-16T13:44:38.031266", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c819cddd-23b4-447a-8a55-dea7e04165ae sent", "data": {}}
+{"timestamp": "2026-04-16T13:45:08.034434", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9868bf9d-7bf7-49b1-aa06-81426db335dd sent", "data": {}}
+{"timestamp": "2026-04-16T13:45:38.037023", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5cad6e68-d3a8-49d2-8e1a-f642fb605ed6 sent", "data": {}}
+{"timestamp": "2026-04-16T13:46:08.039564", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d04c28cf-9269-4cc3-95fa-f1de3acee28d sent", "data": {}}
+{"timestamp": "2026-04-16T13:46:38.043173", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a99b9240-68a9-4c85-ba60-cf90e19d0550 sent", "data": {}}
+{"timestamp": "2026-04-16T13:47:08.048913", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3179e87b-55e0-4bed-9734-2fd03338616e sent", "data": {}}
+{"timestamp": "2026-04-16T13:47:38.055253", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 2a5943eb-4c16-4f22-b9cc-6aeeaf213dfa sent", "data": {}}
+{"timestamp": "2026-04-16T13:48:08.057372", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 995d8369-55d3-495c-91a3-3e9e6f02e7fe sent", "data": {}}
+{"timestamp": "2026-04-16T13:48:38.062349", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 52d25301-513c-4a55-bdb8-383506a4e493 sent", "data": {}}
+{"timestamp": "2026-04-16T13:49:08.068842", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ebd4ffd6-7640-4078-85ac-c4d3e80e45b9 sent", "data": {}}
+{"timestamp": "2026-04-16T13:49:38.070681", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 16f8e62d-035e-4252-899a-83b6189cb4f5 sent", "data": {}}
+{"timestamp": "2026-04-16T13:50:08.074507", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 828e34dd-fac9-4367-84e8-d15a71d16f14 sent", "data": {}}
+{"timestamp": "2026-04-16T13:50:38.076394", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message fb6a08f5-06b3-4732-bca8-60b8dbbf1cd4 sent", "data": {}}
+{"timestamp": "2026-04-16T13:51:08.079952", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message bcbb054c-df11-4d0f-a4fd-c6ac256e8b6f sent", "data": {}}
+{"timestamp": "2026-04-16T13:51:38.086555", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b1c037e3-0b8c-4a9c-8c6a-ba499de325c7 sent", "data": {}}
+{"timestamp": "2026-04-16T13:52:08.092665", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message cc0e159e-f137-4d5b-8533-85b575a7ceaa sent", "data": {}}
+{"timestamp": "2026-04-16T13:52:38.101250", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f6f90964-b81e-48c0-b1e7-260986c0f7e3 sent", "data": {}}
+{"timestamp": "2026-04-16T13:53:08.105313", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6ec84c1b-b3a2-4819-90b5-b2a40a863653 sent", "data": {}}
+{"timestamp": "2026-04-16T13:53:38.108805", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 37f75afc-41ff-4322-98ac-30cccf8ab415 sent", "data": {}}
+{"timestamp": "2026-04-16T13:54:08.113468", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 58c55bdd-1c2c-4cc9-92da-d192b65336ac sent", "data": {}}
+{"timestamp": "2026-04-16T13:54:38.116693", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message dcb47c98-609e-416c-96c9-3156b4e2e8de sent", "data": {}}
+{"timestamp": "2026-04-16T13:55:08.124212", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d824b00a-c86f-43fe-9c43-d146c3e30593 sent", "data": {}}
+{"timestamp": "2026-04-16T13:55:38.127031", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message bde052b3-b585-4b04-88d8-aef11cd28ed1 sent", "data": {}}
+{"timestamp": "2026-04-16T13:56:08.134212", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 31d89bb2-9704-4dbd-b64f-4ba83ed63710 sent", "data": {}}
+{"timestamp": "2026-04-16T13:56:38.137576", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c7bb3f39-148a-4ae3-9c03-1a124b5d5bee sent", "data": {}}
+{"timestamp": "2026-04-16T13:57:08.144516", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 8b0fd83e-c979-42ff-96c0-550d2fc38e59 sent", "data": {}}
+{"timestamp": "2026-04-16T13:57:38.149208", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a3283880-2e74-4926-9b3b-c1506906fce9 sent", "data": {}}
+{"timestamp": "2026-04-16T13:58:08.154224", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 984d97c8-70e5-4c75-9e1f-3975577feba0 sent", "data": {}}
+{"timestamp": "2026-04-16T13:58:38.155124", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 07545ee3-75d9-43e7-934c-453bfefb492a sent", "data": {}}
+{"timestamp": "2026-04-16T13:59:08.161500", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f690cbc4-133e-43ff-8902-e02708d3937f sent", "data": {}}
+{"timestamp": "2026-04-16T13:59:38.163710", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a3c56922-b879-4d06-a3fb-fd4805efbf64 sent", "data": {}}
+{"timestamp": "2026-04-16T14:00:08.165928", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 94f73e7a-d367-4b02-b20a-ce277d5a0798 sent", "data": {}}
+{"timestamp": "2026-04-16T14:00:38.173374", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f15f42aa-810e-4ff2-80c8-464b36f816f9 sent", "data": {}}
+{"timestamp": "2026-04-16T14:01:08.178762", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7136a3f2-8bd8-48e3-8f71-25458cd5350b sent", "data": {}}
+{"timestamp": "2026-04-16T14:01:38.201472", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3f85f610-00e5-4f82-b858-8efab54eb326 sent", "data": {}}
+{"timestamp": "2026-04-16T14:02:08.205901", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6c1f024a-9fea-46d7-8626-37b2e6aba73d sent", "data": {}}
+{"timestamp": "2026-04-16T14:02:38.210892", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 20ce0cfa-3152-4862-aef8-911a3ca1f446 sent", "data": {}}
+{"timestamp": "2026-04-16T14:03:08.216071", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e32d151e-5e4c-4cd7-8e28-22ebe72187ae sent", "data": {}}
+{"timestamp": "2026-04-16T14:03:38.221322", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a5a9dcff-0f7d-4be8-b8df-88231ac12292 sent", "data": {}}
+{"timestamp": "2026-04-16T14:04:08.228099", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message fa280c06-b5eb-4df3-b460-3d95d15fb9e3 sent", "data": {}}
+{"timestamp": "2026-04-16T14:04:38.230666", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message cf9d830b-81ae-4b73-b19e-f5b0031ba7b8 sent", "data": {}}
+{"timestamp": "2026-04-16T14:05:08.234579", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 370104f8-697f-4d8f-aec7-0399546cd978 sent", "data": {}}
+{"timestamp": "2026-04-16T14:05:38.237483", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message cad30391-0f8b-496e-9038-3224df32f450 sent", "data": {}}
+{"timestamp": "2026-04-16T14:06:08.242297", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ec542e5e-98eb-47a0-9754-729f92e925a3 sent", "data": {}}
+{"timestamp": "2026-04-16T14:06:38.247348", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e6e98647-d820-456c-962b-2fc7502f0518 sent", "data": {}}
+{"timestamp": "2026-04-16T14:07:08.248831", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e72ea608-44d7-4090-bcf3-74e40649a944 sent", "data": {}}
+{"timestamp": "2026-04-16T14:07:38.253723", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5c81872f-bb41-41dd-8a3a-9eea38593ff4 sent", "data": {}}
+{"timestamp": "2026-04-16T14:08:08.258755", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9568d3bb-9ce7-4836-bde7-dbfbb2455848 sent", "data": {}}
+{"timestamp": "2026-04-16T14:08:38.260375", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message eb377293-057b-4faf-81ef-0246514cd8d8 sent", "data": {}}
+{"timestamp": "2026-04-16T14:09:08.262677", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6d708a27-7624-4e33-9c38-9e73f510d716 sent", "data": {}}
+{"timestamp": "2026-04-16T14:09:38.265152", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c147188d-ef8e-4bf1-86cc-07bf64076c02 sent", "data": {}}
+{"timestamp": "2026-04-16T14:10:08.270235", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c0d0937f-53de-4497-86df-9ee06293cdda sent", "data": {}}
+{"timestamp": "2026-04-16T14:10:38.272920", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 976d26cd-9aaf-48ed-869e-36d0ccd11e29 sent", "data": {}}
+{"timestamp": "2026-04-16T14:11:08.275862", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a3a455e9-f807-4cab-b165-c00091846ae0 sent", "data": {}}
+{"timestamp": "2026-04-16T14:11:38.279718", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 9d60724a-47bf-4ef1-9d44-f9f460fb4f09 sent", "data": {}}
+{"timestamp": "2026-04-16T14:12:08.285788", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 52e30804-5a28-4cc1-a477-149513597606 sent", "data": {}}
+{"timestamp": "2026-04-16T14:12:38.292733", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f6233e94-e2ee-41d3-8839-a72dff0f9f6c sent", "data": {}}
+{"timestamp": "2026-04-16T14:13:08.297378", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f4e50389-737d-493d-b237-519441ee8290 sent", "data": {}}
+{"timestamp": "2026-04-16T14:13:38.301307", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message c29391b0-a73c-4835-ab57-06af99fa543d sent", "data": {}}
+{"timestamp": "2026-04-16T14:14:08.307507", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f55877f8-8470-437e-ace9-fafdcad96d8a sent", "data": {}}
+{"timestamp": "2026-04-16T14:14:38.310971", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b2b3764c-72cc-4503-8dad-c0d79e4e86fd sent", "data": {}}
+{"timestamp": "2026-04-16T14:15:08.314056", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 3ce9ea13-9112-4469-87a0-4dec1e12eaa0 sent", "data": {}}
+{"timestamp": "2026-04-16T14:15:38.318597", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message fb2bcb65-c922-469a-b2a9-06047e34be3e sent", "data": {}}
+{"timestamp": "2026-04-16T14:16:08.325235", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5a3047a9-c439-48c1-954c-2f4361aa0d2d sent", "data": {}}
+{"timestamp": "2026-04-16T14:16:38.327790", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b58b4591-0fa9-45c8-a664-2ca07f7d8686 sent", "data": {}}
+{"timestamp": "2026-04-16T14:17:08.331869", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 78c1e594-c69d-498d-aeb1-91c8460e2a02 sent", "data": {}}
+{"timestamp": "2026-04-16T14:17:38.337708", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b37bd56c-b3e6-4cfd-b13f-d2992a594f11 sent", "data": {}}
+{"timestamp": "2026-04-16T14:18:08.340863", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e9733407-7317-4ebd-bb1c-0c42cded90f9 sent", "data": {}}
+{"timestamp": "2026-04-16T14:18:38.349779", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 87e06083-e873-4111-920b-1e1c96bb272f sent", "data": {}}
+{"timestamp": "2026-04-16T14:19:08.355296", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7cfc91ca-bfd4-465c-86d6-31c1fd768953 sent", "data": {}}
+{"timestamp": "2026-04-16T14:19:38.361902", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6c043bbf-b6af-4d6b-82d8-658611879a77 sent", "data": {}}
+{"timestamp": "2026-04-16T14:20:08.371229", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7f9b8aa1-844b-4fac-bc98-75f5f0440ca5 sent", "data": {}}
+{"timestamp": "2026-04-16T14:20:38.374216", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 01af0716-3bf4-40ca-8bd3-b917886ef54b sent", "data": {}}
+{"timestamp": "2026-04-16T14:21:08.376631", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 809ba137-ab3d-4fbb-b616-b3f6196f12d7 sent", "data": {}}
+{"timestamp": "2026-04-16T14:21:38.380699", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b746dd66-a72a-40d8-be66-a9f0ddccd596 sent", "data": {}}
+{"timestamp": "2026-04-16T14:22:08.384969", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 73f17729-3b6e-4882-a6d0-82c4e9ddcff4 sent", "data": {}}
+{"timestamp": "2026-04-16T14:22:38.390094", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a34de7f9-659e-494d-b7c9-847c52298c85 sent", "data": {}}
+{"timestamp": "2026-04-16T14:23:08.396053", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 20382228-8df6-4841-ad37-db1507d6a101 sent", "data": {}}
+{"timestamp": "2026-04-16T14:23:38.401683", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6f2cc0a9-3314-4bd0-9b20-86da3afd02c2 sent", "data": {}}
+{"timestamp": "2026-04-16T14:24:08.403111", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f5a5f03b-6109-44ef-83e1-245a13f143af sent", "data": {}}
+{"timestamp": "2026-04-16T14:24:38.406314", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 035fd1b6-2884-455f-9f10-1a9bd36760ff sent", "data": {}}
+{"timestamp": "2026-04-16T14:25:08.410016", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 65d74308-ed09-46a9-a8fd-7b3d12700171 sent", "data": {}}
+{"timestamp": "2026-04-16T14:25:38.413830", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 69e3ea3d-a957-46b7-a01e-24843ee5891d sent", "data": {}}
+{"timestamp": "2026-04-16T14:26:10.052308", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5ed7ad5f-4720-4c26-94a4-da477182ac6c sent", "data": {}}
+{"timestamp": "2026-04-16T14:26:40.056679", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f359daa2-3217-4112-aacc-f07473ad5707 sent", "data": {}}
+{"timestamp": "2026-04-16T14:27:10.063301", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 5f606dc5-c9fb-4b8c-bcfa-b9506826bc19 sent", "data": {}}
+{"timestamp": "2026-04-16T14:27:40.068415", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 229ab5bb-fde8-438a-ab00-b8b0831b9d25 sent", "data": {}}
+{"timestamp": "2026-04-16T14:28:10.072230", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 2ab7dc6a-39ea-47ed-9e77-36fc2fea8703 sent", "data": {}}
+{"timestamp": "2026-04-16T14:28:40.075154", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 82dc1a99-fad4-4879-a8f3-c1500cd1b110 sent", "data": {}}
+{"timestamp": "2026-04-16T14:29:10.080964", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 38ddbaab-ba99-43b5-9ff8-d178890ad505 sent", "data": {}}
+{"timestamp": "2026-04-16T14:29:40.083186", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message b409583f-a833-4c66-91f3-a373069852f6 sent", "data": {}}
+{"timestamp": "2026-04-16T14:30:10.086329", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message d062a3e8-567a-485e-8bba-e8b257d35713 sent", "data": {}}
+{"timestamp": "2026-04-16T14:30:40.092295", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 619315ba-590b-4e92-bc64-8855b4e52295 sent", "data": {}}
+{"timestamp": "2026-04-16T14:31:10.097748", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message afedff75-ca7a-4bee-89be-8e9a7065af9d sent", "data": {}}
+{"timestamp": "2026-04-16T14:31:40.099110", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message ca85c76a-08e4-4403-8941-37a38167dbac sent", "data": {}}
+{"timestamp": "2026-04-16T14:32:10.104769", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 6a84e437-65bb-4ed4-af53-4b3c62851297 sent", "data": {}}
+{"timestamp": "2026-04-16T14:32:40.106116", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 137b016f-00ef-458e-844e-ad0962e3ed04 sent", "data": {}}
+{"timestamp": "2026-04-16T14:33:10.112243", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 2b7a924f-98f3-4f0c-be79-9ba74039f0f4 sent", "data": {}}
+{"timestamp": "2026-04-16T14:33:40.122091", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1652a718-7338-4041-baef-f20805648544 sent", "data": {}}
+{"timestamp": "2026-04-16T14:34:10.128596", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 7fc13bb3-641a-4dcb-ba4e-76144ea72154 sent", "data": {}}
+{"timestamp": "2026-04-16T14:34:40.134471", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 185bc566-76b6-4881-8f19-fcea51b192d5 sent", "data": {}}
+{"timestamp": "2026-04-16T14:35:10.141179", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message f50c1c18-3162-497b-a634-b63a934abdfd sent", "data": {}}
+{"timestamp": "2026-04-16T14:35:40.144730", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1ad73bf7-c709-4609-94d1-6e6418085dbb sent", "data": {}}
+{"timestamp": "2026-04-16T14:36:10.151673", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message a5f466f6-1683-4a1c-8277-7245ad1cdd9a sent", "data": {}}
+{"timestamp": "2026-04-16T14:36:40.153082", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 1980e2d1-975a-4cb4-adf9-dfa3def17a9d sent", "data": {}}
+{"timestamp": "2026-04-16T14:37:10.155753", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 4d3c677c-5188-4d2b-81e0-04eda572006f sent", "data": {}}
+{"timestamp": "2026-04-16T14:37:40.157130", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message e432f6e8-9bf9-4eb9-b65e-3e4dcf78fcdd sent", "data": {}}
+{"timestamp": "2026-04-16T14:38:10.162243", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 75ec8e97-d0b8-4a3f-b829-eb4988f61f10 sent", "data": {}}
+{"timestamp": "2026-04-16T14:38:40.169814", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message bc0e2daa-08e8-4ff0-b69b-08c7d2087dbf sent", "data": {}}
+{"timestamp": "2026-04-16T14:39:10.174043", "event_type": "message_sent", "agent_id": "simp_broker", "channel": "capability_ads", "message": "Message 61fb4858-ee83-419e-9f67-ccb945a0edbb sent", "data": {}}
+{"timestamp": "2026-04-16T14:55:43.784239", "event_type": "agent_deregistered", "agent_id": "simp_broker", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T19:01:03.054179", "event_type": "agent_registered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}
+{"timestamp": "2026-04-16T19:01:27.300980", "event_type": "agent_registered", "agent_id": "quantumarb_primary", "channel": "system", "message": "", "data": {}}

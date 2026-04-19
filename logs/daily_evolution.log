@@ -1,0 +1,4 @@
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/tools/run_daily_evolution.sh", line 7
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+                      ^
+SyntaxError: invalid syntax

@@ -1,0 +1,20 @@
+title: 'Agent Lightning: Agent bypasses normal tool flow for direct execution'
+id: BRP-TRACE-PATTERN-004
+status: experimental
+description: 'Generated from Agent Lightning trace analysis. Pattern: PATTERN-004'
+author: Agent Lightning Safety Analyzer
+date: 2026/04/14
+modified: 2026/04/14
+logsource:
+  category: agent_behavior
+  product: simp
+detection:
+  condition: all of them
+  selection:
+    tool_abstraction_violation: true
+level: high
+tags:
+- agent-lightning
+- safety
+- brp
+- stray_goose

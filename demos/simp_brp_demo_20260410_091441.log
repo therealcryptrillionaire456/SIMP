@@ -1,0 +1,28 @@
+2026-04-10 09:14:41,365 - INFO - ================================================================================
+2026-04-10 09:14:41,365 - INFO - SIMP WITH BILL RUSSELL PROTOCOL - INTEGRATION DEMONSTRATION
+2026-04-10 09:14:41,365 - INFO - ================================================================================
+2026-04-10 09:14:41,365 - INFO - Showing defensive capabilities in agentic AI ecosystem
+2026-04-10 09:14:41,365 - INFO - ================================================================================
+2026-04-10 09:14:41,366 - INFO - 
+🚀 STARTING DEMONSTRATIONS
+2026-04-10 09:14:41,366 - INFO - --------------------------------------------------------------------------------
+2026-04-10 09:14:41,366 - INFO - 
+================================================================================
+2026-04-10 09:14:41,366 - INFO - DEMONSTRATION 1: NORMAL OPERATION
+2026-04-10 09:14:41,366 - INFO - ================================================================================
+2026-04-10 09:14:41,366 - INFO - Bill Russell Protocol initialized
+2026-04-10 09:14:41,366 - INFO - Enhanced SIMP Broker initialized with BRP
+2026-04-10 09:14:41,366 - INFO - Telegram Alert Bot initialized
+2026-04-10 09:14:41,366 - INFO - Routing intent: trading_execution from kashclaw to quantumarb
+2026-04-10 09:14:41,366 - ERROR - Demonstration failed: local variable 'behavior_score' referenced before assignment
+2026-04-10 09:14:41,366 - ERROR - Traceback (most recent call last):
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/demo_simp_brp_integration.py", line 715, in main
+    normal_result = demonstrate_normal_operation()
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/demo_simp_brp_integration.py", line 499, in demonstrate_normal_operation
+    result = broker.route_intent(normal_intent)
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/demo_simp_brp_integration.py", line 324, in route_intent
+    threat_score = self.brp.assess_threat(intent)
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/demo_simp_brp_integration.py", line 122, in assess_threat
+    scores = [s for s in [pattern_score, behavior_score, intel_score, temporal_score] if s is not None]
+UnboundLocalError: local variable 'behavior_score' referenced before assignment
+

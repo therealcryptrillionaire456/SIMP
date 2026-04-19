@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-04-14T10:46:40.606662",
+  "test": "adjusted_risk_scoring",
+  "parameters": {
+    "spread_normalization": 0.5,
+    "confidence_weight": 0.4,
+    "slippage_threshold": 0.2,
+    "risk_threshold": 0.5
+  },
+  "results": [
+    {
+      "test": 1,
+      "spread": 0.15,
+      "confidence": 0.8,
+      "decision": "execute",
+      "risk_score": 0.6100000000000001,
+      "approved": true
+    },
+    {
+      "test": 2,
+      "spread": 0.2,
+      "confidence": 0.75,
+      "decision": "execute",
+      "risk_score": 0.6300000000000001,
+      "approved": true
+    },
+    {
+      "test": 3,
+      "spread": 0.1,
+      "confidence": 0.85,
+      "decision": "execute",
+      "risk_score": 0.5900000000000001,
+      "approved": true
+    },
+    {
+      "test": 4,
+      "spread": 0.25,
+      "confidence": 0.7,
+      "decision": "execute",
+      "risk_score": 0.65,
+      "approved": true
+    },
+    {
+      "test": 5,
+      "spread": 0.3,
+      "confidence": 0.65,
+      "decision": "execute",
+      "risk_score": 0.67,
+      "approved": true
+    }
+  ]
+}

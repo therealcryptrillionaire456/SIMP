@@ -1,0 +1,93 @@
+{
+  "start_time": 1775933263.801719,
+  "end_time": 1775933266.84845,
+  "modules_tested": 5,
+  "modules_passed": 2,
+  "modules_failed": 3,
+  "module_details": {
+    "CAI": {
+      "initialized": true,
+      "available": true,
+      "capabilities": 4,
+      "type": "intelligence"
+    },
+    "OpenShell": {
+      "initialized": true,
+      "available": true,
+      "capabilities": 5,
+      "type": "offensive"
+    }
+  },
+  "integration_tests": {
+    "module_manager": {
+      "success": false,
+      "error": "__init__() takes 3 positional arguments but 4 were given"
+    },
+    "defensive_workflow": {
+      "events_submitted": 3,
+      "events_processed": 6014,
+      "scan_results": {
+        "timestamp": "2026-04-11T18:47:45.831237Z",
+        "repositories_used": [
+          "cai",
+          "hexstrike",
+          "strix"
+        ],
+        "findings": [
+          {
+            "repository": "cai",
+            "available": false,
+            "type": "defensive"
+          },
+          {
+            "repository": "hexstrike",
+            "available": false,
+            "type": "hybrid"
+          },
+          {
+            "repository": "strix",
+            "available": false,
+            "type": "defensive"
+          }
+        ]
+      },
+      "defensive_actions": 27,
+      "success": true
+    },
+    "offensive_capabilities": {
+      "capabilities_tested": 3,
+      "test_results": [
+        {
+          "capability": "pentagi_scan",
+          "result": "simulated"
+        },
+        {
+          "capability": "hexstrike_binary_analysis",
+          "result": "simulated"
+        },
+        {
+          "capability": "openshell_command",
+          "result": "simulated"
+        }
+      ],
+      "success": true
+    },
+    "hybrid_mode": {
+      "threat_submitted": true,
+      "mode": "hybrid",
+      "offensive_operations": 10,
+      "success": true
+    },
+    "intelligence_gathering": {
+      "success": false,
+      "error": "__init__() takes 3 positional arguments but 4 were given"
+    }
+  },
+  "errors": [
+    "hexstrike-ai initialization error: __init__() takes 3 positional arguments but 4 were given",
+    "pentagi initialization error: __init__() takes 3 positional arguments but 4 were given",
+    "strix initialization error: __init__() takes 3 positional arguments but 4 were given",
+    "Module Manager error: __init__() takes 3 positional arguments but 4 were given",
+    "Intelligence gathering error: __init__() takes 3 positional arguments but 4 were given"
+  ]
+}

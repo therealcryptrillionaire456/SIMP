@@ -1,0 +1,53 @@
+[
+  {
+    "timestamp": "2026-04-16T04:42:49.855747Z",
+    "component": "AgentRegistry",
+    "operation": "register_agent",
+    "iterations": 2,
+    "total_duration_ms": 0.5741660133935511,
+    "avg_duration_ms": 0.28708300669677556,
+    "min_duration_ms": 0.07437501335516572,
+    "max_duration_ms": 0.4997910000383854,
+    "p50_duration_ms": 0.28708300669677556,
+    "p95_duration_ms": 0.4997910000383854,
+    "p99_duration_ms": 0.4997910000383854,
+    "throughput_ops_per_sec": 3483.313106916933,
+    "file_size_before_bytes": 0,
+    "file_size_after_bytes": 862,
+    "file_growth_bytes": 862
+  },
+  {
+    "timestamp": "2026-04-16T04:42:49.857012Z",
+    "component": "OrchestrationManager",
+    "operation": "create_plan",
+    "iterations": 0,
+    "total_duration_ms": 0,
+    "avg_duration_ms": 0,
+    "min_duration_ms": 0,
+    "max_duration_ms": 0,
+    "p50_duration_ms": 0,
+    "p95_duration_ms": 0,
+    "p99_duration_ms": 0,
+    "throughput_ops_per_sec": 0,
+    "file_size_before_bytes": 0,
+    "file_size_after_bytes": 0,
+    "file_growth_bytes": 0
+  },
+  {
+    "timestamp": "2026-04-16T04:42:49.858010Z",
+    "component": "JSONL",
+    "operation": "append",
+    "iterations": 20,
+    "total_duration_ms": 0.7861260673962533,
+    "avg_duration_ms": 0.03930630336981267,
+    "min_duration_ms": 0.024833017960190773,
+    "max_duration_ms": 0.10608398588374257,
+    "p50_duration_ms": 0.03154147998429835,
+    "p95_duration_ms": 0.10473393776919693,
+    "p99_duration_ms": 0.10608398588374257,
+    "throughput_ops_per_sec": 25441.21207714492,
+    "file_size_before_bytes": 0,
+    "file_size_after_bytes": 3990,
+    "file_growth_bytes": 3990
+  }
+]

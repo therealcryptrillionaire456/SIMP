@@ -1,0 +1,108 @@
+{
+  "start_time": 1775933321.629416,
+  "end_time": 1775933324.653965,
+  "modules_tested": 5,
+  "modules_passed": 5,
+  "modules_failed": 0,
+  "module_details": {
+    "CAI": {
+      "initialized": true,
+      "available": true,
+      "capabilities": 4,
+      "type": "intelligence"
+    },
+    "hexstrike-ai": {
+      "initialized": true,
+      "available": true,
+      "capabilities": 6,
+      "type": "hybrid"
+    },
+    "pentagi": {
+      "initialized": true,
+      "available": true,
+      "capabilities": 8,
+      "type": "hybrid"
+    },
+    "OpenShell": {
+      "initialized": true,
+      "available": true,
+      "capabilities": 5,
+      "type": "offensive"
+    },
+    "strix": {
+      "initialized": true,
+      "available": true,
+      "capabilities": 8,
+      "type": "hybrid"
+    }
+  },
+  "integration_tests": {
+    "module_manager": {
+      "success": false,
+      "error": "'HexstrikeModule' object has no attribute 'get_status'"
+    },
+    "defensive_workflow": {
+      "events_submitted": 3,
+      "events_processed": 6018,
+      "scan_results": {
+        "timestamp": "2026-04-11T18:48:43.638792Z",
+        "repositories_used": [
+          "cai",
+          "hexstrike",
+          "strix"
+        ],
+        "findings": [
+          {
+            "repository": "cai",
+            "available": false,
+            "type": "defensive"
+          },
+          {
+            "repository": "hexstrike",
+            "available": false,
+            "type": "hybrid"
+          },
+          {
+            "repository": "strix",
+            "available": false,
+            "type": "defensive"
+          }
+        ]
+      },
+      "defensive_actions": 28,
+      "success": true
+    },
+    "offensive_capabilities": {
+      "capabilities_tested": 3,
+      "test_results": [
+        {
+          "capability": "pentagi_scan",
+          "result": "simulated"
+        },
+        {
+          "capability": "hexstrike_binary_analysis",
+          "result": "simulated"
+        },
+        {
+          "capability": "openshell_command",
+          "result": "simulated"
+        }
+      ],
+      "success": true
+    },
+    "hybrid_mode": {
+      "threat_submitted": true,
+      "mode": "hybrid",
+      "offensive_operations": 13,
+      "success": true
+    },
+    "intelligence_gathering": {
+      "success": false,
+      "error": "'PentagiModule' object has no attribute '_maintain_access'"
+    }
+  },
+  "errors": [
+    "Module Manager error: 'HexstrikeModule' object has no attribute 'get_status'",
+    "Intelligence gathering error: 'PentagiModule' object has no attribute '_maintain_access'"
+  ]
+}

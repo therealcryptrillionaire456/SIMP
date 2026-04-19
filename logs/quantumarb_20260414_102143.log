@@ -1,0 +1,47 @@
+2026-04-14 10:21:58,241 - quantumarb_minimal - INFO - QuantumArbEngineMinimal initialized for Phase 4 microscopic trading
+2026-04-14 10:21:58,241 - quantumarb_minimal - INFO - QuantumArbAgentMinimal initialized with poll interval 2.0s
+2026-04-14 10:21:58,242 - quantumarb_minimal - INFO - Starting QuantumArbAgentMinimal...
+2026-04-14 10:22:00,243 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:23:00,298 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:24:00,354 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:25:00,410 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:25:10,420 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade1_1776176710
+2026-04-14 10:25:10,420 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade1_1776176710', 'spread_pct': 0.0789, 'decision': 'reject_risk', 'reason': 'Risk score 0.40 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:25:10.420446'}
+2026-04-14 10:25:10,421 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade1_1776176710, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade1_1776176710.json
+2026-04-14 10:25:18,432 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade2_1776176717
+2026-04-14 10:25:18,433 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade2_1776176717', 'spread_pct': 0.0616, 'decision': 'reject_risk', 'reason': 'Risk score 0.42 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:25:18.433183'}
+2026-04-14 10:25:18,434 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade2_1776176717, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade2_1776176717.json
+2026-04-14 10:25:24,442 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade3_1776176724
+2026-04-14 10:25:24,443 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade3_1776176724', 'spread_pct': 0.0557, 'decision': 'reject_risk', 'reason': 'Risk score 0.40 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:25:24.442982'}
+2026-04-14 10:25:24,444 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade3_1776176724, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade3_1776176724.json
+2026-04-14 10:25:32,455 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade4_1776176731
+2026-04-14 10:25:32,455 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade4_1776176731', 'spread_pct': 0.0427, 'decision': 'reject_risk', 'reason': 'Risk score 0.41 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:25:32.455624'}
+2026-04-14 10:25:32,458 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade4_1776176731, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade4_1776176731.json
+2026-04-14 10:25:38,464 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch1_trade5_1776176738
+2026-04-14 10:25:38,465 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch1_trade5_1776176738', 'spread_pct': 0.1111, 'decision': 'reject_risk', 'reason': 'Risk score 0.40 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:25:38.465305'}
+2026-04-14 10:25:38,467 - quantumarb_minimal - INFO - Processed signal gate1_batch1_trade5_1776176738, result: data/quantumarb_minimal/outbox/result_gate1_batch1_trade5_1776176738.json
+2026-04-14 10:25:54,481 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch2_trade1_1776176753
+2026-04-14 10:25:54,482 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch2_trade1_1776176753', 'spread_pct': 0.0599, 'decision': 'reject_risk', 'reason': 'Risk score 0.38 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:25:54.481922'}
+2026-04-14 10:25:54,484 - quantumarb_minimal - INFO - Processed signal gate1_batch2_trade1_1776176753, result: data/quantumarb_minimal/outbox/result_gate1_batch2_trade1_1776176753.json
+2026-04-14 10:26:00,488 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch2_trade2_1776176760
+2026-04-14 10:26:00,489 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch2_trade2_1776176760', 'spread_pct': 0.0735, 'decision': 'reject_risk', 'reason': 'Risk score 0.43 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:26:00.489062'}
+2026-04-14 10:26:00,489 - quantumarb_minimal - INFO - Processed signal gate1_batch2_trade2_1776176760, result: data/quantumarb_minimal/outbox/result_gate1_batch2_trade2_1776176760.json
+2026-04-14 10:26:00,490 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:26:08,498 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch2_trade3_1776176767
+2026-04-14 10:26:08,499 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch2_trade3_1776176767', 'spread_pct': 0.0838, 'decision': 'reject_risk', 'reason': 'Risk score 0.40 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:26:08.499388'}
+2026-04-14 10:26:08,501 - quantumarb_minimal - INFO - Processed signal gate1_batch2_trade3_1776176767, result: data/quantumarb_minimal/outbox/result_gate1_batch2_trade3_1776176767.json
+2026-04-14 10:26:14,507 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch2_trade4_1776176774
+2026-04-14 10:26:14,508 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch2_trade4_1776176774', 'spread_pct': 0.1082, 'decision': 'reject_risk', 'reason': 'Risk score 0.39 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:26:14.507934'}
+2026-04-14 10:26:14,509 - quantumarb_minimal - INFO - Processed signal gate1_batch2_trade4_1776176774, result: data/quantumarb_minimal/outbox/result_gate1_batch2_trade4_1776176774.json
+2026-04-14 10:26:22,520 - quantumarb_minimal - INFO - Evaluating arbitrage signal: gate1_batch2_trade5_1776176781
+2026-04-14 10:26:22,520 - quantumarb_minimal - INFO - Decision: {'signal_id': 'gate1_batch2_trade5_1776176781', 'spread_pct': 0.047, 'decision': 'reject_risk', 'reason': 'Risk score 0.39 below threshold 0.70', 'position_size_usd': 0.0, 'expected_pnl_usd': 0.0, 'risk_score': 0.0, 'timestamp': '2026-04-14T14:26:22.520747'}
+2026-04-14 10:26:22,522 - quantumarb_minimal - INFO - Processed signal gate1_batch2_trade5_1776176781, result: data/quantumarb_minimal/outbox/result_gate1_batch2_trade5_1776176781.json
+2026-04-14 10:27:00,558 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:28:00,610 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:29:00,662 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:30:00,721 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:31:00,772 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:32:00,826 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:33:00,877 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:34:00,939 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading
+2026-04-14 10:35:00,995 - quantumarb_minimal - INFO - Status: Phase 4, microscopic trading

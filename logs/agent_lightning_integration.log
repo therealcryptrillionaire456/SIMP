@@ -1,0 +1,54 @@
+2026-04-13 21:46:36,139 - __main__ - INFO - Loaded configuration: enabled=True
+2026-04-13 21:46:36,139 - __main__ - INFO - Starting full Agent Lightning integration for SIMP ecosystem...
+2026-04-13 21:46:36,206 - agent_lightning_integration - INFO - AgentLightningManager initialized
+2026-04-13 21:46:36,206 - __main__ - INFO - Agent Lightning integration module loaded successfully
+2026-04-13 21:46:36,206 - __main__ - INFO - Starting Agent Lightning proxy...
+2026-04-13 21:46:37,050 - __main__ - INFO - ✅ Agent Lightning proxy is already running
+2026-04-13 21:46:37,050 - __main__ - INFO - Integrating Agent Lightning with SIMP broker...
+2026-04-13 21:46:37,051 - __main__ - INFO - ✅ Agent Lightning broker patch loaded
+2026-04-13 21:46:37,051 - __main__ - INFO -    Apply by calling: patch_broker_for_agent_lightning(broker_instance)
+2026-04-13 21:46:37,051 - __main__ - INFO - Integrating Agent Lightning with SIMP dashboard...
+2026-04-13 21:46:37,051 - __main__ - INFO - ✅ Agent Lightning dashboard patch loaded
+2026-04-13 21:46:37,051 - __main__ - INFO -    Apply by calling: patch_dashboard_for_agent_lightning(dashboard_app)
+2026-04-13 21:46:37,051 - __main__ - INFO -    Dashboard UI available at: /agent-lightning-ui
+2026-04-13 21:46:37,053 - __main__ - INFO - ✅ Updated dashboard static files with Agent Lightning integration
+2026-04-13 21:46:37,053 - __main__ - INFO - Patching SIMP agents for Agent Lightning integration...
+2026-04-13 21:46:37,053 - __main__ - INFO - ✅ Patch loaded for quantumarb
+2026-04-13 21:46:37,053 - __main__ - INFO - Creating Agent Lightning configurations for SIMP agents...
+2026-04-13 21:46:37,054 - __main__ - INFO - ✅ Created configurations for 4 agents in /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/config/agent_lightning
+2026-04-13 21:46:37,054 - __main__ - INFO - Running Agent Lightning health check...
+2026-04-13 21:46:37,658 - __main__ - INFO - Patching SIMP agents for Agent Lightning integration...
+2026-04-13 21:46:37,658 - __main__ - INFO - ✅ Patch loaded for quantumarb
+2026-04-13 21:46:37,658 - __main__ - INFO - Health check complete:
+2026-04-13 21:46:37,658 - __main__ - INFO -   Proxy running: True
+2026-04-13 21:46:37,658 - __main__ - INFO -   Store accessible: True
+2026-04-13 21:46:37,658 - __main__ - INFO -   Agents patched: 1
+2026-04-13 21:46:37,658 - __main__ - INFO - ======================================================================
+2026-04-13 21:46:37,658 - __main__ - INFO - AGENT LIGHTNING INTEGRATION SUMMARY
+2026-04-13 21:46:37,658 - __main__ - INFO - ======================================================================
+2026-04-13 21:46:37,658 - __main__ - INFO - ✅ Integration: ENABLED
+2026-04-13 21:46:37,658 - __main__ - INFO - 
+2026-04-13 21:46:37,658 - __main__ - INFO - 📊 Endpoints:
+2026-04-13 21:46:37,658 - __main__ - INFO -    Agent Lightning Proxy: http://localhost:8235
+2026-04-13 21:46:37,658 - __main__ - INFO -    LightningStore: http://localhost:43887
+2026-04-13 21:46:37,658 - __main__ - INFO -    Dashboard UI: http://localhost:8050/agent-lightning-ui
+2026-04-13 21:46:37,658 - __main__ - INFO - 
+2026-04-13 21:46:37,658 - __main__ - INFO - 🤖 Agents Configured:
+2026-04-13 21:46:37,658 - __main__ - INFO -    • quantumarb
+2026-04-13 21:46:37,658 - __main__ - INFO -    • kashclaw_gemma
+2026-04-13 21:46:37,658 - __main__ - INFO -    • kloutbot
+2026-04-13 21:46:37,658 - __main__ - INFO -    • projectx_native
+2026-04-13 21:46:37,658 - __main__ - INFO - 
+2026-04-13 21:46:37,658 - __main__ - INFO - ⚡ Features Enabled:
+2026-04-13 21:46:37,658 - __main__ - INFO -    • Trace all agents
+2026-04-13 21:46:37,658 - __main__ - INFO -    • Automatic Prompt Optimization (APO)
+2026-04-13 21:46:37,658 - __main__ - INFO -    • Dashboard integration
+2026-04-13 21:46:37,658 - __main__ - INFO - 
+2026-04-13 21:46:37,658 - __main__ - INFO - 🔧 Next Steps:
+2026-04-13 21:46:37,658 - __main__ - INFO -    1. Restart SIMP broker to enable Agent Lightning endpoints
+2026-04-13 21:46:37,658 - __main__ - INFO -    2. Restart SIMP dashboard to see Agent Lightning metrics
+2026-04-13 21:46:37,658 - __main__ - INFO -    3. Monitor traces at: http://localhost:43887/v1/agl/rollouts
+2026-04-13 21:46:37,658 - __main__ - INFO - 
+2026-04-13 21:46:37,658 - __main__ - INFO - 🚀 All LLM calls will now be traced and optimized!
+2026-04-13 21:46:37,658 - __main__ - INFO - ======================================================================
+2026-04-13 21:46:37,658 - __main__ - INFO - ✅ Agent Lightning integration completed successfully!

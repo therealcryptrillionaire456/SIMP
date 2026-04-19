@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-04-14T14:10:05.409123",
+  "signal": {
+    "signal_id": "solusd_gate3_1776190205_5822",
+    "arb_type": "cross_venue",
+    "symbol_a": "SOL-USD",
+    "symbol_b": "SOL-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.1004,
+    "expected_return_pct": 0.0919,
+    "confidence": 0.91,
+    "timestamp": "2026-04-14T14:10:05.408333",
+    "metadata": {
+      "gate": "3",
+      "market": "SOL-USD",
+      "microscopic": true,
+      "multi_market": true,
+      "test_signal": true,
+      "estimated_price": 81.48921431089137
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "solusd_gate3_1776190205_5822",
+      "arb_type": "cross_venue",
+      "symbol_a": "SOL-USD",
+      "symbol_b": "SOL-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.1004,
+      "expected_return_pct": 0.0919,
+      "confidence": 0.91,
+      "timestamp": "2026-04-14T14:10:05.408333",
+      "metadata": {
+        "gate": "3",
+        "market": "SOL-USD",
+        "microscopic": true,
+        "multi_market": true,
+        "test_signal": true,
+        "estimated_price": 81.48921431089137
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: SOL-USD risk score 0.721, spread 0.1004%, confidence 0.91",
+    "position_size_usd": 0.1,
+    "expected_pnl_usd": 9.190000000000001e-05,
+    "risk_score": 0.7207183544615265,
+    "metadata": {
+      "approved": true,
+      "symbol": "SOL-USD",
+      "estimated_slippage_bps": 3.2650809384124937,
+      "size_tier": "determined_by_risk",
+      "multi_market": true
+    }
+  },
+  "execution_result": {
+    "trade_id": "trade_1776190205_5759",
+    "timestamp": "2026-04-14T14:10:05.409042",
+    "symbol": "SOL-USD",
+    "side": "sell",
+    "quantity": 0.0010822443671338877,
+    "price": 81.48921431089137,
+    "notional_usd": 0.08819124317012839,
+    "fees_usd": 8.819124317012838e-05,
+    "slippage_pct": 0.0021403484094023413,
+    "pnl_usd": -7.143490696780405e-06,
+    "status": "filled",
+    "metadata": {
+      "gate": "3",
+      "order_type": "limit",
+      "time_in_force": "GTC",
+      "fill_percentage": 88.19124317012837,
+      "price_improvement_pct": 0.002492821988714099,
+      "limit_order": true,
+      "partial_fill": true,
+      "multi_market": true,
+      "symbol": "SOL-USD"
+    }
+  },
+  "session_id": "gate3_1776190187",
+  "gate": "3"
+}

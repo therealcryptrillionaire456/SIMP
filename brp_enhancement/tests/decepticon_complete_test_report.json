@@ -1,0 +1,14 @@
+{
+  "test_date": "2026-04-12T07:50:31.692414Z",
+  "results": {
+    "component_1_engagement_planning": false,
+    "component_2a_kill_chain": false,
+    "component_2b_c2_integration": false,
+    "integrated_workflow": true
+  },
+  "summary": {
+    "passed": 1,
+    "total": 4,
+    "percentage": 25.0
+  }
+}

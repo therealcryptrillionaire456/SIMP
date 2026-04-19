@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-04-14T18:03:03.579487Z",
+  "component": "brp_threat_detection",
+  "experiment": "daily_brp_threat_detection_evolution",
+  "results": {
+    "success": true,
+    "experiment_name": "daily_brp_threat_detection_evolution",
+    "rounds_completed": 5,
+    "final_best_score": 0.6715534640031144,
+    "improvement_percent": 34.31069280062289,
+    "improvement_history": [
+      {
+        "round": 1,
+        "best_score": 0.6434861828001722,
+        "population_avg": 0.5882724315679486,
+        "population_size": 4
+      },
+      {
+        "round": 2,
+        "best_score": 0.6677405313565338,
+        "population_avg": 0.6343274948795529,
+        "population_size": 4
+      },
+      {
+        "round": 3,
+        "best_score": 0.6677405313565338,
+        "population_avg": 0.6553827630824867,
+        "population_size": 4
+      },
+      {
+        "round": 4,
+        "best_score": 0.6715534640031144,
+        "population_avg": 0.663362902657896,
+        "population_size": 4
+      },
+      {
+        "round": 5,
+        "best_score": 0.6715534640031144,
+        "population_avg": 0.6469980611355507,
+        "population_size": 4
+      }
+    ],
+    "best_candidate": {
+      "score": 0.6715534640031144,
+      "code_hash": "4a757880",
+      "generation": 5
+    },
+    "timestamp": "2026-04-14T18:03:03.579283Z"
+  },
+  "success": true
+}

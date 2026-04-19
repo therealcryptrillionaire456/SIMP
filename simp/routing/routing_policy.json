@@ -1,0 +1,42 @@
+{
+  "builder_pool": {
+    "primary": "claude_cowork",
+    "secondary": "perplexity_research",
+    "support": ["gemma4_local", "kloutbot", "projectx_native"]
+  },
+  "task_routing": {
+    "code_task": ["claude_cowork", "perplexity_research", "gemma4_local", "projectx_native"],
+    "code_editing": ["claude_cowork", "gemma4_local", "projectx_native"],
+    "planning": ["claude_cowork", "perplexity_research", "gemma4_local", "kloutbot", "projectx_native"],
+    "research": ["perplexity_research", "gemma4_local", "projectx_native"],
+    "market_analysis": ["bullbear_predictor", "perplexity_research"],
+    "trade_execution": ["kashclaw"],
+    "orchestration": ["kloutbot"],
+    "scaffolding": ["claude_cowork", "perplexity_research", "gemma4_local", "projectx_native"],
+    "test_harness": ["claude_cowork", "projectx_native"],
+    "prediction_signal": ["bullbear_predictor"],
+    "arbitrage": ["quantumarb"],
+    "spec": ["perplexity_research", "claude_cowork", "gemma4_local", "projectx_native"],
+    "architecture": ["perplexity_research", "claude_cowork", "gemma4_local", "projectx_native"],
+    "docs": ["perplexity_research", "claude_cowork", "gemma4_local", "projectx_native"],
+    "code_review": ["claude_cowork", "gemma4_local", "projectx_native"],
+    "summarization": ["perplexity_research", "gemma4_local", "projectx_native"],
+    "implementation": ["projectx_native", "claude_cowork", "gemma4_local"],
+    "native_agent_health_check": ["projectx_native"],
+    "native_agent_repo_scan": ["projectx_native"],
+    "native_agent_task_audit": ["projectx_native"],
+    "native_agent_security_audit": ["projectx_native"],
+    "projectx_query": ["projectx_native"],
+    "build_feature": ["projectx_native", "perplexity_research", "claude_cowork"],
+    "reload_target": ["projectx_native"]
+  },
+  "fallback_rules": {
+    "rate_limited": "next_in_pool",
+    "agent_unavailable": "next_in_pool",
+    "timeout": "retry_then_fallback",
+    "execution_failed": "retry_then_fallback",
+    "schema_invalid": "fail_immediately",
+    "policy_denied": "escalate"
+  },
+  "capacity_check_interval_seconds": 30
+}

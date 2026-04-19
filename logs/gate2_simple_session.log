@@ -1,0 +1,235 @@
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - ============================================================
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - QUANTUMARB GATE 2 SIMPLE - SOL MICROSCOPIC TRADING
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - ============================================================
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Mode: live_phase_2_microscopic_sol
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Primary market: SOL-USD
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Position size: $0.01-$0.1
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Gate 2 Simple Agent ready
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - ------------------------------------------------------------
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Starting Gate 2 trading session...
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Target: 100 trades
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Minimum for success: 80
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - ============================================================
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO -   Spread: 0.1463%, Confidence: 0.95, Risk: 0.614
+2026-04-14 12:40:59,384 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000082
+2026-04-14 12:41:03,113 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:41:03,113 - quantumarb_gate2_simple - INFO -   Spread: 0.1154%, Confidence: 0.81, Risk: 0.496
+2026-04-14 12:41:06,083 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:06,083 - quantumarb_gate2_simple - INFO -   Spread: 0.2258%, Confidence: 0.87, Risk: 0.662
+2026-04-14 12:41:06,083 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000058
+2026-04-14 12:41:09,662 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:09,663 - quantumarb_gate2_simple - INFO -   Spread: 0.0706%, Confidence: 0.94, Risk: 0.501
+2026-04-14 12:41:09,663 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000027
+2026-04-14 12:41:13,093 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:13,093 - quantumarb_gate2_simple - INFO -   Spread: 0.1916%, Confidence: 0.78, Risk: 0.580
+2026-04-14 12:41:13,093 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000063
+2026-04-14 12:41:15,307 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:15,307 - quantumarb_gate2_simple - INFO -   Spread: 0.2422%, Confidence: 0.76, Risk: 0.605
+2026-04-14 12:41:15,308 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000113
+2026-04-14 12:41:19,041 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:19,041 - quantumarb_gate2_simple - INFO -   Spread: 0.0656%, Confidence: 0.93, Risk: 0.506
+2026-04-14 12:41:19,041 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000026
+2026-04-14 12:41:21,118 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:21,119 - quantumarb_gate2_simple - INFO -   Spread: 0.1642%, Confidence: 0.92, Risk: 0.595
+2026-04-14 12:41:21,119 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000087
+2026-04-14 12:41:24,531 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:41:24,532 - quantumarb_gate2_simple - INFO -   Spread: 0.0859%, Confidence: 0.86, Risk: 0.485
+2026-04-14 12:41:27,674 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:41:27,674 - quantumarb_gate2_simple - INFO -   Spread: 0.0785%, Confidence: 0.76, Risk: 0.451
+2026-04-14 12:41:27,675 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:41:27,675 - quantumarb_gate2_simple - INFO - Session Status
+2026-04-14 12:41:27,675 - quantumarb_gate2_simple - INFO -   Opportunities evaluated: 10
+2026-04-14 12:41:27,675 - quantumarb_gate2_simple - INFO -   Trades executed: 7
+2026-04-14 12:41:27,675 - quantumarb_gate2_simple - INFO -   Total P&L: $0.000454
+2026-04-14 12:41:27,675 - quantumarb_gate2_simple - INFO -   Approval rate: 82.4%
+2026-04-14 12:41:27,675 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:41:30,309 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:30,309 - quantumarb_gate2_simple - INFO -   Spread: 0.1259%, Confidence: 0.86, Risk: 0.536
+2026-04-14 12:41:30,309 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000027
+2026-04-14 12:41:33,104 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:33,105 - quantumarb_gate2_simple - INFO -   Spread: 0.2386%, Confidence: 0.91, Risk: 0.684
+2026-04-14 12:41:33,105 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000128
+2026-04-14 12:41:36,840 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:36,840 - quantumarb_gate2_simple - INFO -   Spread: 0.2466%, Confidence: 0.76, Risk: 0.643
+2026-04-14 12:41:36,840 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000162
+2026-04-14 12:41:39,900 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:39,901 - quantumarb_gate2_simple - INFO -   Spread: 0.0864%, Confidence: 0.90, Risk: 0.520
+2026-04-14 12:41:39,901 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000025
+2026-04-14 12:41:43,366 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:43,366 - quantumarb_gate2_simple - INFO -   Spread: 0.1740%, Confidence: 0.85, Risk: 0.577
+2026-04-14 12:41:43,366 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000064
+2026-04-14 12:41:45,610 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:45,610 - quantumarb_gate2_simple - INFO -   Spread: 0.1181%, Confidence: 0.82, Risk: 0.516
+2026-04-14 12:41:45,610 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000065
+2026-04-14 12:41:47,728 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:47,729 - quantumarb_gate2_simple - INFO -   Spread: 0.0819%, Confidence: 0.91, Risk: 0.506
+2026-04-14 12:41:47,729 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000022
+2026-04-14 12:41:51,332 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:51,333 - quantumarb_gate2_simple - INFO -   Spread: 0.1004%, Confidence: 0.94, Risk: 0.548
+2026-04-14 12:41:51,333 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000047
+2026-04-14 12:41:53,436 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:53,436 - quantumarb_gate2_simple - INFO -   Spread: 0.2394%, Confidence: 0.88, Risk: 0.664
+2026-04-14 12:41:53,437 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000148
+2026-04-14 12:41:56,202 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:41:56,202 - quantumarb_gate2_simple - INFO -   Spread: 0.0589%, Confidence: 0.90, Risk: 0.466
+2026-04-14 12:41:56,204 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:41:56,205 - quantumarb_gate2_simple - INFO - Session Status
+2026-04-14 12:41:56,205 - quantumarb_gate2_simple - INFO -   Opportunities evaluated: 20
+2026-04-14 12:41:56,205 - quantumarb_gate2_simple - INFO -   Trades executed: 16
+2026-04-14 12:41:56,205 - quantumarb_gate2_simple - INFO -   Total P&L: $0.001142
+2026-04-14 12:41:56,205 - quantumarb_gate2_simple - INFO -   Approval rate: 88.9%
+2026-04-14 12:41:56,205 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:41:58,942 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:41:58,943 - quantumarb_gate2_simple - INFO -   Spread: 0.2234%, Confidence: 0.94, Risk: 0.687
+2026-04-14 12:41:58,943 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000097
+2026-04-14 12:42:01,327 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:01,327 - quantumarb_gate2_simple - INFO -   Spread: 0.1377%, Confidence: 0.78, Risk: 0.510
+2026-04-14 12:42:01,327 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000030
+2026-04-14 12:42:03,672 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:42:03,673 - quantumarb_gate2_simple - INFO -   Spread: 0.0529%, Confidence: 0.85, Risk: 0.457
+2026-04-14 12:42:07,659 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:07,659 - quantumarb_gate2_simple - INFO -   Spread: 0.2473%, Confidence: 0.94, Risk: 0.712
+2026-04-14 12:42:07,659 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000148
+2026-04-14 12:42:10,386 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:42:10,386 - quantumarb_gate2_simple - INFO -   Spread: 0.0768%, Confidence: 0.87, Risk: 0.483
+2026-04-14 12:42:13,909 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:13,910 - quantumarb_gate2_simple - INFO -   Spread: 0.1730%, Confidence: 0.94, Risk: 0.631
+2026-04-14 12:42:13,910 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000094
+2026-04-14 12:42:16,885 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:42:16,886 - quantumarb_gate2_simple - INFO -   Spread: 0.0549%, Confidence: 0.86, Risk: 0.455
+2026-04-14 12:42:19,966 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:42:19,966 - quantumarb_gate2_simple - INFO -   Spread: 0.0907%, Confidence: 0.76, Risk: 0.438
+2026-04-14 12:42:23,683 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:23,683 - quantumarb_gate2_simple - INFO -   Spread: 0.1783%, Confidence: 0.84, Risk: 0.598
+2026-04-14 12:42:23,684 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000075
+2026-04-14 12:42:25,740 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:25,741 - quantumarb_gate2_simple - INFO -   Spread: 0.1903%, Confidence: 0.86, Risk: 0.615
+2026-04-14 12:42:25,741 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000068
+2026-04-14 12:42:25,743 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:42:25,743 - quantumarb_gate2_simple - INFO - Session Status
+2026-04-14 12:42:25,743 - quantumarb_gate2_simple - INFO -   Opportunities evaluated: 30
+2026-04-14 12:42:25,743 - quantumarb_gate2_simple - INFO -   Trades executed: 22
+2026-04-14 12:42:25,743 - quantumarb_gate2_simple - INFO -   Total P&L: $0.001653
+2026-04-14 12:42:25,743 - quantumarb_gate2_simple - INFO -   Approval rate: 84.6%
+2026-04-14 12:42:25,743 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:42:28,855 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:28,855 - quantumarb_gate2_simple - INFO -   Spread: 0.2472%, Confidence: 0.83, Risk: 0.642
+2026-04-14 12:42:28,855 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000107
+2026-04-14 12:42:31,017 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:31,018 - quantumarb_gate2_simple - INFO -   Spread: 0.1688%, Confidence: 0.77, Risk: 0.524
+2026-04-14 12:42:31,018 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000090
+2026-04-14 12:42:33,415 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:42:33,416 - quantumarb_gate2_simple - INFO -   Spread: 0.0602%, Confidence: 0.88, Risk: 0.461
+2026-04-14 12:42:36,376 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:36,376 - quantumarb_gate2_simple - INFO -   Spread: 0.1190%, Confidence: 0.93, Risk: 0.544
+2026-04-14 12:42:36,376 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000053
+2026-04-14 12:42:38,619 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:38,619 - quantumarb_gate2_simple - INFO -   Spread: 0.0835%, Confidence: 0.91, Risk: 0.519
+2026-04-14 12:42:38,619 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000033
+2026-04-14 12:42:41,932 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:42:41,933 - quantumarb_gate2_simple - INFO -   Spread: 0.0538%, Confidence: 0.80, Risk: 0.427
+2026-04-14 12:42:44,206 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:44,206 - quantumarb_gate2_simple - INFO -   Spread: 0.1329%, Confidence: 0.85, Risk: 0.521
+2026-04-14 12:42:44,207 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000077
+2026-04-14 12:42:47,859 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:47,859 - quantumarb_gate2_simple - INFO -   Spread: 0.1335%, Confidence: 0.89, Risk: 0.545
+2026-04-14 12:42:47,859 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000042
+2026-04-14 12:42:50,501 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:50,501 - quantumarb_gate2_simple - INFO -   Spread: 0.0752%, Confidence: 0.93, Risk: 0.521
+2026-04-14 12:42:50,502 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000019
+2026-04-14 12:42:54,188 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:54,188 - quantumarb_gate2_simple - INFO -   Spread: 0.2249%, Confidence: 0.85, Risk: 0.627
+2026-04-14 12:42:54,189 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000092
+2026-04-14 12:42:54,191 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:42:54,191 - quantumarb_gate2_simple - INFO - Session Status
+2026-04-14 12:42:54,191 - quantumarb_gate2_simple - INFO -   Opportunities evaluated: 40
+2026-04-14 12:42:54,191 - quantumarb_gate2_simple - INFO -   Trades executed: 30
+2026-04-14 12:42:54,192 - quantumarb_gate2_simple - INFO -   Total P&L: $0.002166
+2026-04-14 12:42:54,192 - quantumarb_gate2_simple - INFO -   Approval rate: 85.7%
+2026-04-14 12:42:54,192 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:42:56,342 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:56,342 - quantumarb_gate2_simple - INFO -   Spread: 0.1230%, Confidence: 0.94, Risk: 0.575
+2026-04-14 12:42:56,343 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000039
+2026-04-14 12:42:59,885 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:42:59,886 - quantumarb_gate2_simple - INFO -   Spread: 0.1578%, Confidence: 0.86, Risk: 0.589
+2026-04-14 12:42:59,886 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000032
+2026-04-14 12:43:02,246 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:02,247 - quantumarb_gate2_simple - INFO -   Spread: 0.1914%, Confidence: 0.76, Risk: 0.578
+2026-04-14 12:43:02,247 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000087
+2026-04-14 12:43:06,127 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:43:06,128 - quantumarb_gate2_simple - INFO -   Spread: 0.0698%, Confidence: 0.86, Risk: 0.488
+2026-04-14 12:43:09,622 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:43:09,622 - quantumarb_gate2_simple - INFO -   Spread: 0.0676%, Confidence: 0.89, Risk: 0.464
+2026-04-14 12:43:13,226 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:13,227 - quantumarb_gate2_simple - INFO -   Spread: 0.1785%, Confidence: 0.75, Risk: 0.556
+2026-04-14 12:43:13,227 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000060
+2026-04-14 12:43:16,014 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:16,015 - quantumarb_gate2_simple - INFO -   Spread: 0.1565%, Confidence: 0.93, Risk: 0.620
+2026-04-14 12:43:16,015 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000043
+2026-04-14 12:43:18,859 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:18,860 - quantumarb_gate2_simple - INFO -   Spread: 0.1397%, Confidence: 0.82, Risk: 0.516
+2026-04-14 12:43:18,860 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000077
+2026-04-14 12:43:22,812 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:22,812 - quantumarb_gate2_simple - INFO -   Spread: 0.2290%, Confidence: 0.82, Risk: 0.637
+2026-04-14 12:43:22,812 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000116
+2026-04-14 12:43:25,806 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:25,806 - quantumarb_gate2_simple - INFO -   Spread: 0.1546%, Confidence: 0.86, Risk: 0.586
+2026-04-14 12:43:25,806 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000089
+2026-04-14 12:43:25,808 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:43:25,808 - quantumarb_gate2_simple - INFO - Session Status
+2026-04-14 12:43:25,808 - quantumarb_gate2_simple - INFO -   Opportunities evaluated: 50
+2026-04-14 12:43:25,808 - quantumarb_gate2_simple - INFO -   Trades executed: 38
+2026-04-14 12:43:25,808 - quantumarb_gate2_simple - INFO -   Total P&L: $0.002709
+2026-04-14 12:43:25,808 - quantumarb_gate2_simple - INFO -   Approval rate: 86.4%
+2026-04-14 12:43:25,808 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:43:29,110 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:43:29,111 - quantumarb_gate2_simple - INFO -   Spread: 0.0652%, Confidence: 0.91, Risk: 0.493
+2026-04-14 12:43:31,196 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:31,196 - quantumarb_gate2_simple - INFO -   Spread: 0.1574%, Confidence: 0.89, Risk: 0.565
+2026-04-14 12:43:31,196 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000070
+2026-04-14 12:43:33,520 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:33,520 - quantumarb_gate2_simple - INFO -   Spread: 0.1791%, Confidence: 0.80, Risk: 0.586
+2026-04-14 12:43:33,520 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000106
+2026-04-14 12:43:35,617 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:35,617 - quantumarb_gate2_simple - INFO -   Spread: 0.2009%, Confidence: 0.88, Risk: 0.632
+2026-04-14 12:43:35,618 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000118
+2026-04-14 12:43:38,586 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:43:38,586 - quantumarb_gate2_simple - INFO -   Spread: 0.0875%, Confidence: 0.77, Risk: 0.447
+2026-04-14 12:43:42,029 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:43:42,029 - quantumarb_gate2_simple - INFO -   Spread: 0.0516%, Confidence: 0.78, Risk: 0.397
+2026-04-14 12:43:44,323 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:44,324 - quantumarb_gate2_simple - INFO -   Spread: 0.1654%, Confidence: 0.76, Risk: 0.552
+2026-04-14 12:43:44,324 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000056
+2026-04-14 12:43:48,098 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:48,098 - quantumarb_gate2_simple - INFO -   Spread: 0.1285%, Confidence: 0.89, Risk: 0.559
+2026-04-14 12:43:48,099 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000065
+2026-04-14 12:43:51,967 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:51,967 - quantumarb_gate2_simple - INFO -   Spread: 0.1854%, Confidence: 0.78, Risk: 0.571
+2026-04-14 12:43:51,968 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000072
+2026-04-14 12:43:55,030 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:43:55,031 - quantumarb_gate2_simple - INFO -   Spread: 0.0833%, Confidence: 0.87, Risk: 0.506
+2026-04-14 12:43:55,031 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000018
+2026-04-14 12:43:55,033 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:43:55,033 - quantumarb_gate2_simple - INFO - Session Status
+2026-04-14 12:43:55,033 - quantumarb_gate2_simple - INFO -   Opportunities evaluated: 60
+2026-04-14 12:43:55,033 - quantumarb_gate2_simple - INFO -   Trades executed: 45
+2026-04-14 12:43:55,033 - quantumarb_gate2_simple - INFO -   Total P&L: $0.003215
+2026-04-14 12:43:55,034 - quantumarb_gate2_simple - INFO -   Approval rate: 85.7%
+2026-04-14 12:43:55,034 - quantumarb_gate2_simple - INFO - ----------------------------------------
+2026-04-14 12:43:58,434 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:43:58,435 - quantumarb_gate2_simple - INFO -   Spread: 0.0741%, Confidence: 0.76, Risk: 0.419
+2026-04-14 12:44:02,367 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:44:02,369 - quantumarb_gate2_simple - INFO -   Spread: 0.2159%, Confidence: 0.80, Risk: 0.603
+2026-04-14 12:44:02,369 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000071
+2026-04-14 12:44:05,576 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:44:05,576 - quantumarb_gate2_simple - INFO -   Spread: 0.0944%, Confidence: 0.88, Risk: 0.510
+2026-04-14 12:44:05,576 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000047
+2026-04-14 12:44:08,574 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:44:08,575 - quantumarb_gate2_simple - INFO -   Spread: 0.2470%, Confidence: 0.76, Risk: 0.634
+2026-04-14 12:44:08,575 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000099
+2026-04-14 12:44:11,183 - quantumarb_gate2_simple - INFO - Opportunity: reject_risk
+2026-04-14 12:44:11,183 - quantumarb_gate2_simple - INFO -   Spread: 0.1198%, Confidence: 0.75, Risk: 0.485
+2026-04-14 12:44:14,344 - quantumarb_gate2_simple - INFO - Opportunity: execute
+2026-04-14 12:44:14,344 - quantumarb_gate2_simple - INFO -   Spread: 0.1701%, Confidence: 0.89, Risk: 0.586
+2026-04-14 12:44:14,344 - quantumarb_gate2_simple - INFO - SOL trade simulated: $0.0500, P&L: $0.000084

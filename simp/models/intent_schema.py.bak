@@ -1,0 +1,185 @@
+"""
+simp/models/intent_schema.py
+─────────────────────────────
+Pydantic v2-compatible request/response schemas for SIMP intents.
+Used by http_server.py for validation and by broker.py for internal checks.
+
+Falls back gracefully if Pydantic is not installed (raises ImportError with
+a helpful message rather than crashing at import time).
+"""
+
+from __future__ import annotations
+
+import json
+import re
+import sys
+from typing import Any, Dict, Optional
+
+# ── compatibility shim: support Pydantic v1 and v2 ──────────────────────────
+try:
+    from pydantic import BaseModel, Field, field_validator, model_validator
+    import pydantic
+    _PYDANTIC_V2 = int(pydantic.VERSION.split(".")[0]) >= 2
+except ImportError as exc:  # pragma: no cover
+    raise ImportError(
+        "pydantic is required for SIMP schema validation. "
+        "Install it with: pip install pydantic>=1.10"
+    ) from exc
+
+# ── constants ────────────────────────────────────────────────────────────────
+# Allowed characters for agent/intent IDs: alphanum, underscore, hyphen, colon, dot
+_ID_RE = re.compile(r"^[A-Za-z0-9_\-:.]{1,256}$")
+_AGENT_ID_RE = re.compile(r"^[A-Za-z0-9_\-:.]{1,128}$")
+_TYPE_RE = re.compile(r"^[A-Za-z0-9_\-:.]{1,128}$")
+
+# Configurable, but import-time default is 1 MB
+_DEFAULT_MAX_PAYLOAD_BYTES = 1_000_000
+
+try:
+    from config.config import config as _cfg
+    _MAX_PAYLOAD = _cfg.MAX_PAYLOAD_BYTES
+except Exception:  # pragma: no cover
+    _MAX_PAYLOAD = _DEFAULT_MAX_PAYLOAD_BYTES
+
+
+# ── helpers ──────────────────────────────────────────────────────────────────
+
+def _check_id(value: str, pattern: re.Pattern, field_name: str) -> str:
+    if not pattern.match(value):
+        raise ValueError(
+            f"{field_name} must match pattern {pattern.pattern!r}, got {value!r}"
+        )
+    return value
+
+
+def _check_payload_size(data: Any, max_bytes: int = _MAX_PAYLOAD) -> Any:
+    serialized = json.dumps(data, separators=(",", ":"))
+    if len(serialized.encode()) > max_bytes:
+        raise ValueError(
+            f"Payload exceeds maximum size of {max_bytes} bytes "
+            f"(got {len(serialized.encode())} bytes)"
+        )
+    return data
+
+
+# ── schemas ──────────────────────────────────────────────────────────────────
+
+if _PYDANTIC_V2:
+    class IntentRequest(BaseModel):
+        """Schema for an inbound intent routing request."""
+
+        intent_id: str = Field(..., description="Unique intent identifier")
+        source_agent: str = Field(..., description="ID of the sending agent")
+        target_agent: str = Field(..., description="ID of the receiving agent")
+        intent_type: str = Field(..., description="Intent type / action name")
+        params: Dict[str, Any] = Field(default_factory=dict, description="Intent parameters")
+        signature: Optional[str] = Field(None, description="Base64-encoded request signature")
+        correlation_id: Optional[str] = Field(None, description="Distributed trace correlation ID")
+        trace_id: Optional[str] = Field(None, description="Distributed trace root ID")
+        parent_intent_id: Optional[str] = Field(None, description="Parent intent for chained calls")
+
+        @field_validator("intent_id")
+        @classmethod
+        def validate_intent_id(cls, v: str) -> str:
+            return _check_id(v, _ID_RE, "intent_id")
+
+        @field_validator("source_agent")
+        @classmethod
+        def validate_source_agent(cls, v: str) -> str:
+            return _check_id(v, _AGENT_ID_RE, "source_agent")
+
+        @field_validator("target_agent")
+        @classmethod
+        def validate_target_agent(cls, v: str) -> str:
+            return _check_id(v, _AGENT_ID_RE, "target_agent")
+
+        @field_validator("intent_type")
+        @classmethod
+        def validate_intent_type(cls, v: str) -> str:
+            return _check_id(v, _TYPE_RE, "intent_type")
+
+        @field_validator("params")
+        @classmethod
+        def validate_params_size(cls, v: Dict) -> Dict:
+            return _check_payload_size(v)
+
+        model_config = {"extra": "forbid"}
+
+    class AgentRegistrationRequest(BaseModel):
+        """Schema for agent registration."""
+        agent_id: str
+        endpoint: str = Field(..., description="host:port of agent's listener")
+        public_key: Optional[str] = Field(None, description="PEM-encoded public key for signature verification")
+        capabilities: Dict[str, Any] = Field(default_factory=dict)
+
+        @field_validator("agent_id")
+        @classmethod
+        def validate_agent_id(cls, v: str) -> str:
+            return _check_id(v, _AGENT_ID_RE, "agent_id")
+
+        model_config = {"extra": "forbid"}
+
+else:
+    # Pydantic v1 path
+    from pydantic import validator  # type: ignore[no-redef]
+
+    class IntentRequest(BaseModel):  # type: ignore[no-redef]
+        intent_id: str
+        source_agent: str
+        target_agent: str
+        intent_type: str
+        params: Dict[str, Any] = Field(default_factory=dict)
+        signature: Optional[str] = None
+        correlation_id: Optional[str] = None
+        trace_id: Optional[str] = None
+        parent_intent_id: Optional[str] = None
+
+        @validator("intent_id")
+        def validate_intent_id(cls, v: str) -> str:
+            return _check_id(v, _ID_RE, "intent_id")
+
+        @validator("source_agent")
+        def validate_source_agent(cls, v: str) -> str:
+            return _check_id(v, _AGENT_ID_RE, "source_agent")
+
+        @validator("target_agent")
+        def validate_target_agent(cls, v: str) -> str:
+            return _check_id(v, _AGENT_ID_RE, "target_agent")
+
+        @validator("intent_type")
+        def validate_intent_type(cls, v: str) -> str:
+            return _check_id(v, _TYPE_RE, "intent_type")
+
+        @validator("params")
+        def validate_params_size(cls, v: Dict) -> Dict:
+            return _check_payload_size(v)
+
+        class Config:
+            extra = "forbid"
+
+    class AgentRegistrationRequest(BaseModel):  # type: ignore[no-redef]
+        agent_id: str
+        endpoint: str
+        public_key: Optional[str] = None
+        capabilities: Dict[str, Any] = Field(default_factory=dict)
+
+        @validator("agent_id")
+        def validate_agent_id(cls, v: str) -> str:
+            return _check_id(v, _AGENT_ID_RE, "agent_id")
+
+        class Config:
+            extra = "forbid"
+
+
+def parse_intent_request(data: dict) -> tuple[bool, Any, Optional[str]]:
+    """
+    Validate raw dict as an IntentRequest.
+
+    Returns:
+        (ok: bool, parsed_or_None, error_message_or_None)
+    """
+    try:
+        parsed = IntentRequest(**data)
+        return True, parsed, None
+    except Exception as exc:
+        return False, None, str(exc)

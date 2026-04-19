@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "2026-04-12T02:04:10.862944",
+    "agent_id": "litigation_agent_001",
+    "action": "open_case",
+    "details": {
+      "case_id": "case_20260412_020410",
+      "case_number": "CV-2024-001234",
+      "case_type": "civil",
+      "court_level": "state_trial",
+      "jurisdiction": "California",
+      "party_count": 2
+    },
+    "compliance_standard": "ISO 20700:2017 (Legal Services)",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T02:04:10.863301",
+    "agent_id": "litigation_agent_001",
+    "action": "manage_discovery",
+    "details": {
+      "request_id": "disc_20260412_020410",
+      "case_id": "case_20260412_020410",
+      "request_type": "interrogatory",
+      "requesting_party": "Plaintiff",
+      "question_count": 2,
+      "document_count": 0
+    },
+    "compliance_standard": "ISO 20700:2017 (Legal Services)",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T02:04:10.864009",
+    "agent_id": "litigation_agent_001",
+    "action": "file_motion",
+    "details": {
+      "motion_id": "motion_20260412_020410",
+      "case_id": "case_20260412_020410",
+      "motion_type": "dismiss",
+      "moving_party": "Defendant",
+      "relief_sought": "Dismissal of complaint with prejudice"
+    },
+    "compliance_standard": "ISO 20700:2017 (Legal Services)",
+    "security_level": "confidential"
+  },
+  {
+    "timestamp": "2026-04-12T02:04:10.864255",
+    "agent_id": "litigation_agent_001",
+    "action": "track_deadlines",
+    "details": {
+      "days_ahead": 90,
+      "deadlines_found": 3,
+      "high_priority": 0
+    },
+    "compliance_standard": "ISO 20700:2017 (Legal Services)",
+    "security_level": "confidential"
+  }
+]

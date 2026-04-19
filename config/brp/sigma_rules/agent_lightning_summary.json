@@ -1,0 +1,10 @@
+{
+  "integration_time": "2026-04-14T14:33:00.244453",
+  "total_rules": 3,
+  "rule_ids": [
+    "BRP-TRACE-PATTERN-001",
+    "BRP-TRACE-PATTERN-003",
+    "BRP-TRACE-PATTERN-004"
+  ],
+  "source": "Agent Lightning Trace Analysis"
+}

@@ -1,0 +1,24 @@
+{
+  "gate": 2,
+  "completion_time": "2026-04-14T12:45:45.019708",
+  "session_start": "2026-04-14T12:38:10",
+  "session_duration_minutes": 7.6,
+  "trades_executed": 80,
+  "total_pnl": 0.005602,
+  "opportunities_evaluated": 109,
+  "decisions": {
+    "execute": 73,
+    "reject_risk": 29,
+    "reject_slippage": 0,
+    "reject_brp": 0,
+    "reject_symbol": 0
+  },
+  "criteria_check": {
+    "min_trades_met": true,
+    "pnl_not_clearly_negative": true,
+    "no_safety_incidents": true,
+    "data_integrity": true
+  },
+  "gate2_status": "PASSED",
+  "recommendation": "Proceed to Gate 3"
+}
