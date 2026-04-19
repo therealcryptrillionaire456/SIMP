@@ -1,17 +1,17 @@
-# SIMP Architecture Graph - 20260416_045123
+# SIMP Architecture Graph - 20260417_123655
 
 ## Statistics
-- **Nodes**: 4407
-- **Edges**: 11484
+- **Nodes**: 4442
+- **Edges**: 11530
 - **Files Processed**: 300
-- **Total Python Files**: 21074
+- **Total Python Files**: 23061
 
 ## Top 5 Central Modules
-1. **base_command** (centrality: 0.083)
+1. **base_command** (centrality: 0.082)
 1. **exceptions_usererror** (centrality: 0.032)
 1. **exceptions_agentsexception** (centrality: 0.031)
 1. **tool_functiontool** (centrality: 0.029)
-1. **agent_agent** (centrality: 0.029)
+1. **agent_agent** (centrality: 0.028)
 
 ## Top 5 Modules by File Count
 1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/repl/commands** (714 files)

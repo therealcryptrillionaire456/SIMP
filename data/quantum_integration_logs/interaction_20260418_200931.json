@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-04-18T20:09:31.691384",
+  "query": "optimize portfolio allocation across BTC ETH SOL using quantum amplitude estimation",
+  "context": null,
+  "force_quantum": true,
+  "is_quantum": true,
+  "confidence": 1.0,
+  "detection_info": {
+    "forced": true
+  },
+  "routed_to": "quantum_mode",
+  "success": false,
+  "trace_id": null,
+  "error": "No verified examples found",
+  "formatted_result": {
+    "success": false,
+    "error": "No verified examples found",
+    "source": "quantum_mode",
+    "metadata": {
+      "error_code": "QMODE_RETRIEVAL_EMPTY",
+      "should_block": false,
+      "should_exit_quantum_mode": false,
+      "trace_id": null,
+      "retrieval_info": {
+        "examples_found": 0,
+        "confidence": "very_low"
+      }
+    },
+    "quantum_integration": {
+      "detected_quantum": true,
+      "confidence": 1.0,
+      "in_quantum_mode": true,
+      "interaction_id": 0
+    }
+  },
+  "result": {
+    "success": false,
+    "error": "No verified examples found",
+    "source": "quantum_mode",
+    "metadata": {
+      "error_code": "QMODE_RETRIEVAL_EMPTY",
+      "should_block": false,
+      "should_exit_quantum_mode": false,
+      "trace_id": null,
+      "retrieval_info": {
+        "examples_found": 0,
+        "confidence": "very_low"
+      }
+    },
+    "quantum_integration": {
+      "detected_quantum": true,
+      "confidence": 1.0,
+      "in_quantum_mode": true,
+      "interaction_id": 0
+    }
+  }
+}

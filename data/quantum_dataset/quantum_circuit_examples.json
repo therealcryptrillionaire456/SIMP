@@ -1,0 +1,26 @@
+{
+  "task_type": "quantum_circuit",
+  "examples": [
+    {
+      "id": "example_2",
+      "query": "Create a Bell state circuit",
+      "solution": "from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2)\nqc.h(0)\nqc.cx(0, 1)\nqc.measure_all()",
+      "framework": "qiskit",
+      "complexity": "beginner",
+      "verification_status": "verified",
+      "verification_score": 0.98,
+      "safety_checks": [
+        "no_execution",
+        "circuit_only"
+      ],
+      "tags": [
+        "entanglement",
+        "bell_state",
+        "basic"
+      ],
+      "created_at": "2024-01-01T00:00:00Z",
+      "verified_at": "2024-01-02T00:00:00Z"
+    }
+  ],
+  "created_at": "2026-04-18T20:09:31.673001"
+}

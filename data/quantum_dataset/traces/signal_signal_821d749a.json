@@ -1,0 +1,13 @@
+{
+  "signal_id": "signal_821d749a",
+  "task_id": "quantum_2e60bc83_1776557371",
+  "trace_id": "trace_c8b4d5084634",
+  "signal_type": "negative",
+  "value": -1.0,
+  "reason": "Trace failed: QMODE_RETRIEVAL_EMPTY - No verified examples found",
+  "metadata": {
+    "error_code": "QMODE_RETRIEVAL_EMPTY",
+    "severity": "MEDIUM"
+  },
+  "timestamp": "2026-04-19T00:09:31.692046Z"
+}

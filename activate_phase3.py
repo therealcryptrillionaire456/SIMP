@@ -163,14 +163,17 @@ def activate_quantum_intelligence(pennylane_adapter=None):
         print(f"     Listening on: quantum_problems, quantum_circuits")
         print(f"     Features: QUANTUM_SKILL_EVOLUTION={agent.deployment_manager.config.feature_flags.get('quantum_skill_evolution', False)}")
 
-        # Run a quick local test problem
-        print("\n     🧪 Running test quantum problem...")
+        # Run a quick local test problem.
+        # Smoke tests must stay on simulator — never dispatch to real hardware during activation,
+        # regardless of IBM_QUANTUM_TOKEN / enable_real_hardware state.
+        print("\n     🧪 Running test quantum problem (simulator-only)...")
         try:
             result = agent.solve_quantum_problem_with_rollout(
                 problem_description="Find optimal portfolio allocation across 3 assets",
                 problem_type="optimization",
                 qubits=3,
                 request_id="activation_test_001",
+                metadata={"source": "activation_smoke_test", "use_real_hardware": False},
             )
             status = result.get("status", "unknown")
             print(f"     Test result status: {status}")
@@ -182,8 +185,12 @@ def activate_quantum_intelligence(pennylane_adapter=None):
         return agent
 
     except Exception as e:
+        import traceback
+        logging.getLogger("activate_phase3").debug(
+            "QuantumIntelligentAgent activation failure:\n%s", traceback.format_exc()
+        )
         print(f"  ⚠️  QuantumIntelligentAgent activation: {e}")
-        print("     (Non-fatal — agent will activate when quantum deps are installed)")
+        print("     (Non-fatal — run with --verbose to see full traceback)")
         return None
 
 
@@ -490,7 +497,7 @@ def verify_broker_routed_intents(broker_url: str) -> List[Tuple[str, bool, Dict]
             "problem_type": "optimization",
             "qubits": 3,
             "request_id": "phase3_broker_route_verify",
-            "metadata": {"source": "activate_phase3"},
+            "metadata": {"source": "activate_phase3", "use_real_hardware": False},
         },
     ) or {}
     quantum_problem = wait_for_intent_result(

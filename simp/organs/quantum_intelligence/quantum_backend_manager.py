@@ -154,11 +154,12 @@ class QuantumBackendManager:
             default_config["ibm_quantum"].update({
                 "enabled": True,
                 "api_token": env_token,
-                "hub": os.environ.get("IBM_QUANTUM_HUB", default_config["ibm_quantum"].get("hub", "ibm-q")),
-                "group": os.environ.get("IBM_QUANTUM_GROUP", default_config["ibm_quantum"].get("group", "open")),
-                "project": os.environ.get("IBM_QUANTUM_PROJECT", default_config["ibm_quantum"].get("project", "main")),
+                "instance": os.environ.get("IBM_QUANTUM_INSTANCE", default_config["ibm_quantum"].get("instance", "open-instance")),
             })
-            default_config["enable_real_hardware"] = True
+            # Token alone enables the service; a second explicit opt-in is required
+            # before any circuit actually gets dispatched to real hardware.
+            if os.environ.get("SIMP_USE_REAL_HARDWARE", "").strip() == "1":
+                default_config["enable_real_hardware"] = True
         
         return default_config
     
@@ -241,9 +242,9 @@ class QuantumBackendManager:
             
             # Initialize service
             service = QiskitRuntimeService(
-                channel="ibm_quantum",
+                channel="ibm_quantum_platform",
                 token=api_token,
-                instance=f"{ibm_config.get('hub', 'ibm-q')}/{ibm_config.get('group', 'open')}/{ibm_config.get('project', 'main')}"
+                instance=ibm_config.get('instance', 'open-instance')
             )
             
             # Get available backends
@@ -269,7 +270,7 @@ class QuantumBackendManager:
                             "description": backend.description,
                             "version": backend.version,
                             "basis_gates": backend.operation_names,
-                            "max_shots": backend.max_shots,
+                            "max_shots": getattr(backend, "max_shots", 1024),
                             "simulator": backend.simulator
                         }
                     )
@@ -667,9 +668,9 @@ class QuantumBackendManager:
             # Get IBM Quantum service
             ibm_config = self.config.get("ibm_quantum", {})
             service = QiskitRuntimeService(
-                channel="ibm_quantum",
+                channel="ibm_quantum_platform",
                 token=ibm_config.get("api_token", ""),
-                instance=f"{ibm_config.get('hub', 'ibm-q')}/{ibm_config.get('group', 'open')}/{ibm_config.get('project', 'main')}"
+                instance=ibm_config.get('instance', 'open-instance')
             )
             
             # Get backend
@@ -700,9 +701,31 @@ class QuantumBackendManager:
             # Execute using Sampler
             sampler = Sampler(backend=backend)
             job = sampler.run(transpiled_qc, shots=shots)
-            
-            # Wait for result
-            result = job.result()
+
+            # Wait for result, but never block the caller indefinitely on queue.
+            timeout_seconds = int(self.config.get("timeout_seconds", 30))
+            try:
+                result = job.result(timeout=timeout_seconds)
+            except Exception as wait_err:
+                self.logger.warning(
+                    "IBM Quantum job %s did not complete within %ss: %s. "
+                    "Returning job handle for asynchronous retrieval.",
+                    getattr(job, "job_id", lambda: "?")(),
+                    timeout_seconds,
+                    wait_err,
+                )
+                return {
+                    "status": "submitted",
+                    "job_id": job.job_id() if hasattr(job, "job_id") else None,
+                    "backend_id": backend_id,
+                    "shots": shots,
+                    "execution_time_ms": int((time.time() - start_time) * 1000),
+                    "counts": {},
+                    "note": (
+                        "Job submitted to IBM Quantum hardware; results not yet available. "
+                        "Retrieve later via QiskitRuntimeService().job(job_id).result()."
+                    ),
+                }
             
             # Get quasi-probabilities
             quasi_dists = result.quasi_dists

@@ -196,7 +196,11 @@
     "market_analysis": {
       "tags": [
         "market_analysis",
-        "routed"
+        "routed",
+        "completed"
+      ],
+      "decisions": [
+        "Task 'Intent market_analysis' completed by quantum_intelligence_prime"
       ]
     },
     "trade_execution": {
@@ -220,7 +224,11 @@
     "status_check": {
       "tags": [
         "status_check",
-        "routed"
+        "routed",
+        "completed"
+      ],
+      "decisions": [
+        "Task 'Intent status_check' completed by quantumarb_primary"
       ]
     }
   },
@@ -351,6 +359,12 @@
       "notes": ""
     },
     "gate4_real": {
+      "notes": ""
+    },
+    "quantumarb_primary": {
+      "notes": ""
+    },
+    "quantum_intelligence_prime": {
       "notes": ""
     }
   },
