@@ -19,12 +19,14 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sqlite3
 import threading
 import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger("simp.organs.ktc.mesh_agent")
 
@@ -66,6 +68,13 @@ def _ensure_db(db_path: str = "ktc.db") -> None:
     conn.close()
 
 
+def _env_flag(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 # ── main class ────────────────────────────────────────────────────────────────
 
 class KTCMeshAgent:
@@ -94,12 +103,27 @@ class KTCMeshAgent:
         db_path: str = "ktc.db",
         min_savings_usd: float = 0.01,
         auto_invest: bool = True,
+        quantumarb_inbox: Optional[str] = None,
+        live_execution_enabled: Optional[bool] = None,
     ):
         self.agent_id = agent_id
         self.broker_url = broker_url
         self.db_path = db_path
         self.min_savings_usd = min_savings_usd
         self.auto_invest = auto_invest
+        self.live_execution_enabled = (
+            _env_flag("KTC_LIVE_EXECUTION_ENABLED", default=False)
+            if live_execution_enabled is None
+            else live_execution_enabled
+        )
+        self.quantumarb_inbox = Path(
+            quantumarb_inbox
+            or os.getenv("KTC_QUANTUMARB_INBOX")
+            or "data/quantumarb_phase4/inbox"
+        )
+        self.legacy_quantumarb_inbox = Path(
+            os.getenv("KTC_QUANTUMARB_LEGACY_INBOX", "data/inboxes/quantumarb_real")
+        )
 
         self._running = False
         self._thread: Optional[threading.Thread] = None
@@ -107,11 +131,15 @@ class KTCMeshAgent:
         self._receipts_processed = 0
         self._savings_accumulated = 0.0
         self._investments_made = 0
+        self._investments_queued = 0
+        self._routing_failures = 0
+        self._last_routed_request_id: Optional[str] = None
 
         self._message_handlers: List[Callable] = []
 
         # Ensure DB schema
         _ensure_db(db_path)
+        self.quantumarb_inbox.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"[KTC] KTCMeshAgent initialized — agent_id={agent_id}")
 
@@ -278,45 +306,26 @@ class KTCMeshAgent:
     def _handle_investment(self, data: Dict) -> None:
         user_id = data.get("user_id", "anonymous")
         amount_usd = float(data.get("amount_usd", 0.0))
+        receipt_id = data.get("receipt_id")
+        auto_approve = bool(data.get("auto_approve", True))
 
         if amount_usd < self.min_savings_usd:
             return
 
-        # Mock crypto conversion (SOL @ $150)
-        sol_price = 150.0
-        sol_amount = round(amount_usd / sol_price, 6)
-        tx_hash = f"mock_tx_{uuid.uuid4().hex[:16]}"
-
-        investment_id = str(uuid.uuid4())
-        try:
-            conn = sqlite3.connect(self.db_path)
-            conn.execute(
-                "INSERT OR IGNORE INTO ktc_investments VALUES (?,?,?,?,?,?,datetime('now'))",
-                (investment_id, user_id, amount_usd, "SOL", sol_amount, "completed"),
-            )
-            conn.execute(
-                "UPDATE ktc_users SET total_invested = total_invested + ? WHERE id = ?",
-                (amount_usd, user_id),
-            )
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            logger.warning(f"[KTC] DB investment write error: {e}")
-
-        self._investments_made += 1
-
-        self._publish_event("investment_confirmed", {
-            "investment_id": investment_id,
-            "user_id": user_id,
-            "amount_usd": amount_usd,
-            "crypto_asset": "SOL",
-            "crypto_amount": sol_amount,
-            "tx_hash": tx_hash,
-        }, channel="ktc_investment_confirmations")
-
+        routing = self.queue_investment_request(
+            user_id=user_id,
+            amount_usd=amount_usd,
+            receipt_id=receipt_id,
+            auto_approve=auto_approve,
+            source="ktc_mesh_agent",
+            metadata=data.get("metadata"),
+        )
         logger.info(
-            f"[KTC] Investment  user={user_id}  "
-            f"${amount_usd:.4f} → {sol_amount} SOL  tx={tx_hash}"
+            "[KTC] Investment routed  user=%s  amount=$%.4f  status=%s  request=%s",
+            user_id,
+            amount_usd,
+            routing["status"],
+            routing["investment_id"],
         )
 
     def _handle_trade_change(self, data: Dict) -> None:
@@ -332,6 +341,8 @@ class KTCMeshAgent:
     # ── publishing ────────────────────────────────────────────────────────────
 
     def _publish_event(self, event_type: str, data: Dict, channel: str = "ktc_events") -> None:
+        if not hasattr(self, "_bus"):
+            return
         try:
             from simp.mesh.packet import create_event_packet
             pkt = create_event_packet(
@@ -344,6 +355,126 @@ class KTCMeshAgent:
         except Exception as e:
             logger.warning(f"[KTC] Publish error: {e}")
 
+    def _queue_targets(self) -> List[Path]:
+        targets = [self.quantumarb_inbox]
+        if (
+            self.legacy_quantumarb_inbox != self.quantumarb_inbox
+            and self.legacy_quantumarb_inbox.exists()
+        ):
+            targets.append(self.legacy_quantumarb_inbox)
+        return targets
+
+    def _write_quantumarb_queue_files(self, payload: Dict[str, Any]) -> List[str]:
+        written_paths: List[str] = []
+        filename = f"ktc_investment_{payload['intent_id']}.json"
+        for target in self._queue_targets():
+            target.mkdir(parents=True, exist_ok=True)
+            path = target / filename
+            path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+            written_paths.append(str(path))
+        return written_paths
+
+    def queue_investment_request(
+        self,
+        user_id: str,
+        amount_usd: float,
+        receipt_id: Optional[str] = None,
+        auto_approve: bool = True,
+        source: str = "ktc_api",
+        asset: str = "SOL",
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        amount_usd = round(float(amount_usd), 2)
+        if amount_usd < self.min_savings_usd:
+            raise ValueError(
+                f"amount_usd must be at least {self.min_savings_usd:.2f}"
+            )
+
+        review_required = (not self.live_execution_enabled) or (not auto_approve) or amount_usd >= 50
+        status = "pending_review" if review_required else "queued"
+        investment_id = str(uuid.uuid4())
+        queued_at = datetime.now(timezone.utc).isoformat()
+
+        intent_payload = {
+            "intent_id": investment_id,
+            "intent_type": "ktc_investment_request",
+            "source_agent": source,
+            "target_agent": "quantumarb_phase4",
+            "timestamp": queued_at,
+            "status": status,
+            "params": {
+                "request_kind": "spot_accumulate",
+                "user_id": user_id,
+                "amount_usd": amount_usd,
+                "asset": asset,
+                "quote_asset": "USD",
+                "receipt_id": receipt_id,
+                "auto_approve": auto_approve,
+                "review_required": review_required,
+                "live_execution_enabled": self.live_execution_enabled,
+            },
+            "payload": {
+                "user_id": user_id,
+                "amount_usd": amount_usd,
+                "asset": asset,
+                "quote_asset": "USD",
+                "receipt_id": receipt_id,
+                "review_required": review_required,
+            },
+            "metadata": {
+                "origin": "ktc",
+                "observable": True,
+                "queue_targets": [str(path) for path in self._queue_targets()],
+                **(metadata or {}),
+            },
+        }
+
+        written_paths = self._write_quantumarb_queue_files(intent_payload)
+
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.execute(
+                "INSERT OR REPLACE INTO ktc_investments VALUES (?,?,?,?,?,?,datetime('now'))",
+                (investment_id, user_id, amount_usd, asset, None, status),
+            )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            self._routing_failures += 1
+            logger.warning(f"[KTC] DB investment queue write error: {e}")
+            raise
+
+        self._investments_queued += 1
+        self._last_routed_request_id = investment_id
+
+        event_type = "investment_pending_review" if review_required else "investment_queued"
+        self._publish_event(
+            event_type,
+            {
+                "investment_id": investment_id,
+                "user_id": user_id,
+                "amount_usd": amount_usd,
+                "crypto_asset": asset,
+                "queue_paths": written_paths,
+                "live_execution_enabled": self.live_execution_enabled,
+                "review_required": review_required,
+            },
+            channel="ktc_investment_confirmations",
+        )
+
+        return {
+            "status": status,
+            "investment_id": investment_id,
+            "user_id": user_id,
+            "amount_usd": amount_usd,
+            "asset": asset,
+            "queue_paths": written_paths,
+            "receipt_id": receipt_id,
+            "review_required": review_required,
+            "live_execution_enabled": self.live_execution_enabled,
+            "queued_at": queued_at,
+        }
+
     # ── status ────────────────────────────────────────────────────────────────
 
     def get_status(self) -> Dict:
@@ -354,6 +485,11 @@ class KTCMeshAgent:
             "receipts_processed": self._receipts_processed,
             "savings_accumulated_usd": round(self._savings_accumulated, 4),
             "investments_made": self._investments_made,
+            "investments_queued": self._investments_queued,
+            "routing_failures": self._routing_failures,
+            "last_routed_request_id": self._last_routed_request_id,
+            "quantumarb_inbox": str(self.quantumarb_inbox),
+            "live_execution_enabled": self.live_execution_enabled,
             "subscribe_channels": self.SUBSCRIBE_CHANNELS,
             "broadcast_channels": self.BROADCAST_CHANNELS,
         }
@@ -369,11 +505,20 @@ def get_ktc_mesh_agent(
     agent_id: str = "ktc_agent",
     broker_url: str = "http://127.0.0.1:5555",
     autostart: bool = True,
+    db_path: str = "ktc.db",
+    quantumarb_inbox: Optional[str] = None,
+    live_execution_enabled: Optional[bool] = None,
 ) -> KTCMeshAgent:
     global _ktc_agent
     with _ktc_lock:
         if _ktc_agent is None:
-            _ktc_agent = KTCMeshAgent(agent_id=agent_id, broker_url=broker_url)
+            _ktc_agent = KTCMeshAgent(
+                agent_id=agent_id,
+                broker_url=broker_url,
+                db_path=db_path,
+                quantumarb_inbox=quantumarb_inbox,
+                live_execution_enabled=live_execution_enabled,
+            )
             if autostart:
                 _ktc_agent.start()
     return _ktc_agent

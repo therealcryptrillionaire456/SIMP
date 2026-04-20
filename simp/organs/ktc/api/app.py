@@ -19,12 +19,14 @@ import sqlite3
 # Import KTC agent
 try:
     from simp.organs.ktc.agent.ktc_agent import KTCAgent, create_ktc_agent
+    from simp.organs.ktc.mesh_agent import KTCMeshAgent, get_ktc_mesh_agent
 except ModuleNotFoundError:
     import sys
 
     # Allow direct execution without relying on the ambiguous top-level `agent` name.
     sys.path.append(str(Path(__file__).parent.parent.parent.parent.parent))
     from simp.organs.ktc.agent.ktc_agent import KTCAgent, create_ktc_agent
+    from simp.organs.ktc.mesh_agent import KTCMeshAgent, get_ktc_mesh_agent
 
 
 # Initialize Flask app
@@ -40,6 +42,7 @@ logger = logging.getLogger("ktc_api")
 
 # Initialize KTC agent
 ktc_agent = create_ktc_agent()
+ktc_mesh_agent: Optional[KTCMeshAgent] = None
 
 # Configuration
 CONFIG = {
@@ -53,6 +56,28 @@ CONFIG = {
 
 # Ensure upload directory exists
 Path(CONFIG["upload_folder"]).mkdir(parents=True, exist_ok=True)
+
+
+def configure_runtime(
+    mesh_agent: Optional[KTCMeshAgent] = None,
+    simp_broker_url: Optional[str] = None,
+) -> None:
+    """Inject runtime dependencies from the startup wrapper."""
+    global ktc_mesh_agent
+    if mesh_agent is not None:
+        ktc_mesh_agent = mesh_agent
+    if simp_broker_url:
+        CONFIG["simp_broker_url"] = simp_broker_url
+
+
+def _get_mesh_agent() -> KTCMeshAgent:
+    global ktc_mesh_agent
+    if ktc_mesh_agent is None:
+        ktc_mesh_agent = get_ktc_mesh_agent(
+            broker_url=CONFIG["simp_broker_url"],
+            autostart=False,
+        )
+    return ktc_mesh_agent
 
 
 @app.route("/")
@@ -81,11 +106,24 @@ def index():
 @app.route("/health", methods=["GET"])
 def health():
     """Health check endpoint"""
+    mesh_status = None
+    try:
+        mesh_status = _get_mesh_agent().get_status()
+    except Exception as exc:
+        logger.debug(f"Mesh agent status unavailable during health check: {exc}")
+
     return jsonify({
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "service": "ktc_api",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "investment_routing": {
+            "live_execution_enabled": (
+                mesh_status.get("live_execution_enabled") if mesh_status else False
+            ),
+            "quantumarb_inbox": mesh_status.get("quantumarb_inbox") if mesh_status else None,
+            "investments_queued": mesh_status.get("investments_queued", 0) if mesh_status else 0,
+        },
     })
 
 
@@ -94,6 +132,10 @@ def agent_health():
     """Get KTC agent health status"""
     try:
         health_data = ktc_agent.health()
+        try:
+            health_data["mesh_runtime"] = _get_mesh_agent().get_status()
+        except Exception as exc:
+            health_data["mesh_runtime_error"] = str(exc)
         return jsonify(health_data)
     except Exception as e:
         logger.error(f"Error getting agent health: {str(e)}")
@@ -264,7 +306,9 @@ def create_investment():
         user_id = data.get("user_id")
         amount = float(data.get("amount", 0))
         receipt_id = data.get("receipt_id")
-        
+        auto_approve = bool(data.get("auto_approve", True))
+        asset = data.get("asset", "SOL")
+
         if not user_id:
             return jsonify({
                 "status": "error",
@@ -276,27 +320,28 @@ def create_investment():
                 "status": "error",
                 "error": "amount must be greater than 0"
             }), 400
-        
-        # Create intent for KTC agent
-        intent_data = {
-            "intent_type": "invest_savings",
-            "parameters": {
-                "user_id": user_id,
-                "amount": amount,
-                "receipt_id": receipt_id
-            }
+
+        mesh_agent = _get_mesh_agent()
+        routing = mesh_agent.queue_investment_request(
+            user_id=user_id,
+            amount_usd=amount,
+            receipt_id=receipt_id,
+            auto_approve=auto_approve,
+            source="ktc_api",
+            asset=asset,
+            metadata={"request_ip": request.remote_addr},
+        )
+
+        response = {
+            "status": "accepted",
+            "message": (
+                "Investment request queued for QuantumArb review"
+                if routing["review_required"]
+                else "Investment request queued for QuantumArb execution"
+            ),
+            "routing": routing,
         }
-        
-        # Process through KTC agent
-        result = ktc_agent.handle_intent(intent_data)
-        
-        # If auto_approve is true and amount is significant, route to SIMP FinancialOps
-        auto_approve = data.get("auto_approve", True)
-        if auto_approve and amount > 50:  # Threshold for FinancialOps approval
-            logger.info(f"Large investment ${amount:.2f} - would route to SIMP FinancialOps")
-            # In production: route to SIMP broker for FinancialOps approval
-        
-        return jsonify(result)
+        return jsonify(response), 202
         
     except Exception as e:
         logger.error(f"Error creating investment: {str(e)}")

@@ -18,7 +18,8 @@ import threading
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from simp.organs.ktc.agent.ktc_agent import create_ktc_agent
-from simp.organs.ktc.api.app import start_server as start_api_server
+from simp.organs.ktc.api.app import configure_runtime
+from simp.organs.ktc.mesh_agent import get_ktc_mesh_agent
 
 
 def setup_logging():
@@ -107,14 +108,21 @@ def register_with_simp(agent_id: str, endpoint: str, simp_url: str = "http://loc
         return False
 
 
-def start_ktc_api(host: str = "127.0.0.1", port: int = 8765, debug: bool = False):
+def start_ktc_api(
+    host: str = "127.0.0.1",
+    port: int = 8765,
+    debug: bool = False,
+    simp_url: str = "http://localhost:5555",
+    mesh_agent=None,
+):
     """Start KTC API server in a separate thread"""
     logger = logging.getLogger("ktc_startup")
     
     def run_server():
         try:
             logger.info(f"Starting KTC API server on {host}:{port}")
-            from simp.organs.ktc.api.app import start_server
+            from simp.organs.ktc.api.app import configure_runtime, start_server
+            configure_runtime(mesh_agent=mesh_agent, simp_broker_url=simp_url)
             start_server(host=host, port=port, debug=debug)
         except Exception as e:
             logger.error(f"API server error: {str(e)}")
@@ -169,6 +177,17 @@ def main():
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument("--no-simp", action="store_true", help="Don't register with SIMP broker")
     parser.add_argument("--test-only", action="store_true", help="Run tests only, don't start server")
+    parser.add_argument("--ktc-db", default="ktc.db", help="Path to the KTC SQLite database")
+    parser.add_argument(
+        "--quantumarb-inbox",
+        default=os.getenv("KTC_QUANTUMARB_INBOX", "data/quantumarb_phase4/inbox"),
+        help="Queue directory for local QuantumArb requests",
+    )
+    parser.add_argument(
+        "--live-execution-enabled",
+        action="store_true",
+        help="Allow KTC requests to be queued without mandatory review gating",
+    )
     
     args = parser.parse_args()
     
@@ -210,9 +229,24 @@ def main():
     if not agent:
         logger.error("Failed to create agent. Exiting.")
         return
+
+    mesh_agent = get_ktc_mesh_agent(
+        broker_url=args.simp_url,
+        autostart=not args.no_simp,
+        db_path=args.ktc_db,
+        quantumarb_inbox=args.quantumarb_inbox,
+        live_execution_enabled=args.live_execution_enabled,
+    )
+    configure_runtime(mesh_agent=mesh_agent, simp_broker_url=args.simp_url)
     
     # Start API server
-    if not start_ktc_api(host=args.host, port=args.port, debug=args.debug):
+    if not start_ktc_api(
+        host=args.host,
+        port=args.port,
+        debug=args.debug,
+        simp_url=args.simp_url,
+        mesh_agent=mesh_agent,
+    ):
         logger.error("Failed to start API server. Exiting.")
         return
     
@@ -231,7 +265,9 @@ def main():
     print(f"📡 KTC API Server: http://{args.host}:{args.port}")
     print(f"🤖 KTC Agent ID: ktc_agent")
     print(f"🔗 SIMP Broker: {args.simp_url}")
-    print(f"💾 Database: data/ktc.db")
+    print(f"💾 Database: {args.ktc_db}")
+    print(f"📥 QuantumArb Queue: {args.quantumarb_inbox}")
+    print(f"🛡️  Live Execution Enabled: {args.live_execution_enabled}")
     print("\nAvailable Endpoints:")
     print(f"  GET  http://{args.host}:{args.port}/health")
     print(f"  POST http://{args.host}:{args.port}/api/receipts/process")
@@ -243,7 +279,7 @@ def main():
     print("1. Test the API with curl or Postman")
     print("2. Develop frontend application")
     print("3. Integrate with real OCR service")
-    print("4. Connect to live crypto trading via QuantumArb")
+    print("4. Monitor queued QuantumArb investment requests")
     print("\nPress Ctrl+C to stop the server.")
     print("=" * 60)
     

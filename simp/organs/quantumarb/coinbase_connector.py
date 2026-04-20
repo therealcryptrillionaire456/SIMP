@@ -60,6 +60,10 @@ class CoinbaseConnector(BaseExchangeConnector):
         # Test connectivity
         if api_key:
             self._test_connectivity()
+
+    def get_fees(self) -> float:
+        """Return the default fee estimate used by the Phase 4 executor."""
+        return 0.0 if self.sandbox else 0.005
     
     def _test_connectivity(self):
         """Test API connectivity."""
@@ -149,8 +153,8 @@ class CoinbaseConnector(BaseExchangeConnector):
         """
         self._rate_limit()
         
-        if not self.api_key:
-            raise AuthenticationError("API key not configured")
+        if not self.api_key or not self.api_secret or not self.passphrase:
+            raise AuthenticationError("Coinbase credentials are not fully configured")
         
         url = self.base_url + path
         timestamp = str(int(time.time()))
@@ -296,7 +300,13 @@ class CoinbaseConnector(BaseExchangeConnector):
             # Create Order object from response
             order = self._create_order_object(order_response)
             
-            log.info(f"✅ Order placed on Coinbase: {order_id} - {side.value} {quantity} {symbol}")
+            log.info(
+                "✅ Order placed on Coinbase: %s - %s %s %s",
+                order.order_id,
+                side.value,
+                quantity,
+                symbol,
+            )
             
             return order
             
@@ -321,7 +331,10 @@ class CoinbaseConnector(BaseExchangeConnector):
             response = self._authenticated_request("DELETE", f"/orders/{order_id}")
             
             # Coinbase returns the order ID if successful
-            if response.get("id") == order_id:
+            if isinstance(response, dict) and response.get("id") == order_id:
+                log.info(f"✅ Order cancelled: {order_id}")
+                return True
+            if isinstance(response, list) and order_id in response:
                 log.info(f"✅ Order cancelled: {order_id}")
                 return True
             else:
@@ -403,7 +416,7 @@ class CoinbaseConnector(BaseExchangeConnector):
         
         return Order(
             order_id=order_data.get("id", ""),
-            symbol=order_data.get("product_id", "").replace("-", "/"),
+            symbol=order_data.get("product_id", ""),
             side=side,
             order_type=order_type,
             quantity=float(order_data.get("size", "0")),

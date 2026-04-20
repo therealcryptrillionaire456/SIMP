@@ -9,7 +9,7 @@ Append-only ledger for audit trail.
 import json
 import time
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -85,6 +85,28 @@ class PnLRecord:
             "brp_decision": self.brp_decision,
             "risk_allowed": self.risk_allowed,
             "monitoring_trade_id": self.monitoring_trade_id
+        }
+
+
+@dataclass
+class TradeRecord:
+    """Compatibility wrapper used by older Phase 4 paths."""
+
+    trade_id: str
+    timestamp: str
+    opportunity: Dict[str, Any]
+    execution_result: Dict[str, Any]
+    pnl_usd: float
+    fees_usd: float = 0.0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "trade_id": self.trade_id,
+            "timestamp": self.timestamp,
+            "opportunity": self.opportunity,
+            "execution_result": self.execution_result,
+            "pnl_usd": self.pnl_usd,
+            "fees_usd": self.fees_usd,
         }
 
 class PNLLedger:
@@ -386,6 +408,60 @@ class PNLLedger:
         """
         recent_records = self.records[-limit:] if self.records else []
         return [r.to_dict() for r in recent_records]
+
+    def get_trade_count(self) -> int:
+        return self.total_trades
+
+    def get_total_pnl(self) -> float:
+        return self.total_net_pnl
+
+    def get_win_rate(self) -> float:
+        return self.winning_trades / self.total_trades if self.total_trades else 0.0
+
+    def get_average_trade_size(self) -> float:
+        if not self.records:
+            return 0.0
+        return sum(r.position_size_usd for r in self.records) / len(self.records)
+
+    def record_trade(self, trade_record: TradeRecord) -> bool:
+        """
+        Compatibility path for older agents that persisted a generic execution
+        payload instead of explicit leg dictionaries.
+        """
+        try:
+            trades = trade_record.execution_result.get("trades", [])
+            if len(trades) < 2:
+                log.warning(
+                    "Skipping legacy trade record %s: expected two legs, got %s",
+                    trade_record.trade_id,
+                    len(trades),
+                )
+                return False
+
+            leg_a_result = trades[0]
+            leg_b_result = trades[1]
+            opportunity = trade_record.opportunity
+
+            return self.record_arbitrage_trade(
+                trade_id=trade_record.trade_id,
+                symbol=leg_a_result.get("symbol") or opportunity.get("signal", {}).get("symbol_a", ""),
+                exchange_a=leg_a_result.get("exchange", "unknown"),
+                exchange_b=leg_b_result.get("exchange", "unknown"),
+                leg_a_result=leg_a_result,
+                leg_b_result=leg_b_result,
+                expected_spread_bps=float(
+                    opportunity.get("signal", {}).get("spread_pct", 0.0)
+                )
+                * 100.0,
+                brp_decision=opportunity.get("decision", "unknown"),
+                risk_allowed=trade_record.pnl_usd >= 0 or True,
+                position_size_usd=float(opportunity.get("position_size_usd", 0.0)),
+                risk_percentage=float(opportunity.get("risk_score", 0.0)),
+                monitoring_trade_id=opportunity.get("monitoring_id"),
+            )
+        except Exception as e:
+            log.error(f"Failed to record legacy trade: {e}")
+            return False
     
     def get_daily_pnl(self, days: int = 7) -> List[Dict]:
         """
@@ -585,3 +661,6 @@ def test_pnl_ledger():
 
 if __name__ == "__main__":
     test_pnl_ledger()
+
+
+PnLLedger = PNLLedger

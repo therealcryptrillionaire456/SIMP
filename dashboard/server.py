@@ -50,7 +50,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 # Configuration
 # ---------------------------------------------------------------------------
 
-BROKER_URL = os.environ.get("SIMP_BROKER_URL", "http://127.0.0.1:8080")
+BROKER_URL = os.environ.get("SIMP_BROKER_URL", "http://127.0.0.1:5555")
 PROJECTX_GUARD_URL = os.environ.get("PROJECTX_GUARD_URL", "http://127.0.0.1:8771")
 DASHBOARD_HOST = os.environ.get("DASHBOARD_HOST", "0.0.0.0")
 DASHBOARD_PORT = int(os.environ.get("DASHBOARD_PORT", "8050"))
