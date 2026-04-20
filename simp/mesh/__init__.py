@@ -13,6 +13,7 @@ from .packet import (
     create_heartbeat_packet,
 )
 from .bus import MeshBus
+from .commitment_market import CommitmentMarket, Commitment, Settlement, get_commitment_market
 from .enhanced_bus import (
     EnhancedMeshBus,
     get_enhanced_mesh_bus,
@@ -38,6 +39,10 @@ __all__ = [
     "create_system_packet",
     "create_heartbeat_packet",
     "MeshBus",
+    "CommitmentMarket",
+    "Commitment",
+    "Settlement",
+    "get_commitment_market",
     "EnhancedMeshBus",
     "get_mesh_bus",
     "get_enhanced_mesh_bus",
