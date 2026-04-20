@@ -283,10 +283,10 @@ start_http_service \
     "broker" \
     "SIMP Broker" \
     "${SIMP_BROKER_URL}/health" \
-    "simp.server.broker" \
+    "bin/start_server.py" \
     60 \
     "${ROOT_DIR}" \
-    env PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" "${PYTHON_BIN}" -m simp.server.broker
+    env PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" "${PYTHON_BIN}" bin/start_server.py
 
 start_http_service \
     "dashboard" \

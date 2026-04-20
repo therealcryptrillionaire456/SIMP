@@ -94,7 +94,7 @@ if ps aux | grep -q "[p]rojectx_quantum_advisor"; then
     echo -e "${GREEN}✓ projectx_quantum_advisor already running${NC}"
 else
     source venv_gate4/bin/activate
-    python3.10 projectx_quantum_advisor.py --proactive-scan > logs/quantum/projectx_advisor.log 2>&1 &
+    python3.10 projectx_quantum_advisor.py > logs/quantum/projectx_advisor.log 2>&1 &
     PROJECTX_PID=$!
     echo $PROJECTX_PID > /tmp/quantum_projectx.pid
     echo -e "${GREEN}✓ projectx_quantum_advisor started (PID: $PROJECTX_PID)${NC}"

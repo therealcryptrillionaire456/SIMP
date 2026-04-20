@@ -166,9 +166,11 @@ class KTCMeshAgent:
         # Announce presence
         try:
             announce = create_event_packet(
-                source=self.agent_id,
-                event_type="agent_online",
-                data={
+                sender_id=self.agent_id,
+                recipient_id="*",
+                channel="system_alerts",
+                payload={
+                    "event_type": "agent_online",
                     "agent_id": self.agent_id,
                     "capabilities": [
                         "receipt_processing",
@@ -180,9 +182,8 @@ class KTCMeshAgent:
                     "channels": self.SUBSCRIBE_CHANNELS,
                     "timestamp": time.time(),
                 },
-                channel="system_alerts",
             )
-            self._bus.publish(announce)
+            self._bus.send(announce)
         except Exception as e:
             logger.warning(f"[KTC] Could not broadcast online announcement: {e}")
 
@@ -200,7 +201,7 @@ class KTCMeshAgent:
     def _processing_loop(self) -> None:
         while self._running:
             try:
-                messages = self._bus.get_messages(self.agent_id, max_messages=20)
+                messages = self._bus.receive(self.agent_id, max_messages=20)
                 for msg in messages:
                     self._dispatch(msg)
             except Exception as e:
@@ -211,8 +212,8 @@ class KTCMeshAgent:
         """Route an inbound mesh packet to the right handler."""
         try:
             channel = getattr(packet, "channel", None)
-            msg_type = getattr(packet, "message_type", None)
-            data = getattr(packet, "data", {}) or {}
+            msg_type = getattr(packet, "msg_type", getattr(packet, "message_type", None))
+            data = getattr(packet, "payload", getattr(packet, "data", {})) or {}
 
             if channel == "ktc_intents":
                 intent_type = data.get("intent_type", "")
@@ -346,12 +347,12 @@ class KTCMeshAgent:
         try:
             from simp.mesh.packet import create_event_packet
             pkt = create_event_packet(
-                source=self.agent_id,
-                event_type=event_type,
-                data=data,
+                sender_id=self.agent_id,
+                recipient_id="*",
                 channel=channel,
+                payload={"event_type": event_type, **data},
             )
-            self._bus.publish(pkt)
+            self._bus.send(pkt)
         except Exception as e:
             logger.warning(f"[KTC] Publish error: {e}")
 

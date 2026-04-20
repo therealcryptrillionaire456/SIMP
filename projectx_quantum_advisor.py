@@ -171,18 +171,18 @@ def setup(broker: str):
     _post(f"{broker}/agents/register", {
         "agent_id": ADVISOR_AGENT_ID,
         "agent_type": "quantum_advisor",
-        "endpoint": "",
-        "simp_versions": ["1.0"],
-        "capabilities": [
-            "quantum_task_advisory",
-            "maintenance_pre_flight",
-            "quantum_code_analysis",
-            "quantum_security_review",
-        ],
+        "endpoint": "(file-based)",
         "metadata": {
+            "simp_versions": ["1.0"],
             "mesh_native": True,
             "advises": PROJECTX_AGENT_ID,
             "qip_powered": True,
+            "capabilities": [
+                "quantum_task_advisory",
+                "maintenance_pre_flight",
+                "quantum_code_analysis",
+                "quantum_security_review",
+            ],
         }
     })
     logger.info(f"Registered as {ADVISOR_AGENT_ID}")
