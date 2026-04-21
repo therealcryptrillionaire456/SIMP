@@ -42,6 +42,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 from simp.security.brp.forecasting import PredictiveSafetyForecaster
 from simp.security.brp.predictive_safety import PredictiveSafetyIntelligence
+from simp.security.brp_bridge import BRPBridge
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +121,7 @@ class BRPMeshGateway:
     def __init__(
         self,
         brp_db_path:   str  = "threat_memory.db",
+        bridge_data_dir: Optional[str] = None,
         trust_graph    = None,
         enable_alerts: bool = True,
         dry_run:       bool = False,
@@ -156,6 +158,7 @@ class BRPMeshGateway:
         }
         self._predictive = PredictiveSafetyIntelligence()
         self._forecaster = PredictiveSafetyForecaster()
+        self._bridge_data_dir = bridge_data_dir
 
         # Lazy-init BRP to avoid import cost on startup
         self._brp             = None
@@ -215,6 +218,7 @@ class BRPMeshGateway:
         threat_level = analysis.get("threat_assessment", {}).get("threat_level", "low")
         confidence   = analysis.get("threat_assessment", {}).get("confidence", 0.0)
         patterns     = analysis.get("pattern_details", [])
+        bridge_context = self._load_bridge_predictive_context()
         predictive = self._predictive.evaluate(
             {
                 **log_entry,
@@ -227,8 +231,8 @@ class BRPMeshGateway:
                 ],
             },
             recent_events=self._recent_predictive_events(),
-            recent_observations=[],
-            adaptive_rules={},
+            recent_observations=bridge_context["recent_observations"],
+            adaptive_rules=bridge_context["adaptive_rules"],
             sensitive_action_tier=self._extract_sensitive_action_tier(getattr(packet, "payload", {}) or {}),
         )
         threat_level = self._max_threat_level(threat_level, predictive["threat_level"])
@@ -498,6 +502,18 @@ class BRPMeshGateway:
             for item in recent
         ]
 
+    def _load_bridge_predictive_context(self) -> Dict[str, Any]:
+        if not self._bridge_data_dir:
+            return {"recent_observations": [], "adaptive_rules": {}}
+        try:
+            return BRPBridge.read_runtime_predictive_context(
+                data_dir=self._bridge_data_dir,
+                recent_limit=64,
+            )
+        except Exception as exc:
+            logger.debug("[BRPGateway] bridge predictive context unavailable: %s", exc)
+            return {"recent_observations": [], "adaptive_rules": {}}
+
     def _forecast_packet_risk(
         self,
         *,
@@ -607,6 +623,7 @@ _gateway_lock = threading.Lock()
 
 def get_brp_mesh_gateway(
     brp_db_path:   str  = "threat_memory.db",
+    bridge_data_dir: Optional[str] = None,
     trust_graph    = None,
     enable_alerts: bool = True,
     dry_run:       bool = False,
@@ -638,6 +655,7 @@ def get_brp_mesh_gateway(
 
             _gateway_instance = BRPMeshGateway(
                 brp_db_path   = brp_db_path,
+                bridge_data_dir = bridge_data_dir,
                 trust_graph   = trust_graph,
                 enable_alerts = enable_alerts,
                 dry_run       = dry_run,

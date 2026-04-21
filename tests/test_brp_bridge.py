@@ -480,6 +480,54 @@ class TestOperatorReadHelpers:
         assert detail["remediations"]
         assert detail["playbook"]["last_remediation"]["status"] == "completed"
 
+    def test_failed_remediation_feeds_back_into_predictive_learning(self, bridge, tmp_data_dir):
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="run_shell",
+            context={"projectx_action": "run_shell", "details": "autonomous fuzz bypass"},
+            tags=["projectx", "network"],
+        )
+        bridge.evaluate_event(event)
+
+        playbook = BRPBridge.read_operator_playbooks(data_dir=tmp_data_dir, limit=10)[0]
+        remediation = BRPBridge.record_operator_remediation(
+            alert_id=playbook["alert_id"],
+            playbook_id=playbook["playbook_id"],
+            actor="test_operator",
+            job=playbook["automation"]["job"],
+            result={
+                "status": "error",
+                "routing_mode": "broker",
+                "broker_intent_id": "intent-456",
+                "delivery_status": "delivered",
+                "response": {"status": "error"},
+            },
+            data_dir=tmp_data_dir,
+        )
+
+        assert remediation is not None
+        observations_path = os.path.join(tmp_data_dir, "observations.jsonl")
+        with open(observations_path, "r", encoding="utf-8") as handle:
+            observations = [json.loads(line) for line in handle if line.strip()]
+        assert observations[-1]["event_id"] == event.event_id
+        assert observations[-1]["outcome"] == "error"
+        assert "remediation_feedback" in observations[-1]["tags"]
+
+        refreshed_bridge = BRPBridge(data_dir=tmp_data_dir)
+        follow_up = refreshed_bridge.evaluate_event(
+            BRPEvent(
+                source_agent="projectx_native",
+                action="run_shell",
+                context={"projectx_action": "run_shell"},
+                tags=["projectx"],
+            )
+        )
+
+        predictive = follow_up.metadata["predictive_assessment"]
+        assert "adaptive_rule_match" in follow_up.threat_tags
+        assert predictive["near_miss_count"] >= 1
+        assert predictive["adaptive_rule_matches"]
+
     def test_operator_report_includes_incident_state(self, bridge, tmp_data_dir):
         bridge.evaluate_event(
             BRPEvent(

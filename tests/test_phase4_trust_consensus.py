@@ -642,6 +642,54 @@ class TestBRPMeshGateway:
         assert result.metadata["predictive_assessment"]["score_boost"] > 0.0
         assert any(pattern["type"] == "zero_day_signal" for pattern in result.patterns)
 
+    def test_mesh_gateway_can_reuse_bridge_learning_state(self, tmp_dir):
+        from simp.mesh.brp_mesh_gateway import BRPMeshGateway
+        from simp.security.brp_bridge import BRPBridge
+        from simp.security.brp_models import BRPObservation
+
+        class _StubBRP:
+            def analyze_event(self, log_entry):
+                return {
+                    "threat_assessment": {"threat_level": "low", "confidence": 0.05},
+                    "pattern_details": [],
+                }
+
+        brp_dir = tmp_dir / "brp_runtime"
+        bridge = BRPBridge(data_dir=str(brp_dir))
+        for _ in range(2):
+            bridge.ingest_observation(
+                BRPObservation(
+                    source_agent="projectx_native",
+                    action="mesh_packet",
+                    outcome="failure",
+                    tags=["auth_control", "computer_use"],
+                )
+            )
+
+        gateway = BRPMeshGateway(
+            brp_db_path=str(tmp_dir / "brp.db"),
+            bridge_data_dir=str(brp_dir),
+            dry_run=False,
+        )
+        gateway._get_brp = lambda: _StubBRP()
+
+        pkt = self._make_packet(
+            sender_id="projectx_native",
+            channel="auth_control",
+            payload={
+                "type": "computer_use",
+                "projectx_action": "review",
+                "details": "routine request",
+            },
+        )
+
+        result = gateway.screen_packet(pkt)
+
+        predictive = result.metadata["predictive_assessment"]
+        assert predictive["near_miss_count"] >= 2
+        assert "adaptive_rule_match" in predictive["threat_tags"]
+        assert result.threat_level in {"medium", "high", "critical"}
+
     def test_risky_packets_include_forecast_metadata(self, tmp_dir):
         from simp.mesh.brp_mesh_gateway import BRPMeshGateway
 

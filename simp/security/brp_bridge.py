@@ -805,6 +805,46 @@ class BRPBridge:
         }
         _append_jsonl(brp_dir / "remediations.jsonl", record)
 
+        feedback_bridge = cls(data_dir=str(brp_dir))
+        feedback_observation = BRPObservation(
+            source_agent=str(alert.get("source_agent") or actor or "dashboard_ui"),
+            event_id=str(alert.get("event_id") or ""),
+            action=str(alert.get("action") or job or "remediation"),
+            outcome=(
+                "success"
+                if remediation_status == "completed"
+                else "error"
+                if remediation_status == "failed"
+                else "partial"
+            ),
+            result_data={
+                "remediation_id": record["remediation_id"],
+                "playbook_id": playbook["playbook_id"],
+                "job": job,
+                "remediation_status": remediation_status,
+                "delivery_status": result.get("delivery_status"),
+                "response_status": record.get("response_status"),
+            },
+            context={
+                "actor": str(actor or "dashboard_ui"),
+                "alert_id": alert["alert_id"],
+                "playbook_id": playbook["playbook_id"],
+                "remediation_status": remediation_status,
+                "automation_job": job,
+            },
+            mode=str(alert.get("mode") or BRPMode.ADVISORY.value),
+            tags=cls._dedupe_str_list(
+                list(alert.get("threat_tags", []) or [])
+                + [
+                    "remediation_feedback",
+                    f"remediation_{remediation_status}",
+                    str(playbook.get("category") or "").strip().lower(),
+                ]
+            ),
+        )
+        feedback_bridge.ingest_observation(feedback_observation)
+        record["observation_id"] = feedback_observation.observation_id
+
         next_state = "remediated" if remediation_status == "completed" else "acknowledged"
         note = f"Remediation {remediation_status} via {job}"
         cls._set_operator_alert_state(
@@ -836,6 +876,26 @@ class BRPBridge:
             "remediations": cls.read_operator_remediations(data_dir=str(brp_dir), limit=min(limit, 25)),
             "evaluations": cls.read_operator_evaluations(data_dir=str(brp_dir), limit=limit),
             "adaptive_rules": cls.read_operator_adaptive_rules(data_dir=str(brp_dir), limit=limit),
+        }
+
+    @classmethod
+    def read_runtime_predictive_context(
+        cls,
+        data_dir: Optional[str] = None,
+        recent_limit: int = 64,
+    ) -> Dict[str, Any]:
+        """Return BRP learning state for runtime consumers such as mesh screening."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        adaptive_rules = cls._load_json_file(brp_dir / "adaptive_rules.json")
+        if not isinstance(adaptive_rules, dict):
+            adaptive_rules = {}
+        return {
+            "data_dir": str(brp_dir),
+            "recent_observations": cls._load_jsonl_tail(
+                brp_dir / "observations.jsonl",
+                limit=max(1, min(recent_limit, 256)),
+            ),
+            "adaptive_rules": adaptive_rules,
         }
 
     # ------------------------------------------------------------------

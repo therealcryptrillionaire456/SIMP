@@ -103,6 +103,21 @@ class QuantumArbBRPIntegrator:
         if self._bridge is None:
             self._bridge = BRPBridge()
         return self._bridge
+
+    @staticmethod
+    def _interpret_brp_decision(decision: str) -> str:
+        decision_value = str(decision or "").strip().upper()
+        if decision_value == BRPDecision.DENY.value:
+            return "block"
+        if decision_value == BRPDecision.ELEVATE.value:
+            return "warn"
+        if decision_value in {
+            BRPDecision.ALLOW.value,
+            BRPDecision.SHADOW_ALLOW.value,
+            BRPDecision.LOG_ONLY.value,
+        }:
+            return "allow"
+        return "allow"
     
     def evaluate_trade_action(self, context: TradeContext) -> Tuple[bool, BRPResponse]:
         """
@@ -151,12 +166,13 @@ class QuantumArbBRPIntegrator:
             self._log_evaluation(event, response, context)
             
             # Update statistics
-            if response.decision == "block":
+            interpreted_decision = self._interpret_brp_decision(response.decision)
+            if interpreted_decision == "block":
                 self.stats["blocks"] += 1
                 log.warning(f"BRP BLOCKED trade action: {context.action} for {context.market}. "
                           f"Reason: {response.summary}")
                 return False, response
-            elif response.decision == "warn":
+            elif interpreted_decision == "warn":
                 self.stats["warnings"] += 1
                 log.warning(f"BRP WARNING for trade action: {context.action} for {context.market}. "
                           f"Reason: {response.summary}")
@@ -170,9 +186,9 @@ class QuantumArbBRPIntegrator:
             log.error(f"BRP evaluation failed: {e}", exc_info=True)
             # On error, default to allowing (fail-open for safety)
             return True, BRPResponse(
-                decision="allow",
+                decision=BRPDecision.ALLOW.value,
                 threat_score=0.0,
-                severity="info",
+                severity=BRPSeverity.INFO.value,
                 summary=f"BRP evaluation failed, defaulting to allow: {str(e)}",
                 event_id=str(uuid4()),
             )
