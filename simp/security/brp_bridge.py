@@ -28,6 +28,7 @@ from simp.security.brp_models import (
     BRPSeverity,
     RESTRICTED_ACTIONS,
 )
+from simp.security.brp.multimodal_analysis import MultiModalSafetyAnalyzer
 from simp.security.brp.predictive_safety import PredictiveSafetyIntelligence
 
 logger = logging.getLogger("SIMP.BRP")
@@ -92,6 +93,7 @@ class BRPBridge:
         self.adaptive_rules_file = self.data_dir / "adaptive_rules.json"
 
         self._predictive = PredictiveSafetyIntelligence()
+        self._multimodal = MultiModalSafetyAnalyzer()
         self._recent_events = deque(maxlen=256)
         self._recent_observations = deque(maxlen=256)
         self._adaptive_rules: Dict[str, Dict[str, Any]] = {}
@@ -120,6 +122,17 @@ class BRPBridge:
         )
         threat_score = min(1.0, threat_score + predictive["score_boost"])
         threat_tags = self._merge_tags(threat_tags, predictive["threat_tags"])
+        multimodal = self._evaluate_multimodal_record(
+            {
+                **event.to_dict(),
+                "action": event.action,
+                "params": event.params,
+                "context": event.context,
+                "tags": event.tags,
+            }
+        )
+        threat_score = min(1.0, threat_score + multimodal["score_boost"])
+        threat_tags = self._merge_tags(threat_tags, multimodal["threat_tags"])
         severity = self._severity_for(threat_score)
         decision = self._decide(threat_score, mode, event.action)
 
@@ -132,7 +145,10 @@ class BRPBridge:
             confidence=self._confidence_for(threat_score),
             threat_tags=threat_tags,
             summary=self._build_summary(event.action, decision, threat_score),
-            metadata={"predictive_assessment": predictive},
+            metadata={
+                "predictive_assessment": predictive,
+                "multimodal_assessment": multimodal,
+            },
         )
 
         # Persist
@@ -158,6 +174,7 @@ class BRPBridge:
         max_threat = 0.0
         all_tags: List[str] = []
         predictive_details: List[Dict[str, Any]] = []
+        multimodal_details: List[Dict[str, Any]] = []
 
         for step in plan.steps:
             action = step.get("action", "")
@@ -177,10 +194,23 @@ class BRPBridge:
                 sensitive_action_tier=self._extract_sensitive_action_tier(action, plan.context),
             )
             step_threat = min(1.0, t + predictive["score_boost"])
+            multimodal = self._evaluate_multimodal_record(
+                {
+                    "source_agent": plan.source_agent,
+                    "event_type": BRPEventType.PLAN_REVIEW.value,
+                    "action": action,
+                    "params": step,
+                    "context": plan.context,
+                    "tags": plan.tags,
+                }
+            )
+            step_threat = min(1.0, step_threat + multimodal["score_boost"])
             max_threat = max(max_threat, step_threat)
             all_tags.extend(tags)
             all_tags.extend(predictive["threat_tags"])
+            all_tags.extend(multimodal["threat_tags"])
             predictive_details.append({"action": action, **predictive})
+            multimodal_details.append({"action": action, **multimodal})
 
         severity = self._severity_for(max_threat)
         decision = self._decide(max_threat, mode, "plan_review")
@@ -194,7 +224,10 @@ class BRPBridge:
             confidence=self._confidence_for(max_threat),
             threat_tags=self._merge_tags(all_tags, []),
             summary=self._build_summary("plan_review", decision, max_threat),
-            metadata={"predictive_steps": predictive_details},
+            metadata={
+                "predictive_steps": predictive_details,
+                "multimodal_steps": multimodal_details,
+            },
         )
 
         plan_record = plan.to_dict()
@@ -309,6 +342,110 @@ class BRPBridge:
         severity = self._severity_for(threat_score)
         return threat_score, severity, threat_tags
 
+    def _evaluate_multimodal_record(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        inputs = self._build_multimodal_inputs(record)
+        if not any(inputs.values()):
+            return {
+                "score_boost": 0.0,
+                "threat_tags": [],
+                "summary": {"total_detections": 0, "detection_breakdown": {}},
+            }
+
+        result = self._multimodal.run_all(
+            texts=inputs["texts"],
+            code_samples=inputs["code_samples"],
+            behavior_events=inputs["behavior_events"],
+            network_flows=inputs["network_flows"],
+            memory_records=inputs["memory_records"],
+        )
+        total_detections = int(result["total_detections"])
+        max_channel_hits = max(result["detection_breakdown"].values(), default=0)
+        score_boost = min(0.35, (0.08 * total_detections) + (0.03 * max_channel_hits))
+
+        threat_tags = []
+        breakdown = result["detection_breakdown"]
+        if breakdown.get("text_threats"):
+            threat_tags.append("multimodal_text_threat")
+        if breakdown.get("code_vulnerabilities"):
+            threat_tags.append("multimodal_code_risk")
+        if breakdown.get("behavior_anomalies"):
+            threat_tags.append("multimodal_behavior_risk")
+        if breakdown.get("network_anomalies"):
+            threat_tags.append("multimodal_network_risk")
+        if breakdown.get("memory_correlations"):
+            threat_tags.append("multimodal_memory_risk")
+
+        return {
+            "score_boost": round(score_boost, 4),
+            "threat_tags": threat_tags,
+            "summary": {
+                "total_detections": total_detections,
+                "detection_breakdown": breakdown,
+                "combined_accuracy": result["combined_accuracy"],
+            },
+        }
+
+    def _build_multimodal_inputs(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        params = record.get("params") or {}
+        context = record.get("context") or {}
+        tags = record.get("tags") or []
+
+        texts = []
+        code_samples = []
+        behavior_events = []
+        network_flows = []
+        memory_records = []
+
+        for container in (record, params, context):
+            for key in ("text", "message", "prompt", "description", "details", "content", "rationale"):
+                value = container.get(key)
+                if isinstance(value, str) and value.strip():
+                    texts.append(value.strip())
+            for key in ("code", "script", "patch", "command"):
+                value = container.get(key)
+                if isinstance(value, str) and value.strip():
+                    code_samples.append(
+                        {
+                            "file": str(container.get("file") or container.get("path") or f"{record.get('action', 'snippet')}.txt"),
+                            "code": value,
+                        }
+                    )
+
+        if isinstance(context.get("network_flow"), dict):
+            network_flows.append(context["network_flow"])
+        elif any(key in context for key in ("source", "destination", "protocol", "bytes", "suspicious")):
+            network_flows.append(context)
+
+        if any(key in context for key in ("pattern", "risk_level")):
+            behavior_events.append(
+                {
+                    "pattern": context.get("pattern", ""),
+                    "description": context.get("description", context.get("details", "")),
+                    "risk_level": context.get("risk_level", "medium"),
+                }
+            )
+
+        if any(key in context for key in ("memory_id", "correlation_score", "access_agent")):
+            memory_records.append(
+                {
+                    "memory_id": context.get("memory_id", record.get("event_id", "memory_record")),
+                    "content": context.get("content", context.get("details", "")),
+                    "access_agent": context.get("access_agent", record.get("source_agent", "")),
+                    "correlation_score": context.get("correlation_score", 0),
+                }
+            )
+
+        if "network" in [str(tag).lower() for tag in tags] and isinstance(params, dict) and params:
+            network_flows.append(params)
+
+        return {
+            "texts": self._dedupe_str_list(texts),
+            "code_samples": code_samples,
+            "behavior_events": behavior_events,
+            "network_flows": network_flows,
+            "memory_records": memory_records,
+        }
+
     def _warm_history(self) -> None:
         self._adaptive_rules = self._load_adaptive_rules()
 
@@ -403,6 +540,17 @@ class BRPBridge:
             seen.add(tag)
             merged.append(tag)
         return merged
+
+    @staticmethod
+    def _dedupe_str_list(values: List[str]) -> List[str]:
+        seen = set()
+        ordered = []
+        for value in values:
+            if value in seen:
+                continue
+            seen.add(value)
+            ordered.append(value)
+        return ordered
 
     @staticmethod
     def _severity_for(threat_score: float) -> str:

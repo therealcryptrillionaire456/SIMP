@@ -40,6 +40,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+from simp.security.brp.forecasting import PredictiveSafetyForecaster
 from simp.security.brp.predictive_safety import PredictiveSafetyIntelligence
 
 logger = logging.getLogger(__name__)
@@ -154,6 +155,7 @@ class BRPMeshGateway:
             "blocks_expired":    0,
         }
         self._predictive = PredictiveSafetyIntelligence()
+        self._forecaster = PredictiveSafetyForecaster()
 
         # Lazy-init BRP to avoid import cost on startup
         self._brp             = None
@@ -232,6 +234,14 @@ class BRPMeshGateway:
         threat_level = self._max_threat_level(threat_level, predictive["threat_level"])
         confidence = max(confidence, predictive["confidence"])
         patterns = patterns + self._predictive.synthetic_patterns(predictive)
+        forecast = self._forecast_packet_risk(
+            agent_id=agent_id,
+            packet=packet,
+            threat_level=threat_level,
+            confidence=confidence,
+            predictive=predictive,
+            patterns=patterns,
+        )
 
         # Determine action
         action_taken = "none"
@@ -276,7 +286,10 @@ class BRPMeshGateway:
             agent_id     = agent_id,
             patterns     = patterns,
             action_taken = action_taken,
-            metadata     = {"predictive_assessment": predictive},
+            metadata     = {
+                "predictive_assessment": predictive,
+                "forecast_assessment": forecast,
+            },
         )
         self._log_screening(result)
         return result
@@ -484,6 +497,56 @@ class BRPMeshGateway:
             }
             for item in recent
         ]
+
+    def _forecast_packet_risk(
+        self,
+        *,
+        agent_id: str,
+        packet,
+        threat_level: str,
+        confidence: float,
+        predictive: Dict[str, Any],
+        patterns: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        ranking = {"clean": 0.0, "low": 0.3, "medium": 0.6, "high": 0.85, "critical": 0.95}
+        base_severity = max(ranking.get(threat_level, 0.0), float(confidence or 0.0))
+        if base_severity < 0.25 and not predictive.get("threat_tags"):
+            return {"generated": False}
+
+        payload = getattr(packet, "payload", {}) or {}
+        threat_type = "zero_day"
+        if any("memory" in str(pattern.get("type", "")) for pattern in patterns):
+            threat_type = "insider_threat"
+        elif str(payload.get("type", "")).lower() in {"computer_use", "shell"}:
+            threat_type = "zero_day"
+        elif str(getattr(packet, "channel", "")).lower().startswith("auth"):
+            threat_type = "apt"
+        elif str(payload.get("type", "")).lower() in {"file_transfer", "artifact"}:
+            threat_type = "malware"
+
+        forecasts = self._forecaster.generate_threat_forecasts(
+            [
+                {
+                    "type": threat_type,
+                    "severity": base_severity,
+                    "description": f"{threat_level} packet from {agent_id}",
+                }
+            ],
+            forecast_horizon=12,
+        )
+        top_forecast = max(forecasts, key=lambda item: item.probability)
+        return {
+            "generated": True,
+            "threat_type": threat_type,
+            "top_forecast": {
+                "forecast_id": top_forecast.forecast_id,
+                "probability": top_forecast.probability,
+                "predicted_severity": top_forecast.predicted_severity,
+                "time_window_hours": top_forecast.time_window_hours,
+                "affected_systems": top_forecast.affected_systems,
+                "mitigation_recommendations": top_forecast.mitigation_recommendations[:3],
+            },
+        }
 
     @staticmethod
     def _extract_sensitive_action_tier(payload: Dict[str, Any]) -> Optional[int]:

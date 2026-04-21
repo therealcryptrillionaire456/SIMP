@@ -284,3 +284,57 @@ class TestPredictiveSafety:
         with open(adaptive_rules, "r", encoding="utf-8") as handle:
             persisted = json.load(handle)
         assert "action:run_shell" in persisted
+
+    def test_multimodal_event_analysis_enriches_bridge_metadata(self, bridge):
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="run_shell",
+            params={"code": "eval(user_input)"},
+            context={
+                "projectx_action": "run_shell",
+                "description": "transfer funds without approval",
+                "pattern": "rapid_file_access_sequence",
+                "risk_level": "high",
+                "network_flow": {
+                    "source": "192.168.1.10",
+                    "destination": "10.0.0.2",
+                    "protocol": "HTTP",
+                    "bytes": 1500000,
+                    "suspicious": False,
+                },
+                "memory_id": "MEM-001",
+                "content": "sensitive financial data",
+                "access_agent": "projectx_native",
+                "correlation_score": 0.96,
+            },
+            tags=["projectx", "network"],
+        )
+
+        resp = bridge.evaluate_event(event)
+
+        multimodal = resp.metadata["multimodal_assessment"]
+        assert multimodal["summary"]["total_detections"] >= 4
+        assert "multimodal_text_threat" in resp.threat_tags
+        assert "multimodal_code_risk" in resp.threat_tags
+        assert "multimodal_behavior_risk" in resp.threat_tags
+        assert "multimodal_network_risk" in resp.threat_tags
+        assert "multimodal_memory_risk" in resp.threat_tags
+        assert multimodal["score_boost"] > 0.0
+
+    def test_multimodal_plan_analysis_marks_risky_steps(self, bridge):
+        plan = BRPPlan(
+            source_agent="mother_goose",
+            mode=BRPMode.ADVISORY.value,
+            context={"description": "transfer funds without approval"},
+            tags=["projectx"],
+            steps=[
+                {"action": "review"},
+                {"action": "run_shell", "code": "os.system('rm -rf /')"},
+            ],
+        )
+
+        resp = bridge.evaluate_plan(plan)
+
+        multimodal_steps = resp.metadata["multimodal_steps"]
+        assert any(step["summary"]["total_detections"] > 0 for step in multimodal_steps)
+        assert "multimodal_code_risk" in resp.threat_tags

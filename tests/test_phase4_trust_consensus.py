@@ -642,6 +642,36 @@ class TestBRPMeshGateway:
         assert result.metadata["predictive_assessment"]["score_boost"] > 0.0
         assert any(pattern["type"] == "zero_day_signal" for pattern in result.patterns)
 
+    def test_risky_packets_include_forecast_metadata(self, tmp_dir):
+        from simp.mesh.brp_mesh_gateway import BRPMeshGateway
+
+        class _StubBRP:
+            def analyze_event(self, log_entry):
+                return {
+                    "threat_assessment": {"threat_level": "medium", "confidence": 0.71},
+                    "pattern_details": [{"type": "memory_correlation", "confidence": 0.88}],
+                }
+
+        gateway = BRPMeshGateway(brp_db_path=str(tmp_dir / "brp.db"), dry_run=True)
+        gateway._get_brp = lambda: _StubBRP()
+
+        pkt = self._make_packet(
+            sender_id="projectx_native",
+            channel="auth_control",
+            payload={
+                "type": "computer_use",
+                "projectx_action": "run_shell",
+                "details": "operator requested shell access",
+            },
+        )
+
+        result = gateway.screen_packet(pkt)
+
+        forecast = result.metadata["forecast_assessment"]
+        assert forecast["generated"] is True
+        assert forecast["top_forecast"]["probability"] > 0.0
+        assert forecast["top_forecast"]["time_window_hours"] in {6, 12}
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ProjectX Mesh Bridge Tests (unit, no broker connection needed)
