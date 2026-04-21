@@ -392,6 +392,7 @@ class TestDashboardStaticFiles:
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
         assert "<!DOCTYPE html>" in response.text
+        assert "BRP Operator View" in response.text
     
     def test_static_files_served(self, client):
         """Test static files (CSS, JS) are served correctly."""

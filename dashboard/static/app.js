@@ -111,6 +111,17 @@
     systemOverviewCards: $("#system-overview-cards"),
     systemOverviewActions: $("#system-overview-actions"),
     agentObservabilityCards: $("#agent-observability-cards"),
+    valBrpResponses: $("#val-brp-responses"),
+    valBrpActiveRules: $("#val-brp-active-rules"),
+    valBrpElevated: $("#val-brp-elevated"),
+    valBrpAvgThreat: $("#val-brp-avg-threat"),
+    valBrpLastEval: $("#val-brp-last-eval"),
+    valBrpTopTag: $("#val-brp-top-tag"),
+    brpPostureSummary: $("#brp-posture-summary"),
+    brpThreatTags: $("#brp-threat-tags"),
+    brpSignalSummary: $("#brp-signal-summary"),
+    brpEvaluationsTbody: $("#brp-evaluations-tbody"),
+    brpRulesTbody: $("#brp-rules-tbody"),
     projectxChatFeed: $("#projectx-chat-feed"),
     projectxChatForm: $("#projectx-chat-form"),
     projectxChatInput: $("#projectx-chat-input"),
@@ -1325,6 +1336,136 @@
     renderSystemOverview(facts.protocol_docs || null);
   }
 
+  function brpDecisionBadge(decision) {
+    var value = String(decision || "--");
+    var normalized = value.toUpperCase();
+    var cls = "unknown";
+    if (normalized === "ALLOW" || normalized === "SHADOW_ALLOW") cls = "online";
+    else if (normalized === "ELEVATE" || normalized === "DENY") cls = "offline";
+    else if (normalized === "LOG_ONLY") cls = "degraded";
+    return '<span class="status-badge ' + cls + '">' + escHtml(value) + "</span>";
+  }
+
+  function brpSeverityBadge(severity) {
+    var value = String(severity || "--");
+    var normalized = value.toLowerCase();
+    var cls = "unknown";
+    if (normalized === "critical" || normalized === "high") cls = "offline";
+    else if (normalized === "medium" || normalized === "low") cls = "degraded";
+    else if (normalized === "info") cls = "online";
+    return '<span class="status-badge ' + cls + '">' + escHtml(value) + "</span>";
+  }
+
+  function renderBrpStatus(data) {
+    if (!dom.valBrpResponses) return;
+    if (!data || data.status !== "success" || !data.has_data) {
+      dom.valBrpResponses.textContent = "--";
+      dom.valBrpActiveRules.textContent = "--";
+      dom.valBrpElevated.textContent = "--";
+      dom.valBrpAvgThreat.textContent = "--";
+      dom.valBrpLastEval.textContent = "--";
+      dom.valBrpTopTag.textContent = "--";
+      if (dom.brpPostureSummary) {
+        dom.brpPostureSummary.innerHTML = '<div class="empty-state">BRP status not loaded.</div>';
+      }
+      if (dom.brpThreatTags) {
+        dom.brpThreatTags.innerHTML = '<div class="empty-state">No threat tags observed.</div>';
+      }
+      return;
+    }
+
+    var counts = data.counts || {};
+    var recent = data.recent || {};
+    var decisionCounts = recent.decision_counts || {};
+    var elevated = Number(decisionCounts.ELEVATE || 0) + Number(decisionCounts.DENY || 0);
+    var topTags = recent.top_threat_tags || [];
+
+    dom.valBrpResponses.textContent = counts.responses != null ? String(counts.responses) : "--";
+    dom.valBrpActiveRules.textContent = recent.active_adaptive_rules != null ? String(recent.active_adaptive_rules) : "--";
+    dom.valBrpElevated.textContent = String(elevated);
+    dom.valBrpElevated.className = elevated > 0 ? "card-value mono status-error" : "card-value mono";
+    dom.valBrpAvgThreat.textContent = recent.average_threat_score != null ? Number(recent.average_threat_score).toFixed(2) : "--";
+    dom.valBrpAvgThreat.className = "card-value mono " + ((recent.average_threat_score || 0) >= 0.6 ? "status-error" : (recent.average_threat_score || 0) >= 0.3 ? "status-degraded" : "");
+    dom.valBrpLastEval.textContent = formatDate(recent.last_evaluation_at);
+    dom.valBrpTopTag.textContent = topTags.length ? String(topTags[0].tag || "--") : "--";
+
+    renderDiagnosticPairs(dom.brpPostureSummary, [
+      { label: "Events", value: String(counts.events != null ? counts.events : "--") },
+      { label: "Plans", value: String(counts.plans != null ? counts.plans : "--") },
+      { label: "Observations", value: String(counts.observations != null ? counts.observations : "--") },
+      { label: "Max Threat", value: recent.max_threat_score != null ? Number(recent.max_threat_score).toFixed(2) : "--" },
+      { label: "Last Observation", value: formatDate(recent.last_observation_at) },
+    ]);
+
+    if (dom.brpThreatTags) {
+      dom.brpThreatTags.innerHTML = topTags.length ? topTags.map(function(item) {
+        return '<div class="brp-chip"><span>' + escHtml(item.tag || "--") + '</span><span class="brp-chip-count">' + escHtml(String(item.count || 0)) + '</span></div>';
+      }).join("") : '<div class="empty-state">No threat tags observed.</div>';
+    }
+  }
+
+  function renderBrpInsights(data) {
+    if (!dom.brpSignalSummary) return;
+    if (!data || data.status !== "success") {
+      dom.brpSignalSummary.innerHTML = '<div class="empty-state">BRP insights not loaded.</div>';
+      return;
+    }
+    var summary = data.summary || {};
+    var signals = data.signals || {};
+    renderDiagnosticPairs(dom.brpSignalSummary, [
+      { label: "Window", value: String(summary.window_size != null ? summary.window_size : "--") },
+      { label: "Elevated / Denied", value: String(summary.elevated_or_denied != null ? summary.elevated_or_denied : "--") },
+      { label: "High Severity", value: String(summary.high_severity != null ? summary.high_severity : "--") },
+      { label: "Predictive Boost", value: signals.predictive_score_boost != null ? Number(signals.predictive_score_boost).toFixed(2) : "--" },
+      { label: "Multimodal Detections", value: String(signals.multimodal_detections != null ? signals.multimodal_detections : "--") },
+    ]);
+  }
+
+  function renderBrpEvaluations(data) {
+    if (!dom.brpEvaluationsTbody) return;
+    var evaluations = (data && data.evaluations) || [];
+    if (!evaluations.length) {
+      dom.brpEvaluationsTbody.innerHTML = '<tr><td colspan="7" class="empty-row">No BRP evaluations recorded yet.</td></tr>';
+      return;
+    }
+    dom.brpEvaluationsTbody.innerHTML = evaluations.slice(0, 12).map(function(row) {
+      var source = [row.source_agent || "--", row.record_type || "--"].join(" • ");
+      var threat = row.threat_score != null ? Number(row.threat_score).toFixed(2) : "--";
+      var signalLines = [];
+      if ((row.predictive_score_boost || 0) > 0) signalLines.push("predictive +" + Number(row.predictive_score_boost).toFixed(2));
+      if ((row.multimodal_score_boost || 0) > 0) signalLines.push("multimodal +" + Number(row.multimodal_score_boost).toFixed(2));
+      if ((row.multimodal_detections || 0) > 0) signalLines.push(String(row.multimodal_detections) + " detections");
+      return "<tr>"
+        + td(mono(escHtml(formatDate(row.timestamp))))
+        + td(escHtml(source))
+        + td('<div>' + escHtml(row.action || row.event_type || "--") + '</div><div class="brp-inline-tags">' + ((row.threat_tags || []).slice(0, 3).map(capPill).join("") || "") + '</div>')
+        + td(brpDecisionBadge(row.decision))
+        + td(brpSeverityBadge(row.severity))
+        + td(mono(escHtml(threat)))
+        + td('<div class="brp-signal-stack">' + (signalLines.length ? signalLines.map(function(line) { return '<div class="brp-signal-line">' + escHtml(line) + '</div>'; }).join("") : '<div class="brp-signal-line">no extra signals</div>') + '</div>')
+        + "</tr>";
+    }).join("");
+  }
+
+  function renderBrpAdaptiveRules(data) {
+    if (!dom.brpRulesTbody) return;
+    var rules = (data && data.rules) || [];
+    if (!rules.length) {
+      dom.brpRulesTbody.innerHTML = '<tr><td colspan="6" class="empty-row">No adaptive BRP rules learned yet.</td></tr>';
+      return;
+    }
+    dom.brpRulesTbody.innerHTML = rules.slice(0, 12).map(function(rule) {
+      return "<tr>"
+        + td('<span class="mono" style="font-size:0.74rem">' + escHtml(rule.key || "--") + "</span>")
+        + td(brpSeverityBadge(rule.severity))
+        + td(mono(escHtml(rule.boost != null ? Number(rule.boost).toFixed(2) : "--")))
+        + td(mono(escHtml(rule.count != null ? String(rule.count) : "--")))
+        + td(statusBadge(rule.active ? "active" : "inactive"))
+        + td(mono(escHtml(formatDate(rule.last_seen))))
+        + "</tr>";
+    }).join("");
+  }
+
   function renderAgentObservability(activityData, agentsData, capabilitiesData, failedIntentsData, smokeData) {
     if (!activityData || !activityData.events || !agentsData || !agentsData.agents) {
       dom.agentObservabilityCards.innerHTML =
@@ -1779,7 +1920,7 @@
     setLoading('overview-section', true);
 
     // Fetch all endpoints in parallel
-    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts] = await Promise.all([
+    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, brpStatus, brpEvaluations, brpRules, brpInsights] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -1801,6 +1942,10 @@
       apiFetch("/api/projectx/processes"),
       apiFetch("/api/projectx/actions"),
       apiFetch("/api/projectx/protocol-facts"),
+      apiFetch("/api/brp/status"),
+      apiFetch("/api/brp/evaluations?limit=12"),
+      apiFetch("/api/brp/adaptive-rules?limit=12"),
+      apiFetch("/api/brp/insights?limit=12"),
     ]);
 
     setLoading('overview-section', false);
@@ -1828,6 +1973,10 @@
     renderProjectXProcesses(projectxProcesses);
     renderProjectXActions(projectxActions);
     renderProjectXProtocolFacts(projectxProtocolFacts);
+    renderBrpStatus(brpStatus);
+    renderBrpEvaluations(brpEvaluations);
+    renderBrpAdaptiveRules(brpRules);
+    renderBrpInsights(brpInsights);
     
     // Agent observability - show intent counts by agent
     renderAgentObservability(activity, agents, capabilities, failedIntents, smokeData);

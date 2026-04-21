@@ -158,6 +158,71 @@
       </div>
     </section>
 
+    <section class="section" id="brp-section">
+      <h2 class="section-title">BRP Operator View</h2>
+      <p class="section-description">Predictive safety posture, recent BRP decisions, and adaptive rule evolution</p>
+      <div class="cards-grid" id="brp-overview-cards">
+        <div class="card"><div class="card-label">Responses Reviewed</div><div class="card-value mono" id="val-brp-responses">--</div></div>
+        <div class="card"><div class="card-label">Active Adaptive Rules</div><div class="card-value mono" id="val-brp-active-rules">--</div></div>
+        <div class="card"><div class="card-label">Elevated / Denied</div><div class="card-value mono" id="val-brp-elevated">--</div></div>
+        <div class="card"><div class="card-label">Average Threat</div><div class="card-value mono" id="val-brp-avg-threat">--</div></div>
+        <div class="card"><div class="card-label">Last Evaluation</div><div class="card-value mono" id="val-brp-last-eval">--</div></div>
+        <div class="card"><div class="card-label">Top Threat Tag</div><div class="card-value mono" id="val-brp-top-tag">--</div></div>
+      </div>
+      <div class="diagnostic-grid">
+        <div class="card diagnostic-card">
+          <div class="card-label">Risk Posture</div>
+          <div id="brp-posture-summary" class="diagnostic-pairs">
+            <div class="empty-state">BRP status not loaded.</div>
+          </div>
+          <div id="brp-threat-tags" class="brp-chip-list">
+            <div class="empty-state">No threat tags observed.</div>
+          </div>
+        </div>
+        <div class="card diagnostic-card">
+          <div class="card-label">Predictive / Multimodal Signals</div>
+          <div id="brp-signal-summary" class="diagnostic-pairs">
+            <div class="empty-state">BRP insights not loaded.</div>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Source</th>
+              <th>Action</th>
+              <th>Decision</th>
+              <th>Severity</th>
+              <th>Threat</th>
+              <th>Signals</th>
+            </tr>
+          </thead>
+          <tbody id="brp-evaluations-tbody">
+            <tr><td colspan="7" class="empty-row">Loading BRP evaluations...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap" style="margin-top:16px;">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Rule</th>
+              <th>Severity</th>
+              <th>Boost</th>
+              <th>Count</th>
+              <th>Active</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="brp-rules-tbody">
+            <tr><td colspan="6" class="empty-row">Loading adaptive rules...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="section" id="projectx-protocol-section">
       <h2 class="section-title">Protocol Facts</h2>
       <p class="section-description">SIMP protocol version and definition counts</p>
