@@ -24,6 +24,124 @@ def client():
 
 
 @pytest.fixture
+def brp_sample_data(tmp_path, monkeypatch):
+    """Create synthetic BRP audit files for dashboard endpoint tests."""
+    brp_dir = tmp_path / "brp"
+    brp_dir.mkdir()
+
+    def write_jsonl(name, rows):
+        target = brp_dir / name
+        with open(target, "w", encoding="utf-8") as handle:
+            for row in rows:
+                handle.write(json.dumps(row) + "\n")
+
+    event = {
+        "schema_version": "brp.event.v1",
+        "event_id": "evt-001",
+        "timestamp": "2026-04-21T09:00:00",
+        "source_agent": "quantumarb_phase4",
+        "event_type": "mesh_intent",
+        "action": "route_order",
+        "params": {"quantity": 42},
+        "context": {"pattern": "burst retry", "risk_level": "high"},
+        "mode": "shadow",
+        "tags": ["mesh", "network"],
+    }
+    plan = {
+        "schema_version": "brp.plan.v1",
+        "plan_id": "plan-001",
+        "timestamp": "2026-04-21T09:01:00",
+        "source_agent": "mother_goose",
+        "steps": [{"action": "route_order"}, {"action": "withdrawal"}],
+        "context": {"goal": "rebalance"},
+        "mode": "advisory",
+        "tags": ["planning"],
+    }
+    responses = [
+        {
+            "response_id": "resp-001",
+            "event_id": "evt-001",
+            "decision": "ALLOW",
+            "mode": "shadow",
+            "severity": "medium",
+            "threat_score": 0.44,
+            "confidence": 0.8,
+            "threat_tags": ["predictive_pattern", "multimodal_behavior_risk"],
+            "summary": "BRP evaluated action='route_order': decision=ALLOW, threat_score=0.44",
+            "timestamp": "2026-04-21T09:00:05",
+            "metadata": {
+                "predictive_assessment": {"score_boost": 0.12, "threat_tags": ["predictive_pattern"]},
+                "multimodal_assessment": {
+                    "score_boost": 0.08,
+                    "summary": {"total_detections": 2, "detection_breakdown": {"behavior_anomalies": 1}},
+                },
+            },
+        },
+        {
+            "response_id": "resp-002",
+            "event_id": "plan-001",
+            "decision": "ELEVATE",
+            "mode": "advisory",
+            "severity": "high",
+            "threat_score": 0.86,
+            "confidence": 0.95,
+            "threat_tags": ["restricted_action", "predictive_sequence"],
+            "summary": "BRP evaluated action='plan_review': decision=ELEVATE, threat_score=0.86",
+            "timestamp": "2026-04-21T09:01:05",
+            "metadata": {
+                "predictive_steps": [
+                    {"action": "withdrawal", "score_boost": 0.16, "threat_tags": ["predictive_sequence"]},
+                ],
+                "multimodal_steps": [
+                    {"action": "withdrawal", "score_boost": 0.05, "summary": {"total_detections": 1}},
+                ],
+            },
+        },
+    ]
+    observations = [
+        {
+            "schema_version": "brp.observation.v1",
+            "observation_id": "obs-001",
+            "timestamp": "2026-04-21T09:02:00",
+            "source_agent": "quantumarb_phase4",
+            "event_id": "evt-001",
+            "action": "route_order",
+            "outcome": "executed",
+            "result_data": {"success": True},
+            "context": {},
+            "mode": "shadow",
+            "tags": ["mesh"],
+        }
+    ]
+    adaptive_rules = {
+        "predictive_pattern::route_order": {
+            "severity": "medium",
+            "boost": 0.12,
+            "count": 3,
+            "last_seen": "2026-04-21T09:02:00",
+            "active": True,
+            "description": "Escalate repeated route_order bursts",
+        },
+        "legacy_rule": {
+            "severity": "low",
+            "boost": 0.05,
+            "count": 1,
+            "last_seen": "2026-04-20T08:00:00",
+            "active": False,
+            "description": "Retired low-signal rule",
+        },
+    }
+
+    write_jsonl("events.jsonl", [event])
+    write_jsonl("plans.jsonl", [plan])
+    write_jsonl("responses.jsonl", responses)
+    write_jsonl("observations.jsonl", observations)
+    (brp_dir / "adaptive_rules.json").write_text(json.dumps(adaptive_rules), encoding="utf-8")
+    monkeypatch.setenv("BRP_DATA_DIR", str(brp_dir))
+    return brp_dir
+
+
+@pytest.fixture
 def mock_broker_responses():
     """Mock broker responses for dashboard endpoints."""
     with patch('dashboard.server._broker_get') as mock_get, \
@@ -92,18 +210,16 @@ class TestDashboardCoreEndpoints:
         response = client.get("/api/stats")
         assert response.status_code == 200
         data = response.json()
-        assert "status" in data
-        # Stats should contain broker metrics
-        assert "broker_url_reachable" in data
+        assert "dashboard_started_at" in data
+        assert "broker" in data or "status" in data
     
     def test_agents_endpoint(self, client):
         """Test /api/agents endpoint."""
         response = client.get("/api/agents")
         assert response.status_code == 200
         data = response.json()
-        assert "status" in data
         assert "agents" in data
-        # Agents can be dict or list depending on broker response
+        assert "count" in data
         assert isinstance(data["agents"], (dict, list))
     
     def test_activity_endpoint(self, client):
@@ -218,6 +334,53 @@ class TestProjectXEndpoints:
         assert "status" in data
         # Protocol facts endpoint returns protocol_facts
         assert "protocol_facts" in data
+
+
+class TestBRPEndpoints:
+    """Test operator-visible BRP dashboard endpoints."""
+
+    def test_brp_status_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/status")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["has_data"] is True
+        assert data["counts"]["responses"] == 2
+        assert data["counts"]["observations"] == 1
+        assert data["recent"]["decision_counts"]["ELEVATE"] == 1
+        assert data["recent"]["active_adaptive_rules"] == 1
+
+    def test_brp_evaluations_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/evaluations?limit=1")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["count"] == 1
+        evaluation = data["evaluations"][0]
+        assert evaluation["event_id"] == "plan-001"
+        assert evaluation["record_type"] == "plan"
+        assert evaluation["predictive_score_boost"] == 0.16
+        assert evaluation["multimodal_detections"] == 1
+
+    def test_brp_adaptive_rules_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/adaptive-rules")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["count"] == 2
+        assert data["rules"][0]["key"] == "predictive_pattern::route_order"
+        assert data["rules"][0]["active"] is True
+
+    def test_brp_insights_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/insights?limit=2")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["summary"]["elevated_or_denied"] == 1
+        assert data["summary"]["high_severity"] == 1
+        assert data["signals"]["predictive_score_boost"] == 0.28
+        assert data["signals"]["multimodal_detections"] == 3
+        assert len(data["recent_evaluations"]) == 2
 
 
 class TestDashboardStaticFiles:

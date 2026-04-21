@@ -32,6 +32,7 @@ from fastapi.staticfiles import StaticFiles
 
 # Import operator API
 from dashboard.operator_api import router as operator_router
+from simp.security.brp_bridge import BRPBridge
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -230,6 +231,81 @@ def _cache_ttl_for_path(path: str) -> float:
     if path.startswith(("/tasks", "/routing", "/logs")):
         return BROKER_NEGATIVE_CACHE_TTL
     return BROKER_CACHE_TTL
+
+
+def _brp_data_dir() -> Path:
+    override = os.environ.get("BRP_DATA_DIR")
+    if override:
+        return Path(override)
+    return Path(__file__).resolve().parent.parent / "data" / "brp"
+
+
+def _brp_status_payload(recent_limit: int = 50) -> dict[str, Any]:
+    return BRPBridge.read_operator_status(data_dir=str(_brp_data_dir()), recent_limit=recent_limit)
+
+
+def _brp_evaluations_payload(limit: int = 25) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 200))
+    evaluations = BRPBridge.read_operator_evaluations(data_dir=str(_brp_data_dir()), limit=safe_limit)
+    return {
+        "status": "success",
+        "count": len(evaluations),
+        "limit": safe_limit,
+        "evaluations": evaluations,
+    }
+
+
+def _brp_adaptive_rules_payload(limit: int = 50) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 500))
+    rules = BRPBridge.read_operator_adaptive_rules(data_dir=str(_brp_data_dir()), limit=safe_limit)
+    return {
+        "status": "success",
+        "count": len(rules),
+        "limit": safe_limit,
+        "rules": rules,
+    }
+
+
+def _brp_insights_payload(limit: int = 10) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 50))
+    status = _brp_status_payload(recent_limit=max(25, safe_limit))
+    evaluations = BRPBridge.read_operator_evaluations(data_dir=str(_brp_data_dir()), limit=safe_limit)
+    rules = BRPBridge.read_operator_adaptive_rules(data_dir=str(_brp_data_dir()), limit=10)
+
+    elevated_or_denied = sum(
+        1 for item in evaluations
+        if str(item.get("decision") or "") in {"ELEVATE", "DENY"}
+    )
+    high_severity = sum(
+        1 for item in evaluations
+        if str(item.get("severity") or "") in {"high", "critical"}
+    )
+    predictive_boost = round(
+        sum(float(item.get("predictive_score_boost") or 0.0) for item in evaluations),
+        4,
+    )
+    multimodal_detections = sum(
+        int(item.get("multimodal_detections") or 0)
+        for item in evaluations
+    )
+
+    return {
+        "status": "success",
+        "summary": {
+            "window_size": safe_limit,
+            "elevated_or_denied": elevated_or_denied,
+            "high_severity": high_severity,
+            "active_adaptive_rules": status.get("recent", {}).get("active_adaptive_rules", 0),
+            "average_threat_score": status.get("recent", {}).get("average_threat_score", 0.0),
+            "top_threat_tags": status.get("recent", {}).get("top_threat_tags", []),
+        },
+        "signals": {
+            "predictive_score_boost": predictive_boost,
+            "multimodal_detections": multimodal_detections,
+        },
+        "recent_evaluations": evaluations,
+        "adaptive_rules": rules,
+    }
 
 
 def _cached_entry_fresh(entry: dict[str, Any] | None, ttl: float) -> bool:
@@ -1467,6 +1543,30 @@ async def api_logs(limit: int = 100):
             "count": 0,
         }
     return _redact(data)
+
+
+@app.get("/api/brp/status")
+async def api_brp_status():
+    """Operator-facing BRP summary and recent risk posture."""
+    return _redact(_brp_status_payload())
+
+
+@app.get("/api/brp/evaluations")
+async def api_brp_evaluations(limit: int = 25):
+    """Recent BRP evaluation decisions with normalized metadata."""
+    return _redact(_brp_evaluations_payload(limit=limit))
+
+
+@app.get("/api/brp/adaptive-rules")
+async def api_brp_adaptive_rules(limit: int = 50):
+    """Adaptive BRP rules learned from observations."""
+    return _redact(_brp_adaptive_rules_payload(limit=limit))
+
+
+@app.get("/api/brp/insights")
+async def api_brp_insights(limit: int = 10):
+    """Condensed BRP operator view combining recent decisions and active rules."""
+    return _redact(_brp_insights_payload(limit=limit))
 
 
 @app.get("/api/projectx/system")

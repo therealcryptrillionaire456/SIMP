@@ -5,6 +5,7 @@
 
 ### System URLs:
 - **Dashboard**: http://127.0.0.1:5555/dashboard/ui
+- **Read-Only Dashboard API**: http://127.0.0.1:8050
 - **Broker API**: http://127.0.0.1:5555
 - **Health Check**: http://127.0.0.1:5555/health
 
@@ -48,6 +49,18 @@ tail -f logs/quantumarb/brp/evaluations.jsonl
 
 ### Check BRP Status:
 ```bash
+# Read-only dashboard BRP summary
+curl -s http://127.0.0.1:8050/api/brp/status | python3 -m json.tool
+
+# Recent BRP evaluations with predictive/multimodal metadata
+curl -s "http://127.0.0.1:8050/api/brp/evaluations?limit=10" | python3 -m json.tool
+
+# Adaptive rules learned from observations
+curl -s http://127.0.0.1:8050/api/brp/adaptive-rules | python3 -m json.tool
+
+# Condensed operator BRP insights
+curl -s "http://127.0.0.1:8050/api/brp/insights?limit=10" | python3 -m json.tool
+
 # Count BRP evaluations
 wc -l logs/quantumarb/brp/evaluations.jsonl
 
@@ -147,6 +160,7 @@ print('BRP set to ENFORCED mode')
 2. **Pending Intents** - Should be low/none
 3. **BRP Decisions** - Check for BLOCK decisions
 4. **Trade Execution** - Monitor success/failure rates
+5. **BRP Insights** - Review `/api/brp/status` and `/api/brp/insights` for elevated decisions, top threat tags, and active adaptive rules
 
 ## 🔧 TROUBLESHOOTING
 

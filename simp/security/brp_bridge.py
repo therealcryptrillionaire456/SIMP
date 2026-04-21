@@ -270,6 +270,178 @@ class BRPBridge:
                 ", ".join(learned_rules),
             )
 
+    @classmethod
+    def read_operator_status(
+        cls,
+        data_dir: Optional[str] = None,
+        recent_limit: int = 50,
+    ) -> Dict[str, Any]:
+        """Read a lightweight operator-facing BRP summary without instantiating the bridge."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        recent_evaluations = cls.read_operator_evaluations(data_dir=str(brp_dir), limit=recent_limit)
+        recent_observations = cls._load_jsonl_tail(brp_dir / "observations.jsonl", limit=recent_limit)
+        adaptive_rules = cls.read_operator_adaptive_rules(data_dir=str(brp_dir), limit=500)
+
+        decision_counts: Dict[str, int] = {}
+        severity_counts: Dict[str, int] = {}
+        mode_counts: Dict[str, int] = {}
+        tag_counts: Dict[str, int] = {}
+        total_threat = 0.0
+
+        for evaluation in recent_evaluations:
+            decision = str(evaluation.get("decision") or "unknown")
+            severity = str(evaluation.get("severity") or "unknown")
+            mode = str(evaluation.get("mode") or "unknown")
+            decision_counts[decision] = decision_counts.get(decision, 0) + 1
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
+            mode_counts[mode] = mode_counts.get(mode, 0) + 1
+            total_threat += float(evaluation.get("threat_score") or 0.0)
+            for tag in evaluation.get("threat_tags", []) or []:
+                tag_key = str(tag)
+                tag_counts[tag_key] = tag_counts.get(tag_key, 0) + 1
+
+        active_rules = [rule for rule in adaptive_rules if rule.get("active", True)]
+        latest_evaluation = recent_evaluations[0].get("timestamp") if recent_evaluations else None
+        latest_observation = recent_observations[-1].get("timestamp") if recent_observations else None
+        average_threat = round(total_threat / len(recent_evaluations), 4) if recent_evaluations else 0.0
+
+        return {
+            "status": "success",
+            "has_data": any(
+                (
+                    cls._count_jsonl(brp_dir / "events.jsonl"),
+                    cls._count_jsonl(brp_dir / "plans.jsonl"),
+                    cls._count_jsonl(brp_dir / "responses.jsonl"),
+                    cls._count_jsonl(brp_dir / "observations.jsonl"),
+                    len(adaptive_rules),
+                )
+            ),
+            "data_dir": str(brp_dir),
+            "counts": {
+                "events": cls._count_jsonl(brp_dir / "events.jsonl"),
+                "plans": cls._count_jsonl(brp_dir / "plans.jsonl"),
+                "responses": cls._count_jsonl(brp_dir / "responses.jsonl"),
+                "observations": cls._count_jsonl(brp_dir / "observations.jsonl"),
+            },
+            "recent": {
+                "window_size": recent_limit,
+                "decision_counts": decision_counts,
+                "severity_counts": severity_counts,
+                "mode_counts": mode_counts,
+                "active_adaptive_rules": len(active_rules),
+                "last_evaluation_at": latest_evaluation,
+                "last_observation_at": latest_observation,
+                "max_threat_score": max((float(item.get("threat_score") or 0.0) for item in recent_evaluations), default=0.0),
+                "average_threat_score": average_threat,
+                "top_threat_tags": [
+                    {"tag": tag, "count": count}
+                    for tag, count in sorted(tag_counts.items(), key=lambda item: (-item[1], item[0]))[:10]
+                ],
+            },
+        }
+
+    @classmethod
+    def read_operator_evaluations(
+        cls,
+        data_dir: Optional[str] = None,
+        limit: int = 25,
+    ) -> List[Dict[str, Any]]:
+        """Read normalized BRP evaluations for dashboard/operator views."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        safe_limit = max(1, min(limit, 200))
+        responses = cls._load_jsonl_tail(brp_dir / "responses.jsonl", limit=safe_limit)
+        events = cls._load_jsonl_tail(brp_dir / "events.jsonl", limit=max(safe_limit * 4, 200))
+        plans = cls._load_jsonl_tail(brp_dir / "plans.jsonl", limit=max(safe_limit * 4, 200))
+        event_index = {str(record.get("event_id")): record for record in events}
+        plan_index = {str(record.get("plan_id")): record for record in plans}
+
+        evaluations: List[Dict[str, Any]] = []
+        for response in responses:
+            event_id = str(response.get("event_id") or "")
+            event_record = event_index.get(event_id)
+            plan_record = plan_index.get(event_id)
+            source_record = event_record or plan_record or {}
+            record_type = "event" if event_record else "plan" if plan_record else "unknown"
+            metadata = response.get("metadata") if isinstance(response.get("metadata"), dict) else {}
+            predictive = metadata.get("predictive_assessment") if isinstance(metadata.get("predictive_assessment"), dict) else {}
+            multimodal = metadata.get("multimodal_assessment") if isinstance(metadata.get("multimodal_assessment"), dict) else {}
+            predictive_steps = metadata.get("predictive_steps") if isinstance(metadata.get("predictive_steps"), list) else []
+            multimodal_steps = metadata.get("multimodal_steps") if isinstance(metadata.get("multimodal_steps"), list) else []
+
+            step_predictive_boost = max((float(step.get("score_boost") or 0.0) for step in predictive_steps), default=0.0)
+            step_multimodal_boost = max((float(step.get("score_boost") or 0.0) for step in multimodal_steps), default=0.0)
+            step_multimodal_detections = sum(
+                int((step.get("summary") or {}).get("total_detections", 0))
+                for step in multimodal_steps
+                if isinstance(step, dict)
+            )
+
+            evaluations.append(
+                {
+                    "response_id": response.get("response_id"),
+                    "event_id": event_id,
+                    "record_type": record_type,
+                    "timestamp": response.get("timestamp"),
+                    "decision": response.get("decision"),
+                    "mode": response.get("mode"),
+                    "severity": response.get("severity"),
+                    "threat_score": response.get("threat_score"),
+                    "confidence": response.get("confidence"),
+                    "threat_tags": response.get("threat_tags", []),
+                    "summary": response.get("summary"),
+                    "source_agent": source_record.get("source_agent"),
+                    "event_type": source_record.get("event_type", "plan_review" if plan_record else None),
+                    "action": source_record.get("action", "plan_review" if plan_record else None),
+                    "step_count": len(plan_record.get("steps", [])) if plan_record else None,
+                    "predictive_score_boost": round(
+                        max(float(predictive.get("score_boost") or 0.0), step_predictive_boost),
+                        4,
+                    ),
+                    "multimodal_score_boost": round(
+                        max(float(multimodal.get("score_boost") or 0.0), step_multimodal_boost),
+                        4,
+                    ),
+                    "multimodal_detections": (
+                        int((multimodal.get("summary") or {}).get("total_detections", 0))
+                        if multimodal
+                        else step_multimodal_detections
+                    ),
+                    "metadata": metadata,
+                }
+            )
+
+        evaluations.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
+        return evaluations[:safe_limit]
+
+    @classmethod
+    def read_operator_adaptive_rules(
+        cls,
+        data_dir: Optional[str] = None,
+        limit: int = 50,
+    ) -> List[Dict[str, Any]]:
+        """Read adaptive rules in operator-friendly sorted order."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        data = cls._load_json_file(brp_dir / "adaptive_rules.json")
+        if not isinstance(data, dict):
+            return []
+
+        rules: List[Dict[str, Any]] = []
+        for key, value in data.items():
+            if not isinstance(value, dict):
+                continue
+            rules.append({"key": key, **value})
+
+        rules.sort(
+            key=lambda item: (
+                not bool(item.get("active", True)),
+                -int(item.get("count", 0)),
+                str(item.get("last_seen") or ""),
+                str(item.get("key") or ""),
+            ),
+            reverse=False,
+        )
+        return rules[: max(1, min(limit, 500))]
+
     # ------------------------------------------------------------------
     # Scoring internals
     # ------------------------------------------------------------------
@@ -469,6 +641,33 @@ class BRPBridge:
                 except json.JSONDecodeError:
                     continue
         return records
+
+    @staticmethod
+    def _load_json_file(filepath: Path) -> Any:
+        if not filepath.exists():
+            return None
+        try:
+            with open(filepath, "r", encoding="utf-8") as handle:
+                return json.load(handle)
+        except (OSError, json.JSONDecodeError):
+            return None
+
+    @classmethod
+    def _resolve_data_dir(cls, data_dir: Optional[str] = None) -> Path:
+        if data_dir:
+            return Path(data_dir)
+        return cls._REPO_ROOT / "data" / "brp"
+
+    @staticmethod
+    def _count_jsonl(filepath: Path) -> int:
+        if not filepath.exists():
+            return 0
+        count = 0
+        with open(filepath, "r", encoding="utf-8") as handle:
+            for line in handle:
+                if line.strip():
+                    count += 1
+        return count
 
     def _load_adaptive_rules(self) -> Dict[str, Dict[str, Any]]:
         if not self.adaptive_rules_file.exists():

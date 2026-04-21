@@ -338,3 +338,40 @@ class TestPredictiveSafety:
         multimodal_steps = resp.metadata["multimodal_steps"]
         assert any(step["summary"]["total_detections"] > 0 for step in multimodal_steps)
         assert "multimodal_code_risk" in resp.threat_tags
+
+
+class TestOperatorReadHelpers:
+    def test_operator_status_and_evaluations(self, bridge, tmp_data_dir):
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="run_shell",
+            context={"projectx_action": "run_shell", "details": "autonomous fuzz bypass"},
+            tags=["projectx", "network"],
+        )
+        plan = BRPPlan(
+            source_agent="mother_goose",
+            mode=BRPMode.ADVISORY.value,
+            steps=[{"action": "withdrawal"}],
+        )
+        bridge.evaluate_event(event)
+        bridge.evaluate_plan(plan)
+        bridge.ingest_observation(
+            BRPObservation(
+                source_agent="projectx_native",
+                action="run_shell",
+                event_id=event.event_id,
+                outcome="failure",
+            )
+        )
+
+        status = BRPBridge.read_operator_status(data_dir=tmp_data_dir, recent_limit=10)
+        evaluations = BRPBridge.read_operator_evaluations(data_dir=tmp_data_dir, limit=10)
+        rules = BRPBridge.read_operator_adaptive_rules(data_dir=tmp_data_dir, limit=10)
+
+        assert status["status"] == "success"
+        assert status["counts"]["responses"] == 2
+        assert status["counts"]["observations"] == 1
+        assert status["recent"]["decision_counts"]
+        assert evaluations[0]["record_type"] in {"event", "plan"}
+        assert any(item["event_id"] == event.event_id for item in evaluations)
+        assert isinstance(rules, list)
