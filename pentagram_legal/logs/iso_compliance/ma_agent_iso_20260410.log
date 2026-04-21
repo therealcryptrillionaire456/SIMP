@@ -1,0 +1,92 @@
+2026-04-10 18:31:53,473 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:31:53,474 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:31:53,474 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:31:53,474 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:31:53,475 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:31:53,475 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:31:53,475 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:31:53,475 - iso_compliance - INFO - Hardening layer initialized for agent integration_test_agent
+2026-04-10 18:32:46,829 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:32:46,830 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:32:46,830 - iso_compliance - INFO - Audit trail generated for test_hardened_txn_001
+2026-04-10 18:32:46,830 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:32:46,830 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:32:46,830 - iso_compliance - INFO - Security check passed for create_transaction
+2026-04-10 18:32:46,830 - iso_compliance - INFO - Transaction creation validation passed: test_hardened_txn_002
+2026-04-10 18:32:46,831 - iso_compliance - INFO - ISO compliance check for test_hardened_txn_002: non-compliant
+2026-04-10 18:32:46,831 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:32:46,831 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:32:46,831 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:32:46,831 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:32:46,831 - iso_compliance - INFO - ISO compliance check for test_hardened_txn_001: non-compliant
+2026-04-10 18:32:46,832 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:32:46,832 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:32:46,844 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:32:46,844 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:32:46,844 - iso_compliance - WARNING - Security check failed for create_transaction: ['SQL injection attempt']
+2026-04-10 18:32:46,845 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:32:46,845 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:32:46,845 - iso_compliance - WARNING - Transaction creation validation failed: ['Missing required field: parties']
+2026-04-10 18:32:46,845 - iso_compliance - INFO - Hardening layer initialized for agent integration_test_agent
+2026-04-10 18:32:46,845 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: integration_test_agent
+2026-04-10 18:32:46,845 - iso_compliance - INFO - Security check passed for create_transaction
+2026-04-10 18:32:46,845 - iso_compliance - INFO - Transaction creation validation passed: integration_txn_001
+2026-04-10 18:32:46,845 - iso_compliance - INFO - ISO compliance check for integration_txn_001: non-compliant
+2026-04-10 18:32:46,845 - iso_compliance - INFO - ISO compliance check for integration_txn_001: non-compliant
+2026-04-10 18:32:46,845 - iso_compliance - INFO - Audit trail generated for integration_txn_001
+2026-04-10 18:33:03,577 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:03,577 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:03,577 - iso_compliance - INFO - Audit trail generated for test_hardened_txn_001
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Security check passed for create_transaction
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Transaction creation validation passed: test_hardened_txn_002
+2026-04-10 18:33:03,578 - iso_compliance - INFO - ISO compliance check for test_hardened_txn_002: non-compliant
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:03,578 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:03,578 - iso_compliance - INFO - ISO compliance check for test_hardened_txn_001: non-compliant
+2026-04-10 18:33:03,579 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:03,579 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:03,591 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:03,591 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:03,592 - iso_compliance - WARNING - Security check failed for create_transaction: ['SQL injection attempt']
+2026-04-10 18:33:03,592 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:03,592 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:03,592 - iso_compliance - WARNING - Transaction creation validation failed: ['Missing required field: parties']
+2026-04-10 18:33:03,592 - iso_compliance - INFO - Hardening layer initialized for agent integration_test_agent
+2026-04-10 18:33:03,592 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: integration_test_agent
+2026-04-10 18:33:03,592 - iso_compliance - INFO - Security check passed for create_transaction
+2026-04-10 18:33:03,592 - iso_compliance - INFO - Transaction creation validation passed: integration_txn_001
+2026-04-10 18:33:03,592 - iso_compliance - INFO - ISO compliance check for integration_txn_001: non-compliant
+2026-04-10 18:33:03,592 - iso_compliance - INFO - ISO compliance check for integration_txn_001: non-compliant
+2026-04-10 18:33:03,592 - iso_compliance - INFO - Audit trail generated for integration_txn_001
+2026-04-10 18:33:36,249 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:36,250 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:36,250 - iso_compliance - INFO - Audit trail generated for test_hardened_txn_001
+2026-04-10 18:33:36,250 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:36,250 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:36,250 - iso_compliance - INFO - Security check passed for create_transaction
+2026-04-10 18:33:36,250 - iso_compliance - INFO - Transaction creation validation passed: test_hardened_txn_002
+2026-04-10 18:33:36,251 - iso_compliance - INFO - ISO compliance check for test_hardened_txn_002: non-compliant
+2026-04-10 18:33:36,251 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:36,251 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:36,251 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:36,251 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:36,251 - iso_compliance - INFO - ISO compliance check for test_hardened_txn_001: non-compliant
+2026-04-10 18:33:36,251 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:36,251 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:36,264 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:36,264 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:36,264 - iso_compliance - WARNING - Security check failed for create_transaction: ['SQL injection attempt']
+2026-04-10 18:33:36,264 - iso_compliance - INFO - Hardening layer initialized for agent test_hardened_ma_agent
+2026-04-10 18:33:36,264 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: test_hardened_ma_agent
+2026-04-10 18:33:36,264 - iso_compliance - WARNING - Transaction creation validation failed: ['Missing required field: parties']
+2026-04-10 18:33:36,265 - iso_compliance - INFO - Hardening layer initialized for agent integration_test_agent
+2026-04-10 18:33:36,265 - iso_compliance - INFO - Hardened M&A Transaction Agent initialized: integration_test_agent
+2026-04-10 18:33:36,265 - iso_compliance - INFO - Security check passed for create_transaction
+2026-04-10 18:33:36,265 - iso_compliance - INFO - Transaction creation validation passed: integration_txn_001
+2026-04-10 18:33:36,265 - iso_compliance - INFO - ISO compliance check for integration_txn_001: non-compliant
+2026-04-10 18:33:36,265 - iso_compliance - INFO - ISO compliance check for integration_txn_001: non-compliant
+2026-04-10 18:33:36,265 - iso_compliance - INFO - Audit trail generated for integration_txn_001

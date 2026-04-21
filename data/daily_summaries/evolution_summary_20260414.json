@@ -1,0 +1,22 @@
+{
+  "date": "2026-04-14",
+  "timestamp": "2026-04-14T18:14:08.368959Z",
+  "total_components": 2,
+  "successful_components": 2,
+  "components": [
+    {
+      "name": "brp_threat_detection",
+      "success": true,
+      "score": 0.634245204364975,
+      "improvement": 26.849040872995,
+      "rounds": 5
+    },
+    {
+      "name": "quantumarb_trading",
+      "success": true,
+      "score": 24361.862524731863,
+      "improvement": 0.0,
+      "rounds": 5
+    }
+  ]
+}

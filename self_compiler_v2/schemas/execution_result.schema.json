@@ -1,0 +1,304 @@
+{
+  "$schema": "http://json-schema.org/draft-2020-12/schema",
+  "title": "ExecutionResult",
+  "description": "Result of executing a self-compilation task",
+  "type": "object",
+  
+  "properties": {
+    "execution_id": {
+      "type": "string",
+      "description": "Unique identifier for this execution",
+      "format": "uuid",
+      "examples": ["660e8400-e29b-41d4-a716-446655440001"]
+    },
+    
+    "prompt_id": {
+      "type": "string",
+      "description": "ID of the prompt that was executed",
+      "format": "uuid",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"]
+    },
+    
+    "status": {
+      "type": "string",
+      "description": "Overall execution status",
+      "enum": ["success", "failed", "timeout", "cancelled", "resource_exceeded"],
+      "default": "success"
+    },
+    
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When execution started",
+      "examples": ["2026-04-14T13:37:00Z"]
+    },
+    
+    "end_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When execution ended",
+      "examples": ["2026-04-14T13:37:30Z"]
+    },
+    
+    "exit_code": {
+      "type": "integer",
+      "description": "Process exit code",
+      "minimum": 0,
+      "maximum": 255,
+      "default": 0
+    },
+    
+    "stdout_path": {
+      "type": "string",
+      "description": "Path to captured stdout",
+      "pattern": "^[a-zA-Z0-9_\\-\\./]+\\.txt$",
+      "examples": ["/staging/exec_660e8400/stdout.txt"]
+    },
+    
+    "stderr_path": {
+      "type": "string",
+      "description": "Path to captured stderr",
+      "pattern": "^[a-zA-Z0-9_\\-\\./]+\\.txt$",
+      "examples": ["/staging/exec_660e8400/stderr.txt"]
+    },
+    
+    "artifacts_created": {
+      "type": "array",
+      "description": "Files created during execution",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_\\-\\./]+$",
+        "examples": ["/staging/inventory.py", "/staging/test_output.json"]
+      },
+      "default": []
+    },
+    
+    "tests_run": {
+      "type": "integer",
+      "description": "Number of tests executed",
+      "minimum": 0,
+      "default": 0
+    },
+    
+    "tests_passed": {
+      "type": "integer",
+      "description": "Number of tests that passed",
+      "minimum": 0,
+      "default": 0
+    },
+    
+    "evaluation_status": {
+      "type": "string",
+      "description": "Status of evaluation",
+      "enum": ["pending", "in_progress", "completed", "failed"],
+      "default": "pending"
+    },
+    
+    "resource_usage": {
+      "type": "object",
+      "description": "Resource consumption metrics",
+      "properties": {
+        "cpu_time_seconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "CPU time used"
+        },
+        
+        "memory_peak_mb": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Peak memory usage"
+        },
+        
+        "disk_usage_mb": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Disk space used"
+        },
+        
+        "network_usage_kb": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Network traffic"
+        }
+      }
+    },
+    
+    "errors": {
+      "type": "array",
+      "description": "Errors encountered during execution",
+      "items": {
+        "type": "object",
+        "properties": {
+          "error_code": {
+            "type": "string",
+            "description": "Error code"
+          },
+          "error_message": {
+            "type": "string",
+            "description": "Error description"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "warning", "error", "critical"]
+          }
+        }
+      },
+      "default": []
+    },
+    
+    "warnings": {
+      "type": "array",
+      "description": "Warnings generated during execution",
+      "items": {
+        "type": "object",
+        "properties": {
+          "warning_code": {
+            "type": "string"
+          },
+          "warning_message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "default": []
+    },
+    
+    "metadata": {
+      "type": "object",
+      "description": "Execution metadata",
+      "properties": {
+        "execution_mode": {
+          "type": "string",
+          "enum": ["python", "bash", "document_transform", "analysis_only"]
+        },
+        
+        "sandbox_used": {
+          "type": "string",
+          "description": "Sandbox environment used",
+          "examples": ["local", "docker", "none"]
+        },
+        
+        "timeout_enforced": {
+          "type": "boolean",
+          "description": "Whether timeout was enforced"
+        },
+        
+        "resource_limits_exceeded": {
+          "type": "boolean",
+          "description": "Whether resource limits were exceeded"
+        },
+        
+        "security_violations": {
+          "type": "array",
+          "description": "Security policy violations",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  
+  "required": [
+    "execution_id",
+    "prompt_id",
+    "status",
+    "start_time",
+    "end_time",
+    "exit_code",
+    "stdout_path",
+    "stderr_path",
+    "artifacts_created",
+    "tests_run",
+    "tests_passed",
+    "evaluation_status"
+  ],
+  
+  "additionalProperties": false,
+  
+  "examples": [
+    {
+      "execution_id": "660e8400-e29b-41d4-a716-446655440001",
+      "prompt_id": "550e8400-e29b-41d4-a716-446655440000",
+      "status": "success",
+      "start_time": "2026-04-14T13:37:00Z",
+      "end_time": "2026-04-14T13:37:30Z",
+      "exit_code": 0,
+      "stdout_path": "/staging/exec_660e8400/stdout.txt",
+      "stderr_path": "/staging/exec_660e8400/stderr.txt",
+      "artifacts_created": [
+        "/staging/inventory.py",
+        "/staging/inventory_config.json"
+      ],
+      "tests_run": 5,
+      "tests_passed": 5,
+      "evaluation_status": "pending",
+      "resource_usage": {
+        "cpu_time_seconds": 2.5,
+        "memory_peak_mb": 45.2,
+        "disk_usage_mb": 0.8,
+        "network_usage_kb": 0
+      },
+      "errors": [],
+      "warnings": [
+        {
+          "warning_code": "WARN_SLOW_EXECUTION",
+          "warning_message": "Execution took longer than expected",
+          "timestamp": "2026-04-14T13:37:25Z"
+        }
+      ],
+      "metadata": {
+        "execution_mode": "python",
+        "sandbox_used": "local",
+        "timeout_enforced": false,
+        "resource_limits_exceeded": false,
+        "security_violations": []
+      }
+    },
+    {
+      "execution_id": "770e8400-e29b-41d4-a716-446655440002",
+      "prompt_id": "550e8400-e29b-41d4-a716-446655440000",
+      "status": "failed",
+      "start_time": "2026-04-14T13:38:00Z",
+      "end_time": "2026-04-14T13:38:10Z",
+      "exit_code": 1,
+      "stdout_path": "/staging/exec_770e8400/stdout.txt",
+      "stderr_path": "/staging/exec_770e8400/stderr.txt",
+      "artifacts_created": [],
+      "tests_run": 0,
+      "tests_passed": 0,
+      "evaluation_status": "failed",
+      "resource_usage": {
+        "cpu_time_seconds": 0.5,
+        "memory_peak_mb": 25.1,
+        "disk_usage_mb": 0.1,
+        "network_usage_kb": 0
+      },
+      "errors": [
+        {
+          "error_code": "ERR_SYNTAX_ERROR",
+          "error_message": "SyntaxError: invalid syntax on line 15",
+          "timestamp": "2026-04-14T13:38:05Z",
+          "severity": "error"
+        }
+      ],
+      "warnings": [],
+      "metadata": {
+        "execution_mode": "python",
+        "sandbox_used": "local",
+        "timeout_enforced": false,
+        "resource_limits_exceeded": false,
+        "security_violations": []
+      }
+    }
+  ]
+}

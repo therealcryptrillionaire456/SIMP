@@ -1,0 +1,347 @@
+{
+  "project_name": "KeepTheChange.com Dynamic GUI",
+  "project_description": "AI-powered shopping assistant that automatically finds cheapest grocery prices, purchases items, arranges express shipping, and reinvests savings into cryptocurrency markets. Users can tip agents and subscribe to investment tiers for a share of crypto returns.",
+  
+  "backend_architecture": {
+    "framework": "FastAPI with SQLAlchemy (async)",
+    "database": "PostgreSQL",
+    "authentication": "JWT tokens with OAuth2",
+    "file_structure": {
+      "api_routers": [
+        "shopping.py",
+        "crypto.py", 
+        "subscriptions.py",
+        "users.py",
+        "payments.py",
+        "admin.py",
+        "mobile.py"
+      ],
+      "schemas": [
+        "shopping.py",
+        "crypto.py",
+        "user.py",
+        "subscription.py", 
+        "payment.py",
+        "admin.py"
+      ]
+    }
+  },
+  
+  "api_endpoints": {
+    "authentication": {
+      "POST /api/auth/login": "User login with email/password",
+      "POST /api/auth/register": "User registration",
+      "POST /api/auth/refresh": "Refresh JWT token",
+      "POST /api/auth/logout": "User logout",
+      "POST /api/auth/forgot-password": "Password reset request",
+      "POST /api/auth/reset-password": "Password reset confirmation"
+    },
+    
+    "user_management": {
+      "GET /api/users/me": "Get current user profile",
+      "PUT /api/users/me": "Update user profile",
+      "GET /api/users/me/preferences": "Get user preferences",
+      "PUT /api/users/me/preferences": "Update user preferences",
+      "GET /api/users/me/notifications": "Get user notifications",
+      "PUT /api/users/me/notifications/{notification_id}/read": "Mark notification as read",
+      "DELETE /api/users/me": "Delete user account"
+    },
+    
+    "shopping": {
+      "POST /api/shopping/receipts/scan": "Scan receipt image/text",
+      "GET /api/shopping/receipts": "List user receipts",
+      "GET /api/shopping/receipts/{receipt_id}": "Get receipt details",
+      "POST /api/shopping/optimize": "Optimize shopping list for price",
+      "POST /api/shopping/purchase": "Make purchase with optimized items",
+      "GET /api/shopping/purchases": "List user purchases",
+      "GET /api/shopping/purchases/{purchase_id}": "Get purchase details",
+      "POST /api/shopping/barcode/scan": "Scan barcode for product info",
+      "GET /api/shopping/retailers": "List supported retailers",
+      "GET /api/shopping/products/search": "Search products across retailers",
+      "GET /api/shopping/products/{product_id}": "Get product details"
+    },
+    
+    "crypto_investment": {
+      "GET /api/crypto/portfolio": "Get user crypto portfolio",
+      "GET /api/crypto/transactions": "List crypto transactions",
+      "GET /api/crypto/transactions/{transaction_id}": "Get transaction details",
+      "POST /api/crypto/invest": "Invest savings into crypto",
+      "POST /api/crypto/withdraw": "Withdraw from crypto portfolio",
+      "GET /api/crypto/market-data": "Get current crypto market data",
+      "GET /api/crypto/historical/{symbol}": "Get historical price data",
+      "GET /api/crypto/performance": "Get portfolio performance metrics",
+      "GET /api/crypto/allocations": "Get current allocation strategy",
+      "PUT /api/crypto/allocations": "Update allocation strategy"
+    },
+    
+    "subscriptions": {
+      "GET /api/subscriptions/plans": "List available subscription plans",
+      "GET /api/subscriptions/current": "Get current subscription",
+      "POST /api/subscriptions/subscribe": "Subscribe to a plan",
+      "POST /api/subscriptions/cancel": "Cancel subscription",
+      "POST /api/subscriptions/upgrade": "Upgrade subscription tier",
+      "GET /api/subscriptions/invoices": "List subscription invoices",
+      "GET /api/subscriptions/invoices/{invoice_id}": "Get invoice details",
+      "POST /api/subscriptions/promo-code": "Apply promo code",
+      "GET /api/subscriptions/trial-status": "Check trial status"
+    },
+    
+    "payments": {
+      "GET /api/payments/methods": "List payment methods",
+      "POST /api/payments/methods": "Add payment method",
+      "DELETE /api/payments/methods/{method_id}": "Remove payment method",
+      "POST /api/payments/tip": "Tip agent",
+      "GET /api/payments/transactions": "List payment transactions",
+      "GET /api/payments/balance": "Get user balance",
+      "POST /api/payments/deposit": "Deposit funds",
+      "POST /api/payments/withdraw": "Withdraw funds"
+    },
+    
+    "admin": {
+      "GET /api/admin/users": "List all users (admin only)",
+      "GET /api/admin/users/{user_id}": "Get user details (admin only)",
+      "PUT /api/admin/users/{user_id}": "Update user (admin only)",
+      "GET /api/admin/transactions": "List all transactions (admin only)",
+      "GET /api/admin/financial-report": "Generate financial report (admin only)",
+      "GET /api/admin/system-metrics": "Get system metrics (admin only)",
+      "GET /api/admin/audit-logs": "Get audit logs (admin only)",
+      "POST /api/admin/broadcast": "Send broadcast notification (admin only)"
+    }
+  },
+  
+  "data_models": {
+    "User": {
+      "id": "UUID",
+      "email": "string",
+      "first_name": "string",
+      "last_name": "string",
+      "phone": "string (optional)",
+      "avatar_url": "string (optional)",
+      "preferences": "JSON object",
+      "created_at": "datetime",
+      "updated_at": "datetime",
+      "email_verified": "boolean",
+      "phone_verified": "boolean",
+      "status": "string (active, suspended, deleted)"
+    },
+    
+    "Receipt": {
+      "id": "UUID",
+      "user_id": "UUID",
+      "retailer": "string",
+      "total_amount": "decimal",
+      "tax_amount": "decimal",
+      "items": "JSON array of items",
+      "scan_method": "string (image, text, manual)",
+      "scan_confidence": "float",
+      "scan_date": "datetime",
+      "created_at": "datetime"
+    },
+    
+    "Purchase": {
+      "id": "UUID",
+      "user_id": "UUID",
+      "receipt_id": "UUID (optional)",
+      "items": "JSON array of purchased items",
+      "total_amount": "decimal",
+      "savings_amount": "decimal",
+      "status": "string (pending, processing, shipped, delivered, cancelled)",
+      "tracking_number": "string (optional)",
+      "estimated_delivery": "datetime (optional)",
+      "actual_delivery": "datetime (optional)",
+      "created_at": "datetime"
+    },
+    
+    "CryptoPortfolio": {
+      "user_id": "UUID",
+      "total_value": "decimal",
+      "available_balance": "decimal",
+      "invested_balance": "decimal",
+      "allocations": "JSON object of asset allocations",
+      "daily_change": "decimal",
+      "total_return": "decimal",
+      "last_updated": "datetime"
+    },
+    
+    "Subscription": {
+      "id": "UUID",
+      "user_id": "UUID",
+      "plan_id": "string",
+      "plan_name": "string",
+      "status": "string (active, cancelled, expired, trial)",
+      "current_period_start": "datetime",
+      "current_period_end": "datetime",
+      "cancel_at_period_end": "boolean",
+      "created_at": "datetime",
+      "updated_at": "datetime"
+    }
+  },
+  
+  "ui_requirements": {
+    "design_system": {
+      "theme": "Modern, clean, financial-tech aesthetic",
+      "primary_color": "#10B981 (Emerald green - represents growth/savings)",
+      "secondary_color": "#3B82F6 (Blue - represents trust/stability)",
+      "accent_color": "#8B5CF6 (Purple - represents premium/crypto)",
+      "typography": "Inter font family (sans-serif)",
+      "border_radius": "8px",
+      "shadows": "Subtle elevation shadows",
+      "animations": "Smooth transitions (300ms)"
+    },
+    
+    "responsive_breakpoints": {
+      "mobile": "0px - 767px",
+      "tablet": "768px - 1023px",
+      "desktop": "1024px - 1439px",
+      "large_desktop": "1440px+"
+    },
+    
+    "authentication_flows": {
+      "login_page": "Email/password form with 'Remember me' and 'Forgot password'",
+      "registration_page": "Multi-step form with email verification",
+      "password_reset": "Email-based reset flow",
+      "social_login": "Optional Google/Apple login integration points"
+    },
+    
+    "main_dashboard": {
+      "layout": "Sidebar navigation with main content area",
+      "sidebar_sections": [
+        "Dashboard (overview)",
+        "Shopping",
+        "Crypto Portfolio",
+        "Subscriptions",
+        "Payments",
+        "Settings"
+      ],
+      "header": "User avatar, notifications bell, search bar",
+      "overview_cards": [
+        "Total Savings",
+        "Crypto Portfolio Value",
+        "Active Subscription",
+        "Recent Purchases"
+      ]
+    },
+    
+    "shopping_module": {
+      "receipt_scanning": {
+        "upload_interface": "Drag & drop or click to upload receipt images",
+        "text_input": "Manual entry form for receipt text",
+        "scan_preview": "Preview of scanned items with edit capability",
+        "confidence_indicator": "Visual indicator of scan accuracy"
+      },
+      "price_optimization": {
+        "optimization_results": "Side-by-side comparison of original vs optimized",
+        "savings_breakdown": "Visual breakdown of savings per item",
+        "retailer_comparison": "Table showing prices across different retailers",
+        "one_click_purchase": "Single button to purchase all optimized items"
+      },
+      "purchase_tracking": {
+        "order_timeline": "Visual timeline of purchase status",
+        "tracking_integration": "Real-time shipping updates",
+        "delivery_estimates": "Countdown to estimated delivery"
+      }
+    },
+    
+    "crypto_module": {
+      "portfolio_overview": {
+        "portfolio_chart": "Interactive pie/donut chart of allocations",
+        "performance_graph": "Line chart of portfolio value over time",
+        "quick_stats": "Total value, 24h change, total return"
+      },
+      "investment_interface": {
+        "investment_form": "Amount input with source selection (savings vs balance)",
+        "allocation_strategy": "Visual selector for investment strategy",
+        "confirmation_modal": "Review details before investing"
+      },
+      "transaction_history": {
+        "filterable_table": "Sort/filter by date, type, amount, status",
+        "export_options": "CSV/PDF export capability",
+        "transaction_details": "Modal with full transaction details"
+      }
+    },
+    
+    "subscription_module": {
+      "plan_comparison": {
+        "comparison_table": "Feature comparison across tiers",
+        "tier_cards": "Visual cards for each subscription level",
+        "upgrade_path": "Visual guide showing upgrade benefits"
+      },
+      "billing_management": {
+        "payment_methods": "List with ability to add/remove",
+        "invoice_history": "Downloadable invoices",
+        "billing_cycle": "Visual representation of current billing period"
+      }
+    },
+    
+    "admin_panel": {
+      "access_control": "Role-based access (admin only)",
+      "user_management": "CRUD interface for user accounts",
+      "financial_reports": "Interactive charts and data tables",
+      "system_monitoring": "Real-time metrics and alerts"
+    }
+  },
+  
+  "state_management": {
+    "authentication_state": "JWT token storage, user profile, permissions",
+    "shopping_state": "Current cart, receipt scans, optimization results",
+    "crypto_state": "Portfolio data, market prices, transaction history",
+    "ui_state": "Sidebar collapse, theme preferences, notifications"
+  },
+  
+  "real_time_features": {
+    "notifications": {
+      "types": ["purchase_updates", "crypto_price_alerts", "system_announcements"],
+      "delivery": "In-app toast notifications + push notifications (optional)",
+      "preferences": "User-configurable notification settings"
+    },
+    "live_updates": {
+      "crypto_prices": "WebSocket updates for portfolio value",
+      "order_status": "Real-time shipping updates",
+      "system_status": "Service availability indicators"
+    }
+  },
+  
+  "performance_requirements": {
+    "loading_times": "First contentful paint < 1.5s, Time to interactive < 3s",
+    "bundle_size": "Initial load < 500KB, total < 2MB",
+    "caching": "API response caching, asset caching with versioning",
+    "lazy_loading": "Code splitting for routes, image lazy loading"
+  },
+  
+  "accessibility": {
+    "wcag_compliance": "AA level compliance target",
+    "keyboard_navigation": "Full keyboard support",
+    "screen_reader": "ARIA labels, semantic HTML",
+    "color_contrast": "Minimum 4.5:1 contrast ratio"
+  },
+  
+  "browser_support": {
+    "modern_browsers": "Chrome 90+, Firefox 88+, Safari 14+, Edge 90+",
+    "mobile_browsers": "iOS Safari 14+, Chrome for Android 90+"
+  },
+  
+  "development_requirements": {
+    "framework": "React 18+ with TypeScript",
+    "state_management": "React Query for server state, Zustand for client state",
+    "styling": "Tailwind CSS with custom design tokens",
+    "form_handling": "React Hook Form with Zod validation",
+    "charts": "Recharts or Chart.js for data visualization",
+    "icons": "Lucide React icon library",
+    "testing": "Vitest + React Testing Library",
+    "build_tool": "Vite for fast development and building"
+  },
+  
+  "deployment": {
+    "hosting": "Vercel, Netlify, or AWS Amplify",
+    "environment_variables": "API base URL, authentication keys, feature flags",
+    "ci_cd": "Automated tests and deployments on git push"
+  },
+  
+  "deliverables": {
+    "source_code": "Complete React TypeScript project",
+    "build_artifacts": "Production-ready static files",
+    "documentation": "Component documentation with Storybook",
+    "api_integration": "Fully connected to backend endpoints",
+    "responsive_design": "Mobile-first responsive implementation"
+  }
+}

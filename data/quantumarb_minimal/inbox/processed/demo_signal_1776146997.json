@@ -1,0 +1,22 @@
+{
+  "intent_type": "arbitrage_signal",
+  "source_agent": "demo",
+  "target_agent": "quantumarb_minimal",
+  "timestamp": "2026-04-14T06:09:57.156832",
+  "payload": {
+    "signal_id": "demo_signal_1776146997",
+    "arb_type": "cross_venue",
+    "symbol_a": "BTC-USD",
+    "symbol_b": "BTC-USD",
+    "venue_a": "coinbase_sandbox",
+    "venue_b": "coinbase_sandbox",
+    "spread_pct": 0.05,
+    "expected_return_pct": 0.03,
+    "confidence": 0.8,
+    "metadata": {
+      "demo": true,
+      "phase": 4,
+      "microscopic": true
+    }
+  }
+}

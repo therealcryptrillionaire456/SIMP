@@ -1,0 +1,396 @@
+{
+  "name": "Compliance Check & Approval",
+  "nodes": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 300],
+      "parameters": {
+        "path": "compliance-check",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "compliance-check-webhook"
+    },
+    {
+      "name": "Parse Compliance Request",
+      "type": "n8n-nodes-base.code",
+      "position": [450, 300],
+      "parameters": {
+        "jsCode": "// Parse and validate compliance check request\nconst request = $input.first().json;\n\n// Validate required fields\nconst requiredFields = ['content_type', 'content_data', 'platforms', 'target_regions'];\nconst missingFields = requiredFields.filter(field => !request[field]);\n\nif (missingFields.length > 0) {\n  return {\n    json: {\n      error: `Missing required fields: ${missingFields.join(', ')}`,\n      valid: false,\n      request_id: request.request_id || `comp_${Date.now()}`\n    }\n  };\n}\n\n// Determine check type based on content\nlet checkType = 'standard';\nif (request.content_type === 'affiliate_offer') {\n  checkType = 'affiliate';\n} else if (request.content_type === 'financial_advice') {\n  checkType = 'financial';\n} else if (request.content_type === 'health_advice') {\n  checkType = 'health';\n} else if (request.content_type.includes('crypto') || request.content_type.includes('investment')) {\n  checkType = 'financial';\n}\n\n// Extract content for analysis\nconst contentText = typeof request.content_data === 'string' ? \n  request.content_data : \n  JSON.stringify(request.content_data);\n\nreturn {\n  json: {\n    valid: true,\n    request_id: request.request_id || `comp_${Date.now()}`,\n    check_type: checkType,\n    content_type: request.content_type,\n    platforms: Array.isArray(request.platforms) ? request.platforms : [request.platforms],\n    target_regions: Array.isArray(request.target_regions) ? request.target_regions : [request.target_regions],\n    content_text: contentText.substring(0, 10000), // Limit size\n    metadata: request.metadata || {},\n    urgency: request.urgency || 'normal',\n    submitted_by: request.submitted_by || 'unknown',\n    submitted_at: new Date().toISOString()\n  }\n};"
+      }
+    },
+    {
+      "name": "Check Type Router",
+      "type": "n8n-nodes-base.switch",
+      "position": [650, 300],
+      "parameters": {
+        "dataPropertyName": "check_type",
+        "rules": [
+          {
+            "value": "affiliate"
+          },
+          {
+            "value": "financial"
+          },
+          {
+            "value": "health"
+          },
+          {
+            "value": "standard"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Affiliate Compliance Check",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 100],
+      "parameters": {
+        "jsCode": "// Perform affiliate-specific compliance checks\nconst request = $input.first().json;\nconst content = request.content_text.toLowerCase();\nconst regions = request.target_regions.map(r => r.toLowerCase());\n\nconst checks = {\n  ftc_disclosure: false,\n  clear_terms: false,\n  no_misleading_claims: false,\n  proper_disclaimer: false,\n  region_specific: {}\n};\n\n// FTC disclosure check (US)\nif (regions.includes('us') || regions.includes('usa') || regions.includes('united states')) {\n  const ftcKeywords = ['affiliate', 'commission', 'sponsored', 'ad', '#ad', '#sponsored'];\n  checks.ftc_disclosure = ftcKeywords.some(keyword => content.includes(keyword));\n}\n\n// Clear terms check\nconst termsKeywords = ['terms', 'conditions', 'disclaimer', 'policy'];\nchecks.clear_terms = termsKeywords.some(keyword => content.includes(keyword));\n\n// No misleading claims check\nconst misleadingPhrases = [\n  'get rich quick',\n  'guaranteed results',\n  'risk free',\n  'no risk',\n  'instant success',\n  'overnight success'\n];\nchecks.no_misleading_claims = !misleadingPhrases.some(phrase => content.includes(phrase));\n\n// Proper disclaimer check\nconst disclaimerPhrases = [\n  'results may vary',\n  'individual results',\n  'not financial advice',\n  'consult professional'\n];\nchecks.proper_disclaimer = disclaimerPhrases.some(phrase => content.includes(phrase));\n\n// Region-specific checks\nfor (const region of regions) {\n  checks.region_specific[region] = {\n    passed: true,\n    requirements: []\n  };\n  \n  // EU GDPR requirements\n  if (region.includes('eu') || region.includes('europe')) {\n    checks.region_specific[region].requirements.push('gdpr_compliance');\n    // Check for privacy policy mention\n    if (!content.includes('privacy') && !content.includes('gdpr')) {\n      checks.region_specific[region].passed = false;\n    }\n  }\n  \n  // UK requirements\n  if (region.includes('uk') || region.includes('united kingdom')) {\n    checks.region_specific[region].requirements.push('asa_compliance');\n    // ASA requires clear identification of marketing\n    if (!content.includes('ad') && !content.includes('advert')) {\n      checks.region_specific[region].passed = false;\n    }\n  }\n}\n\n// Calculate overall score\nconst totalChecks = Object.keys(checks).filter(k => k !== 'region_specific').length;\nconst passedChecks = Object.entries(checks)\n  .filter(([key, value]) => key !== 'region_specific' && value === true)\n  .length;\n\nconst regionChecks = Object.values(checks.region_specific);\nconst regionPassed = regionChecks.filter(r => r.passed).length;\nconst regionTotal = regionChecks.length;\n\nconst overallScore = Math.round(\n  ((passedChecks / totalChecks) * 0.7 + (regionPassed / Math.max(regionTotal, 1)) * 0.3) * 100\n);\n\nconst result = {\n  check_type: 'affiliate',\n  checks_performed: checks,\n  overall_score: overallScore,\n  passed: overallScore >= 70,\n  warnings: [],\n  required_actions: []\n};\n\n// Generate warnings\nif (!checks.ftc_disclosure && regions.some(r => r.includes('us'))) {\n  result.warnings.push('Missing FTC disclosure for US audience');\n  result.required_actions.push('Add \"#ad\" or \"affiliate link\" disclosure');\n}\n\nif (!checks.no_misleading_claims) {\n  result.warnings.push('Contains potentially misleading claims');\n  result.required_actions.push('Remove or qualify exaggerated claims');\n}\n\n// Check region-specific failures\nfor (const [region, regionCheck] of Object.entries(checks.region_specific)) {\n  if (!regionCheck.passed) {\n    result.warnings.push(`Failed ${region} specific requirements: ${regionCheck.requirements.join(', ')}`);\n    result.required_actions.push(`Add ${region} compliance statements`);\n  }\n}\n\nreturn result;"
+      }
+    },
+    {
+      "name": "Financial Compliance Check",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 200],
+      "parameters": {
+        "jsCode": "// Perform financial compliance checks\nconst request = $input.first().json;\nconst content = request.content_text.toLowerCase();\nconst regions = request.target_regions.map(r => r.toLowerCase());\n\nconst checks = {\n  risk_disclosure: false,\n  not_advice_disclaimer: false,\n  past_performance_disclaimer: false,\n  no_guarantees: false,\n  regulatory_compliance: {}\n};\n\n// Risk disclosure check\nconst riskKeywords = ['risk', 'volatile', 'uncertain', 'speculative', 'loss'];\nchecks.risk_disclosure = riskKeywords.some(keyword => content.includes(keyword));\n\n// Not financial advice disclaimer\nconst adviceKeywords = ['not financial advice', 'not investment advice', 'consult professional', 'for educational purposes'];\nchecks.not_advice_disclaimer = adviceKeywords.some(keyword => content.includes(keyword));\n\n// Past performance disclaimer\nconst pastPerfKeywords = ['past performance', 'historical results', 'not indicative', 'future results'];\nchecks.past_performance_disclaimer = pastPerfKeywords.some(keyword => content.includes(keyword));\n\n// No guarantees check\nconst guaranteePhrases = ['guaranteed', '100% sure', 'cannot lose', 'risk-free'];\nchecks.no_guarantees = !guaranteePhrases.some(phrase => content.includes(phrase));\n\n// Regulatory compliance by region\nfor (const region of regions) {\n  checks.regulatory_compliance[region] = {\n    passed: true,\n    regulations: []\n  };\n  \n  // US SEC/FINRA requirements\n  if (region.includes('us')) {\n    checks.regulatory_compliance[region].regulations.push('sec', 'finra');\n    // Check for proper disclosures\n    if (!content.includes('sec') && !content.includes('registered')) {\n      checks.regulatory_compliance[region].passed = false;\n    }\n  }\n  \n  // UK FCA requirements\n  if (region.includes('uk')) {\n    checks.regulatory_compliance[region].regulations.push('fca');\n    if (!content.includes('fca') && !content.includes('authorised')) {\n      checks.regulatory_compliance[region].passed = false;\n    }\n  }\n  \n  // EU MiFID requirements\n  if (region.includes('eu')) {\n    checks.regulatory_compliance[region].regulations.push('mifid');\n    if (!content.includes('mifid') && !content.includes('investment firm')) {\n      checks.regulatory_compliance[region].passed = false;\n    }\n  }\n}\n\n// Calculate overall score\nconst totalChecks = Object.keys(checks).filter(k => k !== 'regulatory_compliance').length;\nconst passedChecks = Object.entries(checks)\n  .filter(([key, value]) => key !== 'regulatory_compliance' && value === true)\n  .length;\n\nconst regChecks = Object.values(checks.regulatory_compliance);\nconst regPassed = regChecks.filter(r => r.passed).length;\nconst regTotal = regChecks.length;\n\nconst overallScore = Math.round(\n  ((passedChecks / totalChecks) * 0.6 + (regPassed / Math.max(regTotal, 1)) * 0.4) * 100\n);\n\nconst result = {\n  check_type: 'financial',\n  checks_performed: checks,\n  overall_score: overallScore,\n  passed: overallScore >= 80, // Higher threshold for financial\n  warnings: [],\n  required_actions: [],\n  high_risk: false\n};\n\n// Generate warnings and determine risk level\nif (!checks.risk_disclosure) {\n  result.warnings.push('Missing risk disclosure');\n  result.required_actions.push('Add risk warning statement');\n  result.high_risk = true;\n}\n\nif (!checks.not_advice_disclaimer) {\n  result.warnings.push('Missing \"not financial advice\" disclaimer');\n  result.required_actions.push('Add clear disclaimer that this is not financial advice');\n  result.high_risk = true;\n}\n\nif (!checks.no_guarantees) {\n  result.warnings.push('Contains guarantee language');\n  result.required_actions.push('Remove guarantee language');\n  result.high_risk = true;\n}\n\n// Check regulatory failures\nfor (const [region, regCheck] of Object.entries(checks.regulatory_compliance)) {\n  if (!regCheck.passed) {\n    result.warnings.push(`Failed ${region} regulatory requirements: ${regCheck.regulations.join(', ')}`);\n    result.required_actions.push(`Add ${region} regulatory disclosures`);\n    result.high_risk = true;\n  }\n}\n\nreturn result;"
+      }
+    },
+    {
+      "name": "Standard Compliance Check",
+      "type": "n8n-nodes-base.code",
+      "position": [850, 300],
+      "parameters": {
+        "jsCode": "// Perform standard compliance checks\nconst request = $input.first().json;\nconst content = request.content_text.toLowerCase();\nconst platforms = request.platforms.map(p => p.toLowerCase());\n\nconst checks = {\n  no_hate_speech: true,\n  no_harassment: true,\n  appropriate_content: true,\n  copyright_compliance: true,\n  platform_specific: {}\n};\n\n// Hate speech check\nconst hateTerms = [\n  'hate', 'racist', 'sexist', 'homophobic', 'transphobic',\n  'discriminat', 'bigot', 'slur', 'offensive'\n];\nchecks.no_hate_speech = !hateTerms.some(term => content.includes(term));\n\n// Harassment check\nconst harassmentTerms = [\n  'bully', 'threat', 'intimidat', 'stalk', 'harass'\n];\nchecks.no_harassment = !harassmentTerms.some(term => content.includes(term));\n\n// Appropriate content check\nconst inappropriateTerms = [\n  'explicit', 'porn', 'nsfw', 'adult', 'violence', 'gore'\n];\nchecks.appropriate_content = !inappropriateTerms.some(term => content.includes(term));\n\n// Copyright check (basic)\nconst copyrightPhrases = [\n  'copyright', 'all rights reserved', '©', 'trademark', '™', 'registered', '®'\n];\nchecks.copyright_compliance = !copyrightPhrases.some(phrase => content.includes(phrase)) || \n  content.includes('fair use') || content.includes('licensed');\n\n// Platform-specific checks\nfor (const platform of platforms) {\n  checks.platform_specific[platform] = {\n    passed: true,\n    requirements: []\n  };\n  \n  // YouTube specific\n  if (platform.includes('youtube')) {\n    checks.platform_specific[platform].requirements.push('community_guidelines');\n    // Check for monetization suitability\n    if (content.includes('controversial') || content.includes('sensitive')) {\n      checks.platform_specific[platform].passed = false;\n    }\n  }\n  \n  // Twitter/X specific\n  if (platform.includes('twitter') || platform.includes('x')) {\n    checks.platform_specific[platform].requirements.push('twitter_rules');\n    // Check for misinformation\n    const misinfoTerms = ['fake news', 'conspiracy', 'hoax'];\n    if (misinfoTerms.some(term => content.includes(term))) {\n      checks.platform_specific[platform].passed = false;\n    }\n  }\n  \n  // LinkedIn specific\n  if (platform.includes('linkedin')) {\n    checks.platform_specific[platform].requirements.push('professional_standards');\n    // Check for professional tone\n    if (content.includes('casual') || content.includes('informal')) {\n      checks.platform_specific[platform].passed = false;\n    }\n  }\n}\n\n// Calculate overall score\nconst totalChecks = Object.keys(checks).filter(k => k !== 'platform_specific').length;\nconst passedChecks = Object.entries(checks)\n  .filter(([key, value]) => key !== 'platform_specific' && value === true)\n  .length;\n\nconst platformChecks = Object.values(checks.platform_specific);\nconst platformPassed = platformChecks.filter(p => p.passed).length;\nconst platformTotal = platformChecks.length;\n\nconst overallScore = Math.round(\n  ((passedChecks / totalChecks) * 0.8 + (platformPassed / Math.max(platformTotal, 1)) * 0.2) * 100\n);\n\nconst result = {\n  check_type: 'standard',\n  checks_performed: checks,\n  overall_score: overallScore,\n  passed: overallScore >= 60,\n  warnings: [],\n  required_actions: []\n};\n\n// Generate warnings\nif (!checks.no_hate_speech) {\n  result.warnings.push('Potential hate speech detected');\n  result.required_actions.push('Review and remove offensive content');\n}\n\nif (!checks.appropriate_content) {\n  result.warnings.push('Inappropriate content detected');\n  result.required_actions.push('Make content appropriate for all audiences');\n}\n\n// Check platform-specific failures\nfor (const [platform, platformCheck] of Object.entries(checks.platform_specific)) {\n  if (!platformCheck.passed) {\n    result.warnings.push(`Failed ${platform} specific requirements`);\n    result.required_actions.push(`Adjust content for ${platform} guidelines`);\n  }\n}\n\nreturn result;"
+      }
+    },
+    {
+      "name": "Merge Compliance Results",
+      "type": "n8n-nodes-base.merge",
+      "position": [1050, 300],
+      "parameters": {
+        "mode": "passThrough",
+        "output": "input"
+      }
+    },
+    {
+      "name": "Determine Approval Path",
+      "type": "n8n-nodes-base.if",
+      "position": [1250, 300],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.passed}}",
+              "operation": "equal",
+              "value2": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Auto-Approved Path",
+      "type": "n8n-nodes-base.code",
+      "position": [1450, 200],
+      "parameters": {
+        "jsCode": "// Process auto-approved content\nconst complianceResult = $input.first().json;\nconst originalRequest = $node[\"Parse Compliance Request\"].json;\n\nconst approvalRecord = {\n  request_id: originalRequest.request_id,\n  content_type: originalRequest.content_type,\n  check_type: complianceResult.check_type,\n  status: 'auto_approved',\n  approved_at: new Date().toISOString(),\n  approved_by: 'compliance_system',\n  score: complianceResult.overall_score,\n  warnings: complianceResult.warnings || [],\n  notes: 'Automatically approved by compliance system',\n  requires_monitoring: complianceResult.warnings && complianceResult.warnings.length > 0\n};\n\n// Send to SIMP broker\nconst approvalPayload = {\n  intent_type: 'compliance_approval',\n  source_agent: 'n8n_workflow',\n  target_agent: 'base_media_agent',\n  payload: approvalRecord\n};\n\nreturn {\n  json: {\n    approval_record: approvalRecord,\n    approval_payload: approvalPayload,\n    should_notify: true,\n    next_step: 'proceed_with_publishing'\n  }\n};"
+      }
+    },
+    {
+      "name": "Human Review Required",
+      "type": "n8n-nodes-base.code",
+      "position": [1450, 400],
+      "parameters": {
+        "jsCode": "// Route to human review\nconst complianceResult = $input.first().json;\nconst originalRequest = $node[\"Parse Compliance Request\"].json;\n\nconst reviewRequest = {\n  request_id: originalRequest.request_id,\n  content_type: originalRequest.content_type,\n  check_type: complianceResult.check_type,\n  status: 'requires_review',\n  submitted_at: originalRequest.submitted_at,\n  submitted_by: originalRequest.submitted_by,\n  score: complianceResult.overall_score,\n  warnings: complianceResult.warnings || [],\n  required_actions: complianceResult.required_actions || [],\n  high_risk: complianceResult.high_risk || false,\n  urgency: originalRequest.urgency || 'normal',\n  review_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours\n  assigned_to: null // To be assigned by human\n};\n\n// Determine priority\nlet priority = 'medium';\nif (reviewRequest.high_risk) priority = 'high';\nif (reviewRequest.urgency === 'urgent') priority = 'critical';\nif (reviewRequest.urgency === 'low') priority = 'low';\n\nreviewRequest.priority = priority;\n\n// Send to SIMP broker for human review queue\nconst reviewPayload = {\n  intent_type: 'compliance_review_request',\n  source_agent: 'n8n_workflow',\n  target_agent: 'compliance_agent',\n  payload: reviewRequest\n};\n\n// Also send notification\nconst notification = {\n  type: 'compliance_review_required',\n  priority: priority,\n  request_id: reviewRequest.request_id,\n  content_type: reviewRequest.content_type,\n  score: reviewRequest.score,\n  warnings_count: reviewRequest.warnings.length,\n  review_deadline: reviewRequest.review_deadline\n};\n\nreturn {\n  json: {\n    review_request: reviewRequest,\n    review_payload: reviewPayload,\n    notification: notification,\n    should_escalate: priority === 'critical' || priority === 'high',\n    next_step: 'await_human_review'\n  }\n};"
+      }
+    },
+    {
+      "name": "Send Approval Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1650, 200],
+      "parameters": {
+        "fromEmail": "={{$env.NOTIFICATION_EMAIL}}",
+        "toEmail": "={{$json.approval_record.submitted_by || $env.DEFAULT_NOTIFICATION_EMAIL}}",
+        "subject": "Compliance Approval: {{$json.approval_record.request_id}}",
+        "text": "Your content has been approved by the compliance system.\\n\\nRequest ID: {{$json.approval_record.request_id}}\\nContent Type: {{$json.approval_record.content_type}}\\nApproval Score: {{$json.approval_record.score}}/100\\nStatus: {{$json.approval_record.status}}\\n\\n{{#if $json.approval_record.warnings.length}}Warnings:\\n{{$json.approval_record.warnings.map(w => `• ${w}`).join('\\n')}}\\n{{/if}}\\n\\nNotes: {{$json.approval_record.notes}}\\n\\nYou may proceed with publishing.\\n\\n---\\nThis is an automated message from the Compliance Check workflow.",
+        "options": {}
+      }
+    },
+    {
+      "name": "Send Review Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [1650, 400],
+      "parameters": {
+        "fromEmail": "={{$env.NOTIFICATION_EMAIL}}",
+        "toEmail": "={{$env.COMPLIANCE_TEAM_EMAIL}}",
+        "subject": "[{{$json.review_request.priority}}] Compliance Review Required: {{$json.review_request.request_id}}",
+        "text": "A compliance review is required.\\n\\nRequest ID: {{$json.review_request.request_id}}\\nPriority: {{$json.review_request.priority}}\\nContent Type: {{$json.review_request.content_type}}\\nSubmitted By: {{$json.review_request.submitted_by}}\\nScore: {{$json.review_request.score}}/100\\n\\nWarnings ({{$json.review_request.warnings.length}}):\\n{{$json.review_request.warnings.map(w => `• ${w}`).join('\\n')}}\\n\\nRequired Actions:\\n{{$json.review_request.required_actions.map(a => `• ${a}`).join('\\n')}}\\n\\nReview Deadline: {{new Date($json.review_request.review_deadline).toLocaleString()}}\\n{{#if $json.review_request.high_risk}}⚠️ HIGH RISK CONTENT ⚠️{{/if}}\\n\\n---\\nThis is an automated message from the Compliance Check workflow.",
+        "options": {}
+      }
+    },
+    {
+      "name": "Store Compliance Record",
+      "type": "n8n-nodes-base.postgres",
+      "position": [1850, 300],
+      "parameters": {
+        "operation": "insert",
+        "schema": "media",
+        "table": "compliance_records",
+        "columns": {
+          "parameters": [
+            {
+              "column": "request_id",
+              "value": "={{$json.request_id || $json.approval_record?.request_id || $json.review_request?.request_id}}"
+            },
+            {
+              "column": "content_type",
+              "value": "={{$json.content_type || $json.approval_record?.content_type || $json.review_request?.content_type}}"
+            },
+            {
+              "column": "check_type",
+              "value": "={{$json.check_type || $json.approval_record?.check_type || $json.review_request?.check_type}}"
+            },
+            {
+              "column": "status",
+              "value": "={{$json.status || $json.approval_record?.status || $json.review_request?.status}}"
+            },
+            {
+              "column": "score",
+              "value": "={{$json.overall_score || $json.approval_record?.score || $json.review_request?.score}}"
+            },
+            {
+              "column": "passed",
+              "value": "={{$json.passed || ($json.approval_record ? true : false)}}"
+            },
+            {
+              "column": "warnings",
+              "value": "={{JSON.stringify($json.warnings || $json.approval_record?.warnings || $json.review_request?.warnings || [])}}"
+            },
+            {
+              "column": "submitted_at",
+              "value": "={{$json.submitted_at || $json.review_request?.submitted_at || new Date().toISOString()}}"
+            },
+            {
+              "column": "processed_at",
+              "value": "={{new Date().toISOString()}}"
+            },
+            {
+              "column": "raw_data",
+              "value": "={{JSON.stringify($json)}}"
+            }
+          ]
+        },
+        "additionalFields": {},
+        "options": {}
+      }
+    },
+    {
+      "name": "Generate Compliance Report",
+      "type": "n8n-nodes-base.code",
+      "position": [2050, 300],
+      "parameters": {
+        "jsCode": "// Generate compliance workflow report\nconst allResults = $input.all();\n\nconst report = {\n  timestamp: new Date().toISOString(),\n  workflow: 'compliance_check',\n  summary: {\n    total_processed: allResults.length,\n    auto_approved: 0,\n    requires_review: 0,\n    average_score: 0,\n    by_check_type: {},\n    by_content_type: {}\n  },\n  recent_requests: []\n};\n\nlet totalScore = 0;\n\nfor (const result of allResults) {\n  const data = result.json;\n  \n  // Count by status\n  if (data.status === 'auto_approved' || data.approval_record) {\n    report.summary.auto_approved++;\n  } else if (data.status === 'requires_review' || data.review_request) {\n    report.summary.requires_review++;\n  }\n  \n  // Track scores\n  const score = data.overall_score || data.score || 0;\n  totalScore += score;\n  \n  // Count by check type\n  const checkType = data.check_type || 'unknown';\n  if (!report.summary.by_check_type[checkType]) {\n    report.summary.by_check_type[checkType] = 0;\n  }\n  report.summary.by_check_type[checkType]++;\n  \n  // Count by content type\n  const contentType = data.content_type || 'unknown';\n  if (!report.summary.by_content_type[contentType]) {\n    report.summary.by_content_type[contentType] = 0;\n  }\n  report.summary.by_content_type[contentType]++;\n  \n  // Add to recent requests\n  report.recent_requests.push({\n    request_id: data.request_id || data.approval_record?.request_id || data.review_request?.request_id,\n    check_type: checkType,\n    content_type: contentType,\n    score: score,\n    status: data.status || (data.approval_record ? 'auto_approved' : 'requires_review'),\n    timestamp: data.submitted_at || new Date().toISOString()\n  });\n}\n\nreport.summary.average_score = allResults.length > 0 ? \n  Math.round(totalScore / allResults.length) : 0;\n\n// Limit recent requests\nreport.recent_requests = report.recent_requests.slice(-10);\n\n// Send to SIMP broker\nconst reportPayload = {\n  intent_type: 'compliance_workflow_report',\n  source_agent: 'n8n_workflow',\n  target_agent: 'base_media_agent',\n  payload: report\n};\n\nreturn {\n  json: {\n    report: report,\n    report_payload: reportPayload,\n    should_send_report: true\n  }\n};"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Compliance Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Compliance Request": {
+      "main": [
+        [
+          {
+            "node": "Check Type Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Type Router": {
+      "main": [
+        [
+          {
+            "node": "Affiliate Compliance Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Financial Compliance Check",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Standard Compliance Check",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Affiliate Compliance Check": {
+      "main": [
+        [
+          {
+            "node": "Merge Compliance Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Financial Compliance Check": {
+      "main": [
+        [
+          {
+            "node": "Merge Compliance Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standard Compliance Check": {
+      "main": [
+        [
+          {
+            "node": "Merge Compliance Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Compliance Results": {
+      "main": [
+        [
+          {
+            "node": "Determine Approval Path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Approval Path": {
+      "main": [
+        [
+          {
+            "node": "Auto-Approved Path",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Human Review Required",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Auto-Approved Path": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Compliance Record",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Human Review Required": {
+      "main": [
+        [
+          {
+            "node": "Send Review Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Compliance Record",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Send Approval Notification": {
+      "main": [
+        [
+          {
+            "node": "Generate Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Notification": {
+      "main": [
+        [
+          {
+            "node": "Generate Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Compliance Record": {
+      "main": [
+        [
+          {
+            "node": "Generate Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Compliance Report": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "timezone": "America/New_York",
+    "executionTimeout": 3600,
+    "maxExecutionTime": 3600
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "1.0",
+  "tags": ["compliance", "approval", "regulatory", "content", "review"],
+  "webhook": null,
+  "triggerCount": 0,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "description": "Compliance check and approval workflow for KashClaw Media Grid. Performs automated compliance checks for different content types (affiliate, financial, standard), routes content through appropriate approval paths, and manages human review workflows when needed."
+}

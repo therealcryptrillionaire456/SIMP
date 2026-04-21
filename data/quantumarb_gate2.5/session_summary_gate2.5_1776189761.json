@@ -1,0 +1,19 @@
+{
+  "session_id": "gate2.5_1776189761",
+  "session_start": "2026-04-14T14:02:41.604549",
+  "session_end": "2026-04-14T14:03:37.049544",
+  "session_duration_minutes": 0.92,
+  "trades_executed": 50,
+  "total_pnl": -0.001916,
+  "opportunities_evaluated": 53,
+  "decisions": {
+    "execute": 50,
+    "reject_risk": 3,
+    "reject_slippage": 0,
+    "reject_confidence": 0,
+    "reject_symbol": 0
+  },
+  "config_file": "config/gate2.5_enhanced_sol.json",
+  "gate": "2.5",
+  "completion_status": "complete"
+}

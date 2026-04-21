@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "proxy_url": "http://localhost:8235",
+  "store_url": "http://localhost:43887",
+  "model": "glm-4-plus",
+  "enable_apo": true,
+  "trace_agent": true,
+  "agent_id": "quantumarb",
+  "agent_type": "trading",
+  "llm_methods_to_trace": [
+    "analyze_arbitrage_opportunities",
+    "execute_trade",
+    "calculate_risk"
+  ],
+  "optimization_focus_areas": [
+    "arbitrage_analysis",
+    "risk_assessment"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-04-14T14:13:30.638592",
+  "signal": {
+    "signal_id": "solusd_gate3_1776190410_3887",
+    "arb_type": "cross_venue",
+    "symbol_a": "SOL-USD",
+    "symbol_b": "SOL-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.0381,
+    "expected_return_pct": 0.0335,
+    "confidence": 0.91,
+    "timestamp": "2026-04-14T14:13:30.637887",
+    "metadata": {
+      "gate": "3",
+      "market": "SOL-USD",
+      "microscopic": true,
+      "multi_market": true,
+      "test_signal": true,
+      "estimated_price": 100.59608518645226
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "solusd_gate3_1776190410_3887",
+      "arb_type": "cross_venue",
+      "symbol_a": "SOL-USD",
+      "symbol_b": "SOL-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.0381,
+      "expected_return_pct": 0.0335,
+      "confidence": 0.91,
+      "timestamp": "2026-04-14T14:13:30.637887",
+      "metadata": {
+        "gate": "3",
+        "market": "SOL-USD",
+        "microscopic": true,
+        "multi_market": true,
+        "test_signal": true,
+        "estimated_price": 100.59608518645226
+      }
+    },
+    "decision": "reject_risk",
+    "decision_reason": "Risk score 0.492 < minimum 0.6 for SOL-USD",
+    "position_size_usd": 0.0,
+    "expected_pnl_usd": 0.0,
+    "risk_score": 0.49233732238065103,
+    "metadata": {
+      "rejection_reason": "low_risk_score",
+      "symbol": "SOL-USD"
+    }
+  },
+  "execution_result": null,
+  "session_id": "gate3_1776190276",
+  "gate": "3"
+}

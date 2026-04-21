@@ -1,0 +1,20 @@
+{
+  "intent_id": "test_intent_001",
+  "intent_type": "arbitrage_signal",
+  "source_agent": "bullbear_predictor",
+  "target_agent": "quantumarb",
+  "params": {
+    "direction": "BULL",
+    "delta": 0.05,
+    "trust": 0.85,
+    "contradiction_score": 0.3,
+    "ticker": "BTC-USD",
+    "venue_a": "coinbase",
+    "venue_b": "binance",
+    "timestamp": "2026-04-14T01:30:00Z"
+  },
+  "metadata": {
+    "priority": "normal",
+    "ttl_seconds": 300
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "threat_actor": "apt29",
+  "objectives": [
+    "Test kill chain execution",
+    "Validate security controls"
+  ]
+}

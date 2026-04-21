@@ -1,0 +1,109 @@
+{
+  "scan_result": {
+    "scan_id": "net_scan_20260412_070655",
+    "start_time": "2026-04-12T07:06:55.705910Z",
+    "end_time": "2026-04-12T07:06:55.714423Z",
+    "targets_scanned": [
+      "127.0.0.1"
+    ],
+    "services_found": {
+      "127.0.0.1": [
+        "PostgreSQL (port 5432)",
+        "SIMP Dashboard (port 8050)",
+        "ProjectX (port 8771)",
+        "SIMP Broker (port 5555)",
+        "Gemma4 (port 8780)"
+      ]
+    },
+    "total_findings": 6,
+    "findings_by_severity": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "low": 0,
+      "info": 5
+    },
+    "findings_by_category": {
+      "port": 5,
+      "service": 1
+    },
+    "critical_findings": [],
+    "high_findings": [
+      {
+        "id": "postgres_running_5432",
+        "severity": "high",
+        "category": "service",
+        "target": "127.0.0.1:5432",
+        "description": "PostgreSQL service is running",
+        "evidence": "Port 5432 is open for PostgreSQL",
+        "recommendation": "Ensure PostgreSQL has strong passwords and proper pg_hba.conf configuration",
+        "timestamp": "2026-04-12 07:06:55.707690"
+      }
+    ],
+    "medium_findings": [],
+    "low_findings": [],
+    "duration_seconds": 0.008513
+  },
+  "findings": [
+    {
+      "id": "port_5432_a9315712",
+      "severity": "info",
+      "category": "port",
+      "target": "127.0.0.1:5432",
+      "description": "PostgreSQL service running on port 5432",
+      "evidence": "Port 5432 is open and responding",
+      "recommendation": "Ensure service is properly secured and firewalled",
+      "timestamp": "2026-04-12T07:06:55.706979Z"
+    },
+    {
+      "id": "port_8050_338f48a9",
+      "severity": "info",
+      "category": "port",
+      "target": "127.0.0.1:8050",
+      "description": "SIMP Dashboard service running on port 8050",
+      "evidence": "Port 8050 is open and responding",
+      "recommendation": "Ensure service is properly secured and firewalled",
+      "timestamp": "2026-04-12T07:06:55.707265Z"
+    },
+    {
+      "id": "port_8771_cf84ed06",
+      "severity": "info",
+      "category": "port",
+      "target": "127.0.0.1:8771",
+      "description": "ProjectX service running on port 8771",
+      "evidence": "Port 8771 is open and responding",
+      "recommendation": "Ensure service is properly secured and firewalled",
+      "timestamp": "2026-04-12T07:06:55.707384Z"
+    },
+    {
+      "id": "port_5555_a5e2a0db",
+      "severity": "info",
+      "category": "port",
+      "target": "127.0.0.1:5555",
+      "description": "SIMP Broker service running on port 5555",
+      "evidence": "Port 5555 is open and responding",
+      "recommendation": "Ensure service is properly secured and firewalled",
+      "timestamp": "2026-04-12T07:06:55.707434Z"
+    },
+    {
+      "id": "port_8780_b50708b5",
+      "severity": "info",
+      "category": "port",
+      "target": "127.0.0.1:8780",
+      "description": "Gemma4 service running on port 8780",
+      "evidence": "Port 8780 is open and responding",
+      "recommendation": "Ensure service is properly secured and firewalled",
+      "timestamp": "2026-04-12T07:06:55.707468Z"
+    },
+    {
+      "id": "postgres_running_5432",
+      "severity": "high",
+      "category": "service",
+      "target": "127.0.0.1:5432",
+      "description": "PostgreSQL service is running",
+      "evidence": "Port 5432 is open for PostgreSQL",
+      "recommendation": "Ensure PostgreSQL has strong passwords and proper pg_hba.conf configuration",
+      "timestamp": "2026-04-12T07:06:55.707690Z"
+    }
+  ]
+}

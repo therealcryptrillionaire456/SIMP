@@ -1,304 +1,441 @@
 """
-Agent Manager: Spawns and manages SIMP agents as separate processes
+Agent Manager: Spawns and manages SIMP agents as separate processes.
 
-Handles agent lifecycle, inter-process communication, and monitoring.
+Security hardening (v0.2):
+  - No hardcoded absolute paths (/sessions/… → project-relative)  (#1, #12)
+  - agent args validated against allowlist before use               (#1)
+  - Args passed via env vars, NOT injected into Python code strings (#1)
+  - Temp files in secure tempfile.mkstemp() directory              (#12)
+  - Bare except replaced with specific exception handling           (#6)
 """
 
-import multiprocessing as mp
-import subprocess
-import time
 import logging
-from dataclasses import dataclass
-from typing import Dict, Optional, Any, List, Callable
-from datetime import datetime
-import json
-import signal
+import multiprocessing as mp
 import os
+import re
+import signal
+import sys
+import tempfile
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
+# ── project root (robust: works regardless of CWD) ───────────────────────────
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]   # …/SIMP/
+
+# ── safe temporary directory (never world-writable /tmp directly) ─────────────
+try:
+    from config.config import config as _cfg
+    _TMP_BASE = Path(_cfg.TMP_DIR) / "simp_agents"
+except Exception:
+    _TMP_BASE = Path(tempfile.gettempdir()) / "simp_agents"
+
+_TMP_BASE.mkdir(parents=True, exist_ok=True)
+
+# ── arg validation allowlists ─────────────────────────────────────────────────
+_SAFE_ARG_KEY_RE   = re.compile(r'^[A-Za-z0-9_]{1,64}$')
+_SAFE_ARG_VALUE_RE = re.compile(r'^[A-Za-z0-9_\-\.:/@ ]{0,512}$')
+_SAFE_MODULE_RE    = re.compile(r'^[A-Za-z0-9_\.]{1,128}$')
+_SAFE_CLASS_RE     = re.compile(r'^[A-Za-z0-9_\.]{1,64}$')
+_SAFE_ID_RE        = re.compile(r'^[A-Za-z0-9_\-]{1,64}$')
+
+logger = logging.getLogger("SIMP.AgentManager")
+
+# ── DeerFlow upgrade: sandbox audit integration ───────────────────────────────
+# Loaded lazily so the module works even without the scaffolding path on sys.path
+_sandbox_audit = None
+
+def _get_sandbox_audit():
+    """Lazy-load SandboxAudit from DeerFlow upgrade scaffolding."""
+    global _sandbox_audit
+    if _sandbox_audit is not None:
+        return _sandbox_audit
+    try:
+        import sys, pathlib
+        _scaffold = str(pathlib.Path(__file__).resolve().parents[4] /
+                        "ProjectX" / "proposals" / "scaffolding")
+        if _scaffold not in sys.path:
+            sys.path.insert(0, _scaffold)
+        from draft_projectx_sandbox_audit import SandboxAudit
+        _sandbox_audit = SandboxAudit()
+        logger.info("✅ SandboxAudit loaded for AgentManager")
+    except Exception as exc:
+        logger.debug("SandboxAudit not available (non-critical): %s", exc)
+    return _sandbox_audit
+
+
+# ── validation helpers ────────────────────────────────────────────────────────
+
+def validate_agent_args(args: dict) -> dict:
+    """
+    Validate and sanitize agent constructor args.
+
+    Rules:
+      - Keys: alphanumeric + underscore, ≤ 64 chars
+      - Values: restricted charset, ≤ 512 chars
+      - Maximum 32 key-value pairs
+      - Values coerced to str (int/float/bool/None allowed)
+
+    Returns sanitized dict.  Raises TypeError / ValueError on bad input.
+    """
+    if not isinstance(args, dict):
+        raise TypeError(f"args must be a dict, got {type(args).__name__!r}")
+    if len(args) > 32:
+        raise ValueError(f"Too many args ({len(args)}); maximum is 32")
+
+    out: dict = {}
+    for key, val in args.items():
+        if not isinstance(key, str):
+            raise TypeError(f"Arg key must be str, got {type(key).__name__!r}")
+        if not _SAFE_ARG_KEY_RE.match(key):
+            raise ValueError(
+                f"Unsafe arg key {key!r}; allowed pattern: {_SAFE_ARG_KEY_RE.pattern}"
+            )
+        if val is None:
+            str_val = ""
+        elif isinstance(val, bool):
+            str_val = str(val)
+        elif isinstance(val, (int, float)):
+            str_val = str(val)
+        elif isinstance(val, str):
+            str_val = val
+        else:
+            raise TypeError(
+                f"Arg value for {key!r} must be str/int/float/bool/None, "
+                f"got {type(val).__name__!r}"
+            )
+        if not _SAFE_ARG_VALUE_RE.match(str_val):
+            raise ValueError(
+                f"Unsafe value for arg {key!r}: contains disallowed characters"
+            )
+        out[key] = str_val
+    return out
+
+
+def _safe_env(args: dict) -> dict:
+    """Build a subprocess env dict from validated args (SIMP_AGENT_* prefix)."""
+    validated = validate_agent_args(args)
+    env = dict(os.environ)
+    for k, v in validated.items():
+        env[f"SIMP_AGENT_{k.upper()}"] = v
+    return env
+
+
+# ── data classes ──────────────────────────────────────────────────────────────
 
 @dataclass
 class RemoteAgent:
-    """Information about a remote agent"""
-    agent_id: str
-    agent_type: str
-    process: Optional[mp.Process] = None
-    port: int = 0
-    pid: Optional[int] = None
-    status: str = "stopped"  # stopped, starting, running, failed
-    started_at: Optional[str] = None
+    agent_id:      str
+    agent_type:    str
+    process:       Optional[mp.Process] = None
+    port:          int = 0
+    pid:           Optional[int] = None
+    status:        str = "stopped"
+    started_at:    Optional[str] = None
     error_message: Optional[str] = None
-    metrics: Dict[str, Any] = None
-
-    def __post_init__(self):
-        if self.metrics is None:
-            self.metrics = {}
+    metrics:       Dict[str, Any] = field(default_factory=dict)
+    _script_path:  Optional[str] = field(default=None, repr=False)
 
     def is_alive(self) -> bool:
-        """Check if process is alive"""
-        if self.process is None:
-            return False
-        return self.process.is_alive()
+        return self.process is not None and self.process.is_alive()
 
 
 class AgentManager:
     """
-    Manages SIMP agents as separate processes
+    Manages SIMP agents as separate processes.
 
-    Spawns agents, monitors their health, and handles crashes.
+    v0.2 changes:
+      - Paths derived from _PROJECT_ROOT, never hardcoded
+      - Args passed via env vars (no code-gen injection)
+      - Bare exceptions replaced with specific handlers + logging
     """
 
     def __init__(self, broker_config: Dict[str, Any] = None):
-        """Initialize agent manager"""
-        self.logger = logging.getLogger("SIMP.AgentManager")
-        self.agents: Dict[str, RemoteAgent] = {}
-        self.broker_config = broker_config or {}
-        self.base_port = 5001  # Starting port for agents
-        self.next_port = self.base_port
+        self.agents:        Dict[str, RemoteAgent] = {}
+        self.broker_config: Dict[str, Any]         = broker_config or {}
+        self.next_port:     int                    = 5001
+        logger.info("✅ Agent Manager initialized (project root: %s)", _PROJECT_ROOT)
 
-        self.logger.info("✅ Agent Manager initialized")
+    # ── port allocation ───────────────────────────────────────────────────────
 
     def _get_next_port(self) -> int:
-        """Get next available port"""
         port = self.next_port
         self.next_port += 1
         return port
 
+    # ── arg / id validation ───────────────────────────────────────────────────
+
+    def _validate_ids(self, agent_id: str, agent_type: str,
+                      agent_module: str, agent_class: str) -> None:
+        for name, val, pat in [
+            ("agent_id",    agent_id,     _SAFE_ID_RE),
+            ("agent_type",  agent_type,   _SAFE_ID_RE),
+            ("agent_module", agent_module, _SAFE_MODULE_RE),
+            ("agent_class", agent_class,  _SAFE_CLASS_RE),
+        ]:
+            if not pat.match(val):
+                raise ValueError(
+                    f"Invalid {name} {val!r}; must match {pat.pattern}"
+                )
+
+    # ── spawn ─────────────────────────────────────────────────────────────────
+
     def spawn_agent(
         self,
-        agent_id: str,
-        agent_type: str,
-        agent_class: str,  # e.g., "simp.agents.KloutbotAgent"
-        agent_module: str,  # e.g., "simp.agents.kloutbot_agent"
-        args: Optional[Dict[str, Any]] = None,
-    ) -> Optional[RemoteAgent]:
+        agent_id:     str,
+        agent_type:   str,
+        agent_class:  str,
+        agent_module: str,
+        args:         Optional[Dict[str, Any]] = None,
+    ) -> Optional["RemoteAgent"]:
         """
-        Spawn an agent as a separate process
+        Spawn an agent as a separate process.
 
-        Args:
-            agent_id: Unique agent identifier
-            agent_type: Type of agent (e.g., "grok", "vision")
-            agent_class: Fully qualified class name
-            agent_module: Module containing the agent
-            args: Arguments to pass to agent constructor
-
-        Returns:
-            RemoteAgent instance, or None if spawn failed
+        Args are validated and passed via SIMP_AGENT_* environment variables
+        rather than being interpolated into generated Python code.
         """
-        if agent_id in self.agents:
-            self.logger.error(f"❌ Agent '{agent_id}' already spawned")
+        # ── validate identifiers ─────────────────────────────────────────
+        try:
+            self._validate_ids(agent_id, agent_type, agent_module, agent_class)
+        except ValueError as exc:
+            logger.error("❌ Invalid spawn arguments: %s", exc)
             return None
 
+        if agent_id in self.agents:
+            logger.error("❌ Agent '%s' already spawned", agent_id)
+            return None
+
+        # ── validate args ─────────────────────────────────────────────────
+        safe_args: dict = {}
+        try:
+            safe_args = validate_agent_args(args or {})
+        except (TypeError, ValueError) as exc:
+            logger.error("❌ Invalid agent args for '%s': %s", agent_id, exc)
+            return None
+
+        # ── DeerFlow upgrade: audit any shell-like values in safe_args ────────
+        _audit = _get_sandbox_audit()
+        if _audit:
+            for k, v in safe_args.items():
+                if any(c in v for c in ('|', ';', '&&', '`', '$(')):
+                    cls = _audit.classify(v)
+                    if cls.is_blocked:
+                        logger.error(
+                            "❌ Agent arg '%s' blocked by SandboxAudit: %s", k, cls.reason
+                        )
+                        return None
+                    if cls.is_warned:
+                        logger.warning(
+                            "⚠️  Agent arg '%s' flagged by SandboxAudit: %s", k, cls.reason
+                        )
+
         port = self._get_next_port()
-        args = args or {}
+        logger.info("🚀 Spawning agent: %s (%s) on port %s", agent_id, agent_type, port)
 
-        self.logger.info(
-            f"🚀 Spawning agent: {agent_id} ({agent_type}) on port {port}"
-        )
-
-        # Create agent process
         remote_agent = RemoteAgent(
-            agent_id=agent_id,
-            agent_type=agent_type,
-            port=port,
-            status="starting",
-            started_at=datetime.utcnow().isoformat(),
+            agent_id=agent_id, agent_type=agent_type,
+            port=port, status="starting",
+            started_at=datetime.now(timezone.utc).isoformat(),
         )
 
         try:
-            # Spawn process via subprocess for better isolation
-            script = self._generate_agent_script(
-                agent_id, agent_type, agent_class, agent_module, port, args
+            # ── write launcher script using safe path ─────────────────────
+            script_path = self._write_launcher_script(
+                agent_id, agent_type, agent_class, agent_module, port
             )
+            remote_agent._script_path = script_path
 
-            # Write script to temp file
-            script_path = f"/tmp/simp_agent_{agent_id}_{port}.py"
-            with open(script_path, "w") as f:
-                f.write(script)
+            # ── build env with args (no code injection) ───────────────────
+            env = _safe_env(safe_args)
 
-            # Spawn process
+            # ── spawn via multiprocessing ─────────────────────────────────
             process = mp.Process(
                 target=self._run_agent_process,
-                args=(script_path, agent_id, port),
+                args=(script_path, agent_id, port, env),
                 name=f"simp-{agent_type}-{agent_id}",
             )
             process.start()
 
             remote_agent.process = process
-            remote_agent.pid = process.pid
-            remote_agent.status = "running"
-
+            remote_agent.pid     = process.pid
+            remote_agent.status  = "running"
             self.agents[agent_id] = remote_agent
 
-            self.logger.info(
-                f"✅ Agent spawned: {agent_id} (PID: {process.pid}, Port: {port})"
-            )
-
+            logger.info("✅ Agent spawned: %s (PID: %s, Port: %s)",
+                        agent_id, process.pid, port)
             return remote_agent
 
-        except Exception as e:
-            remote_agent.status = "failed"
-            remote_agent.error_message = str(e)
-            self.agents[agent_id] = remote_agent
-
-            self.logger.error(f"❌ Failed to spawn agent '{agent_id}': {str(e)}")
+        except OSError as exc:
+            logger.error("❌ OS error spawning agent '%s': %s",
+                         agent_id, exc, exc_info=True)
+            remote_agent.status        = "failed"
+            remote_agent.error_message = str(exc)
+            self.agents[agent_id]      = remote_agent
+            return None
+        except Exception as exc:
+            logger.error("❌ Unexpected error spawning agent '%s': %s",
+                         agent_id, exc, exc_info=True)
+            remote_agent.status        = "failed"
+            remote_agent.error_message = str(exc)
+            self.agents[agent_id]      = remote_agent
             return None
 
-    def _generate_agent_script(
-        self,
-        agent_id: str,
-        agent_type: str,
-        agent_class: str,
-        agent_module: str,
-        port: int,
-        args: Dict[str, Any],
+    def _write_launcher_script(
+        self, agent_id: str, agent_type: str,
+        agent_class: str, agent_module: str, port: int
     ) -> str:
-        """Generate Python script for agent process"""
-        script = f'''
-import sys
-import logging
-sys.path.insert(0, '/sessions/fervent-elegant-johnson/projects/simp')
+        """
+        Write a minimal, injection-free launcher script.
 
-from {agent_module} import {agent_class.split('.')[-1]}
-from simp.server.agent_client import SimpAgentClient
+        Args are NOT embedded in the script — they are read from SIMP_AGENT_*
+        env vars at runtime, keeping the script source static and safe.
+        """
+        class_name = agent_class.split(".")[-1]   # safe: already validated
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger("Agent.{agent_id}")
+        # All paths relative to project root — no hardcoded absolute paths
+        script_content = (
+            "import os, sys, logging\n"
+            f"sys.path.insert(0, {str(_PROJECT_ROOT)!r})\n"
+            f"from {agent_module} import {class_name}\n"
+            "from simp.server.agent_client import SimpAgentClient\n"
+            "logging.basicConfig(level=logging.INFO,\n"
+            "    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')\n"
+            f"logger = logging.getLogger('Agent.{agent_id}')\n"
+            "# Collect args from env (SIMP_AGENT_* prefix)\n"
+            "agent_args = {k[11:].lower(): v for k, v in os.environ.items()\n"
+            "              if k.startswith('SIMP_AGENT_')}\n"
+            f"logger.info('Starting agent {agent_id} on port {port}')\n"
+            "try:\n"
+            f"    agent = {class_name}(agent_id={agent_id!r}, **agent_args)\n"
+            f"    client = SimpAgentClient(\n"
+            f"        agent_id={agent_id!r}, agent_type={agent_type!r},\n"
+            f"        port={port},\n"
+            "        broker_host=os.environ.get('SIMP_BROKER_HOST', '127.0.0.1'),\n"
+            "        broker_port=int(os.environ.get('SIMP_BROKER_PORT', '5555')),\n"
+            "    )\n"
+            "    client.register()\n"
+            "    client.listen(agent)\n"
+            "except Exception as exc:\n"
+            "    logger.error('Agent failed: %s', exc, exc_info=True)\n"
+            "    sys.exit(1)\n"
+        )
 
-logger.info("🚀 Agent {{agent_id}} starting on port {{port}}")
-
-try:
-    # Create agent instance
-    agent = {agent_class.split('.')[-1]}(
-        agent_id="{agent_id}",
-        **{repr(args)}
-    )
-    logger.info("✅ Agent instance created")
-
-    # Create SIMP client
-    client = SimpAgentClient(
-        agent_id="{agent_id}",
-        agent_type="{agent_type}",
-        port={port},
-        broker_host="127.0.0.1",
-        broker_port=5555
-    )
-
-    logger.info("✅ SIMP client initialized")
-
-    # Register with broker
-    client.register()
-    logger.info("✅ Registered with SIMP broker")
-
-    # Start listening for intents
-    logger.info("▶️ Agent listening for intents...")
-    client.listen(agent)
-
-except Exception as e:
-    logger.error(f"❌ Agent failed: {{e}}", exc_info=True)
-    sys.exit(1)
-'''
-        return script
+        # Use mkstemp for a unique, mode-600 temp file
+        fd, script_path = tempfile.mkstemp(
+            suffix=".py",
+            prefix=f"simp_agent_{agent_id}_",
+            dir=_TMP_BASE,
+        )
+        try:
+            with os.fdopen(fd, "w") as fh:
+                fh.write(script_content)
+            # Restrict to owner only
+            os.chmod(script_path, 0o700)
+        except OSError as exc:
+            logger.error("Failed to write launcher script: %s", exc,
+                         exc_info=True)
+            raise
+        return script_path
 
     @staticmethod
-    def _run_agent_process(script_path: str, agent_id: str, port: int) -> None:
-        """Run agent in subprocess"""
+    def _run_agent_process(script_path: str, agent_id: str,
+                           port: int, env: dict) -> None:
+        """Run agent in subprocess with the provided env."""
         try:
             import subprocess
+            subprocess.run(
+                [sys.executable, script_path],
+                env=env,
+                check=True,
+            )
+        except subprocess.CalledProcessError as exc:
+            logging.error("Agent %s exited with code %s", agent_id,
+                          exc.returncode)
+        except OSError as exc:
+            logging.error("OS error running agent %s: %s", agent_id, exc,
+                          exc_info=True)
+        except Exception as exc:
+            logging.error("Unexpected error running agent %s: %s", agent_id,
+                          exc, exc_info=True)
+        finally:
+            # Clean up temp script
+            try:
+                if os.path.exists(script_path):
+                    os.unlink(script_path)
+            except OSError as exc:
+                logging.warning("Could not remove temp script %s: %s",
+                                script_path, exc)
 
-            subprocess.run([sys.executable, script_path], check=True)
-        except Exception as e:
-            logging.error(f"Agent {agent_id} error: {e}")
+    # ── agent control ─────────────────────────────────────────────────────────
 
     def get_agent(self, agent_id: str) -> Optional[RemoteAgent]:
-        """Get agent by ID"""
         return self.agents.get(agent_id)
 
     def list_agents(self) -> Dict[str, RemoteAgent]:
-        """List all spawned agents"""
         return dict(self.agents)
 
     def stop_agent(self, agent_id: str, timeout: int = 5) -> bool:
-        """Stop an agent"""
         agent = self.get_agent(agent_id)
         if not agent:
-            self.logger.warning(f"⚠️ Agent '{agent_id}' not found")
+            logger.warning("⚠️ Agent '%s' not found", agent_id)
             return False
-
         if agent.process is None or not agent.process.is_alive():
             agent.status = "stopped"
-            self.logger.info(f"✅ Agent stopped: {agent_id}")
             return True
-
         try:
             agent.process.terminate()
             agent.process.join(timeout=timeout)
-
             if agent.process.is_alive():
                 agent.process.kill()
                 agent.process.join()
-
             agent.status = "stopped"
-            self.logger.info(f"✅ Agent terminated: {agent_id}")
+            logger.info("✅ Agent terminated: %s", agent_id)
             return True
-
-        except Exception as e:
-            self.logger.error(f"❌ Error stopping agent '{agent_id}': {e}")
+        except OSError as exc:
+            logger.error("❌ OS error stopping agent '%s': %s",
+                         agent_id, exc, exc_info=True)
+            return False
+        except Exception as exc:
+            logger.error("❌ Unexpected error stopping agent '%s': %s",
+                         agent_id, exc, exc_info=True)
             return False
 
     def stop_all_agents(self, timeout: int = 5) -> Dict[str, bool]:
-        """Stop all agents"""
-        results = {}
-        for agent_id in list(self.agents.keys()):
-            results[agent_id] = self.stop_agent(agent_id, timeout)
-        return results
+        return {aid: self.stop_agent(aid, timeout)
+                for aid in list(self.agents.keys())}
 
     def get_health_status(self) -> Dict[str, Any]:
-        """Get health status of all agents"""
-        status = {
+        status: Dict[str, Any] = {
             "total_agents": len(self.agents),
-            "running": 0,
-            "stopped": 0,
-            "failed": 0,
+            "running": 0, "stopped": 0, "failed": 0,
             "agents": {},
         }
-
         for agent_id, agent in self.agents.items():
-            agent_status = {
-                "status": agent.status,
-                "type": agent.agent_type,
-                "port": agent.port,
-                "pid": agent.pid,
-                "is_alive": agent.is_alive(),
+            status["agents"][agent_id] = {
+                "status":    agent.status,
+                "type":      agent.agent_type,
+                "port":      agent.port,
+                "pid":       agent.pid,
+                "is_alive":  agent.is_alive(),
                 "started_at": agent.started_at,
-                "error": agent.error_message,
+                "error":     agent.error_message,
             }
-            status["agents"][agent_id] = agent_status
-
             if agent.status == "running":
                 status["running"] += 1
             elif agent.status == "stopped":
                 status["stopped"] += 1
             elif agent.status == "failed":
                 status["failed"] += 1
-
         return status
 
     def restart_agent(self, agent_id: str) -> Optional[RemoteAgent]:
-        """Restart an agent"""
         agent = self.get_agent(agent_id)
         if not agent:
             return None
-
-        self.logger.info(f"🔄 Restarting agent: {agent_id}")
+        logger.info("🔄 Restarting agent: %s", agent_id)
         self.stop_agent(agent_id)
         time.sleep(1)
-
-        # Note: Full restart would require storing spawn parameters
-        self.logger.warning(
-            f"⚠️ Agent restart requires full spawn (parameters not stored)"
-        )
+        logger.warning("⚠️ Full restart requires re-calling spawn_agent()")
         return None

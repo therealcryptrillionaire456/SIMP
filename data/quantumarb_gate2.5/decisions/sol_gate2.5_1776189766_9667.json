@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-04-14T14:02:46.191765",
+  "signal": {
+    "signal_id": "sol_gate2.5_1776189766_9667",
+    "arb_type": "cross_venue",
+    "symbol_a": "SOL-USD",
+    "symbol_b": "SOL-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.0443,
+    "expected_return_pct": 0.0343,
+    "confidence": 0.94,
+    "timestamp": "2026-04-14T14:02:46.190643",
+    "metadata": {
+      "gate": "2.5",
+      "market": "SOL-USD",
+      "microscopic": true,
+      "enhanced": true,
+      "test_signal": true
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "sol_gate2.5_1776189766_9667",
+      "arb_type": "cross_venue",
+      "symbol_a": "SOL-USD",
+      "symbol_b": "SOL-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.0443,
+      "expected_return_pct": 0.0343,
+      "confidence": 0.94,
+      "timestamp": "2026-04-14T14:02:46.190643",
+      "metadata": {
+        "gate": "2.5",
+        "market": "SOL-USD",
+        "microscopic": true,
+        "enhanced": true,
+        "test_signal": true
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: risk score 0.638, spread 0.0443%, confidence 0.94",
+    "position_size_usd": 0.25,
+    "expected_pnl_usd": 8.575e-05,
+    "risk_score": 0.6375319320788729,
+    "metadata": {
+      "approved": true,
+      "estimated_slippage_bps": 3.8173778534925904,
+      "size_tier": "determined_by_risk"
+    }
+  },
+  "execution_result": {
+    "trade_id": "trade_1776189766_3358",
+    "timestamp": "2026-04-14T14:02:46.191672",
+    "symbol": "SOL-USD",
+    "side": "sell",
+    "quantity": 0.0023401116983886136,
+    "price": 100.0,
+    "notional_usd": 0.23401116983886136,
+    "fees_usd": 0.00023401116983886138,
+    "slippage_pct": 0.002237200667287412,
+    "pnl_usd": -0.00015374533858413192,
+    "status": "filled",
+    "metadata": {
+      "gate": "2.5",
+      "order_type": "limit",
+      "time_in_force": "IOC",
+      "fill_percentage": 93.60446793554455,
+      "price_improvement_pct": 0.006789312832157643,
+      "limit_order": true,
+      "partial_fill": true
+    }
+  },
+  "session_id": "gate2.5_1776189761",
+  "gate": "2.5"
+}

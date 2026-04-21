@@ -1,0 +1,16 @@
+{
+  "last_updated": "2026-04-14T16:19:26.034840Z",
+  "total_experiments": 1,
+  "successful_experiments": 1,
+  "failed_experiments": 0,
+  "average_improvement": 36.37844431370534,
+  "recent_results": [
+    {
+      "component": "brp_threat_detection",
+      "experiment": "daily_threat_evolution",
+      "timestamp": "2026-04-14T16:19:26.034161Z",
+      "improvement": 36.37844431370534,
+      "best_score": 0.6818922215685267
+    }
+  ]
+}

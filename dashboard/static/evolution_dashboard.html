@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASI-Evolve Evolution Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 20px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin: 0 10px;
+        }
+        
+        .status-active {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            color: #064e3b;
+        }
+        
+        .status-inactive {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+            color: #7f1d1d;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid #334155;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #334155;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+        }
+        
+        .metric {
+            margin: 15px 0;
+        }
+        
+        .metric-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+        
+        .metric-change {
+            font-size: 0.9rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+        
+        .positive {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+        
+        .negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #334155;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+        
+        .experiment-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .experiment-item {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #60a5fa;
+        }
+        
+        .experiment-success {
+            border-left-color: #10b981;
+        }
+        
+        .experiment-failed {
+            border-left-color: #ef4444;
+        }
+        
+        .experiment-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #e2e8f0;
+        }
+        
+        .experiment-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #3b82f6, #6366f1);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(51, 65, 85, 0.7);
+            color: #e2e8f0;
+            border: 1px solid #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(71, 85, 105, 0.7);
+        }
+        
+        .last-updated {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧬 ASI-Evolve Evolution Dashboard</h1>
+            <div class="subtitle">Autonomous AI Evolution for SIMP Ecosystem</div>
+            <div>
+                <span class="status-badge status-active" id="statusBadge">ACTIVE</span>
+                <span class="status-badge" id="nextEvolution">Next: 16:00 (4:00 PM ET)</span>
+            </div>
+        </header>
+        
+        <div class="dashboard-grid">
+            <!-- Overall Metrics Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📊 Overall Metrics</div>
+                    <div class="card-icon">📈</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Total Experiments</span>
+                    <span class="metric-value" id="totalExperiments">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Success Rate</span>
+                    <span class="metric-value" id="successRate">0%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Avg Improvement</span>
+                    <span class="metric-value" id="avgImprovement">0%</span>
+                    <span class="metric-change positive" id="improvementTrend">+0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="successProgress" style="width: 0%"></div>
+                </div>
+                <div class="metric-label">Success Progress</div>
+            </div>
+            
+            <!-- Recent Experiments Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🧪 Recent Experiments</div>
+                    <div class="card-icon">⚗️</div>
+                </div>
+                <div class="experiment-list" id="experimentList">
+                    <div class="experiment-item">
+                        <div class="experiment-title">Loading experiments...</div>
+                        <div class="experiment-meta">
+                            <span>Just now</span>
+                            <span>0% improvement</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Component Evolution Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">⚙️ Component Evolution</div>
+                    <div class="card-icon">🔧</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">BRP Threat Detection</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="brpProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="experiment-meta">
+                        <span id="brpScore">Score: 0.00</span>
+                        <span id="brpImprovement">+0%</span>
+                    </div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">SIMP Routing</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="simpProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="experiment-meta">
+                        <span id="simpScore">Score: 0.00</span>
+                        <span id="simpImprovement">+0%</span>
+                    </div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">QuantumArb Risk</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quantumarbProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="experiment-meta">
+                        <span id="quantumarbScore">Score: 0.00</span>
+                        <span id="quantumarbImprovement">+0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Evolution Timeline Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📅 Evolution Timeline</div>
+                    <div class="card-icon">⏳</div>
+                </div>
+                <div id="timeline">
+                    <div class="experiment-item">
+                        <div class="experiment-title">Daily evolution scheduled</div>
+                        <div class="experiment-meta">
+                            <span>16:00 daily (4:00 PM ET)</span>
+                            <span>Automatic</span>
+                        </div>
+                    </div>
+                    <div class="experiment-item">
+                        <div class="experiment-title">Last evolution run</div>
+                        <div class="experiment-meta">
+                            <span id="lastEvolution">Never</span>
+                            <span id="lastResult">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="controls" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="runManualEvolution()">
+                        🚀 Run Manual Evolution
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="refreshDashboard()">
+                🔄 Refresh Dashboard
+            </button>
+            <button class="btn btn-secondary" onclick="viewLogs()">
+                📋 View Logs
+            </button>
+            <button class="btn btn-secondary" onclick="viewReports()">
+                📊 View Reports
+            </button>
+        </div>
+        
+        <div class="last-updated">
+            Last updated: <span id="lastUpdated">Never</span>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard data URL
+        const DASHBOARD_DATA_URL = '/static/evolution_data.json';
+        const EVOLUTION_API_URL = '/evolution/run';
+        
+        // DOM elements
+        const elements = {
+            totalExperiments: document.getElementById('totalExperiments'),
+            successRate: document.getElementById('successRate'),
+            avgImprovement: document.getElementById('avgImprovement'),
+            improvementTrend: document.getElementById('improvementTrend'),
+            successProgress: document.getElementById('successProgress'),
+            experimentList: document.getElementById('experimentList'),
+            brpProgress: document.getElementById('brpProgress'),
+            brpScore: document.getElementById('brpScore'),
+            brpImprovement: document.getElementById('brpImprovement'),
+            simpProgress: document.getElementById('simpProgress'),
+            simpScore: document.getElementById('simpScore'),
+            simpImprovement: document.getElementById('simpImprovement'),
+            quantumarbProgress: document.getElementById('quantumarbProgress'),
+            quantumarbScore: document.getElementById('quantumarbScore'),
+            quantumarbImprovement: document.getElementById('quantumarbImprovement'),
+            lastEvolution: document.getElementById('lastEvolution'),
+            lastResult: document.getElementById('lastResult'),
+            lastUpdated: document.getElementById('lastUpdated'),
+            statusBadge: document.getElementById('statusBadge'),
+            nextEvolution: document.getElementById('nextEvolution')
+        };
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Never';
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+        
+        // Format time until next evolution
+        function formatNextEvolution() {
+            const now = new Date();
+            const next = new Date(now);
+            next.setHours(16, 0, 0, 0); // 4:00 PM ET
+            if (now >= next) {
+                next.setDate(next.getDate() + 1);
+            }
+            
+            const diff = next - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            return `Next: ${hours}h ${minutes}m`;
+        }
+        
+        // Update next evolution timer
+        function updateNextEvolutionTimer() {
+            elements.nextEvolution.textContent = formatNextEvolution();
+        }
+        
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(DASHBOARD_DATA_URL + '?t=' + Date.now());
+                if (!response.ok) {
+                    throw new Error('Failed to load dashboard data');
+                }
+                
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showErrorState();
+            }
+        }
+        
+        // Update dashboard with data
+        function updateDashboard(data) {
+            // Update overall metrics
+            elements.totalExperiments.textContent = data.total_experiments || 0;
+            
+            const successful = data.successful_experiments || 0;
+            const total = data.total_experiments || 1;
+            const successRate = Math.round((successful / total) * 100);
+            elements.successRate.textContent = `${successRate}%`;
+            elements.successProgress.style.width = `${successRate}%`;
+            
+            const avgImprovement = data.average_improvement || 0;
+            elements.avgImprovement.textContent = `${avgImprovement.toFixed(1)}%`;
+            elements.improvementTrend.textContent = avgImprovement >= 0 ? `+${avgImprovement.toFixed(1)}%` : `${avgImprovement.toFixed(1)}%`;
+            elements.improvementTrend.className = `metric-change ${avgImprovement >= 0 ? 'positive' : 'negative'}`;
+            
+            // Update recent experiments
+            updateExperimentList(data.recent_results || []);
+            
+            // Update component progress
+            updateComponentProgress(data.recent_results || []);
+            
+            // Update timeline
+            if (data.recent_results && data.recent_results.length > 0) {
+                const lastResult = data.recent_results[0];
+                elements.lastEvolution.textContent = formatDate(lastResult.timestamp);
+                elements.lastResult.textContent = lastResult.improvement >= 0 ? `+${lastResult.improvement.toFixed(1)}%` : `${lastResult.improvement.toFixed(1)}%`;
+                elements.lastResult.className = lastResult.improvement >= 0 ? 'positive' : 'negative';
+            }
+            
+            // Update last updated time
+            elements.lastUpdated.textContent = formatDate(data.last_updated);
+            
+            // Update status
+            updateNextEvolutionTimer();
+        }
+        
+        // Update experiment list
+        function updateExperimentList(experiments) {
+            if (experiments.length === 0) {
+                elements.experimentList.innerHTML = `
+                    <div class="experiment-item">
+                        <div class="experiment-title">No experiments yet</div>
+                        <div class="experiment-meta">
+                            <span>Run first evolution to see results</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            elements.experimentList.innerHTML = experiments.map(exp => `
+                <div class="experiment-item ${exp.improvement >= 0 ? 'experiment-success' : 'experiment-failed'}">
+                    <div class="experiment-title">${exp.component} - ${exp.experiment}</div>
+                    <div class="experiment-meta">
+                        <span>${formatDate(exp.timestamp)}</span>
+                        <span class="${exp.improvement >= 0 ? 'positive' : 'negative'}">
+                            ${exp.improvement >= 0 ? '+' : ''}${exp.improvement.toFixed(1)}%
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Update component progress
+        function updateComponentProgress(experiments) {
+            // Group experiments by component
+            const components = {
+                'brp_threat_detection': { score: 0, improvement: 0, count: 0 },
+                'simp_routing': { score: 0, improvement: 0, count: 0 },
+                'quantumarb_risk': { score: 0, improvement: 0, count: 0 }
+            };
+            
+            experiments.forEach(exp => {
+                if (components[exp.component]) {
+                    components[exp.component].score += exp.best_score || 0;
+                    components[exp.component].improvement += exp.improvement || 0;
+                    components[exp.component].count++;
+                }
+            });
+            
+            // Update BRP component
+            const brp = components.brp_threat_detection;
+            if (brp.count > 0) {
+                const avgScore = brp.score / brp.count;
+                const avgImprovement = brp.improvement / brp.count;
+                elements.brpProgress.style.width = `${Math.min(100, avgScore * 100)}%`;
+                elements.brpScore.textContent = `Score: ${avgScore.toFixed(2)}`;
+                elements.brpImprovement.textContent = avgImprovement >= 0 ? `+${avgImprovement.toFixed(1)}%` : `${avgImprovement.toFixed(1)}%`;
+                elements.brpImprovement.className = avgImprovement >= 0 ? 'positive' : 'negative';
+            }
+            
+            // Update SIMP component
+            const simp = components.simp_routing;
+            if (simp.count > 0) {
+                const avgScore = simp.score / simp.count;
+                const avgImprovement = simp.improvement / simp.count;
+                elements.simpProgress.style.width = `${Math.min(100, avgScore * 100)}%`;
+                elements.simpScore.textContent = `Score: ${avgScore.toFixed(2)}`;
+                elements.simpImprovement.textContent = avgImprovement >= 0 ? `+${avgImprovement.toFixed(1)}%` : `${avgImprovement.toFixed(1)}%`;
+                elements.simpImprovement.className = avgImprovement >= 0 ? 'positive' : 'negative';
+            }
+            
+            // Update QuantumArb component
+            const quantumarb = components.quantumarb_risk;
+            if (quantumarb.count > 0) {
+                const avgScore = quantumarb.score / quantumarb.count;
+                const avgImprovement = quantumarb.improvement / quantumarb.count;
+                elements.quantumarbProgress.style.width = `${Math.min(100, avgScore * 100)}%`;
+                elements.quantumarbScore.textContent = `Score: ${avgScore.toFixed(2)}`;
+                elements.quantumarbImprovement.textContent = avgImprovement >= 0 ? `+${avgImprovement.toFixed(1)}%` : `${avgImprovement.toFixed(1)}%`;
+                elements.quantumarbImprovement.className = avgImprovement >= 0 ? 'positive' : 'negative';
+            }
+        }
+        
+        // Show error state
+        function showErrorState() {
+            elements.totalExperiments.textContent = '0';
+            elements.successRate.textContent = '0%';
+            elements.avgImprovement.textContent = '0%';
+            elements.successProgress.style.width = '0%';
+            elements.lastUpdated.textContent = 'Error loading data';
+            elements.statusBadge.className = 'status-badge status-inactive';
+            elements.statusBadge.textContent = 'ERROR';
+        }
+        
+        // Run manual evolution
+        async function runManualEvolution() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Running...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(EVOLUTION_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('Evolution started successfully! Check logs for progress.');
+                    setTimeout(loadDashboardData, 5000); // Reload after 5 seconds
+                } else {
+                    throw new Error('Failed to start evolution');
+                }
+            } catch (error) {
+                alert('Error starting evolution: ' + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+        
+        // Refresh dashboard
+        function refreshDashboard() {
+            loadDashboardData();
+            elements.lastUpdated.textContent = 'Refreshing...';
+        }
+        
+        // View logs
+        function viewLogs() {
+            window.open('/static/logs/daily_evolution_latest.log', '_blank');
+        }
+        
+        // View reports
+        function viewReports() {
+            window.open('/static/data/evolution_daily_report_latest.md', '_blank');
+        }
+        
+        // Initialize dashboard
+        function initDashboard() {
+            loadDashboardData();
+            updateNextEvolutionTimer();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadDashboardData, 30000);
+            setInterval(updateNextEvolutionTimer, 60000);
+            
+            // Initial animation
+            setTimeout(() => {
+                document.querySelectorAll('.progress-fill').forEach(el => {
+                    const width = el.style.width;
+                    el.style.width = '0%';
+                    setTimeout(() => {
+                        el.style.width = width;
+                    }, 100);
+                });
+            }, 500);
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

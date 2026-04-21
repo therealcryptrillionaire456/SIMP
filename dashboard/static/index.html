@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMP Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <svg class="logo" viewBox="0 0 40 40" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="36" height="36" rx="8" fill="none" stroke="#4f98a3" stroke-width="2.5"/>
+        <circle cx="12" cy="14" r="3" fill="#4f98a3"/>
+        <circle cx="28" cy="14" r="3" fill="#4f98a3"/>
+        <circle cx="20" cy="26" r="3" fill="#4f98a3"/>
+        <line x1="12" y1="14" x2="28" y2="14" stroke="#4f98a3" stroke-width="1.5" opacity="0.5"/>
+        <line x1="12" y1="14" x2="20" y2="26" stroke="#4f98a3" stroke-width="1.5" opacity="0.5"/>
+        <line x1="28" y1="14" x2="20" y2="26" stroke="#4f98a3" stroke-width="1.5" opacity="0.5"/>
+      </svg>
+      <h1 class="header-title">SIMP <span class="header-subtitle">Dashboard</span></h1>
+    </div>
+    <div class="header-right">
+      <span id="ws-status" class="ws-status disconnected">Connecting...</span>
+      <span class="broker-badge" id="broker-badge">
+        <span class="status-dot" id="broker-dot"></span>
+        <span id="broker-label">Checking...</span>
+      </span>
+      <button class="refresh-btn" id="refresh-btn" title="Refresh now">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+          <path d="M8 3a5 5 0 0 0-4.546 2.914.5.5 0 1 1-.908-.418A6 6 0 1 1 2.25 9.75a.5.5 0 0 1 .75-.001A5 5 0 1 0 8 3z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        Refresh
+      </button>
+      <span class="auto-refresh-label" id="auto-refresh-label">Auto-refresh: <span id="countdown">5</span>s</span>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- System Overview -->
+    <section class="section" id="overview-section">
+      <h2 class="section-title">System Overview</h2>
+      <p class="section-description">Core system health and performance metrics</p>
+      <div class="cards-grid" id="overview-cards">
+        <div class="card" id="card-broker-status">
+          <div class="card-label">Broker Status</div>
+          <div class="card-value" id="val-broker-status">--</div>
+        </div>
+        <div class="card" id="card-broker-state">
+          <div class="card-label">Broker State</div>
+          <div class="card-value" id="val-broker-state">--</div>
+        </div>
+        <div class="card" id="card-agents-online">
+          <div class="card-label">Agents Online</div>
+          <div class="card-value mono" id="val-agents-online">--</div>
+        </div>
+        <div class="card" id="card-pending">
+          <div class="card-label">Pending Intents</div>
+          <div class="card-value mono" id="val-pending">--</div>
+        </div>
+        <div class="card" id="card-received">
+          <div class="card-label">Intents Received</div>
+          <div class="card-value mono" id="val-received">--</div>
+        </div>
+        <div class="card" id="card-routed">
+          <div class="card-label">Intents Routed</div>
+          <div class="card-value mono" id="val-routed">--</div>
+        </div>
+        <div class="card" id="card-failed">
+          <div class="card-label">Intents Failed</div>
+          <div class="card-value mono" id="val-failed">--</div>
+        </div>
+        <div class="card" id="card-avg-route">
+          <div class="card-label">Avg Route Time</div>
+          <div class="card-value mono" id="val-avg-route">--</div>
+        </div>
+        <div class="card" id="card-projectx-status">
+          <div class="card-label">ProjectX Native</div>
+          <div class="card-value" id="val-projectx-status">--</div>
+        </div>
+        <div class="card" id="card-gemma4-status">
+          <div class="card-label">Gemma4 Planner</div>
+          <div class="card-value" id="val-gemma4-status">--</div>
+        </div>
+        <div class="card" id="card-dashboard-status">
+          <div class="card-label">KashClaw Dashboard</div>
+          <div class="card-value" id="val-dashboard-status">--</div>
+        </div>
+        <div class="card" id="card-protocol-update">
+          <div class="card-label">Last Protocol Update</div>
+          <div class="card-value mono" id="val-protocol-update">--</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ProjectX Kernel -->
+    <section class="section" id="projectx-process-section">
+      <h2 class="section-title">ProjectX Kernel</h2>
+      <p class="section-description">Native SIMP maintenance kernel monitoring</p>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Health</th>
+              <th>Port</th>
+              <th>Log</th>
+            </tr>
+          </thead>
+          <tbody id="projectx-processes-tbody">
+            <tr><td colspan="6" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="stack-command-row">
+        <div><span class="card-label">Ignite</span><div class="mono" id="stack-start-command">--</div></div>
+        <div><span class="card-label">Restart Managed</span><div class="mono" id="stack-restart-command">--</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="projectx-actions-section">
+      <h2 class="section-title">Recent Actions</h2>
+      <p class="section-description">ProjectX maintenance and audit activities</p>
+      <div class="activity-feed" id="projectx-actions-feed">
+        <div class="empty-state">No ProjectX actions recorded yet.</div>
+      </div>
+    </section>
+
+    <section class="section" id="system-overview-section">
+      <h2 class="section-title">Protocol Documentation</h2>
+      <p class="section-description">SIMP protocol facts and component summaries</p>
+      <div class="system-overview-summary" id="system-overview-summary">
+        <div class="empty-state">Protocol docs not loaded.</div>
+      </div>
+      <div class="system-overview-grid" id="system-overview-cards">
+        <div class="empty-state">Component summaries unavailable.</div>
+      </div>
+      <div class="system-overview-actions" id="system-overview-actions">
+        <div class="empty-state">No operator recommendations loaded.</div>
+      </div>
+    </section>
+
+    <!-- Agent Observability -->
+    <section class="section" id="agent-observability-section">
+      <h2 class="section-title">Agent Observability</h2>
+      <p class="section-description">Agent activity, status, and delivery health</p>
+      <div class="cards-grid" id="agent-observability-cards">
+        <div class="empty-state">Agent activity data loading...</div>
+      </div>
+    </section>
+
+    <section class="section" id="brp-section">
+      <h2 class="section-title">BRP Operator View</h2>
+      <p class="section-description">Predictive safety posture, recent BRP decisions, and adaptive rule evolution</p>
+      <div class="filter-controls">
+        <select id="brp-decision-filter" class="filter-select">
+          <option value="">All Decisions</option>
+          <option value="ALLOW">Allow</option>
+          <option value="SHADOW_ALLOW">Shadow Allow</option>
+          <option value="ELEVATE">Elevate</option>
+          <option value="DENY">Deny</option>
+          <option value="LOG_ONLY">Log Only</option>
+        </select>
+        <select id="brp-severity-filter" class="filter-select">
+          <option value="">All Severities</option>
+          <option value="critical">Critical</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+          <option value="info">Info</option>
+        </select>
+        <input type="text" id="brp-source-filter" placeholder="Filter by source agent or action..." class="filter-input">
+      </div>
+      <div class="cards-grid" id="brp-overview-cards">
+        <div class="card"><div class="card-label">Responses Reviewed</div><div class="card-value mono" id="val-brp-responses">--</div></div>
+        <div class="card"><div class="card-label">Active Adaptive Rules</div><div class="card-value mono" id="val-brp-active-rules">--</div></div>
+        <div class="card"><div class="card-label">Elevated / Denied</div><div class="card-value mono" id="val-brp-elevated">--</div></div>
+        <div class="card"><div class="card-label">Average Threat</div><div class="card-value mono" id="val-brp-avg-threat">--</div></div>
+        <div class="card"><div class="card-label">Last Evaluation</div><div class="card-value mono" id="val-brp-last-eval">--</div></div>
+        <div class="card"><div class="card-label">Top Threat Tag</div><div class="card-value mono" id="val-brp-top-tag">--</div></div>
+      </div>
+      <div class="diagnostic-grid">
+        <div class="card diagnostic-card">
+          <div class="card-label">Risk Posture</div>
+          <div id="brp-posture-summary" class="diagnostic-pairs">
+            <div class="empty-state">BRP status not loaded.</div>
+          </div>
+          <div id="brp-threat-tags" class="brp-chip-list">
+            <div class="empty-state">No threat tags observed.</div>
+          </div>
+        </div>
+        <div class="card diagnostic-card">
+          <div class="card-label">Predictive / Multimodal Signals</div>
+          <div id="brp-signal-summary" class="diagnostic-pairs">
+            <div class="empty-state">BRP insights not loaded.</div>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Source</th>
+              <th>Action</th>
+              <th>Decision</th>
+              <th>Severity</th>
+              <th>Threat</th>
+              <th>Signals</th>
+            </tr>
+          </thead>
+          <tbody id="brp-evaluations-tbody">
+            <tr><td colspan="7" class="empty-row">Loading BRP evaluations...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap" style="margin-top:16px;">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Rule</th>
+              <th>Severity</th>
+              <th>Boost</th>
+              <th>Count</th>
+              <th>Active</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="brp-rules-tbody">
+            <tr><td colspan="6" class="empty-row">Loading adaptive rules...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="projectx-protocol-section">
+      <h2 class="section-title">Protocol Facts</h2>
+      <p class="section-description">SIMP protocol version and definition counts</p>
+      <div class="cards-grid" id="projectx-protocol-cards">
+        <div class="card"><div class="card-label">Protocol Version</div><div class="card-value mono" id="val-projectx-protocol-version">--</div></div>
+        <div class="card"><div class="card-label">Intent Definitions</div><div class="card-value mono" id="val-projectx-intent-count">--</div></div>
+        <div class="card"><div class="card-label">Agent Definitions</div><div class="card-value mono" id="val-projectx-agent-count">--</div></div>
+        <div class="card"><div class="card-label">Safety Policies</div><div class="card-value mono" id="val-projectx-policy-count">--</div></div>
+      </div>
+      <div class="protocol-summary" id="projectx-protocol-summary">
+        <div class="empty-state">Protocol facts not loaded.</div>
+      </div>
+    </section>
+
+    <section class="section" id="projectx-chat-section">
+      <h2 class="section-title">ProjectX Chat</h2>
+      <p class="section-description">Interactive query interface with allowlisted audit jobs</p>
+      <div class="chat-controls">
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_health_check">Health Check</button>
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_repo_scan">Repo Scan</button>
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_task_audit">Task Audit</button>
+        <button class="refresh-btn projectx-job-btn" data-job="native_agent_security_audit">Security Audit</button>
+      </div>
+      <div class="chat-panel" id="projectx-chat-feed">
+        <div class="empty-state">Ask ProjectX about system state or trigger an allowlisted audit job.</div>
+      </div>
+      <form class="chat-form" id="projectx-chat-form">
+        <textarea id="projectx-chat-input" class="chat-input" placeholder="Ask ProjectX a system question..." rows="3"></textarea>
+        <button type="submit" class="refresh-btn">Send</button>
+      </form>
+    </section>
+
+    <!-- Registered Agents Table -->
+    <section class="section" id="agents-section">
+      <h2 class="section-title">Registered Agents</h2>
+      <p class="section-description">All agents with capabilities, status, and activity metrics</p>
+      <div class="table-wrap">
+        <table class="agents-table" id="agents-table">
+          <thead>
+            <tr>
+              <th>Agent ID</th>
+              <th>Name</th>
+              <th>Mode</th>
+              <th>Status</th>
+              <th>Capabilities</th>
+              <th class="col-num">Received</th>
+              <th class="col-num">Completed</th>
+              <th>Registered At</th>
+            </tr>
+          </thead>
+          <tbody id="agents-tbody">
+            <tr><td colspan="8" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Capability Map -->
+    <section class="section" id="capabilities-section">
+      <h2 class="section-title">Capability Map</h2>
+      <p class="section-description">Visual mapping of capabilities to available agents</p>
+      <div class="cap-grid" id="cap-grid">
+        <div class="empty-state">Loading...</div>
+      </div>
+    </section>
+
+    <!-- Task Queue -->
+    <section class="section" id="task-queue-section">
+      <h2 class="section-title">Task Queue</h2>
+      <p class="section-description">Task execution status and queue management</p>
+      <div class="cards-grid" id="task-status-cards">
+        <div class="card"><div class="card-label">Queued</div><div class="card-value mono" id="val-tasks-queued">--</div></div>
+        <div class="card"><div class="card-label">Claimed</div><div class="card-value mono" id="val-tasks-claimed">--</div></div>
+        <div class="card"><div class="card-label">In Progress</div><div class="card-value mono" id="val-tasks-in-progress">--</div></div>
+        <div class="card"><div class="card-label">Completed</div><div class="card-value mono" id="val-tasks-completed">--</div></div>
+        <div class="card"><div class="card-label">Failed</div><div class="card-value mono" id="val-tasks-failed">--</div></div>
+        <div class="card"><div class="card-label">Deferred</div><div class="card-value mono" id="val-tasks-deferred">--</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table" id="task-queue-table">
+          <thead>
+            <tr>
+              <th>Task ID</th>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Agent</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="task-queue-tbody">
+            <tr><td colspan="7" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Orchestration -->
+    <section class="section" id="orchestration-section">
+      <h2 class="section-title">Orchestration</h2>
+      <div class="card" style="padding: 1rem;">
+        <div class="card-label">Loop Status</div>
+        <div id="orchestration-status">
+          <span class="status-badge offline">Checking...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Computer Use (ProjectX) -->
+    <section class="section" id="computer-use-section">
+      <h2 class="section-title">Computer Use (ProjectX)</h2>
+      <div class="card" style="padding: 1rem;">
+        <div class="card-label">Status</div>
+        <div id="computer-use-status">
+          <span class="status-badge offline">Checking...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Failure Stats -->
+    <section class="section" id="failure-stats-section">
+      <h2 class="section-title">Failure Stats</h2>
+      <div class="cap-grid" id="failure-grid">
+        <div class="empty-state">Loading...</div>
+      </div>
+    </section>
+
+    <!-- Routing Policy -->
+    <section class="section" id="routing-section">
+      <h2 class="section-title">Routing Policy</h2>
+      <div class="cap-grid" id="routing-grid">
+        <div class="empty-state">Loading...</div>
+      </div>
+    </section>
+
+    <section class="section" id="smoke-section">
+      <h2 class="section-title">Agent Smoke</h2>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Status</th>
+              <th>Probe</th>
+              <th>Latency</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody id="smoke-tbody">
+            <tr><td colspan="5" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Delivery Status -->
+    <section class="section" id="delivery-section">
+      <h2 class="section-title">Delivery Status</h2>
+      <div class="cards-grid" id="delivery-cards">
+        <div class="card"><div class="card-label">Delivered</div><div class="card-value mono" id="val-delivered">--</div></div>
+        <div class="card"><div class="card-label">Queued</div><div class="card-value mono" id="val-queued">--</div></div>
+        <div class="card"><div class="card-label">Queued (No Endpoint)</div><div class="card-value mono" id="val-queued-no-endpoint">--</div></div>
+        <div class="card" id="card-delivery-failed"><div class="card-label">Failed</div><div class="card-value mono" id="val-delivery-failed">--</div></div>
+        <div class="card" id="card-connection-refused"><div class="card-label">Connection Refused</div><div class="card-value mono" id="val-connection-refused">--</div></div>
+        <div class="card" id="card-timeout"><div class="card-label">Timeout</div><div class="card-value mono" id="val-timeout">--</div></div>
+        <div class="card" id="card-rate-limited"><div class="card-label">Rate Limited</div><div class="card-value mono" id="val-rate-limited">--</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table" id="delivery-table">
+          <thead>
+            <tr>
+              <th>Intent ID</th>
+              <th>Target Agent</th>
+              <th>Status</th>
+              <th>Latency</th>
+              <th>Retries</th>
+              <th>Fallback</th>
+            </tr>
+          </thead>
+          <tbody id="delivery-tbody">
+            <tr><td colspan="6" class="empty-row">No delivery data yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+        <h3 class="subsection-title" style="margin-top:1.5rem;">Network Topology</h3>
+        <div id="topology-container" class="topology-grid">
+          <p class="empty-row">No topology data</p>
+        </div>
+    </section>
+
+    <section class="section" id="flows-section">
+      <h2 class="section-title">Planner / Executor Flows</h2>
+      <div class="table-wrap">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Flow</th>
+              <th>Planner</th>
+              <th>Executors</th>
+              <th>Timeline</th>
+              <th>Statuses</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="flows-tbody">
+            <tr><td colspan="6" class="empty-row">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="failed-intents-section">
+      <h2 class="section-title">Failed Intents</h2>
+      <div class="cards-grid" id="failed-intent-cards">
+        <div class="card"><div class="card-label">Recent Failed Intents</div><div class="card-value mono" id="val-failed-intents-count">--</div></div>
+        <div class="card"><div class="card-label">Latest Failure</div><div class="card-value mono" id="val-failed-intents-latest">--</div></div>
+        <div class="card"><div class="card-label">Affected Targets</div><div class="card-value mono" id="val-failed-intents-targets">--</div></div>
+        <div class="card"><div class="card-label">Active Filter</div><div class="card-value mono" id="val-failed-intents-filter">all</div></div>
+      </div>
+      <div class="diagnostic-grid">
+        <div class="card diagnostic-card">
+          <div class="card-label">By Status</div>
+          <div id="failed-status-breakdown" class="diagnostic-breakdown">
+            <div class="empty-state">No failed intents.</div>
+          </div>
+        </div>
+        <div class="card diagnostic-card">
+          <div class="card-label">By Target Agent</div>
+          <div id="failed-target-breakdown" class="diagnostic-breakdown">
+            <div class="empty-state">No failed intents.</div>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="agents-table" id="failed-intents-table">
+          <thead>
+            <tr>
+              <th>Intent ID</th>
+              <th>Timestamp</th>
+              <th>Target Agent</th>
+              <th>Status</th>
+              <th>Reason</th>
+              <th>Correlation</th>
+            </tr>
+          </thead>
+          <tbody id="failed-intents-tbody">
+            <tr><td colspan="6" class="empty-row">No failed intents captured.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Memory -->
+    <section class="section" id="memory-section">
+      <h2 class="section-title">Memory</h2>
+      <div class="memory-subsection">
+        <h3 class="subsection-title">Task Memory</h3>
+        <div class="table-wrap">
+          <table class="agents-table" id="memory-tasks-table">
+            <thead>
+              <tr>
+                <th>Slug</th>
+                <th>Title</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="memory-tasks-tbody">
+              <tr><td colspan="3" class="empty-row">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="memory-subsection" style="margin-top:1.5rem;">
+        <h3 class="subsection-title">Recent Conversations</h3>
+        <div class="table-wrap">
+          <table class="agents-table" id="memory-convos-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Topic</th>
+                <th>Participants</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="memory-convos-tbody">
+              <tr><td colspan="4" class="empty-row">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Activity Charts (Sprint 21) -->
+    <section class="section" id="charts-section">
+      <h2 class="section-title">Activity</h2>
+      <div class="chart-grid">
+        <div class="card chart-card">
+          <div class="card-label">Intent Flow</div>
+          <canvas id="intent-chart" height="200"></canvas>
+        </div>
+        <div class="card chart-card">
+          <div class="card-label">Task Distribution</div>
+          <canvas id="task-chart" height="200"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Task Search/Filter (Sprint 21) -->
+    <section class="section" id="task-filter-section">
+      <h2 class="section-title">Task Search</h2>
+      <div class="filter-controls">
+        <input type="text" id="task-search" placeholder="Search tasks..." class="filter-input">
+        <select id="task-status-filter" class="filter-select">
+          <option value="all">All Statuses</option>
+          <option value="queued">Queued</option>
+          <option value="claimed">Claimed</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="failed">Failed</option>
+          <option value="blocked">Blocked</option>
+        </select>
+        <input type="hidden" id="task-page" value="1">
+      </div>
+      <div id="tasks-container">
+        <div class="empty-state">Loading tasks...</div>
+      </div>
+    </section>
+
+    <!-- Activity Feed -->
+    <section class="section" id="activity-section">
+      <h2 class="section-title">Recent Activity</h2>
+      <div class="activity-feed" id="activity-feed">
+        <div class="empty-state">No broker intents recorded yet.</div>
+      </div>
+    </section>
+
+    <!-- Structured Logs -->
+    <section class="section" id="logs-section">
+      <h2 class="section-title">Structured Logs</h2>
+      <div class="activity-list">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Level</th>
+              <th>Event</th>
+              <th>Agent</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="logs-tbody">
+            <tr><td colspan="5" class="empty-row">No structured logs yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Protocol Info Footer -->
+    <section class="section protocol-info" id="protocol-section">
+      <div class="protocol-grid">
+        <div>
+          <span class="protocol-label">Protocol</span>
+          <span class="protocol-value mono">SIMP v1</span>
+        </div>
+        <div>
+          <span class="protocol-label">Dashboard</span>
+          <span class="protocol-value mono" id="dashboard-version">v2.0.0</span>
+        </div>
+        <div>
+          <span class="protocol-label">Dashboard Uptime</span>
+          <span class="protocol-value mono" id="val-uptime">--</span>
+        </div>
+        <div>
+          <span class="protocol-label">Last Refresh</span>
+          <span class="protocol-value mono" id="val-last-refresh">--</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Unreachable overlay -->
+  <div class="unreachable-banner" id="unreachable-banner" style="display:none;">
+    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+      <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 10.5a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5zM8.75 8a.75.75 0 0 1-1.5 0V4.5a.75.75 0 0 1 1.5 0V8z"/>
+    </svg>
+    <span>Broker Unreachable &mdash; Dashboard is running but cannot connect to the SIMP broker at <code>127.0.0.1:5555</code></span>
+  </div>
+
+  <div class="intent-drawer-backdrop" id="intent-drawer-backdrop" hidden></div>
+  <aside class="intent-drawer" id="intent-drawer" hidden>
+    <div class="intent-drawer-header">
+      <div>
+        <div class="card-label">Intent Diagnostic</div>
+        <div class="mono intent-drawer-title" id="intent-drawer-title">--</div>
+      </div>
+      <button class="refresh-btn" id="intent-drawer-close" type="button">Close</button>
+    </div>
+    <div class="intent-drawer-body">
+      <div class="diagnostic-pairs" id="intent-drawer-summary"></div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Correlation IDs</div>
+        <div class="diagnostic-pairs" id="intent-drawer-correlation"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Route Attempts</div>
+        <div id="intent-drawer-attempts" class="diagnostic-list"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Lifecycle</div>
+        <div id="intent-drawer-lifecycle" class="diagnostic-list"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Operator Actions</div>
+        <div id="intent-drawer-actions" class="diagnostic-list"></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="intent-drawer-backdrop" id="brp-drawer-backdrop" hidden></div>
+  <aside class="intent-drawer" id="brp-drawer" hidden>
+    <div class="intent-drawer-header">
+      <div>
+        <div class="card-label">BRP Evaluation</div>
+        <div class="mono intent-drawer-title" id="brp-drawer-title">--</div>
+      </div>
+      <button class="refresh-btn" id="brp-drawer-close" type="button">Close</button>
+    </div>
+    <div class="intent-drawer-body">
+      <div class="diagnostic-pairs" id="brp-drawer-summary"></div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Source Record</div>
+        <div class="diagnostic-pairs" id="brp-drawer-source"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Signals</div>
+        <div class="diagnostic-pairs" id="brp-drawer-signals"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Threat Tags</div>
+        <div id="brp-drawer-tags" class="brp-chip-list">
+          <div class="empty-state">No threat tags.</div>
+        </div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Related Observations</div>
+        <div id="brp-drawer-observations" class="diagnostic-list"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Related Adaptive Rules</div>
+        <div id="brp-drawer-rules" class="diagnostic-list"></div>
+      </div>
+    </div>
+  </aside>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+usage: quantum_mode_engine.py [-h] [--config CONFIG]
+                              [--dataset-dir DATASET_DIR]
+                              [--projectx-endpoint PROJECTX_ENDPOINT]
+                              [--no-learning] [--no-risk] [--verbose]
+                              query
+quantum_mode_engine.py: error: the following arguments are required: query

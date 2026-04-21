@@ -1,0 +1,1 @@
+./start_missing_components.sh: line 27: 85618 Terminated: 15          python3.10 projectx_guard_server.py

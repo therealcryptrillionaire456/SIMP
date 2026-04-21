@@ -1,0 +1,72 @@
+{
+  "last_updated": "2026-04-14T19:06:07.057448Z",
+  "total_experiments": 10,
+  "successful_experiments": 9,
+  "failed_experiments": 1,
+  "average_improvement": 33.84100262825879,
+  "recent_results": [
+    {
+      "component": "quantumarb_trading",
+      "experiment": "daily_quantumarb_trading_evolution",
+      "timestamp": "2026-04-14T18:14:07.365098",
+      "improvement": 0.0,
+      "best_score": 24361.862524731863
+    },
+    {
+      "component": "quantumarb_trading",
+      "experiment": "daily_quantumarb_trading_evolution",
+      "timestamp": "2026-04-14T18:03:04.663639",
+      "improvement": 0.0,
+      "best_score": 26103.171073904683
+    },
+    {
+      "component": "quantumarb_trading",
+      "experiment": "daily_quantumarb_trading_evolution",
+      "timestamp": "2026-04-14T18:03:59.936834",
+      "improvement": 0.0,
+      "best_score": 20207.50947166412
+    },
+    {
+      "component": "brp_threat_detection",
+      "experiment": "daily_brp_threat_detection_evolution",
+      "timestamp": "2026-04-14T18:03:03.579487Z",
+      "improvement": 34.31069280062289,
+      "best_score": 0.6715534640031144
+    },
+    {
+      "component": "brp_threat_detection",
+      "experiment": "daily_brp_threat_detection_evolution",
+      "timestamp": "2026-04-14T18:03:58.862881Z",
+      "improvement": 36.623755165037196,
+      "best_score": 0.683118775825186
+    },
+    {
+      "component": "brp_threat_detection",
+      "experiment": "daily_brp_threat_detection_evolution",
+      "timestamp": "2026-04-14T18:07:49.088857Z",
+      "improvement": 36.84698779767399,
+      "best_score": 0.68423493898837
+    },
+    {
+      "component": "quantumarb_trading",
+      "experiment": "daily_quantumarb_trading_evolution",
+      "timestamp": "2026-04-14T18:07:50.149955",
+      "improvement": 0.0,
+      "best_score": 20353.34880572781
+    },
+    {
+      "component": "brp_threat_detection",
+      "experiment": "daily_brp_threat_detection_evolution",
+      "timestamp": "2026-04-14T18:14:06.250833Z",
+      "improvement": 26.849040872995,
+      "best_score": 0.634245204364975
+    },
+    {
+      "component": "brp_threat_detection",
+      "experiment": "daily_threat_evolution",
+      "timestamp": "2026-04-14T19:06:07.056782Z",
+      "improvement": 34.57453650496489,
+      "best_score": 0.6728726825248245
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-04-14T14:12:10.326897",
+  "signal": {
+    "signal_id": "btcusd_gate3_1776190330_5504",
+    "arb_type": "cross_venue",
+    "symbol_a": "BTC-USD",
+    "symbol_b": "BTC-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.0178,
+    "expected_return_pct": 0.0106,
+    "confidence": 0.89,
+    "timestamp": "2026-04-14T14:12:10.326698",
+    "metadata": {
+      "gate": "3",
+      "market": "BTC-USD",
+      "microscopic": true,
+      "multi_market": true,
+      "test_signal": true,
+      "estimated_price": 64498.05766743627
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "btcusd_gate3_1776190330_5504",
+      "arb_type": "cross_venue",
+      "symbol_a": "BTC-USD",
+      "symbol_b": "BTC-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.0178,
+      "expected_return_pct": 0.0106,
+      "confidence": 0.89,
+      "timestamp": "2026-04-14T14:12:10.326698",
+      "metadata": {
+        "gate": "3",
+        "market": "BTC-USD",
+        "microscopic": true,
+        "multi_market": true,
+        "test_signal": true,
+        "estimated_price": 64498.05766743627
+      }
+    },
+    "decision": "reject_risk",
+    "decision_reason": "Risk score 0.500 < minimum 0.65 for BTC-USD",
+    "position_size_usd": 0.0,
+    "expected_pnl_usd": 0.0,
+    "risk_score": 0.4995885208012595,
+    "metadata": {
+      "rejection_reason": "low_risk_score",
+      "symbol": "BTC-USD"
+    }
+  },
+  "execution_result": null,
+  "session_id": "gate3_1776190276",
+  "gate": "3"
+}

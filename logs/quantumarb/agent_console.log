@@ -1,0 +1,27 @@
+2026-04-13 19:09:55,475 - QuantumArbEnhanced - ERROR - Registration failed: 400 {"error":"Failed to register agent 'quantumarb_enhanced'","status":"error"}
+
+2026-04-13 19:09:55,475 - QuantumArbEnhanced - WARNING - Registration failed, continuing anyway
+2026-04-13 19:09:55,475 - QuantumArbEnhanced - INFO - Enhanced QuantumArb Agent initialized with BRP protection
+2026-04-13 19:09:55,475 - QuantumArbEnhanced - INFO - BRP ENFORCED mode enabled - trades can be blocked by threat detection
+2026-04-13 19:09:55,475 - QuantumArbEnhanced - INFO - Starting Enhanced QuantumArb Agent loop
+2026-04-13 19:09:55,477 - simp.organs.quantumarb.brp_integration - INFO - QuantumArb BRP Integrator initialized in enforced mode
+2026-04-13 19:09:55,477 - SIMP.BRP - INFO - BRP event evaluated: 643e96fe-0541-4243-a460-2b8448e68a7e -> ALLOW (threat=0.00, mode=enforced)
+2026-04-13 19:09:55,478 - SIMP.BRP - INFO - BRP observation ingested: eabecadb-cf71-42cc-82f6-f10e08fe18a2 (event=643e96fe-0541-4243-a460-2b8448e68a7e, outcome=evaluated)
+2026-04-13 19:09:55,478 - SIMP.BRP - INFO - BRP observation ingested: 9c80c06f-e618-45d9-863e-daf2ee8b4fee (event=55e4144f-9ee1-409d-810a-b1f2b8b9a741, outcome=success)
+2026-04-13 19:09:55,478 - QuantumArbEnhanced - INFO - Wrote arbitrage opportunity: dry_run for None (BRP: True)
+2026-04-13 19:09:55,479 - SIMP.BRP - INFO - BRP event evaluated: c4c1d5eb-77e4-4444-8ec5-161b8ac79562 -> ALLOW (threat=0.00, mode=enforced)
+2026-04-13 19:09:55,479 - SIMP.BRP - INFO - BRP observation ingested: 04c68dc5-3377-4ebe-a995-ba1417aea324 (event=c4c1d5eb-77e4-4444-8ec5-161b8ac79562, outcome=evaluated)
+2026-04-13 19:09:55,479 - SIMP.BRP - INFO - BRP observation ingested: a5fe53a3-74a7-4096-9278-b00a16359c2d (event=49bc1d99-c65c-461a-916f-4bcc9fe657d3, outcome=success)
+2026-04-13 19:09:55,479 - QuantumArbEnhanced - INFO - Wrote arbitrage opportunity: dry_run for None (BRP: True)
+2026-04-13 19:09:55,480 - SIMP.BRP - INFO - BRP event evaluated: f6224de2-562c-4b90-81bb-65c0e6ec51ff -> ALLOW (threat=0.00, mode=enforced)
+2026-04-13 19:09:55,480 - SIMP.BRP - INFO - BRP observation ingested: e252d816-d5f7-4047-af84-52b21142ee4d (event=f6224de2-562c-4b90-81bb-65c0e6ec51ff, outcome=evaluated)
+2026-04-13 19:09:55,480 - SIMP.BRP - INFO - BRP observation ingested: ee604f8f-4e05-4607-97ff-59d2c07e8009 (event=e2a9c2ac-f753-462d-9a1a-86cd26e0643e, outcome=success)
+2026-04-13 19:09:55,481 - QuantumArbEnhanced - INFO - Wrote arbitrage opportunity: dry_run for None (BRP: True)
+2026-04-13 19:09:55,481 - SIMP.BRP - INFO - BRP event evaluated: 80a3d007-a461-40cb-a57c-3485a2fbd372 -> ALLOW (threat=0.00, mode=enforced)
+2026-04-13 19:09:55,481 - SIMP.BRP - INFO - BRP observation ingested: f8bfdbc8-1f0f-4769-a3b2-392c5841aff1 (event=80a3d007-a461-40cb-a57c-3485a2fbd372, outcome=evaluated)
+2026-04-13 19:09:55,481 - SIMP.BRP - INFO - BRP observation ingested: ce49ed6f-a695-4bbc-b12a-8966253dc352 (event=55a159b6-cdcb-4e52-808d-d916c2df4b5a, outcome=success)
+2026-04-13 19:09:55,482 - QuantumArbEnhanced - INFO - Wrote arbitrage opportunity: dry_run for None (BRP: True)
+2026-04-13 19:09:55,482 - SIMP.BRP - INFO - BRP event evaluated: 6bffcaef-dd07-4a09-acf4-48ec6d0b7cc5 -> ALLOW (threat=0.00, mode=enforced)
+2026-04-13 19:09:55,482 - SIMP.BRP - INFO - BRP observation ingested: 157f817e-cf86-4995-b1ae-f3f85506faa3 (event=6bffcaef-dd07-4a09-acf4-48ec6d0b7cc5, outcome=evaluated)
+2026-04-13 19:09:55,482 - SIMP.BRP - INFO - BRP observation ingested: ed9a24d8-2207-41b7-89ea-885ec3e2e560 (event=3d1090c1-d4d3-491a-a691-e304a15298fc, outcome=success)
+2026-04-13 19:09:55,483 - QuantumArbEnhanced - INFO - Wrote arbitrage opportunity: dry_run for None (BRP: True)

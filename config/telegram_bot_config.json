@@ -1,0 +1,34 @@
+{
+  "telegram": {
+    "bot_token": "YOUR_BOT_TOKEN_HERE",
+    "chat_id": "YOUR_CHAT_ID_HERE",
+    "enabled": true,
+    "rate_limit_per_minute": 30,
+    "alert_formats": [
+      "markdown",
+      "html"
+    ],
+    "default_parse_mode": "Markdown"
+  },
+  "alerts": {
+    "minimum_severity": "MEDIUM",
+    "categories": [
+      "Authentication",
+      "Network",
+      "Malware",
+      "Data Exfiltration",
+      "Zero-Day",
+      "Mythos Pattern",
+      "Autonomous Reasoning",
+      "Cross-Domain"
+    ],
+    "enable_test_alerts": true,
+    "alert_history_retention_days": 30
+  },
+  "integration": {
+    "with_bill_russel": "Direct threat feed",
+    "with_log_sources": "Alerts triggered by log analysis",
+    "with_ml_models": "SecBERT and Mistral 7B detections",
+    "webhook_url": "Optional webhook for external systems"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "intent_type": "arbitrage_signal",
+  "source_agent": "spread_test",
+  "target_agent": "quantumarb_minimal",
+  "timestamp": "2026-04-14T14:39:35.511298",
+  "payload": {
+    "signal_id": "spread_test_1_1776177575",
+    "arb_type": "cross_venue",
+    "symbol_a": "BTC-USD",
+    "symbol_b": "BTC-USD",
+    "venue_a": "coinbase_sandbox",
+    "venue_b": "coinbase_sandbox",
+    "spread_pct": 0.1,
+    "expected_return_pct": 0.08,
+    "confidence": 0.85,
+    "metadata": {
+      "test": true,
+      "spread_test": true,
+      "spread_value": 0.1
+    }
+  }
+}

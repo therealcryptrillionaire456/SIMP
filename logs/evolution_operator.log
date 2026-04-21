@@ -1,0 +1,304 @@
+2026-04-14 12:36:12,226 - INFO - 🚀 Starting Evolution Operator System
+2026-04-14 12:36:12,226 - INFO - 📅 Current time: 2026-04-14T12:36:12.226423
+2026-04-14 12:36:12,226 - INFO - ============================================================
+2026-04-14 12:36:12,226 - INFO - DAILY OPERATOR CHECKS
+2026-04-14 12:36:12,226 - INFO - ============================================================
+2026-04-14 12:36:12,226 - INFO - 
+📋 Dashboard Status
+2026-04-14 12:36:12,226 - INFO - 🔍 Checking evolution dashboard status...
+2026-04-14 12:36:12,233 - INFO - ✅ Dashboard is healthy
+2026-04-14 12:36:12,234 - WARNING - ⚠️ Evolution API not responding
+2026-04-14 12:36:12,234 - INFO - 🚨 ALERT [WARNING]: Daily check failed: Dashboard Status
+2026-04-14 12:36:12,234 - INFO -    The daily operator check 'Dashboard Status' failed.
+2026-04-14 12:36:12,234 - INFO - 
+📋 Daily Report
+2026-04-14 12:36:12,234 - INFO - 📋 Reviewing daily evolution report...
+2026-04-14 12:36:12,235 - INFO - ✅ Daily report found: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/daily_reviews/evolution_review_20260414.md
+2026-04-14 12:36:12,235 - INFO -    Total Experiments: 1
+2026-04-14 12:36:12,235 - INFO -    Avg Improvement: 33.63144380698013%
+2026-04-14 12:36:12,235 - INFO -    Success Rate: 100%
+2026-04-14 12:36:12,235 - INFO - 
+📋 SIMP Log Entry
+2026-04-14 12:36:12,235 - INFO - 📝 Verifying SIMP log entry...
+2026-04-14 12:36:12,235 - INFO - ✅ SIMP log entry found and contains evolution section
+2026-04-14 12:36:12,235 - INFO - ✅ Evolution system marked as operational
+2026-04-14 12:36:12,235 - INFO - 
+📋 System Resources
+2026-04-14 12:36:12,235 - INFO - 💻 Monitoring system resources...
+2026-04-14 12:36:13,251 - INFO -    CPU Usage: 9.1%
+2026-04-14 12:36:13,251 - INFO -    Memory Usage: 62.8%
+2026-04-14 12:36:13,252 - INFO -    Disk Usage: 59.7%
+2026-04-14 12:36:13,252 - INFO - ✅ System resources within normal limits
+2026-04-14 12:36:13,252 - INFO - 
+============================================================
+2026-04-14 12:36:13,252 - INFO - ⚠️ SOME DAILY CHECKS FAILED
+2026-04-14 12:36:13,252 - INFO - ============================================================
+2026-04-14 12:36:13,252 - INFO - ============================================================
+2026-04-14 12:36:13,252 - INFO - WEEKLY OPERATOR CHECKS
+2026-04-14 12:36:13,252 - INFO - ============================================================
+2026-04-14 12:36:13,252 - INFO - 
+📋 Performance Trends
+2026-04-14 12:36:13,252 - INFO - 📈 Reviewing weekly performance trends...
+2026-04-14 12:36:13,252 - INFO -    Total Experiments: 1
+2026-04-14 12:36:13,252 - INFO -    Successful: 1
+2026-04-14 12:36:13,252 - INFO -    Avg Improvement: 36.4%
+2026-04-14 12:36:13,252 - INFO -    Success Rate: 100.0%
+2026-04-14 12:36:13,252 - INFO - ✅ Performance trends positive
+2026-04-14 12:36:13,252 - INFO - 
+📋 Evolution Parameters
+2026-04-14 12:36:13,252 - INFO - ⚙️ Checking evolution parameters...
+2026-04-14 12:36:13,253 - INFO -    Current parameters: 5 rounds, 4 population
+2026-04-14 12:36:13,253 - INFO -    Parameters performing well
+2026-04-14 12:36:13,253 - INFO - 
+📋 Results Backup
+2026-04-14 12:36:13,253 - INFO - 💾 Creating evolution results backup...
+2026-04-14 12:36:13,256 - INFO - ✅ Backup created: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/backups/evolution/evolution_backup_20260414_123613.tar.gz
+2026-04-14 12:36:13,257 - INFO - 
+📋 Strategy Updates
+2026-04-14 12:36:13,257 - INFO - 🧠 Checking evolution strategies...
+2026-04-14 12:36:13,257 - INFO -    Current strategies: threat_detection
+2026-04-14 12:36:13,257 - INFO -    Limited strategies available, consider adding more
+2026-04-14 12:36:13,257 - INFO - 🚨 ALERT [INFO]: Weekly check action needed: Strategy Updates
+2026-04-14 12:36:13,257 - INFO -    The weekly check 'Strategy Updates' indicates action may be needed.
+2026-04-14 12:36:13,257 - INFO - 
+============================================================
+2026-04-14 12:36:13,257 - INFO - ⚠️ SOME WEEKLY CHECKS INDICATE ACTION NEEDED
+2026-04-14 12:36:13,257 - INFO - ============================================================
+2026-04-14 12:36:13,257 - INFO - ============================================================
+2026-04-14 12:36:13,257 - INFO - MONTHLY OPERATOR CHECKS
+2026-04-14 12:36:13,258 - INFO - ============================================================
+2026-04-14 12:36:13,258 - INFO - 
+📋 Performance Review
+2026-04-14 12:36:13,258 - INFO - 📊 Conducting comprehensive performance review...
+2026-04-14 12:36:13,258 - INFO -    Monthly Review Results:
+2026-04-14 12:36:13,258 - INFO -      Total Experiments: 1
+2026-04-14 12:36:13,258 - INFO -      Successful: 1
+2026-04-14 12:36:13,258 - INFO -      Success Rate: 100.0%
+2026-04-14 12:36:13,258 - INFO -      Avg Improvement: 36.4%
+2026-04-14 12:36:13,258 - INFO - ✅ Monthly report generated: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/monthly_reports/evolution_monthly_report_202604.md
+2026-04-14 12:36:13,258 - INFO - 
+📋 Strategy Optimization
+2026-04-14 12:36:13,258 - INFO - ⚡ Optimizing evolution strategies...
+2026-04-14 12:36:13,258 - INFO -    Current strategies performing well
+2026-04-14 12:36:13,258 - INFO - 
+📋 Knowledge Base Updates
+2026-04-14 12:36:13,258 - INFO - 📚 Checking knowledge base for updates...
+2026-04-14 12:36:13,258 - INFO -    Knowledge base files: 14
+2026-04-14 12:36:13,258 - INFO -    Knowledge base exists
+2026-04-14 12:36:13,258 - INFO -    Monthly update check complete
+2026-04-14 12:36:13,258 - INFO - 
+📋 System Health Audit
+2026-04-14 12:36:13,258 - INFO - 🏥 Conducting system health audit...
+2026-04-14 12:36:13,258 - INFO - 🔍 Checking evolution dashboard status...
+2026-04-14 12:36:13,260 - INFO - ✅ Dashboard is healthy
+2026-04-14 12:36:13,262 - WARNING - ⚠️ Evolution API not responding
+2026-04-14 12:36:13,262 - WARNING - ⚠️ System health audit found issues: ['Dashboard not healthy']
+2026-04-14 12:36:13,262 - INFO - ✅ Audit report saved: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/audits/system_health_audit_202604.json
+2026-04-14 12:36:13,262 - INFO - 🚨 ALERT [INFO]: Monthly check action needed: System Health Audit
+2026-04-14 12:36:13,262 - INFO -    The monthly check 'System Health Audit' indicates action may be needed.
+2026-04-14 12:36:13,262 - INFO - 
+============================================================
+2026-04-14 12:36:13,262 - INFO - ⚠️ SOME MONTHLY CHECKS INDICATE ACTION NEEDED
+2026-04-14 12:36:13,263 - INFO - ============================================================
+2026-04-14 12:36:13,263 - INFO - 
+============================================================
+2026-04-14 12:36:13,263 - INFO - OPERATION SUMMARY
+2026-04-14 12:36:13,263 - INFO - ============================================================
+2026-04-14 12:36:13,263 - INFO - Daily Checks: ⚠️ ISSUES
+2026-04-14 12:36:13,263 - INFO - Weekly Checks: ⚠️ ACTION NEEDED
+2026-04-14 12:36:13,263 - INFO - Monthly Checks: ⚠️ ACTION NEEDED
+2026-04-14 12:36:13,263 - INFO - 
+📊 Operator state saved: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/evolution_operator_state.json
+2026-04-14 12:36:13,263 - INFO - ============================================================
+2026-04-14 12:36:13,263 - WARNING - ⚠️ Evolution Operator System completed with issues
+2026-04-14 12:38:14,692 - INFO - 🚀 Starting Evolution Operator System
+2026-04-14 12:38:14,692 - INFO - 📅 Current time: 2026-04-14T12:38:14.692696
+2026-04-14 12:38:14,692 - INFO - ============================================================
+2026-04-14 12:38:14,692 - INFO - DAILY OPERATOR CHECKS
+2026-04-14 12:38:14,692 - INFO - ============================================================
+2026-04-14 12:38:14,692 - INFO - 
+📋 Dashboard Status
+2026-04-14 12:38:14,692 - INFO - 🔍 Checking evolution dashboard status...
+2026-04-14 12:38:14,698 - INFO - ✅ Dashboard is healthy
+2026-04-14 12:38:14,700 - WARNING - ⚠️ Evolution API not responding
+2026-04-14 12:38:14,700 - INFO - 🚨 ALERT [WARNING]: Daily check failed: Dashboard Status
+2026-04-14 12:38:14,700 - INFO -    The daily operator check 'Dashboard Status' failed.
+2026-04-14 12:38:14,700 - INFO - 
+📋 Daily Report
+2026-04-14 12:38:14,700 - INFO - 📋 Reviewing daily evolution report...
+2026-04-14 12:38:14,700 - INFO - ✅ Daily report found: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/daily_reviews/evolution_review_20260414.md
+2026-04-14 12:38:14,700 - INFO -    Total Experiments: 1
+2026-04-14 12:38:14,700 - INFO -    Avg Improvement: 33.63144380698013%
+2026-04-14 12:38:14,700 - INFO -    Success Rate: 100%
+2026-04-14 12:38:14,700 - INFO - 
+📋 SIMP Log Entry
+2026-04-14 12:38:14,700 - INFO - 📝 Verifying SIMP log entry...
+2026-04-14 12:38:14,700 - INFO - ✅ SIMP log entry found and contains evolution section
+2026-04-14 12:38:14,700 - INFO - ✅ Evolution system marked as operational
+2026-04-14 12:38:14,700 - INFO - 
+📋 System Resources
+2026-04-14 12:38:14,700 - INFO - 💻 Monitoring system resources...
+2026-04-14 12:38:15,716 - INFO -    CPU Usage: 14.3%
+2026-04-14 12:38:15,718 - INFO -    Memory Usage: 63.3%
+2026-04-14 12:38:15,719 - INFO -    Disk Usage: 59.7%
+2026-04-14 12:38:15,719 - INFO - ✅ System resources within normal limits
+2026-04-14 12:38:15,720 - INFO - 
+============================================================
+2026-04-14 12:38:15,720 - INFO - ⚠️ SOME DAILY CHECKS FAILED
+2026-04-14 12:38:15,721 - INFO - ============================================================
+2026-04-14 12:38:15,721 - INFO - 
+⏭️ Weekly checks not due yet
+2026-04-14 12:38:15,721 - INFO - 
+⏭️ Monthly checks not due yet
+2026-04-14 12:38:15,721 - INFO - 
+============================================================
+2026-04-14 12:38:15,721 - INFO - OPERATION SUMMARY
+2026-04-14 12:38:15,721 - INFO - ============================================================
+2026-04-14 12:38:15,721 - INFO - Daily Checks: ⚠️ ISSUES
+2026-04-14 12:38:15,721 - INFO - 
+📊 Operator state saved: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/evolution_operator_state.json
+2026-04-14 12:38:15,721 - INFO - ============================================================
+2026-04-14 12:38:15,721 - WARNING - ⚠️ Evolution Operator System completed with issues
+2026-04-14 14:15:07,473 - INFO - 🚀 Starting Evolution Operator System
+2026-04-14 14:15:07,473 - INFO - 📅 Current time: 2026-04-14T14:15:07.473965
+2026-04-14 14:15:07,474 - INFO - ============================================================
+2026-04-14 14:15:07,474 - INFO - DAILY OPERATOR CHECKS
+2026-04-14 14:15:07,474 - INFO - ============================================================
+2026-04-14 14:15:07,474 - INFO - 
+📋 Dashboard Status
+2026-04-14 14:15:07,474 - INFO - 🔍 Checking evolution dashboard status...
+2026-04-14 14:15:07,480 - INFO - ✅ Dashboard is healthy
+2026-04-14 14:15:07,481 - WARNING - ⚠️ Evolution API not responding
+2026-04-14 14:15:07,481 - INFO - 🚨 ALERT [WARNING]: Daily check failed: Dashboard Status
+2026-04-14 14:15:07,481 - INFO -    The daily operator check 'Dashboard Status' failed.
+2026-04-14 14:15:07,482 - INFO - 
+📋 Daily Report
+2026-04-14 14:15:07,482 - INFO - 📋 Reviewing daily evolution report...
+2026-04-14 14:15:07,482 - INFO - ✅ Daily report found: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/daily_reviews/evolution_review_20260414.md
+2026-04-14 14:15:07,482 - INFO -    Total Experiments: 1
+2026-04-14 14:15:07,482 - INFO -    Avg Improvement: 33.63144380698013%
+2026-04-14 14:15:07,482 - INFO -    Success Rate: 100%
+2026-04-14 14:15:07,482 - INFO - 
+📋 SIMP Log Entry
+2026-04-14 14:15:07,482 - INFO - 📝 Verifying SIMP log entry...
+2026-04-14 14:15:07,482 - INFO - ✅ SIMP log entry found and contains evolution section
+2026-04-14 14:15:07,482 - INFO - ✅ Evolution system marked as operational
+2026-04-14 14:15:07,482 - INFO - 
+📋 System Resources
+2026-04-14 14:15:07,482 - INFO - 💻 Monitoring system resources...
+2026-04-14 14:15:08,500 - INFO -    CPU Usage: 16.5%
+2026-04-14 14:15:08,500 - INFO -    Memory Usage: 64.4%
+2026-04-14 14:15:08,501 - INFO -    Disk Usage: 59.8%
+2026-04-14 14:15:08,501 - INFO - ✅ System resources within normal limits
+2026-04-14 14:15:08,502 - INFO - 
+============================================================
+2026-04-14 14:15:08,502 - INFO - ⚠️ SOME DAILY CHECKS FAILED
+2026-04-14 14:15:08,502 - INFO - ============================================================
+2026-04-14 14:15:08,502 - INFO - 
+⏭️ Weekly checks not due yet
+2026-04-14 14:15:08,502 - INFO - 
+⏭️ Monthly checks not due yet
+2026-04-14 14:15:08,502 - INFO - 
+============================================================
+2026-04-14 14:15:08,502 - INFO - OPERATION SUMMARY
+2026-04-14 14:15:08,502 - INFO - ============================================================
+2026-04-14 14:15:08,502 - INFO - Daily Checks: ⚠️ ISSUES
+2026-04-14 14:15:08,502 - INFO - 
+📊 Operator state saved: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/evolution_operator_state.json
+2026-04-14 14:15:08,503 - INFO - ============================================================
+2026-04-14 14:15:08,503 - WARNING - ⚠️ Evolution Operator System completed with issues
+2026-04-14 15:06:07,160 - INFO - 🚀 Starting Evolution Operator System
+2026-04-14 15:06:07,161 - INFO - 📅 Current time: 2026-04-14T15:06:07.161221
+2026-04-14 15:06:07,161 - INFO - ============================================================
+2026-04-14 15:06:07,161 - INFO - DAILY OPERATOR CHECKS
+2026-04-14 15:06:07,161 - INFO - ============================================================
+2026-04-14 15:06:07,161 - INFO - 
+📋 Dashboard Status
+2026-04-14 15:06:07,161 - INFO - 🔍 Checking evolution dashboard status...
+2026-04-14 15:06:07,166 - ERROR - ❌ Error checking dashboard: HTTPConnectionPool(host='127.0.0.1', port=8050): Max retries exceeded with url: /health (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=8050): Failed to establish a new connection: [Errno 61] Connection refused"))
+2026-04-14 15:06:07,166 - INFO - 🚨 ALERT [WARNING]: Daily check failed: Dashboard Status
+2026-04-14 15:06:07,166 - INFO -    The daily operator check 'Dashboard Status' failed.
+2026-04-14 15:06:07,167 - INFO - 
+📋 Daily Report
+2026-04-14 15:06:07,167 - INFO - 📋 Reviewing daily evolution report...
+2026-04-14 15:06:07,167 - INFO - ✅ Daily report found: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/daily_reviews/evolution_review_20260414.md
+2026-04-14 15:06:07,167 - INFO -    Total Experiments: 1
+2026-04-14 15:06:07,167 - INFO -    Avg Improvement: 33.63144380698013%
+2026-04-14 15:06:07,167 - INFO -    Success Rate: 100%
+2026-04-14 15:06:07,167 - INFO - 
+📋 SIMP Log Entry
+2026-04-14 15:06:07,167 - INFO - 📝 Verifying SIMP log entry...
+2026-04-14 15:06:07,167 - INFO - ✅ SIMP log entry found and contains evolution section
+2026-04-14 15:06:07,167 - INFO - ✅ Evolution system marked as operational
+2026-04-14 15:06:07,167 - INFO - 
+📋 System Resources
+2026-04-14 15:06:07,167 - INFO - 💻 Monitoring system resources...
+2026-04-14 15:06:08,183 - INFO -    CPU Usage: 12.8%
+2026-04-14 15:06:08,184 - INFO -    Memory Usage: 61.1%
+2026-04-14 15:06:08,184 - INFO -    Disk Usage: 59.8%
+2026-04-14 15:06:08,185 - INFO - ✅ System resources within normal limits
+2026-04-14 15:06:08,187 - INFO - 
+============================================================
+2026-04-14 15:06:08,188 - INFO - ⚠️ SOME DAILY CHECKS FAILED
+2026-04-14 15:06:08,188 - INFO - ============================================================
+2026-04-14 15:06:08,188 - INFO - 
+⏭️ Weekly checks not due yet
+2026-04-14 15:06:08,188 - INFO - 
+⏭️ Monthly checks not due yet
+2026-04-14 15:06:08,188 - INFO - 
+============================================================
+2026-04-14 15:06:08,188 - INFO - OPERATION SUMMARY
+2026-04-14 15:06:08,188 - INFO - ============================================================
+2026-04-14 15:06:08,188 - INFO - Daily Checks: ⚠️ ISSUES
+2026-04-14 15:06:08,188 - INFO - 
+📊 Operator state saved: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/evolution_operator_state.json
+2026-04-14 15:06:08,188 - INFO - ============================================================
+2026-04-14 15:06:08,189 - WARNING - ⚠️ Evolution Operator System completed with issues
+2026-04-14 20:04:43,715 - INFO - 🚀 Starting Evolution Operator System
+2026-04-14 20:04:43,716 - INFO - 📅 Current time: 2026-04-14T20:04:43.716090
+2026-04-14 20:04:43,716 - INFO - ============================================================
+2026-04-14 20:04:43,716 - INFO - DAILY OPERATOR CHECKS
+2026-04-14 20:04:43,716 - INFO - ============================================================
+2026-04-14 20:04:43,716 - INFO - 
+📋 Dashboard Status
+2026-04-14 20:04:43,716 - INFO - 🔍 Checking evolution dashboard status...
+2026-04-14 20:04:43,728 - INFO - ✅ Dashboard is healthy
+2026-04-14 20:04:43,729 - WARNING - ⚠️ Evolution API not responding
+2026-04-14 20:04:43,730 - INFO - 🚨 ALERT [WARNING]: Daily check failed: Dashboard Status
+2026-04-14 20:04:43,730 - INFO -    The daily operator check 'Dashboard Status' failed.
+2026-04-14 20:04:43,730 - INFO - 
+📋 Daily Report
+2026-04-14 20:04:43,730 - INFO - 📋 Reviewing daily evolution report...
+2026-04-14 20:04:43,730 - INFO - ✅ Daily report found: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/daily_reviews/evolution_review_20260414.md
+2026-04-14 20:04:43,730 - INFO -    Total Experiments: 1
+2026-04-14 20:04:43,730 - INFO -    Avg Improvement: 33.63144380698013%
+2026-04-14 20:04:43,730 - INFO -    Success Rate: 100%
+2026-04-14 20:04:43,730 - INFO - 
+📋 SIMP Log Entry
+2026-04-14 20:04:43,730 - INFO - 📝 Verifying SIMP log entry...
+2026-04-14 20:04:43,730 - INFO - ✅ SIMP log entry found and contains evolution section
+2026-04-14 20:04:43,730 - INFO - ✅ Evolution system marked as operational
+2026-04-14 20:04:43,730 - INFO - 
+📋 System Resources
+2026-04-14 20:04:43,731 - INFO - 💻 Monitoring system resources...
+2026-04-14 20:04:44,758 - INFO -    CPU Usage: 40.7%
+2026-04-14 20:04:44,758 - INFO -    Memory Usage: 65.1%
+2026-04-14 20:04:44,758 - INFO -    Disk Usage: 60.3%
+2026-04-14 20:04:44,758 - INFO - ✅ System resources within normal limits
+2026-04-14 20:04:44,759 - INFO - 
+============================================================
+2026-04-14 20:04:44,759 - INFO - ⚠️ SOME DAILY CHECKS FAILED
+2026-04-14 20:04:44,759 - INFO - ============================================================
+2026-04-14 20:04:44,759 - INFO - 
+⏭️ Weekly checks not due yet
+2026-04-14 20:04:44,759 - INFO - 
+⏭️ Monthly checks not due yet
+2026-04-14 20:04:44,759 - INFO - 
+============================================================
+2026-04-14 20:04:44,759 - INFO - OPERATION SUMMARY
+2026-04-14 20:04:44,759 - INFO - ============================================================
+2026-04-14 20:04:44,759 - INFO - Daily Checks: ⚠️ ISSUES
+2026-04-14 20:04:44,759 - INFO - 
+📊 Operator state saved: /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/evolution_operator_state.json
+2026-04-14 20:04:44,759 - INFO - ============================================================
+2026-04-14 20:04:44,759 - WARNING - ⚠️ Evolution Operator System completed with issues

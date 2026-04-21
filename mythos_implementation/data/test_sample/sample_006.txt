@@ -1,0 +1,1 @@
+Multimodal AI systems can process and generate text, images, audio, and video.

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASI-Evolve Operator Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .status-value {
+            font-weight: 600;
+        }
+        
+        .status-good {
+            color: #10b981;
+        }
+        
+        .status-warning {
+            color: #f59e0b;
+        }
+        
+        .status-error {
+            color: #ef4444;
+        }
+        
+        .checklist {
+            list-style: none;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .checklist input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .checklist label {
+            cursor: pointer;
+            color: #333;
+        }
+        
+        .checklist .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            color: #667eea;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .last-updated {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 ASI-Evolve Operator Dashboard</h1>
+            <p>Automated monitoring and management of daily evolution system</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- System Status Card -->
+            <div class="card">
+                <h2>📊 System Status</h2>
+                <div id="system-status">
+                    <div class="status-item">
+                        <span class="status-label">Evolution System</span>
+                        <span class="status-value status-good">✅ Operational</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Daily Evolution</span>
+                        <span class="status-value status-good">✅ Scheduled 16:00 (4:00 PM ET)</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Operator System</span>
+                        <span class="status-value status-good">✅ Active</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Dashboard API</span>
+                        <span class="status-value status-good">✅ Connected</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Daily Checklist Card -->
+            <div class="card">
+                <h2>📋 Daily Operator Checklist</h2>
+                <ul class="checklist" id="daily-checklist">
+                    <li>
+                        <input type="checkbox" id="check1" checked>
+                        <label for="check1" class="completed">Check evolution dashboard for status</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="check2" checked>
+                        <label for="check2" class="completed">Review daily evolution report</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="check3" checked>
+                        <label for="check3" class="completed">Verify SIMP log entry created</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="check4" checked>
+                        <label for="check4" class="completed">Monitor system resources</label>
+                    </li>
+                </ul>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="runDailyChecks()">Run Daily Checks</button>
+                    <button class="btn btn-secondary" onclick="viewDailyReport()">View Report</button>
+                </div>
+            </div>
+            
+            <!-- Performance Metrics Card -->
+            <div class="card">
+                <h2>📈 Performance Metrics</h2>
+                <div class="metrics-grid" id="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="total-experiments">0</div>
+                        <div class="metric-label">Total Experiments</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="success-rate">0%</div>
+                        <div class="metric-label">Success Rate</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="avg-improvement">0%</div>
+                        <div class="metric-label">Avg Improvement</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="last-evolution">-</div>
+                        <div class="metric-label">Last Evolution</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Weekly & Monthly Cards -->
+            <div class="card">
+                <h2>📅 Weekly Operations</h2>
+                <div class="status-item">
+                    <span class="status-label">Last Weekly Check</span>
+                    <span class="status-value" id="last-weekly">Never</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Next Daily Check</span>
+                    <span class="status-value" id="next-daily">15:30 (3:30 PM ET)</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Next Weekly Check</span>
+                    <span class="status-value" id="next-weekly">Monday 09:00</span>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="runWeeklyChecks()">Run Weekly Checks</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📊 Monthly Operations</h2>
+                <div class="status-item">
+                    <span class="status-label">Last Monthly Check</span>
+                    <span class="status-value" id="last-monthly">Never</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Next Monthly Check</span>
+                    <span class="status-value" id="next-monthly">1st of Month 10:00</span>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="runMonthlyChecks()">Run Monthly Checks</button>
+                </div>
+            </div>
+            
+            <!-- Recent Alerts Card -->
+            <div class="card">
+                <h2>🚨 Recent Alerts</h2>
+                <div id="recent-alerts">
+                    <div class="status-item">
+                        <span class="status-label">No recent alerts</span>
+                        <span class="status-value status-good">✅ All Clear</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="last-updated" id="last-updated">
+            Last updated: <span id="update-time">Loading...</span>
+        </div>
+    </div>
+    
+    <button class="refresh-btn" onclick="refreshDashboard()">↻</button>
+    
+    <script>
+        // Dashboard data
+        let dashboardData = {
+            systemStatus: {},
+            performanceMetrics: {},
+            operatorState: {},
+            recentAlerts: []
+        };
+        
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('update-time').textContent = 
+                now.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+        }
+        
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load evolution dashboard data
+                const evolutionResponse = await fetch('/api/evolution/status');
+                if (evolutionResponse.ok) {
+                    const evolutionData = await evolutionResponse.json();
+                    dashboardData.performanceMetrics = evolutionData;
+                    
+                    // Update performance metrics
+                    document.getElementById('total-experiments').textContent = 
+                        evolutionData.total_experiments || 0;
+                    document.getElementById('success-rate').textContent = 
+                        evolutionData.success_rate ? `${evolutionData.success_rate}%` : '0%';
+                    document.getElementById('avg-improvement').textContent = 
+                        evolutionData.average_improvement ? `${evolutionData.average_improvement.toFixed(1)}%` : '0%';
+                    document.getElementById('last-evolution').textContent = 
+                        evolutionData.last_evolution ? 'Today' : 'Never';
+                }
+                
+                // Load operator state
+                const operatorResponse = await fetch('/api/evolution/operator/state');
+                if (operatorResponse.ok) {
+                    const operatorData = await operatorResponse.json();
+                    dashboardData.operatorState = operatorData;
+                    
+                    // Update operator status
+                    if (operatorData.last_daily_check) {
+                        const dailyDate = new Date(operatorData.last_daily_check);
+                        document.querySelector('#daily-checklist input[type="checkbox"]').checked = 
+                            (new Date() - dailyDate) < 24 * 60 * 60 * 1000; // Within 24 hours
+                    }
+                    
+                    if (operatorData.last_weekly_check) {
+                        const weeklyDate = new Date(operatorData.last_weekly_check);
+                        document.getElementById('last-weekly').textContent = 
+                            weeklyDate.toLocaleDateString();
+                    }
+                    
+                    if (operatorData.last_monthly_check) {
+                        const monthlyDate = new Date(operatorData.last_monthly_check);
+                        document.getElementById('last-monthly').textContent = 
+                            monthlyDate.toLocaleDateString();
+                    }
+                    
+                    // Update alerts
+                    if (operatorData.alerts_sent && operatorData.alerts_sent.length > 0) {
+                        const alertsContainer = document.getElementById('recent-alerts');
+                        alertsContainer.innerHTML = '';
+                        
+                        const recentAlerts = operatorData.alerts_sent.slice(-3).reverse();
+                        recentAlerts.forEach(alert => {
+                            const alertDate = new Date(alert.timestamp);
+                            const alertItem = document.createElement('div');
+                            alertItem.className = 'status-item';
+                            alertItem.innerHTML = `
+                                <span class="status-label">${alert.subject}</span>
+                                <span class="status-value ${alert.level === 'error' ? 'status-error' : alert.level === 'warning' ? 'status-warning' : 'status-good'}">
+                                    ${alert.level.toUpperCase()}
+                                </span>
+                            `;
+                            alertsContainer.appendChild(alertItem);
+                        });
+                    }
+                }
+                
+                // Update system status
+                const systemResponse = await fetch('/health');
+                if (systemResponse.ok) {
+                    const systemData = await systemResponse.json();
+                    dashboardData.systemStatus = systemData;
+                    
+                    // Update status indicators
+                    const statusContainer = document.getElementById('system-status');
+                    if (systemData.broker_reachable) {
+                        statusContainer.innerHTML = `
+                            <div class="status-item">
+                                <span class="status-label">Evolution System</span>
+                                <span class="status-value status-good">✅ Operational</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Daily Evolution</span>
+                                <span class="status-value status-good">✅ Scheduled 04:00</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Operator System</span>
+                                <span class="status-value status-good">✅ Active</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Dashboard API</span>
+                                <span class="status-value status-good">✅ Connected</span>
+                            </div>
+                        `;
+                    }
+                }
+                
+                updateTime();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                document.getElementById('system-status').innerHTML = `
+                    <div class="status-item">
+                        <span class="status-label">Connection Error</span>
+                        <span class="status-value status-error">❌ Offline</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // Run daily checks
+        async function runDailyChecks() {
+            try {
+                const response = await fetch('/api/evolution/operator/run/daily', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    alert('Daily checks started successfully!');
+                    setTimeout(loadDashboardData, 2000); // Reload after 2 seconds
+                } else {
+                    alert('Error starting daily checks');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // Run weekly checks
+        async function runWeeklyChecks() {
+            try {
+                const response = await fetch('/api/evolution/operator/run/weekly', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    alert('Weekly checks started successfully!');
+                    setTimeout(loadDashboardData, 2000);
+                } else {
+                    alert('Error starting weekly checks');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // Run monthly checks
+        async function runMonthlyChecks() {
+            try {
+                const response = await fetch('/api/evolution/operator/run/monthly', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    alert('Monthly checks started successfully!');
+                    setTimeout(loadDashboardData, 2000);
+                } else {
+                    alert('Error starting monthly checks');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        // View daily report
+        function viewDailyReport() {
+            window.open('/api/evolution/reports/daily', '_blank');
+        }
+        
+        // Refresh dashboard
+        function refreshDashboard() {
+            loadDashboardData();
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+            updateTime();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadDashboardData, 30000);
+        });
+    </script>
+</body>
+</html>

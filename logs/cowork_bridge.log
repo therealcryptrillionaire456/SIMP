@@ -1,0 +1,67 @@
+2026-04-04T22:17:05 [CoWorkBridge] INFO Registered with SIMP: {'agent': {'agent_id': 'claude_cowork', 'capabilities': [], 'endpoint': 'http://127.0.0.1:8767', 'intents_received': 0, 'last_seen': '2026-04-05T02:17:05.337413+00:00', 'name': 'claude_cowork', 'registered_at': '2026-04-05T02:17:05.337406+00:00', 'status': 'active'}, 'status': 'registered'}
+2026-04-04T22:17:05 [CoWorkBridge] INFO OutboxWatcher started — polling /Users/kaseymarcelle/bullbear/signals/cowork_outbox every 5.0s
+2026-04-04T22:17:05 [CoWorkBridge] INFO OutboxWatcher thread started
+2026-04-04T22:17:05 [CoWorkBridge] INFO CoWork Bridge listening on http://127.0.0.1:8767
+2026-04-04T22:17:05 [CoWorkBridge] INFO Health check: curl http://127.0.0.1:8767/health
+2026-04-04T22:17:05 [CoWorkBridge] INFO Press Ctrl+C to stop
+2026-04-04T22:19:35 [CoWorkBridge] INFO Received intent: ping-live-001 type=ping from=perplexity_research
+2026-04-04T22:19:35 [CoWorkBridge] INFO Received intent: task-quantumarb-001 type=code_task from=perplexity_research
+2026-04-04T22:19:35 [CoWorkBridge] INFO Queued intent cowork-680cc47e3431 (code_task) → /Users/kaseymarcelle/bullbear/signals/cowork_inbox/intent_cowork-680cc47e3431.json
+2026-04-04T22:21:47 [CoWorkBridge] INFO Registered with SIMP: {'agent': {'agent_id': 'claude_cowork', 'capabilities': [], 'endpoint': 'http://127.0.0.1:8767', 'intents_received': 0, 'last_seen': '2026-04-05T02:21:47.844577+00:00', 'name': 'claude_cowork', 'registered_at': '2026-04-05T02:21:47.844568+00:00', 'status': 'active'}, 'status': 'registered'}
+2026-04-04T22:21:47 [CoWorkBridge] INFO OutboxWatcher started — polling /Users/kaseymarcelle/bullbear/signals/cowork_outbox every 5.0s
+2026-04-04T22:21:47 [CoWorkBridge] INFO OutboxWatcher thread started
+2026-04-04T22:21:47 [CoWorkBridge] INFO CoWork Bridge listening on http://127.0.0.1:8767
+2026-04-04T22:21:47 [CoWorkBridge] INFO Health check: curl http://127.0.0.1:8767/health
+2026-04-04T22:21:47 [CoWorkBridge] INFO Press Ctrl+C to stop
+2026-04-04T22:30:32 [CoWorkBridge] INFO Registered with SIMP: {'agent': {'agent_id': 'claude_cowork', 'capabilities': [], 'endpoint': 'http://127.0.0.1:8767', 'intents_received': 0, 'last_seen': '2026-04-05T02:30:32.499191+00:00', 'name': 'claude_cowork', 'registered_at': '2026-04-05T02:30:32.499185+00:00', 'status': 'active'}, 'status': 'registered'}
+2026-04-04T22:30:32 [CoWorkBridge] INFO OutboxWatcher started — polling /Users/kaseymarcelle/bullbear/signals/cowork_outbox every 5.0s
+2026-04-04T22:30:32 [CoWorkBridge] INFO OutboxWatcher thread started
+2026-04-04T22:30:32 [CoWorkBridge] INFO CoWork Bridge listening on http://127.0.0.1:8767
+2026-04-04T22:30:32 [CoWorkBridge] INFO Health check: curl http://127.0.0.1:8767/health
+2026-04-04T22:30:32 [CoWorkBridge] INFO Press Ctrl+C to stop
+2026-04-04T22:53:05 [CoWorkBridge] INFO Registered with SIMP: {'agent': {'agent_id': 'claude_cowork', 'capabilities': [], 'endpoint': 'http://127.0.0.1:8767', 'intents_received': 0, 'last_seen': '2026-04-05T02:53:05.868321+00:00', 'name': 'claude_cowork', 'registered_at': '2026-04-05T02:53:05.868314+00:00', 'status': 'active'}, 'status': 'registered'}
+2026-04-04T22:53:05 [CoWorkBridge] INFO OutboxWatcher started — polling /Users/kaseymarcelle/bullbear/signals/cowork_outbox every 5.0s
+2026-04-04T22:53:05 [CoWorkBridge] INFO OutboxWatcher thread started
+2026-04-04T22:53:05 [CoWorkBridge] INFO CoWork Bridge listening on http://127.0.0.1:8767
+2026-04-04T22:53:05 [CoWorkBridge] INFO Health check: curl http://127.0.0.1:8767/health
+2026-04-04T22:53:05 [CoWorkBridge] INFO Press Ctrl+C to stop
+2026-04-04T22:53:07 [CoWorkBridge] INFO Received intent: unknown-30c0539a type=capability_query from=perplexity_research
+2026-04-04 22:54:23,187 - COWORK_BRIDGE - INFO - ✅ Registered with SIMP broker (claude_cowork agents online)
+2026-04-04 22:54:23,189 - COWORK_BRIDGE - INFO - 🚀 CoWork Bridge v2.0.0 on 127.0.0.1:8767  schema_validation=True
+2026-04-04 22:54:23,189 - COWORK_BRIDGE - INFO -    inbox  → /Users/kaseymarcelle/bullbear/signals/cowork_inbox
+2026-04-04 22:54:23,189 - COWORK_BRIDGE - INFO -    outbox → /Users/kaseymarcelle/bullbear/signals/cowork_outbox
+ * Serving Flask app 'claude_cowork'
+ * Debug mode: off
+2026-04-04 22:54:23,199 - COWORK_BRIDGE - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8767
+2026-04-04 22:54:23,199 - COWORK_BRIDGE - INFO - [33mPress CTRL+C to quit[0m
+2026-04-04 22:54:24,610 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:54:24] "GET /health HTTP/1.1" 200 -
+2026-04-04 22:54:24,655 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:54:24] "GET /health HTTP/1.1" 200 -
+2026-04-04 22:56:19,512 - COWORK_BRIDGE - WARNING - 🚫 Schema rejection 'code_task': task_id is required for intent_type 'code_task'
+2026-04-04 22:56:19,513 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:56:19] "[31m[1mPOST /intents/receive HTTP/1.1[0m" 422 -
+2026-04-04 22:56:19,541 - COWORK_BRIDGE - WARNING - 🚫 Schema rejection 'code_task': task_id is required for intent_type 'code_task'
+2026-04-04 22:56:19,542 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:56:19] "[31m[1mPOST /intents/receive HTTP/1.1[0m" 422 -
+2026-04-04 22:56:19,544 - COWORK_BRIDGE - WARNING - 🚫 Schema rejection 'code_task': task_id is required for intent_type 'code_task'
+2026-04-04 22:56:19,544 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:56:19] "[31m[1mPOST /intents/receive HTTP/1.1[0m" 422 -
+2026-04-04 22:56:19,545 - COWORK_BRIDGE - WARNING - 🚫 Schema rejection 'code_task': task_id is required for intent_type 'code_task'
+2026-04-04 22:56:19,545 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:56:19] "[31m[1mPOST /intents/receive HTTP/1.1[0m" 422 -
+2026-04-04 22:56:19,560 - COWORK_BRIDGE - WARNING - 🚫 Schema rejection 'code_task': task_id is required for intent_type 'code_task'
+2026-04-04 22:56:19,560 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:56:19] "[31m[1mPOST /intents/receive HTTP/1.1[0m" 422 -
+2026-04-04 22:59:15,108 - COWORK_BRIDGE - INFO - 📥 Queued code_task [cowork-63dd9edde90b] from perplexity_research
+2026-04-04 22:59:15,108 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 22:59:15] "POST /intent HTTP/1.1" 200 -
+2026-04-04 23:01:53,825 - COWORK_BRIDGE - INFO - 📤 Forwarded response_cowork-63dd9edde90b.json → SIMP
+2026-04-04 23:06:43,498 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [04/Apr/2026 23:06:43] "GET /queue/responses HTTP/1.1" 200 -
+2026-04-05 09:01:50,425 - COWORK_BRIDGE - WARNING - 🚫 Schema rejection 'code_task': Required field 'target_agent' is missing or empty
+2026-04-05 09:01:50,426 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [05/Apr/2026 09:01:50] "[31m[1mPOST /intents/receive HTTP/1.1[0m" 422 -
+2026-04-05 09:03:25,356 - COWORK_BRIDGE - INFO - 📥 Queued code_task [cowork-06c03f693c30] from kloutbot
+2026-04-05 09:03:25,357 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [05/Apr/2026 09:03:25] "POST /intents/receive HTTP/1.1" 200 -
+2026-04-05 09:06:24,929 - COWORK_BRIDGE - INFO - 📤 Forwarded response_cowork-06c03f693c30.json → SIMP
+2026-04-05 09:12:19,417 - COWORK_BRIDGE - INFO - 📤 Forwarded response_cowork-63dd9edde90b.json → SIMP
+2026-04-05 14:18:55,056 - COWORK_BRIDGE - INFO - 📤 Forwarded response_cowork-63dd9edde90b.json → SIMP
+2026-04-05 14:43:42,204 - COWORK_BRIDGE - INFO - 📤 Forwarded response_sprint3-coord-001.json → SIMP
+2026-04-05 14:52:31,785 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [05/Apr/2026 14:52:31] "GET /health HTTP/1.1" 200 -
+2026-04-05 20:30:38,580 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [05/Apr/2026 20:30:38] "GET /health HTTP/1.1" 200 -
+2026-04-05 20:41:08,499 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [05/Apr/2026 20:41:08] "GET /health HTTP/1.1" 200 -
+2026-04-05 21:07:45,202 - COWORK_BRIDGE - WARNING - 🚫 Schema rejection 'code_task': task_id is required for intent_type 'code_task'
+2026-04-05 21:07:45,205 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [05/Apr/2026 21:07:45] "[31m[1mPOST /intents/receive HTTP/1.1[0m" 422 -
+2026-04-05 21:16:15,614 - COWORK_BRIDGE - INFO - 127.0.0.1 - - [05/Apr/2026 21:16:15] "[33mPOST /intents/handle HTTP/1.1[0m" 404 -

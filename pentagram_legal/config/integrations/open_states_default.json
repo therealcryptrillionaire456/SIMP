@@ -1,0 +1,17 @@
+{
+  "integration_id": "open_states_default",
+  "integration_type": "open_states",
+  "base_url": "https://v3.openstates.org",
+  "api_key": null,
+  "username": null,
+  "password": null,
+  "rate_limit": 5000,
+  "timeout_seconds": 30,
+  "retry_attempts": 3,
+  "retry_delay": 5,
+  "cache_enabled": true,
+  "cache_ttl": 3600,
+  "enabled": true,
+  "created_at": "2026-04-12T02:08:43.473751",
+  "updated_at": "2026-04-12T02:08:43.473751"
+}

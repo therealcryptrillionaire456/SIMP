@@ -1,0 +1,31 @@
+{
+  "judgment_id": "px-20260414_021734-dd3643b3",
+  "timestamp": "2026-04-14T02:17:34.677772Z",
+  "system_component": "SIMP.QuantumGoose",
+  "action_type": "quantum_task",
+  "proposed_action": {
+    "action_type": "quantum_task",
+    "algorithm": "bell state",
+    "framework": "unsupported_framework",
+    "qubits": 2,
+    "require_verification": true
+  },
+  "context_summary": "Quantum task: bell state in unsupported_framework (2 qubits)",
+  "recommendation": "BLOCK",
+  "confidence": 0.9,
+  "reasons": [
+    "Unsupported framework: unsupported_framework"
+  ],
+  "referenced_rules": [
+    "quantum-in-scope"
+  ],
+  "block_cause": "quantum_unsupported",
+  "escalation_reason": null,
+  "assumptions": [],
+  "metadata": {
+    "algorithm": "bell state",
+    "framework": "unsupported_framework",
+    "qubits": 2,
+    "require_verification": true
+  }
+}

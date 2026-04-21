@@ -1,0 +1,26 @@
+{
+  "task_type": "quantum_algorithm",
+  "examples": [
+    {
+      "id": "example_1",
+      "query": "Implement Grover's search algorithm",
+      "solution": "def grover_search(oracle, n_qubits):\n    # Initialize superposition\n    circuit = QuantumCircuit(n_qubits)\n    circuit.h(range(n_qubits))\n    \n    # Apply Grover iterations\n    for _ in range(int(np.pi/4 * np.sqrt(2**n_qubits))):\n        # Apply oracle\n        circuit.append(oracle, range(n_qubits))\n        \n        # Apply diffusion operator\n        circuit.h(range(n_qubits))\n        circuit.x(range(n_qubits))\n        circuit.h(n_qubits-1)\n        circuit.mcx(list(range(n_qubits-1)), n_qubits-1)\n        circuit.h(n_qubits-1)\n        circuit.x(range(n_qubits))\n        circuit.h(range(n_qubits))\n    \n    return circuit",
+      "framework": "qiskit",
+      "complexity": "intermediate",
+      "verification_status": "verified",
+      "verification_score": 0.95,
+      "safety_checks": [
+        "no_execution",
+        "simulation_only"
+      ],
+      "tags": [
+        "search",
+        "amplitude_amplification",
+        "oracle"
+      ],
+      "created_at": "2024-01-01T00:00:00Z",
+      "verified_at": "2024-01-02T00:00:00Z"
+    }
+  ],
+  "created_at": "2026-04-18T20:09:31.672872"
+}

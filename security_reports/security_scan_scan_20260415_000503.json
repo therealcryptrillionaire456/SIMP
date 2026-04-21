@@ -1,0 +1,1135 @@
+{
+  "scan_result": {
+    "scan_id": "scan_20260415_000503",
+    "start_time": "2026-04-15T00:05:03.167006Z",
+    "end_time": "2026-04-15T00:05:13.029693Z",
+    "total_files_scanned": 1000,
+    "total_findings": 55,
+    "findings_by_severity": {
+      "critical": 21,
+      "high": 16,
+      "medium": 18,
+      "low": 0,
+      "info": 0
+    },
+    "findings_by_category": {
+      "vulnerability_insecure_random": 18,
+      "secret_password": 13,
+      "secret_api_key": 19,
+      "vulnerability_command_injection": 2,
+      "vulnerability_xss": 1,
+      "vulnerability_hardcoded_credentials": 2
+    },
+    "critical_findings": [
+      {
+        "id": "secret_0031b66a",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "stress_test_phase1.py",
+        "description": "Potential api key found in code",
+        "evidence": "Line 51: API_KEY = \"781002cryptrillionaire456\"  # From environment variable... (Secret: 7810*****************e456)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:09.717683"
+      },
+      {
+        "id": "secret_f697d9c0",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "activate_agent_lightning.sh",
+        "description": "Potential api key found in code",
+        "evidence": "Line 11: export X_AI_API_KEY='03ad895d8851482dbf3aadeb4e935e15.X2iGms7E0qxssULA'... (Secret: 03ad************************5e15)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:09.745420"
+      },
+      {
+        "id": "secret_034d4596",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "activate_agent_lightning.sh",
+        "description": "Potential api key found in code",
+        "evidence": "Line 175: export X_AI_API_KEY='03ad895d8851482dbf3aadeb4e935e15.X2iGms7E0qxssULA'... (Secret: 03ad************************5e15)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:09.746875"
+      },
+      {
+        "id": "vuln_91416170",
+        "severity": "critical",
+        "category": "vulnerability_command_injection",
+        "location": "integrate_brp_safety_rules.py",
+        "description": "Potential command injection vulnerability",
+        "evidence": "Line 219: os.system(f\"chmod +x {script_file}\")...",
+        "recommendation": "Use subprocess with shell=False and validate/sanitize inputs",
+        "timestamp": "2026-04-15 00:05:09.760866"
+      },
+      {
+        "id": "vuln_ff672641",
+        "severity": "critical",
+        "category": "vulnerability_command_injection",
+        "location": "integrate_brp_safety_rules.py",
+        "description": "Potential command injection vulnerability",
+        "evidence": "Line 406: os.system(f\"chmod +x {script_file}\")...",
+        "recommendation": "Use subprocess with shell=False and validate/sanitize inputs",
+        "timestamp": "2026-04-15 00:05:09.762677"
+      },
+      {
+        "id": "secret_2ee50b13",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "tests/test_stripe_connector.py",
+        "description": "Potential api key found in code",
+        "evidence": "Line 43: conn = StripeTestConnector(api_key=\"sk_test_verylongkeyvalue1234\")... (Secret: sk_t********************1234)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:11.922490"
+      },
+      {
+        "id": "secret_e34a85ee",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/cai_pro_alias1.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 216: ALIAS_API_KEY=\"sk-your-caipro-key-here\"... (Secret: sk-y***************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.732464"
+      },
+      {
+        "id": "secret_53b5bb82",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/cai_pro_quickstart.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 88: ALIAS_API_KEY=\"sk-your-caipro-key-here\"... (Secret: sk-y***************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.741910"
+      },
+      {
+        "id": "secret_fc621d96",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/cai_pro.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 196: ALIAS_API_KEY=\"sk-your-caipro-key-here\"... (Secret: sk-y***************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.765125"
+      },
+      {
+        "id": "secret_85d9a4d1",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/tools.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 31: C99_API_KEY=\"your-c99-api-key-here\"... (Secret: your*************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.781607"
+      },
+      {
+        "id": "secret_55f5da53",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/tui/sidebar_features.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 311: ALIAS_API_KEY=your-alias1-key-here... (Secret: your************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.810246"
+      },
+      {
+        "id": "secret_397f486e",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/providers/azure.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 33: AZURE_API_KEY=\"your_subscription_api_key\"... (Secret: your*****************_key)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.829002"
+      },
+      {
+        "id": "secret_77685201",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/other_cli/opencode.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 55: export ALIAS_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.830757"
+      },
+      {
+        "id": "secret_ea77580d",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/other_cli/opencode.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 73: export OPENAI_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.830915"
+      },
+      {
+        "id": "secret_191e4b1a",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/other_cli/claude_code.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 48: OPENAI_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.837233"
+      },
+      {
+        "id": "secret_6ed5a8ed",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/cli/getting_started.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 58: ALIAS_API_KEY=ak_live_1234567890abcdef... (Secret: ak_l****************cdef)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.850293"
+      },
+      {
+        "id": "secret_8a8e8e30",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/cli/getting_started.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 70: export ALIAS_API_KEY=\"ak_live_1234567890abcdef\"... (Secret: ak_l****************cdef)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.850392"
+      },
+      {
+        "id": "secret_770c4eb5",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/cli/cli_index.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 315: ALIAS_API_KEY=ak_live_1234567890abcdef... (Secret: ak_l****************cdef)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.856940"
+      },
+      {
+        "id": "secret_b2410c3e",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/other_cli/codex.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 32: export OPENAI_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.857744"
+      },
+      {
+        "id": "secret_8b10b8f3",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/other_cli/codex.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 39: echo 'export OPENAI_API_KEY=\"sk-your-alias-api-key-here\"' >> ~/.zshrc... (Secret: sk-y******************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.857820"
+      },
+      {
+        "id": "secret_a9bd5660",
+        "severity": "critical",
+        "category": "secret_api_key",
+        "location": "brp_enhancement/repos/CAI/docs/other_cli/codex.md",
+        "description": "Potential api key found in code",
+        "evidence": "Line 53: OPENAI_API_KEY=\"sk-your-alias-api-key-here\" \\... (Secret: sk-y******************here)",
+        "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.857939"
+      }
+    ],
+    "high_findings": [
+      {
+        "id": "secret_83658b42",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "fix_security_issues.py",
+        "description": "Potential password found in code",
+        "evidence": "Line 85: password = password_match.group(1)... (Secret: pass******atch)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:09.563087"
+      },
+      {
+        "id": "secret_b09c0995",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "ktc_migration_plan.md",
+        "description": "Potential password found in code",
+        "evidence": "Line 479: - POSTGRES_PASSWORD=password... (Secret: ********)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:09.792417"
+      },
+      {
+        "id": "secret_8e3de333",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "ktc_migration_plan.md",
+        "description": "Potential password found in code",
+        "evidence": "Line 579: password=\"password\"... (Secret: ********)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:09.793201"
+      },
+      {
+        "id": "vuln_55d8e154",
+        "severity": "high",
+        "category": "vulnerability_xss",
+        "location": "brp_security_scanner.py",
+        "description": "Potential xss vulnerability",
+        "evidence": "Line 133: r'direct output without escaping',...",
+        "recommendation": "Use template escaping or output encoding",
+        "timestamp": "2026-04-15 00:05:09.823503"
+      },
+      {
+        "id": "secret_4f816d2a",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "update_passwords.py",
+        "description": "Potential password found in code",
+        "evidence": "Line 35: password = 'password123'... (Secret: pass***d123)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:09.854400"
+      },
+      {
+        "id": "vuln_55dc5c3f",
+        "severity": "high",
+        "category": "vulnerability_hardcoded_credentials",
+        "location": "update_passwords.py",
+        "description": "Potential hardcoded credentials vulnerability",
+        "evidence": "Line 35: password = 'password123'...",
+        "recommendation": "Move credentials to environment variables or secure vault",
+        "timestamp": "2026-04-15 00:05:09.875109"
+      },
+      {
+        "id": "secret_f5da0334",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "tools/onboarding_pack_generator.py",
+        "description": "Potential password found in code",
+        "evidence": "Line 388: \"solution\": \"Add repo root to PYTHONPATH: `export PYTHONPATH=$PWD:$PYTHONPATH`\",... (Secret: $PYT***PATH)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:10.042422"
+      },
+      {
+        "id": "secret_b646d637",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "keep-the-change/backend/docker-compose.yml",
+        "description": "Potential password found in code",
+        "evidence": "Line 13: POSTGRES_PASSWORD: ktcpassword... (Secret: ktcp***word)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:10.730763"
+      },
+      {
+        "id": "secret_d8a14780",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "keep-the-change/backend/docker-compose.yml",
+        "description": "Potential password found in code",
+        "evidence": "Line 126: PGADMIN_DEFAULT_PASSWORD: admin123... (Secret: ********)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:10.731754"
+      },
+      {
+        "id": "secret_2669b7b0",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "keep-the-change/backend/app/schemas/user.py",
+        "description": "Potential password found in code",
+        "evidence": "Line 38: password: Optional[str] = Field(None, min_length=8)... (Secret: ********)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:10.775650"
+      },
+      {
+        "id": "secret_c6ed01f6",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "keep-the-change/documents/KTC_MASTER_DOCS/12-testing-strategy.md",
+        "description": "Potential password found in code",
+        "evidence": "Line 44: const password = 'SecurePass123!';... (Secret: Secu******123!)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:11.209964"
+      },
+      {
+        "id": "secret_8efc10f7",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "keep-the-change/documents/KTC_MASTER_DOCS/12-testing-strategy.md",
+        "description": "Potential password found in code",
+        "evidence": "Line 412: POSTGRES_PASSWORD: postgres... (Secret: ********)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:11.213219"
+      },
+      {
+        "id": "secret_59778d04",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "keep-the-change/documents/KTC_MASTER_DOCS/08-monorepo-structure.md",
+        "description": "Potential password found in code",
+        "evidence": "Line 501: POSTGRES_PASSWORD: password... (Secret: ********)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:11.231841"
+      },
+      {
+        "id": "secret_6017eee3",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "keep-the-change/documents/KTC_MASTER_DOCS/09-scoring-engine-spec.md",
+        "description": "Potential password found in code",
+        "evidence": "Line 74: if user.has_strong_password: security_score += 5... (Secret: secu******core)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:11.263304"
+      },
+      {
+        "id": "secret_74b0147d",
+        "severity": "high",
+        "category": "secret_password",
+        "location": "brp_enhancement/repos/CAI/examples/continue_mode_security_audit.py",
+        "description": "Potential password found in code",
+        "evidence": "Line 59: DB_PASSWORD = \"admin123\"... (Secret: ********)",
+        "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+        "timestamp": "2026-04-15 00:05:12.907495"
+      },
+      {
+        "id": "vuln_0149fd27",
+        "severity": "high",
+        "category": "vulnerability_hardcoded_credentials",
+        "location": "brp_enhancement/repos/CAI/examples/continue_mode_security_audit.py",
+        "description": "Potential hardcoded credentials vulnerability",
+        "evidence": "Line 59: DB_PASSWORD = \"admin123\"...",
+        "recommendation": "Move credentials to environment variables or secure vault",
+        "timestamp": "2026-04-15 00:05:12.911521"
+      }
+    ],
+    "medium_findings": [
+      {
+        "id": "vuln_8894507e",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "test_risk_framework.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 85: is_buy = random.random() > 0.3...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:08.994167"
+      },
+      {
+        "id": "vuln_86d9a235",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "improved_security_scanner.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 109: # Use of non-cryptographic random for security purposes...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.713033"
+      },
+      {
+        "id": "vuln_3f4d2117",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "stress_test_phase1.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 140: if random.random() < 0.3:...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.728015"
+      },
+      {
+        "id": "vuln_1639cfbc",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "stress_test_phase1.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 142: if random.random() < 0.2:...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.728056"
+      },
+      {
+        "id": "vuln_9821b8c9",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "stress_test_phase1.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 144: if random.random() < 0.1:...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.728088"
+      },
+      {
+        "id": "vuln_5e4c1598",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "stress_test_phase1.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 170: if random.random() < 0.1:  # 10% chance of timeout...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.728408"
+      },
+      {
+        "id": "vuln_c3ed98ce",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "stress_test_phase1.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 172: elif random.random() < 0.05:  # 5% chance of immediate failure...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.728449"
+      },
+      {
+        "id": "vuln_04cb912c",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "stress_test_phase1.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 342: elif random.random() < 0.1:  # Occasionally try to send more...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.730430"
+      },
+      {
+        "id": "vuln_86b75c3a",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "stress_test_phase1.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 386: if random.random() < 0.05:  # 5% chance...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.730956"
+      },
+      {
+        "id": "vuln_8841a52c",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "brp_security_scanner.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 144: r'use of non-cryptographic random',...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:09.823636"
+      },
+      {
+        "id": "vuln_898df1a0",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "tools/evolution_runner_v2.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 111: \"final_best_score\": 0.75 + random.random() * 0.1,...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:10.205271"
+      },
+      {
+        "id": "vuln_393073ff",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "tools/evolution_runner_v2.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 112: \"improvement_percent\": 20.0 + random.random() * 10.0,...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:10.205301"
+      },
+      {
+        "id": "vuln_75b757f3",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "tools/evolution_quantumarb.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 244: if random.random() < 0.5:...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:10.266687"
+      },
+      {
+        "id": "vuln_e015fda2",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "tools/evolution_quantumarb.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 256: if random.random() < mutation_rate:...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:10.266828"
+      },
+      {
+        "id": "vuln_eb712c12",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "keep-the-change/backend/app/services/payment_service.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 351: # if random.random() < 0.1:...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:10.984582"
+      },
+      {
+        "id": "vuln_06a3d726",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "keep-the-change/backend/app/services/mock_retailer.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 410: product_data[\"shipping_cost\"] = 0.0 if random.random() > 0.3 else 2.99...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:11.048552"
+      },
+      {
+        "id": "vuln_07ae5244",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "keep-the-change/backend/app/services/mock_retailer.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 424: if kwargs.get(\"limit\", 20) > len(results) and random.random() > 0.5:...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:11.048721"
+      },
+      {
+        "id": "vuln_9d60f527",
+        "severity": "medium",
+        "category": "vulnerability_insecure_random",
+        "location": "bill_russel_integration/integration_system.py",
+        "description": "Potential insecure random vulnerability",
+        "evidence": "Line 443: if random.random() < 0.3:  # 30% chance...",
+        "recommendation": "Use secrets module for cryptographic randomness",
+        "timestamp": "2026-04-15 00:05:11.284448"
+      }
+    ],
+    "low_findings": [],
+    "info_findings": [],
+    "duration_seconds": 9.862687
+  },
+  "findings": [
+    {
+      "id": "vuln_8894507e",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "test_risk_framework.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 85: is_buy = random.random() > 0.3...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:08.994167Z"
+    },
+    {
+      "id": "secret_83658b42",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "fix_security_issues.py",
+      "description": "Potential password found in code",
+      "evidence": "Line 85: password = password_match.group(1)... (Secret: pass******atch)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:09.563087Z"
+    },
+    {
+      "id": "vuln_86d9a235",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "improved_security_scanner.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 109: # Use of non-cryptographic random for security purposes...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.713033Z"
+    },
+    {
+      "id": "secret_0031b66a",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "stress_test_phase1.py",
+      "description": "Potential api key found in code",
+      "evidence": "Line 51: API_KEY = \"781002cryptrillionaire456\"  # From environment variable... (Secret: 7810*****************e456)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:09.717683Z"
+    },
+    {
+      "id": "vuln_3f4d2117",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "stress_test_phase1.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 140: if random.random() < 0.3:...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.728015Z"
+    },
+    {
+      "id": "vuln_1639cfbc",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "stress_test_phase1.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 142: if random.random() < 0.2:...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.728056Z"
+    },
+    {
+      "id": "vuln_9821b8c9",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "stress_test_phase1.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 144: if random.random() < 0.1:...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.728088Z"
+    },
+    {
+      "id": "vuln_5e4c1598",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "stress_test_phase1.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 170: if random.random() < 0.1:  # 10% chance of timeout...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.728408Z"
+    },
+    {
+      "id": "vuln_c3ed98ce",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "stress_test_phase1.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 172: elif random.random() < 0.05:  # 5% chance of immediate failure...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.728449Z"
+    },
+    {
+      "id": "vuln_04cb912c",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "stress_test_phase1.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 342: elif random.random() < 0.1:  # Occasionally try to send more...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.730430Z"
+    },
+    {
+      "id": "vuln_86b75c3a",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "stress_test_phase1.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 386: if random.random() < 0.05:  # 5% chance...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.730956Z"
+    },
+    {
+      "id": "secret_f697d9c0",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "activate_agent_lightning.sh",
+      "description": "Potential api key found in code",
+      "evidence": "Line 11: export X_AI_API_KEY='03ad895d8851482dbf3aadeb4e935e15.X2iGms7E0qxssULA'... (Secret: 03ad************************5e15)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:09.745420Z"
+    },
+    {
+      "id": "secret_034d4596",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "activate_agent_lightning.sh",
+      "description": "Potential api key found in code",
+      "evidence": "Line 175: export X_AI_API_KEY='03ad895d8851482dbf3aadeb4e935e15.X2iGms7E0qxssULA'... (Secret: 03ad************************5e15)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:09.746875Z"
+    },
+    {
+      "id": "vuln_91416170",
+      "severity": "critical",
+      "category": "vulnerability_command_injection",
+      "location": "integrate_brp_safety_rules.py",
+      "description": "Potential command injection vulnerability",
+      "evidence": "Line 219: os.system(f\"chmod +x {script_file}\")...",
+      "recommendation": "Use subprocess with shell=False and validate/sanitize inputs",
+      "timestamp": "2026-04-15T00:05:09.760866Z"
+    },
+    {
+      "id": "vuln_ff672641",
+      "severity": "critical",
+      "category": "vulnerability_command_injection",
+      "location": "integrate_brp_safety_rules.py",
+      "description": "Potential command injection vulnerability",
+      "evidence": "Line 406: os.system(f\"chmod +x {script_file}\")...",
+      "recommendation": "Use subprocess with shell=False and validate/sanitize inputs",
+      "timestamp": "2026-04-15T00:05:09.762677Z"
+    },
+    {
+      "id": "secret_b09c0995",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "ktc_migration_plan.md",
+      "description": "Potential password found in code",
+      "evidence": "Line 479: - POSTGRES_PASSWORD=password... (Secret: ********)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:09.792417Z"
+    },
+    {
+      "id": "secret_8e3de333",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "ktc_migration_plan.md",
+      "description": "Potential password found in code",
+      "evidence": "Line 579: password=\"password\"... (Secret: ********)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:09.793201Z"
+    },
+    {
+      "id": "vuln_55d8e154",
+      "severity": "high",
+      "category": "vulnerability_xss",
+      "location": "brp_security_scanner.py",
+      "description": "Potential xss vulnerability",
+      "evidence": "Line 133: r'direct output without escaping',...",
+      "recommendation": "Use template escaping or output encoding",
+      "timestamp": "2026-04-15T00:05:09.823503Z"
+    },
+    {
+      "id": "vuln_8841a52c",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "brp_security_scanner.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 144: r'use of non-cryptographic random',...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:09.823636Z"
+    },
+    {
+      "id": "secret_4f816d2a",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "update_passwords.py",
+      "description": "Potential password found in code",
+      "evidence": "Line 35: password = 'password123'... (Secret: pass***d123)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:09.854400Z"
+    },
+    {
+      "id": "vuln_55dc5c3f",
+      "severity": "high",
+      "category": "vulnerability_hardcoded_credentials",
+      "location": "update_passwords.py",
+      "description": "Potential hardcoded credentials vulnerability",
+      "evidence": "Line 35: password = 'password123'...",
+      "recommendation": "Move credentials to environment variables or secure vault",
+      "timestamp": "2026-04-15T00:05:09.875109Z"
+    },
+    {
+      "id": "secret_f5da0334",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "tools/onboarding_pack_generator.py",
+      "description": "Potential password found in code",
+      "evidence": "Line 388: \"solution\": \"Add repo root to PYTHONPATH: `export PYTHONPATH=$PWD:$PYTHONPATH`\",... (Secret: $PYT***PATH)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:10.042422Z"
+    },
+    {
+      "id": "vuln_898df1a0",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "tools/evolution_runner_v2.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 111: \"final_best_score\": 0.75 + random.random() * 0.1,...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:10.205271Z"
+    },
+    {
+      "id": "vuln_393073ff",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "tools/evolution_runner_v2.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 112: \"improvement_percent\": 20.0 + random.random() * 10.0,...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:10.205301Z"
+    },
+    {
+      "id": "vuln_75b757f3",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "tools/evolution_quantumarb.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 244: if random.random() < 0.5:...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:10.266687Z"
+    },
+    {
+      "id": "vuln_e015fda2",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "tools/evolution_quantumarb.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 256: if random.random() < mutation_rate:...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:10.266828Z"
+    },
+    {
+      "id": "secret_b646d637",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "keep-the-change/backend/docker-compose.yml",
+      "description": "Potential password found in code",
+      "evidence": "Line 13: POSTGRES_PASSWORD: ktcpassword... (Secret: ktcp***word)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:10.730763Z"
+    },
+    {
+      "id": "secret_d8a14780",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "keep-the-change/backend/docker-compose.yml",
+      "description": "Potential password found in code",
+      "evidence": "Line 126: PGADMIN_DEFAULT_PASSWORD: admin123... (Secret: ********)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:10.731754Z"
+    },
+    {
+      "id": "secret_2669b7b0",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "keep-the-change/backend/app/schemas/user.py",
+      "description": "Potential password found in code",
+      "evidence": "Line 38: password: Optional[str] = Field(None, min_length=8)... (Secret: ********)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:10.775650Z"
+    },
+    {
+      "id": "vuln_eb712c12",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "keep-the-change/backend/app/services/payment_service.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 351: # if random.random() < 0.1:...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:10.984582Z"
+    },
+    {
+      "id": "vuln_06a3d726",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "keep-the-change/backend/app/services/mock_retailer.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 410: product_data[\"shipping_cost\"] = 0.0 if random.random() > 0.3 else 2.99...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:11.048552Z"
+    },
+    {
+      "id": "vuln_07ae5244",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "keep-the-change/backend/app/services/mock_retailer.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 424: if kwargs.get(\"limit\", 20) > len(results) and random.random() > 0.5:...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:11.048721Z"
+    },
+    {
+      "id": "secret_c6ed01f6",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "keep-the-change/documents/KTC_MASTER_DOCS/12-testing-strategy.md",
+      "description": "Potential password found in code",
+      "evidence": "Line 44: const password = 'SecurePass123!';... (Secret: Secu******123!)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:11.209964Z"
+    },
+    {
+      "id": "secret_8efc10f7",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "keep-the-change/documents/KTC_MASTER_DOCS/12-testing-strategy.md",
+      "description": "Potential password found in code",
+      "evidence": "Line 412: POSTGRES_PASSWORD: postgres... (Secret: ********)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:11.213219Z"
+    },
+    {
+      "id": "secret_59778d04",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "keep-the-change/documents/KTC_MASTER_DOCS/08-monorepo-structure.md",
+      "description": "Potential password found in code",
+      "evidence": "Line 501: POSTGRES_PASSWORD: password... (Secret: ********)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:11.231841Z"
+    },
+    {
+      "id": "secret_6017eee3",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "keep-the-change/documents/KTC_MASTER_DOCS/09-scoring-engine-spec.md",
+      "description": "Potential password found in code",
+      "evidence": "Line 74: if user.has_strong_password: security_score += 5... (Secret: secu******core)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:11.263304Z"
+    },
+    {
+      "id": "vuln_9d60f527",
+      "severity": "medium",
+      "category": "vulnerability_insecure_random",
+      "location": "bill_russel_integration/integration_system.py",
+      "description": "Potential insecure random vulnerability",
+      "evidence": "Line 443: if random.random() < 0.3:  # 30% chance...",
+      "recommendation": "Use secrets module for cryptographic randomness",
+      "timestamp": "2026-04-15T00:05:11.284448Z"
+    },
+    {
+      "id": "secret_2ee50b13",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "tests/test_stripe_connector.py",
+      "description": "Potential api key found in code",
+      "evidence": "Line 43: conn = StripeTestConnector(api_key=\"sk_test_verylongkeyvalue1234\")... (Secret: sk_t********************1234)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:11.922490Z"
+    },
+    {
+      "id": "secret_e34a85ee",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/cai_pro_alias1.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 216: ALIAS_API_KEY=\"sk-your-caipro-key-here\"... (Secret: sk-y***************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.732464Z"
+    },
+    {
+      "id": "secret_53b5bb82",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/cai_pro_quickstart.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 88: ALIAS_API_KEY=\"sk-your-caipro-key-here\"... (Secret: sk-y***************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.741910Z"
+    },
+    {
+      "id": "secret_fc621d96",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/cai_pro.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 196: ALIAS_API_KEY=\"sk-your-caipro-key-here\"... (Secret: sk-y***************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.765125Z"
+    },
+    {
+      "id": "secret_85d9a4d1",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/tools.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 31: C99_API_KEY=\"your-c99-api-key-here\"... (Secret: your*************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.781607Z"
+    },
+    {
+      "id": "secret_55f5da53",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/tui/sidebar_features.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 311: ALIAS_API_KEY=your-alias1-key-here... (Secret: your************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.810246Z"
+    },
+    {
+      "id": "secret_397f486e",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/providers/azure.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 33: AZURE_API_KEY=\"your_subscription_api_key\"... (Secret: your*****************_key)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.829002Z"
+    },
+    {
+      "id": "secret_77685201",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/other_cli/opencode.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 55: export ALIAS_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.830757Z"
+    },
+    {
+      "id": "secret_ea77580d",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/other_cli/opencode.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 73: export OPENAI_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.830915Z"
+    },
+    {
+      "id": "secret_191e4b1a",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/other_cli/claude_code.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 48: OPENAI_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.837233Z"
+    },
+    {
+      "id": "secret_6ed5a8ed",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/cli/getting_started.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 58: ALIAS_API_KEY=ak_live_1234567890abcdef... (Secret: ak_l****************cdef)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.850293Z"
+    },
+    {
+      "id": "secret_8a8e8e30",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/cli/getting_started.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 70: export ALIAS_API_KEY=\"ak_live_1234567890abcdef\"... (Secret: ak_l****************cdef)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.850392Z"
+    },
+    {
+      "id": "secret_770c4eb5",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/cli/cli_index.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 315: ALIAS_API_KEY=ak_live_1234567890abcdef... (Secret: ak_l****************cdef)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.856940Z"
+    },
+    {
+      "id": "secret_b2410c3e",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/other_cli/codex.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 32: export OPENAI_API_KEY=\"sk-your-alias-api-key-here\"... (Secret: sk-y******************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.857744Z"
+    },
+    {
+      "id": "secret_8b10b8f3",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/other_cli/codex.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 39: echo 'export OPENAI_API_KEY=\"sk-your-alias-api-key-here\"' >> ~/.zshrc... (Secret: sk-y******************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.857820Z"
+    },
+    {
+      "id": "secret_a9bd5660",
+      "severity": "critical",
+      "category": "secret_api_key",
+      "location": "brp_enhancement/repos/CAI/docs/other_cli/codex.md",
+      "description": "Potential api key found in code",
+      "evidence": "Line 53: OPENAI_API_KEY=\"sk-your-alias-api-key-here\" \\... (Secret: sk-y******************here)",
+      "recommendation": "Remove hardcoded api key and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.857939Z"
+    },
+    {
+      "id": "secret_74b0147d",
+      "severity": "high",
+      "category": "secret_password",
+      "location": "brp_enhancement/repos/CAI/examples/continue_mode_security_audit.py",
+      "description": "Potential password found in code",
+      "evidence": "Line 59: DB_PASSWORD = \"admin123\"... (Secret: ********)",
+      "recommendation": "Remove hardcoded password and use environment variables or secure secret management",
+      "timestamp": "2026-04-15T00:05:12.907495Z"
+    },
+    {
+      "id": "vuln_0149fd27",
+      "severity": "high",
+      "category": "vulnerability_hardcoded_credentials",
+      "location": "brp_enhancement/repos/CAI/examples/continue_mode_security_audit.py",
+      "description": "Potential hardcoded credentials vulnerability",
+      "evidence": "Line 59: DB_PASSWORD = \"admin123\"...",
+      "recommendation": "Move credentials to environment variables or secure vault",
+      "timestamp": "2026-04-15T00:05:12.911521Z"
+    }
+  ]
+}

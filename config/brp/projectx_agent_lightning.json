@@ -1,0 +1,153 @@
+{
+  "agent_lightning_monitors": {
+    "enabled": true,
+    "integration_time": "2026-04-14T14:33:00.248113",
+    "monitors": [
+      {
+        "monitor_id": "PX-MON-PATTERN-001",
+        "description": "Agent attempts to modify protected files without proper checks",
+        "source_pattern": "PATTERN-001",
+        "monitor_type": "behavioral_pattern",
+        "detection_method": "trace_analysis",
+        "agents_monitored": [
+          "stray_goose"
+        ],
+        "risk_level": "high",
+        "alert_config": {
+          "threshold": "3 occurrences in 15 minutes",
+          "time_window": "5m",
+          "alert_channels": [
+            "dashboard",
+            "logs",
+            "api"
+          ]
+        },
+        "response_action": "Monitor file write attempts to protected paths, alert on pattern"
+      },
+      {
+        "monitor_id": "PX-MON-PATTERN-002",
+        "description": "Agent shows confusion about safety constraints in prompts",
+        "source_pattern": "PATTERN-002",
+        "monitor_type": "behavioral_pattern",
+        "detection_method": "trace_analysis",
+        "agents_monitored": [
+          "stray_goose"
+        ],
+        "risk_level": "medium",
+        "alert_config": {
+          "threshold": "5 occurrences in 1 hour",
+          "time_window": "5m",
+          "alert_channels": [
+            "dashboard",
+            "logs",
+            "api"
+          ]
+        },
+        "response_action": "Track agent uncertainty about safety rules as early warning"
+      },
+      {
+        "monitor_id": "PX-MON-PATTERN-003",
+        "description": "Rapid sequence of similar operations without pauses",
+        "source_pattern": "PATTERN-003",
+        "monitor_type": "behavioral_pattern",
+        "detection_method": "trace_analysis",
+        "agents_monitored": [
+          "quantumarb"
+        ],
+        "risk_level": "critical",
+        "alert_config": {
+          "threshold": "1 occurrence in 5 minutes",
+          "time_window": "5m",
+          "alert_channels": [
+            "dashboard",
+            "logs",
+            "api"
+          ]
+        },
+        "response_action": "Detect rapid operation sequences as potential runaway behavior"
+      },
+      {
+        "monitor_id": "PX-MON-PATTERN-004",
+        "description": "Agent bypasses normal tool flow for direct execution",
+        "source_pattern": "PATTERN-004",
+        "monitor_type": "behavioral_pattern",
+        "detection_method": "trace_analysis",
+        "agents_monitored": [
+          "stray_goose"
+        ],
+        "risk_level": "high",
+        "alert_config": {
+          "threshold": "3 occurrences in 15 minutes",
+          "time_window": "5m",
+          "alert_channels": [
+            "dashboard",
+            "logs",
+            "api"
+          ]
+        },
+        "response_action": "Monitor for tool abstraction violations"
+      },
+      {
+        "monitor_id": "PX-MON-PATTERN-005",
+        "description": "Inconsistent understanding of rollback procedures",
+        "source_pattern": "PATTERN-005",
+        "monitor_type": "behavioral_pattern",
+        "detection_method": "trace_analysis",
+        "agents_monitored": [
+          "multiple"
+        ],
+        "risk_level": "medium",
+        "alert_config": {
+          "threshold": "5 occurrences in 1 hour",
+          "time_window": "5m",
+          "alert_channels": [
+            "dashboard",
+            "logs",
+            "api"
+          ]
+        },
+        "response_action": "Check rollback understanding as part of agent health check"
+      }
+    ],
+    "alert_thresholds": {
+      "PX-MON-PATTERN-001": {
+        "warning": 1,
+        "critical": 3,
+        "time_window": "1h"
+      },
+      "PX-MON-PATTERN-002": {
+        "warning": 1,
+        "critical": 3,
+        "time_window": "1h"
+      },
+      "PX-MON-PATTERN-003": {
+        "warning": 1,
+        "critical": 3,
+        "time_window": "1h"
+      },
+      "PX-MON-PATTERN-004": {
+        "warning": 1,
+        "critical": 3,
+        "time_window": "1h"
+      },
+      "PX-MON-PATTERN-005": {
+        "warning": 1,
+        "critical": 3,
+        "time_window": "1h"
+      }
+    },
+    "monitoring_categories": {
+      "high_risk": [
+        "PX-MON-PATTERN-001",
+        "PX-MON-PATTERN-004"
+      ],
+      "medium_risk": [
+        "PX-MON-PATTERN-002",
+        "PX-MON-PATTERN-005"
+      ],
+      "critical_risk": [
+        "PX-MON-PATTERN-003"
+      ]
+    }
+  }
+}

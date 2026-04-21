@@ -1,0 +1,17 @@
+{
+  "integration_id": "pacer_default",
+  "integration_type": "pacer",
+  "base_url": "https://pacer.uscourts.gov",
+  "api_key": null,
+  "username": null,
+  "password": null,
+  "rate_limit": 50,
+  "timeout_seconds": 60,
+  "retry_attempts": 3,
+  "retry_delay": 5,
+  "cache_enabled": true,
+  "cache_ttl": 3600,
+  "enabled": true,
+  "created_at": "2026-04-12T02:08:43.473740",
+  "updated_at": "2026-04-12T02:08:43.473744"
+}

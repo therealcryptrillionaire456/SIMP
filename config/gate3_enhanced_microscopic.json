@@ -1,0 +1,172 @@
+{
+  "mode": "gate_3_enhanced_microscopic",
+  "exchange": "coinbase",
+  "symbols": ["SOL-USD", "BTC-USD", "ETH-USD"],
+  "position_sizing": {
+    "position_type": "scaled_dollar",
+    "min_notional": 0.10,
+    "max_notional": 1.00,
+    "default_notional": 0.50,
+    "size_by_symbol": {
+      "SOL-USD": 0.50,
+      "BTC-USD": 0.30,
+      "ETH-USD": 0.20
+    }
+  },
+  "risk_limits": {
+    "max_risk_per_trade_dollar": 1.00,
+    "max_session_loss_dollar": 10.00,
+    "max_open_positions": 3,
+    "max_concurrent_orders": 5,
+    "max_daily_trades": 50
+  },
+  "risk_management": {
+    "multi_factor_scoring": true,
+    "factors": {
+      "spread": {
+        "weight": 0.30,
+        "min": 0.02,
+        "max": 0.50,
+        "normalization": 0.3
+      },
+      "confidence": {
+        "weight": 0.25,
+        "min": 0.70
+      },
+      "liquidity": {
+        "weight": 0.20,
+        "thresholds": {
+          "high": 0.9,
+          "medium": 0.7,
+          "low": 0.5
+        }
+      },
+      "volatility": {
+        "weight": 0.15,
+        "max": 0.30
+      },
+      "slippage": {
+        "weight": 0.10,
+        "max": 0.05
+      }
+    },
+    "minimum_score": 0.60,
+    "symbol_specific_thresholds": {
+      "SOL-USD": 0.60,
+      "BTC-USD": 0.65,
+      "ETH-USD": 0.62
+    }
+  },
+  "execution": {
+    "order_types": ["limit", "market"],
+    "default_order_type": "limit",
+    "time_in_force": "GTC",
+    "max_slippage_bps": 15,
+    "allow_partial_fills": true,
+    "min_fill_percentage": 80,
+    "cancel_on_disconnect": true
+  },
+  "brp": {
+    "mode": "ENFORCED",
+    "min_confidence": 0.75,
+    "require_for_all_trades": true,
+    "elevation_threshold": 0.85
+  },
+  "projectx": {
+    "advisory_enabled": true,
+    "require_for": ["trading_intent", "config_change", "risk_override"],
+    "auto_escalate_threshold": 0.90
+  },
+  "agent_lightning": {
+    "enabled": true,
+    "trace_all_trades": true,
+    "record_full_decision_chain": true,
+    "performance_metrics": true
+  },
+  "monitoring": {
+    "real_time_alerts": true,
+    "alert_on": ["slippage >5bps", "latency >100ms", "risk_score_drop >0.1", "unexpected_rejection"],
+    "dashboard_integration": true,
+    "auto_reporting": true
+  },
+  "logging": {
+    "ledger_path": "data/gate3_enhanced_ledger.jsonl",
+    "decision_log_path": "data/gate3_decisions.jsonl",
+    "performance_log_path": "data/gate3_performance.jsonl"
+  },
+  "microscopic_trading": {
+    "enabled": true,
+    "gate": 3,
+    "target_total_trades": 150,
+    "min_trades_for_success": 120,
+    "trades_by_symbol": {
+      "SOL-USD": 60,
+      "BTC-USD": 45,
+      "ETH-USD": 45
+    },
+    "min_trades_per_symbol": {
+      "SOL-USD": 48,
+      "BTC-USD": 36,
+      "ETH-USD": 36
+    },
+    "session_structure": {
+      "session_1": {
+        "symbol": "SOL-USD",
+        "target_trades": 30,
+        "focus": "enhanced risk scoring, limit orders"
+      },
+      "session_2": {
+        "symbols": ["SOL-USD", "BTC-USD", "ETH-USD"],
+        "target_trades": 60,
+        "focus": "multi-market validation"
+      },
+      "session_3": {
+        "symbols": ["SOL-USD", "BTC-USD", "ETH-USD"],
+        "target_trades": 60,
+        "focus": "edge cases, stress testing"
+      }
+    }
+  },
+  "symbol_characteristics": {
+    "SOL-USD": {
+      "min_spread_pct": 0.02,
+      "typical_spread_pct": 0.05,
+      "liquidity": "very_high",
+      "volatility": "high",
+      "typical_order_size_usd": 0.50,
+      "risk_profile": "aggressive"
+    },
+    "BTC-USD": {
+      "min_spread_pct": 0.01,
+      "typical_spread_pct": 0.02,
+      "liquidity": "extreme",
+      "volatility": "medium",
+      "typical_order_size_usd": 0.30,
+      "risk_profile": "conservative"
+    },
+    "ETH-USD": {
+      "min_spread_pct": 0.015,
+      "typical_spread_pct": 0.03,
+      "liquidity": "high",
+      "volatility": "medium_high",
+      "typical_order_size_usd": 0.20,
+      "risk_profile": "balanced"
+    }
+  },
+  "enhanced_features": {
+    "multi_factor_risk": true,
+    "symbol_specific_params": true,
+    "limit_order_support": true,
+    "partial_fill_handling": true,
+    "real_time_monitoring": true,
+    "performance_tracking": true
+  },
+  "safety_gates": {
+    "gate_1_complete": true,
+    "gate_2_complete": true,
+    "gate_3_active": true,
+    "gate_4_pending": false,
+    "emergency_stop_enabled": true,
+    "auto_fallback_to_gate2": true
+  }
+}

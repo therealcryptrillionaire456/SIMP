@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-04-14T14:02:22.331212",
+  "signal": {
+    "signal_id": "sol_gate2.5_1776189742_7362",
+    "arb_type": "cross_venue",
+    "symbol_a": "SOL-USD",
+    "symbol_b": "SOL-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.0566,
+    "expected_return_pct": 0.0417,
+    "confidence": 0.79,
+    "timestamp": "2026-04-14T14:02:22.331112",
+    "metadata": {
+      "gate": "2.5",
+      "market": "SOL-USD",
+      "microscopic": true,
+      "enhanced": true,
+      "test_signal": true
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "sol_gate2.5_1776189742_7362",
+      "arb_type": "cross_venue",
+      "symbol_a": "SOL-USD",
+      "symbol_b": "SOL-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.0566,
+      "expected_return_pct": 0.0417,
+      "confidence": 0.79,
+      "timestamp": "2026-04-14T14:02:22.331112",
+      "metadata": {
+        "gate": "2.5",
+        "market": "SOL-USD",
+        "microscopic": true,
+        "enhanced": true,
+        "test_signal": true
+      }
+    },
+    "decision": "reject_risk",
+    "decision_reason": "Risk score 0.490 < minimum 0.55",
+    "position_size_usd": 0.0,
+    "expected_pnl_usd": 0.0,
+    "risk_score": 0.49018088535880583,
+    "metadata": {
+      "rejection_reason": "low_risk_score"
+    }
+  },
+  "execution_result": null,
+  "session_id": "gate2.5_1776189735",
+  "gate": "2.5"
+}

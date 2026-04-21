@@ -1,0 +1,141 @@
+2026-04-13 19:43:45,482 - __main__ - INFO - ================================================================================
+2026-04-13 19:43:45,482 - __main__ - INFO - RUNNING COMPREHENSIVE RISK FRAMEWORK TESTS
+2026-04-13 19:43:45,482 - __main__ - INFO - ================================================================================
+2026-04-13 19:43:57,579 - __main__ - INFO - ================================================================================
+2026-04-13 19:43:57,579 - __main__ - INFO - RUNNING COMPREHENSIVE RISK FRAMEWORK TESTS
+2026-04-13 19:43:57,579 - __main__ - INFO - ================================================================================
+2026-04-13 19:43:57,579 - __main__ - INFO - 
+============================================================
+2026-04-13 19:43:57,579 - __main__ - INFO - TEST 1: POSITION SIZING CALCULATIONS
+2026-04-13 19:43:57,579 - __main__ - INFO - ============================================================
+2026-04-13 19:43:57,579 - __main__ - INFO - Testing position sizing calculations...
+2026-04-13 19:43:57,579 - __main__ - INFO - BTC-USD: stop_loss=5.0% -> position=$49.25 (expected=$49.25, match=True)
+2026-04-13 19:43:57,579 - __main__ - INFO - ETH-USD: stop_loss=3.0% -> position=$82.09 (expected=$82.09, match=True)
+2026-04-13 19:43:57,579 - __main__ - INFO - SPY: stop_loss=2.0% -> position=$246.26 (expected=$246.26, match=True)
+2026-04-13 19:43:57,579 - __main__ - INFO - AAPL: stop_loss=4.0% -> position=$123.13 (expected=$123.13, match=True)
+2026-04-13 19:43:57,579 - __main__ - INFO - EUR-USD: stop_loss=1.5% -> position=$262.68 (expected=$262.68, match=True)
+2026-04-13 19:43:57,580 - __main__ - INFO - ✅ All position sizing calculations correct
+2026-04-13 19:43:57,580 - __main__ - INFO - 
+============================================================
+2026-04-13 19:43:57,580 - __main__ - INFO - TEST 2: RISK LIMIT ENFORCEMENT
+2026-04-13 19:43:57,580 - __main__ - INFO - ============================================================
+2026-04-13 19:43:57,580 - __main__ - INFO - Testing risk limit enforcement...
+2026-04-13 19:43:57,580 - __main__ - INFO - Test 1: Daily loss limit
+2026-04-13 19:43:57,580 - __main__ - INFO - Trade blocked: Position size 100.00 > max risk per trade 5.00
+2026-04-13 19:43:57,580 - __main__ - INFO - Test 2: Max concurrent positions
+2026-04-13 19:43:57,580 - __main__ - INFO - Position 1: TEST0 - allowed=False, positions=0/3
+2026-04-13 19:43:57,580 - __main__ - INFO - Position 2: TEST1 - allowed=False, positions=0/3
+2026-04-13 19:43:57,580 - __main__ - INFO - Position 3: TEST2 - allowed=False, positions=0/3
+2026-04-13 19:43:57,580 - __main__ - INFO - Position 4: TEST3 - allowed=False, positions=0/3
+2026-04-13 19:43:57,580 - __main__ - INFO - Position 5: TEST4 - allowed=False, positions=0/3
+2026-04-13 19:43:57,580 - __main__ - INFO - 
+============================================================
+2026-04-13 19:43:57,580 - __main__ - INFO - TEST 3: SIMULATED TRADING DAY
+2026-04-13 19:43:57,580 - __main__ - INFO - ============================================================
+2026-04-13 19:43:57,580 - __main__ - INFO - Simulating trading day with 100 potential trades
+2026-04-13 19:43:57,580 - __main__ - ERROR - Test failed with error: 'str' object has no attribute 'value'
+2026-04-13 20:22:44,173 - __main__ - INFO - ================================================================================
+2026-04-13 20:22:44,173 - __main__ - INFO - RUNNING COMPREHENSIVE RISK FRAMEWORK TESTS
+2026-04-13 20:22:44,173 - __main__ - INFO - ================================================================================
+2026-04-13 20:22:44,174 - __main__ - INFO - 
+============================================================
+2026-04-13 20:22:44,174 - __main__ - INFO - TEST 1: POSITION SIZING CALCULATIONS
+2026-04-13 20:22:44,174 - __main__ - INFO - ============================================================
+2026-04-13 20:22:44,174 - __main__ - INFO - Testing position sizing calculations...
+2026-04-13 20:22:44,174 - __main__ - INFO - BTC-USD: stop_loss=5.0% -> position=$49.25 (expected=$49.25, match=True)
+2026-04-13 20:22:44,174 - __main__ - INFO - ETH-USD: stop_loss=3.0% -> position=$82.09 (expected=$82.09, match=True)
+2026-04-13 20:22:44,174 - __main__ - INFO - SPY: stop_loss=2.0% -> position=$246.26 (expected=$246.26, match=True)
+2026-04-13 20:22:44,174 - __main__ - INFO - AAPL: stop_loss=4.0% -> position=$123.13 (expected=$123.13, match=True)
+2026-04-13 20:22:44,174 - __main__ - INFO - EUR-USD: stop_loss=1.5% -> position=$262.68 (expected=$262.68, match=True)
+2026-04-13 20:22:44,174 - __main__ - INFO - ✅ All position sizing calculations correct
+2026-04-13 20:22:44,174 - __main__ - INFO - 
+============================================================
+2026-04-13 20:22:44,174 - __main__ - INFO - TEST 2: RISK LIMIT ENFORCEMENT
+2026-04-13 20:22:44,174 - __main__ - INFO - ============================================================
+2026-04-13 20:22:44,174 - __main__ - INFO - Testing risk limit enforcement...
+2026-04-13 20:22:44,174 - __main__ - INFO - Test 1: Daily loss limit
+2026-04-13 20:22:44,174 - __main__ - INFO - Trade blocked: Position size 100.00 > max risk per trade 5.00
+2026-04-13 20:22:44,174 - __main__ - INFO - Test 2: Max concurrent positions
+2026-04-13 20:22:44,174 - __main__ - INFO - Position 1: TEST0 - allowed=False, positions=0/3
+2026-04-13 20:22:44,174 - __main__ - INFO - Position 2: TEST1 - allowed=False, positions=0/3
+2026-04-13 20:22:44,174 - __main__ - INFO - Position 3: TEST2 - allowed=False, positions=0/3
+2026-04-13 20:22:44,174 - __main__ - INFO - Position 4: TEST3 - allowed=False, positions=0/3
+2026-04-13 20:22:44,174 - __main__ - INFO - Position 5: TEST4 - allowed=False, positions=0/3
+2026-04-13 20:22:44,174 - __main__ - INFO - 
+============================================================
+2026-04-13 20:22:44,174 - __main__ - INFO - TEST 3: SIMULATED TRADING DAY
+2026-04-13 20:22:44,174 - __main__ - INFO - ============================================================
+2026-04-13 20:22:44,174 - __main__ - INFO - Simulating trading day with 100 potential trades
+2026-04-13 20:22:45,560 - __main__ - INFO - Day complete: 0/100 trades allowed
+2026-04-13 20:22:45,560 - __main__ - INFO - Daily P&L: $0.00
+2026-04-13 20:22:45,560 - __main__ - INFO - Max exposure: $0.00 (0.0%)
+2026-04-13 20:22:45,560 - __main__ - INFO - 
+============================================================
+2026-04-13 20:22:45,561 - __main__ - INFO - TEST 4: EMERGENCY STOP FUNCTIONALITY
+2026-04-13 20:22:45,561 - __main__ - INFO - ============================================================
+2026-04-13 20:22:45,561 - __main__ - WARNING - ❌ Emergency stop functionality not working as expected
+2026-04-13 20:22:45,561 - __main__ - INFO - 
+================================================================================
+2026-04-13 20:22:45,561 - __main__ - INFO - TEST SUMMARY
+2026-04-13 20:22:45,561 - __main__ - INFO - ================================================================================
+2026-04-13 20:22:45,561 - __main__ - INFO - Overall passed: False
+2026-04-13 20:22:45,561 - __main__ - INFO - Issues found:
+2026-04-13 20:22:45,561 - __main__ - INFO -   - Low trade success rate: 0.0%
+2026-04-13 20:22:45,562 - __main__ - INFO -   - Emergency stop not working correctly
+2026-04-13 20:22:45,562 - __main__ - INFO - Recommendations:
+2026-04-13 20:22:45,562 - __main__ - INFO -   - Address issues before integrating with production system
+2026-04-13 20:22:45,562 - __main__ - INFO -   - Review risk parameters and adjust as needed
+2026-04-13 20:22:45,565 - __main__ - INFO - 
+Detailed report saved to: risk_test_report_20260413_202245.json
+2026-04-13 20:24:06,572 - __main__ - INFO - ================================================================================
+2026-04-13 20:24:06,572 - __main__ - INFO - RUNNING COMPREHENSIVE RISK FRAMEWORK TESTS
+2026-04-13 20:24:06,572 - __main__ - INFO - ================================================================================
+2026-04-13 20:24:06,572 - __main__ - INFO - 
+============================================================
+2026-04-13 20:24:06,572 - __main__ - INFO - TEST 1: POSITION SIZING CALCULATIONS
+2026-04-13 20:24:06,572 - __main__ - INFO - ============================================================
+2026-04-13 20:24:06,572 - __main__ - INFO - Testing position sizing calculations...
+2026-04-13 20:24:06,572 - __main__ - INFO - BTC-USD: stop_loss=5.0% -> position=$49.25 (expected=$49.25, match=True)
+2026-04-13 20:24:06,572 - __main__ - INFO - ETH-USD: stop_loss=3.0% -> position=$82.09 (expected=$82.09, match=True)
+2026-04-13 20:24:06,573 - __main__ - INFO - SPY: stop_loss=2.0% -> position=$246.26 (expected=$246.26, match=True)
+2026-04-13 20:24:06,573 - __main__ - INFO - AAPL: stop_loss=4.0% -> position=$123.13 (expected=$123.13, match=True)
+2026-04-13 20:24:06,573 - __main__ - INFO - EUR-USD: stop_loss=1.5% -> position=$262.68 (expected=$262.68, match=True)
+2026-04-13 20:24:06,573 - __main__ - INFO - ✅ All position sizing calculations correct
+2026-04-13 20:24:06,573 - __main__ - INFO - 
+============================================================
+2026-04-13 20:24:06,573 - __main__ - INFO - TEST 2: RISK LIMIT ENFORCEMENT
+2026-04-13 20:24:06,573 - __main__ - INFO - ============================================================
+2026-04-13 20:24:06,573 - __main__ - INFO - Testing risk limit enforcement...
+2026-04-13 20:24:06,573 - __main__ - INFO - Test 1: Daily loss limit
+2026-04-13 20:24:06,573 - __main__ - INFO - Trade blocked: Position size 100.00 > max risk per trade 5.00
+2026-04-13 20:24:06,573 - __main__ - INFO - Test 2: Max concurrent positions
+2026-04-13 20:24:06,573 - __main__ - INFO - Position 1: TEST0 - allowed=False, positions=0/3
+2026-04-13 20:24:06,573 - __main__ - INFO - Position 2: TEST1 - allowed=False, positions=0/3
+2026-04-13 20:24:06,573 - __main__ - INFO - Position 3: TEST2 - allowed=False, positions=0/3
+2026-04-13 20:24:06,573 - __main__ - INFO - Position 4: TEST3 - allowed=False, positions=0/3
+2026-04-13 20:24:06,573 - __main__ - INFO - Position 5: TEST4 - allowed=False, positions=0/3
+2026-04-13 20:24:06,573 - __main__ - INFO - 
+============================================================
+2026-04-13 20:24:06,573 - __main__ - INFO - TEST 3: SIMULATED TRADING DAY
+2026-04-13 20:24:06,573 - __main__ - INFO - ============================================================
+2026-04-13 20:24:06,573 - __main__ - INFO - Simulating trading day with 100 potential trades
+2026-04-13 20:24:07,948 - __main__ - INFO - Day complete: 0/100 trades allowed
+2026-04-13 20:24:07,949 - __main__ - INFO - Daily P&L: $0.00
+2026-04-13 20:24:07,949 - __main__ - INFO - Max exposure: $0.00 (0.0%)
+2026-04-13 20:24:07,949 - __main__ - INFO - 
+============================================================
+2026-04-13 20:24:07,949 - __main__ - INFO - TEST 4: EMERGENCY STOP FUNCTIONALITY
+2026-04-13 20:24:07,949 - __main__ - INFO - ============================================================
+2026-04-13 20:24:07,949 - __main__ - INFO - ✅ Emergency stop functionality working
+2026-04-13 20:24:07,950 - __main__ - INFO - 
+================================================================================
+2026-04-13 20:24:07,950 - __main__ - INFO - TEST SUMMARY
+2026-04-13 20:24:07,950 - __main__ - INFO - ================================================================================
+2026-04-13 20:24:07,950 - __main__ - INFO - Overall passed: True
+2026-04-13 20:24:07,950 - __main__ - INFO - Issues found:
+2026-04-13 20:24:07,950 - __main__ - INFO -   - Low trade success rate: 0.0%
+2026-04-13 20:24:07,950 - __main__ - INFO - Recommendations:
+2026-04-13 20:24:07,950 - __main__ - INFO -   - Risk framework passed all tests - ready for integration with QuantumArb agent
+2026-04-13 20:24:07,951 - __main__ - INFO -   - Proceed to Phase 3: Harden monitoring and alerting
+2026-04-13 20:24:07,952 - __main__ - INFO - 
+Detailed report saved to: risk_test_report_20260413_202407.json

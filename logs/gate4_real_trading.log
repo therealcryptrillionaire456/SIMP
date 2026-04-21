@@ -1,0 +1,3 @@
+usage: gate4_scaled_microscopic_agent.py [-h] [--config CONFIG] [--validate]
+                                         [--create-config] [--status]
+gate4_scaled_microscopic_agent.py: error: unrecognized arguments: --live

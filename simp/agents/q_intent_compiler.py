@@ -16,11 +16,17 @@ by modeling decision-making as adversarial game theory.
 """
 
 import asyncio
+import logging
+import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime
 import random
 import math
+
+from simp.memory.knowledge_index import KnowledgeIndex
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -89,6 +95,35 @@ class StrategicOptimizer:
         self.improvement_history = []
         self.max_iterations = 3
         self.minimax_depth = 5
+        self._knowledge_index = KnowledgeIndex()
+        self._load_persisted_history()
+
+    def _load_persisted_history(self):
+        """Load improvement history from knowledge index."""
+        try:
+            entries = self._knowledge_index.search("improvement_history")
+            if entries:
+                for entry in entries:
+                    if isinstance(entry, dict) and "utility" in entry:
+                        self.improvement_history.append(entry)
+        except Exception:
+            pass  # First run, no history yet
+
+    def _persist_improvement(self, iteration_data):
+        """Save improvement iteration to knowledge index."""
+        try:
+            self._knowledge_index.add_entry(
+                category="improvement_history",
+                data={
+                    "utility": iteration_data.get("utility", 0),
+                    "iteration": len(self.improvement_history),
+                    "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    "mutation_type": iteration_data.get("mutation_type", "random"),
+                    "delta": iteration_data.get("delta", 0),
+                },
+            )
+        except Exception as exc:
+            logger.warning(f"Failed to persist improvement: {exc}")
 
     async def compile_intent(
         self,
@@ -346,6 +381,14 @@ class StrategicOptimizer:
             current_utility = self._calculate_utility(tree)
             self.improvement_history.append(current_utility)
 
+            # Persist this iteration
+            prev_utility = self.improvement_history[-2] if len(self.improvement_history) >= 2 else 0
+            self._persist_improvement({
+                "utility": current_utility,
+                "mutation_type": "directed" if self._knowledge_index.search("mutation_memory") else "random",
+                "delta": current_utility - prev_utility if isinstance(prev_utility, (int, float)) else 0,
+            })
+
             # Generate alternatives
             alternatives = self._generate_alternatives(tree, count=3)
 
@@ -366,11 +409,29 @@ class StrategicOptimizer:
         return tree
 
     def _generate_alternatives(self, tree: DecisionTree, count: int = 3) -> List[DecisionTree]:
-        """Generate alternative tree configurations"""
+        """Generate alternative trees guided by historical success patterns."""
         alternatives = []
 
+        # Get mutation success data from knowledge index
+        success_history = []
+        try:
+            success_history = self._knowledge_index.search("mutation_memory")
+        except Exception:
+            pass
+
+        # Compute directed mutation magnitude from history
+        if success_history:
+            recent = success_history[-20:]  # Last 20 mutations
+            avg_success_rate = sum(
+                1 for m in recent if m.get("success", False)
+            ) / max(len(recent), 1)
+            # Higher success rate -> smaller mutations (converging)
+            # Lower success rate -> larger mutations (exploring)
+            mutation_magnitude = max(0.1, 1.0 - avg_success_rate)
+        else:
+            mutation_magnitude = 0.5  # Default middle ground
+
         for _ in range(count):
-            # Create variation by adjusting branch values
             new_tree = DecisionTree(
                 root_timestamp=tree.root_timestamp,
                 branches=[],
@@ -382,18 +443,16 @@ class StrategicOptimizer:
                 reasoning_trace=tree.reasoning_trace.copy()
             )
 
-            # Adjust branches randomly
             for branch in tree.branches:
                 new_node = TreeNode(
                     trait=branch.trait,
-                    value=branch.value + random.uniform(-0.1, 0.1),
-                    foresight=branch.foresight + random.uniform(-0.05, 0.05),
-                    drift_risk=branch.drift_risk + random.uniform(-0.03, 0.03),
+                    value=branch.value + random.uniform(-mutation_magnitude, mutation_magnitude) * 0.1,
+                    foresight=branch.foresight + random.uniform(-mutation_magnitude, mutation_magnitude) * 0.05,
+                    drift_risk=branch.drift_risk + random.uniform(-mutation_magnitude, mutation_magnitude) * 0.03,
                     depth=branch.depth
                 )
                 new_tree.branches.append(new_node)
 
-            # Recalculate metrics
             new_tree.utility = self._calculate_utility(new_tree)
             alternatives.append(new_tree)
 
@@ -454,8 +513,15 @@ class StrategicOptimizer:
         }
 
 
-# For backward compatibility
-QIntentCompiler = StrategicOptimizer  # Alias for existing code
+class QIntentCompiler(StrategicOptimizer):
+    """QIntentCompiler - Legacy name for StrategicOptimizer
+    
+    Maintains backward compatibility with existing code that expects QIntentCompiler class.
+    """
+    
+    def __init__(self, *args, **kwargs):
+        """Initialize QIntentCompiler, passing all arguments to parent class."""
+        super().__init__(*args, **kwargs)
 
 def create_compiler() -> StrategicOptimizer:
     """Factory function to create StrategicOptimizer instance"""

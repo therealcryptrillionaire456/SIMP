@@ -1,0 +1,4 @@
+usage: quantumarb_agent.py [-h] [--simp-url SIMP_URL]
+                           [--simp-api-key SIMP_API_KEY] [--no-register]
+                           [--poll-interval POLL_INTERVAL]
+quantumarb_agent.py: error: unrecognized arguments: --register

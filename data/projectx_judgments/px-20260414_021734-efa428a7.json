@@ -1,0 +1,34 @@
+{
+  "judgment_id": "px-20260414_021734-efa428a7",
+  "timestamp": "2026-04-14T02:17:34.677504Z",
+  "system_component": "SIMP.QuantumGoose",
+  "action_type": "quantum_task",
+  "proposed_action": {
+    "action_type": "quantum_task",
+    "algorithm": "bell state",
+    "framework": "qiskit",
+    "qubits": 2,
+    "require_verification": true
+  },
+  "context_summary": "Quantum task: bell state in qiskit (2 qubits)",
+  "recommendation": "ALLOW",
+  "confidence": 0.85,
+  "reasons": [
+    "Algorithm 'bell state' is in scope",
+    "Framework 'qiskit' is supported",
+    "Qubits: 2 (within limit)",
+    "Verification required"
+  ],
+  "referenced_rules": [
+    "quantum-in-scope"
+  ],
+  "block_cause": null,
+  "escalation_reason": null,
+  "assumptions": [],
+  "metadata": {
+    "algorithm": "bell state",
+    "framework": "qiskit",
+    "qubits": 2,
+    "require_verification": true
+  }
+}

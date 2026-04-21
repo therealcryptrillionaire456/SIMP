@@ -9,10 +9,11 @@ import asyncio
 import pytest
 import time
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
+import os
 
-sys.path.insert(0, '/sessions/fervent-elegant-johnson/projects/simp')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from simp.server.broker import SimpBroker, BrokerConfig, BrokerState
 from simp.intent import Intent, SimpResponse
@@ -102,7 +103,7 @@ class TestSimpIntentRouting:
             "target_agent": "grok:001",
             "intent_type": "generate_strategy",
             "params": {"market": "SOL/USDC"},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         result = await broker_with_agents.route_intent(intent_data)
@@ -149,9 +150,23 @@ class TestSimpIntentRouting:
 
     def test_intent_status_tracking(self, broker_with_agents):
         """Test intent status tracking"""
+        import asyncio
         intent_id = "intent:tracking:001"
 
-        # Record intent
+        # First route an intent so it exists in intent_records
+        loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(broker_with_agents.route_intent({
+                "intent_id": intent_id,
+                "source_agent": "vision:001",
+                "target_agent": "grok:001",
+                "intent_type": "test",
+                "params": {},
+            }))
+        finally:
+            loop.close()
+
+        # Now record a response
         broker_with_agents.record_response(
             intent_id,
             {"status": "success", "data": "test"},
@@ -185,7 +200,7 @@ class TestSimpProtocolCompliance:
             "target_agent": "agent:b",
             "intent_type": "test",
             "params": {"key": "value"},
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
         # Should not raise exception
@@ -193,18 +208,34 @@ class TestSimpProtocolCompliance:
 
     def test_response_schema_validation(self, broker):
         """Test response schema validation"""
+        import asyncio
+
+        # Register an agent and route an intent first
+        broker.register_agent("test:001", "test", "")  # file-based, no HTTP
+        loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(broker.route_intent({
+                "intent_id": "intent:001",
+                "source_agent": "external",
+                "target_agent": "test:001",
+                "intent_type": "test",
+                "params": {},
+            }))
+        finally:
+            loop.close()
+
         # Record response with proper schema
         broker.record_response(
             "intent:001",
             {
                 "status": "success",
                 "data": {"result": "value"},
-                "timestamp": datetime.utcnow().isoformat()
             },
             execution_time_ms=10.0
         )
 
         status = broker.get_intent_status("intent:001")
+        assert status is not None
         assert status["response"]["status"] == "success"
 
     def test_error_handling_compliance(self, broker):

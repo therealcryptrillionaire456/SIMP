@@ -1,0 +1,4 @@
+{"technique": "T1595", "name": "Active Scanning", "phase": "reconnaissance", "success": true, "duration_seconds": 1.005269, "findings_summary": ["technique_id", "technique_name", "success", "timestamp", "open_ports", "services", "os_fingerprint", "network_topology"], "timestamp": "2026-04-12T07:34:27.672633Z"}
+{"event": "phase_advancement", "from_phase": "reconnaissance", "to_phase": "resource_development", "timestamp": "2026-04-12T07:34:28.179298Z"}
+{"technique": "T1595", "name": "Active Scanning", "phase": "reconnaissance", "success": true, "duration_seconds": 1.005216, "findings_summary": ["technique_id", "technique_name", "success", "timestamp", "open_ports", "services", "os_fingerprint", "network_topology"], "timestamp": "2026-04-12T07:50:31.187370Z"}
+{"event": "phase_advancement", "from_phase": "reconnaissance", "to_phase": "resource_development", "timestamp": "2026-04-12T07:50:31.688531Z"}

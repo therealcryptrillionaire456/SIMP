@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-04-14T12:48:06.511434",
+  "signal": {
+    "signal_id": "sol_gate2_final_1776185286_2693",
+    "arb_type": "cross_venue",
+    "symbol_a": "SOL-USD",
+    "symbol_b": "SOL-USD",
+    "venue_a": "coinbase",
+    "venue_b": "coinbase",
+    "spread_pct": 0.1143,
+    "expected_return_pct": 0.0993,
+    "confidence": 0.9,
+    "timestamp": "2026-04-14T12:48:06.511491",
+    "metadata": {
+      "gate": 2,
+      "market": "SOL-USD",
+      "microscopic": true,
+      "final_push": true
+    }
+  },
+  "opportunity": {
+    "signal": {
+      "signal_id": "sol_gate2_final_1776185286_2693",
+      "arb_type": "cross_venue",
+      "symbol_a": "SOL-USD",
+      "symbol_b": "SOL-USD",
+      "venue_a": "coinbase",
+      "venue_b": "coinbase",
+      "spread_pct": 0.1143,
+      "expected_return_pct": 0.0993,
+      "confidence": 0.9,
+      "timestamp": "2026-04-14T12:48:06.511513",
+      "metadata": {
+        "gate": 2,
+        "market": "SOL-USD",
+        "microscopic": true,
+        "final_push": true
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: spread 0.1143%, confidence 0.90",
+    "position_size_usd": 0.0773,
+    "expected_pnl_usd": 7.7e-05,
+    "risk_score": 0.54,
+    "metadata": {
+      "final_push": true,
+      "trade_number": 6
+    }
+  },
+  "execution_result": {
+    "trade_id": "sol_gate2_final_1776185286_2693",
+    "timestamp": "2026-04-14T12:48:06.511555",
+    "symbol": "SOL-USD",
+    "side": "sell",
+    "quantity": 0.000773,
+    "price": 100.0,
+    "notional_usd": 0.0773,
+    "fees_usd": 7.7e-05,
+    "slippage_pct": 0.0298,
+    "pnl_usd": 6.9e-05,
+    "status": "filled",
+    "metadata": {
+      "gate": 2,
+      "final_push": true,
+      "simulated": true
+    }
+  }
+}

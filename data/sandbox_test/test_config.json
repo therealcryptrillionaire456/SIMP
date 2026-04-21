@@ -1,0 +1,23 @@
+{
+  "test_configuration": {
+    "phase": "gate_1_sandbox",
+    "target_trades": 100,
+    "start_date": "2026-04-14",
+    "max_days": 30,
+    "status": "active"
+  },
+  "exchanges": {
+    "coinbase": {
+      "type": "sandbox",
+      "api_key": "stub",
+      "api_secret": "stub",
+      "passphrase": "stub"
+    }
+  },
+  "testing_parameters": {
+    "trade_interval_seconds": 300,
+    "max_trades_per_day": 20,
+    "symbols": ["BTC-USD", "ETH-USD", "LTC-USD"],
+    "position_size_range_usd": [0.01, 0.10]
+  }
+}

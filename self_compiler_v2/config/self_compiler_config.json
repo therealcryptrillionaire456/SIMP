@@ -1,0 +1,235 @@
+{
+  "version": "2.0.0",
+  "description": "Sovereign Self Compiler v2 Configuration",
+  
+  "recursion": {
+    "max_depth": 3,
+    "max_total_time_seconds": 3600,
+    "max_cycle_time_seconds": 300,
+    "cycle_timeout_action": "escalate",
+    "enable_cycle_detection": true,
+    "max_consecutive_failures": 3
+  },
+  
+  "execution": {
+    "staging_directory": "./staging",
+    "promotion_directory": "./promoted",
+    "backup_directory": "./backups",
+    
+    "resource_limits": {
+      "memory_mb": 1024,
+      "timeout_seconds": 60,
+      "max_file_size_mb": 10,
+      "max_output_lines": 1000,
+      "max_processes": 1
+    },
+    
+    "execution_modes": {
+      "python": {
+        "enabled": true,
+        "sandbox": "local",
+        "import_restrictions": ["os", "sys", "subprocess"],
+        "allowed_modules": ["json", "pathlib", "datetime", "hashlib", "typing"]
+      },
+      "bash": {
+        "enabled": false,
+        "sandbox": "none",
+        "allowed_commands": ["ls", "cat", "grep", "find", "wc"],
+        "blocked_commands": ["rm", "mv", "cp", "chmod", "sudo"]
+      },
+      "document_transform": {
+        "enabled": true,
+        "allowed_formats": ["md", "txt", "json", "yaml", "toml"]
+      },
+      "analysis_only": {
+        "enabled": true
+      }
+    }
+  },
+  
+  "evaluation": {
+    "minimum_score": 0.8,
+    "score_weights": {
+      "schema_validation": 0.2,
+      "syntax_check": 0.2,
+      "tests_passed": 0.3,
+      "policy_compliance": 0.2,
+      "baseline_comparison": 0.1
+    },
+    
+    "required_gates": [
+      "schema_validation",
+      "syntax_check",
+      "policy_compliance"
+    ],
+    
+    "optional_gates": [
+      "tests_passed",
+      "baseline_comparison",
+      "performance_check"
+    ],
+    
+    "sensitive_paths": [
+      "config/",
+      "simp/server/",
+      "simp/broker.py",
+      "simp/server/http_server.py",
+      "simp/models/canonical_intent.py",
+      "simp/compat/financial_ops.py",
+      "self_compiler_v2/config/self_compiler_config.json"
+    ],
+    
+    "policy_rules": {
+      "no_direct_production_writes": true,
+      "require_staging_first": true,
+      "max_file_size_kb": 100,
+      "no_shell_execution_by_default": true,
+      "require_explicit_imports": true
+    }
+  },
+  
+  "promotion": {
+    "auto_promote": false,
+    "require_operator_approval": true,
+    "create_backups": true,
+    "generate_rollback_plan": true,
+    
+    "promotion_outcomes": {
+      "PROMOTE": "Move artifact from staging to production",
+      "REJECT": "Discard artifact, keep in staging for analysis",
+      "REVISE": "Request revision with feedback",
+      "ESCALATE": "Send to ProjectX for manual review"
+    },
+    
+    "sensitive_actions_require_projectx": [
+      "config_file_modification",
+      "broker_core_changes",
+      "security_settings",
+      "self_compiler_config_changes",
+      "financial_connector_updates"
+    ]
+  },
+  
+  "integration": {
+    "projectx": {
+      "enabled": true,
+      "endpoint": "http://localhost:8771",
+      "timeout_seconds": 30,
+      "judgment_required_for": "sensitive_paths",
+      "cache_judgments": true,
+      "cache_ttl_seconds": 3600
+    },
+    
+    "mesh_bus": {
+      "enabled": true,
+      "channels": [
+        "self_compile_events",
+        "artifact_status",
+        "safety_alerts",
+        "maintenance_events"
+      ],
+      "event_ttl_seconds": 86400
+    },
+    
+    "agent_lightning": {
+      "enabled": false,
+      "trace_correlation": true,
+      "learning_signals": true
+    },
+    
+    "obsidian": {
+      "enabled": false,
+      "vault_path": "/Users/kaseymarcelle/stray_goose/SIMP-obsidian-docs",
+      "sync_traces": false,
+      "generate_runbooks": true
+    }
+  },
+  
+  "observability": {
+    "trace_format": "jsonl",
+    "trace_directory": "./traces",
+    "retention_days": 30,
+    "compress_old_traces": true,
+    
+    "trace_surfaces": {
+      "cognitive": true,
+      "operational": true,
+      "contextual": true
+    },
+    
+    "metrics": {
+      "collect_performance": true,
+      "collect_resource_usage": true,
+      "collect_error_rates": true,
+      "export_interval_seconds": 300
+    },
+    
+    "logging": {
+      "level": "INFO",
+      "format": "json",
+      "file": "./logs/self_compiler.log",
+      "max_size_mb": 100,
+      "backup_count": 5
+    }
+  },
+  
+  "learning": {
+    "enabled": true,
+    "learn_from_success": true,
+    "learn_from_failure": true,
+    "signal_generation": true,
+    
+    "improvement_patterns": {
+      "track_successful_prompts": true,
+      "track_failed_evaluations": true,
+      "identify_common_errors": true,
+      "suggest_prompt_improvements": true
+    },
+    
+    "feedback_loops": {
+      "operator_feedback": true,
+      "automated_analysis": true,
+      "periodic_review": true
+    }
+  },
+  
+  "security": {
+    "sandboxing": {
+      "enabled": true,
+      "level": "basic",
+      "isolate_processes": false,
+      "restrict_network": true
+    },
+    
+    "authentication": {
+      "require_api_key": false,
+      "operator_approval_required": true
+    },
+    
+    "audit": {
+      "immutable_logs": true,
+      "cryptographic_verification": false,
+      "regular_audit_reviews": true
+    }
+  },
+  
+  "operator": {
+    "dashboard_enabled": true,
+    "cli_enabled": true,
+    "api_enabled": false,
+    
+    "notifications": {
+      "promotion_requests": true,
+      "safety_violations": true,
+      "system_errors": true,
+      "performance_alerts": false
+    },
+    
+    "control": {
+      "pause_resume": true,
+      "manual_override": true,
+      "emergency_stop": true,
+      "session_inspection": true
+    }
+  }
+}

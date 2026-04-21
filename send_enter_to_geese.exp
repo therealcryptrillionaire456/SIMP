@@ -1,0 +1,18 @@
+#!/usr/bin/expect -f
+
+# Send Enter to all goose TTYs
+set ttys {021 019 029 028 027 026 020 025}
+
+foreach tty $ttys {
+    set tty_device "/dev/ttys$tty"
+    
+    puts "Sending Enter to $tty_device..."
+    
+    spawn -noecho sh -c "printf '\\n' > $tty_device"
+    expect eof
+    
+    # Small delay between sends
+    sleep 0.2
+}
+
+puts "Done sending Enter to all geese."

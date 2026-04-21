@@ -1,0 +1,1 @@
+Machine learning models learn patterns from data to make predictions or generate content.

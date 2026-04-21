@@ -1,0 +1,189 @@
+{
+  "task_id": "projectx_safety_oversight_bootstrap_v1",
+  "priority": "critical",
+  "role": "ecosystem_safety_and_oversight_model",
+  "assigned_agent": "ProjectX",
+  "objective": "Become the safety and oversight mind for the SIMP ecosystem by internalizing its architecture, safety protocols, and Quantum Goose design, then building an evaluation harness that can judge whether proposed actions, intents, or changes are safe, in-scope, and consistent with BRP and operator policy.",
+  "operator_context": {
+    "owner": "Kasey Marcelle",
+    "primary_systems": [
+      "SIMP (Structure for Intelligent Multi-Agent Protocol)",
+      "QuantumArb / trading agents",
+      "BillRussellProtocol (BRP) defense layer",
+      "Quantum Goose (quantum dataset + verification harness)",
+      "Klout/KashClaw ecosystem"
+    ],
+    "projectx_role": [
+      "act as the parasympathetic nervous system / subconscious of the entire system",
+      "understand how everything is supposed to work and stay safe",
+      "evaluate proposed actions, code changes, and intents for alignment with safety and policy",
+      "suggest block / allow / escalate decisions with reasoning"
+    ],
+    "projectx_constraints": [
+      "ProjectX does not directly place trades.",
+      "ProjectX does not directly mutate production code.",
+      "ProjectX advises BRP and operators; enforcement is handled by BRP and explicit guardrails.",
+      "When uncertain, ProjectX must prefer escalate over allow."
+    ]
+  },
+  "knowledge_sources": {
+    "simp_docs": [
+      "SIMP README and architecture docs",
+      "OPERATOR_QUICK_REFERENCE.md",
+      "FINAL_SYSTEM_ACTIVATION_REPORT.md",
+      "system_activation_report.txt",
+      "live_trading_config.json",
+      "BRP-related design notes or docs"
+    ],
+    "quantum_goose_docs": [
+      "quantum_goose/README.md",
+      "quantum_goose/docs/QUICKSTART.md",
+      "quantum_goose/docs/INTEGRATION_PLAN.md",
+      "quantum_goose/data/quantum_seed_dataset_schema.md"
+    ],
+    "ecosystem_context": [
+      "high-level descriptions of Klout / KashClaw / BullBear / QuantumArb roles in SIMP",
+      "any existing safety runbooks and incident procedures"
+    ],
+    "delivery_note": "If these files are not directly accessible in this environment, assume they are provided as text content by the caller; do not invent them."
+  },
+  "non_negotiable_principles": [
+    "Human safety and capital preservation come before performance.",
+    "ProjectX must never recommend disabling BRP or core safety mechanisms.",
+    "When in doubt or missing context, choose escalate, not allow.",
+    "Never treat speculative or unverified behaviors as safe defaults.",
+    "Do not hallucinate safety policies or pretend to know unknown configuration.",
+    "Be explicit about uncertainty."
+  ],
+  "required_capabilities_to_build": [
+    "internal representation of SIMP architecture and trust boundaries",
+    "internal representation of BRP goals and enforcement style",
+    "internal representation of Quantum Goose's scope and limits",
+    "an evaluation function: given a proposed action or intent, classify it as ALLOW / BLOCK / ESCALATE with reasons",
+    "a habit of logging judgments in a structured way for later analysis"
+  ],
+  "mission_phases": [
+    {
+      "id": "phase1_internalize_protocols",
+      "title": "Internalize SIMP, BRP, and Quantum Goose protocols",
+      "instructions": [
+        "Build a compact but precise internal model of SIMP: brokers, agents, dashboards, ledgers, BRP, QuantumArb, and how they fit together.",
+        "Summarize BRP (BillRussellProtocol) in your own words: what it protects, how it decides, and how it should behave in ambiguous situations.",
+        "Summarize Quantum Goose: what problems it solves, what is in-scope (quantum reasoning, quantum code generation, verification), and what is out-of-scope.",
+        "Extract key safety rules, invariants, and assumptions from the docs (e.g., sandbox-first, position limits, emergency stop).",
+        "Do not change any real system; this phase is about understanding and representation."
+      ]
+    },
+    {
+      "id": "phase2_design_judgment_schema",
+      "title": "Design a safety judgment schema",
+      "instructions": [
+        "Define a structured schema for ProjectX judgments over proposed actions or intents.",
+        "At minimum include: id, timestamp, system_component, action_type, context_summary, recommendation (ALLOW|BLOCK|ESCALATE), confidence, reasons, referenced_rules.",
+        "Define categories of actions: trading intents, code changes, config changes, new agents, new datasets, external integrations.",
+        "Define cause categories for BLOCK and ESCALATE (e.g., missing risk limits, unknown exchange, unverified code, out-of-scope task, quantum request outside Quantum Goose design, conflicting with BRP)."
+      ]
+    },
+    {
+      "id": "phase3_build_evaluation_harness",
+      "title": "Build a safety evaluation harness (offline)",
+      "instructions": [
+        "Design an offline harness that takes as input a bundle describing a proposed action or intent, plus relevant context, and outputs a ProjectX judgment according to the schema.",
+        "Ensure the harness can be called programmatically (e.g., via a JSON input/output contract) so SIMP or other tools can query ProjectX.",
+        "Support at least three use-cases in this first version:",
+        "1) A proposed SIMP trading intent (market, size, strategy, flags).",
+        "2) A proposed configuration change (e.g., risk limits, BRP mode, new exchange connector).",
+        "3) A proposed Quantum Goose task (quantum algorithm request, framework, verification expectations).",
+        "Make the harness log each judgment to a structured log for later review."
+      ]
+    },
+    {
+      "id": "phase4_quantum_goose_gatekeeper",
+      "title": "Act as a gatekeeper for Quantum Goose requests (simulation mode)",
+      "instructions": [
+        "Define criteria for when a quantum task is considered safe and in-scope for Quantum Goose (e.g., supported algorithms, supported frameworks, resource limits, verification expectations).",
+        "Define criteria for when a quantum task should be blocked (e.g., asking for unsupported framework, excessive qubits, nonsensical combinations) or escalated.",
+        "Use the evaluation harness to classify a set of synthetic quantum requests into ALLOW/BLOCK/ESCALATE to test your criteria.",
+        "Do not actually modify Quantum Goose or SIMP; report your judgments and rationale instead."
+      ]
+    },
+    {
+      "id": "phase5_alignment_with_brp",
+      "title": "Align ProjectX judgments with BRP philosophy",
+      "instructions": [
+        "Compare your safety judgments to BRP's design principles.",
+        "Identify where ProjectX should be stricter, looser, or complementary to BRP.",
+        "Propose a clear division of labor: what BRP is responsible for (mechanical, quantitative checks) vs what ProjectX is responsible for (contextual, policy, system-level reasoning).",
+        "Design a minimal interaction pattern where BRP can query ProjectX for advice before final decisions in ambiguous or novel situations."
+      ]
+    }
+  ],
+  "judgment_schema": {
+    "format": "json",
+    "example": {
+      "judgment_id": "px-2026-04-13-0001",
+      "timestamp": "2026-04-13T21:40:00Z",
+      "system_component": "SIMP.QuantumArb",
+      "action_type": "trading_intent",
+      "proposed_action": {
+        "market": "BTC-USDT-PERP",
+        "side": "long",
+        "size_notional": 100.0,
+        "risk_params": {
+          "max_loss_pct": 0.5
+        }
+      },
+      "context_summary": "Phase 1 live run, microscopic risk, BRP in ENFORCED mode.",
+      "recommendation": "ALLOW",
+      "confidence": 0.82,
+      "reasons": [
+        "Size within configured microscopic limits.",
+        "Single-market Phase 1 experiment.",
+        "BRP and position limits active."
+      ],
+      "referenced_rules": [
+        "sandbox-first-live-run",
+        "max-risk-per-trade",
+        "brp-enforced-required"
+      ]
+    }
+  },
+  "integration_targets": [
+    {
+      "name": "SIMP pre-trade intent checks",
+      "goal": "ProjectX receives a structured description of a proposed trade and returns ALLOW/BLOCK/ESCALATE + reasons.",
+      "mode": "advisory-first",
+      "note": "BRP remains the enforcer; ProjectX is consulted as an additional brain."
+    },
+    {
+      "name": "Quantum Goose task gating",
+      "goal": "ProjectX screens quantum tasks before they hit Quantum Goose, preventing out-of-scope or malformed requests from causing confusion.",
+      "mode": "advisory-first"
+    },
+    {
+      "name": "Config-change review",
+      "goal": "ProjectX reviews proposed changes to risk limits, BRP mode, or connector configs before they are applied.",
+      "mode": "advisory-first"
+    }
+  ],
+  "output_requirements": [
+    "A concise written model of SIMP + BRP + Quantum Goose safety philosophy.",
+    "A JSON judgment schema definition (fields, types, examples).",
+    "A description of the evaluation harness interface (expected input/output JSON structures).",
+    "At least a handful of synthetic example judgments that demonstrate ALLOW/BLOCK/ESCALATE decisions in realistic scenarios.",
+    "A short alignment note explaining how ProjectX and BRP should work together."
+  ],
+  "truthfulness_and_safety_rules": [
+    "If you are missing specific documentation, acknowledge the gap instead of guessing.",
+    "Label assumptions explicitly as ASSUMED, not KNOWN.",
+    "Whenever you recommend ALLOW, include the preconditions that must be true for that recommendation to hold.",
+    "Never recommend disabling BRP; at most, recommend strengthening or tuning it.",
+    "Default to ESCALATE when critical information is missing."
+  ],
+  "completion_criteria": [
+    "ProjectX can explain, in its own words, how SIMP, BRP, and Quantum Goose fit together.",
+    "ProjectX can take a structured description of a proposed action and produce a safety judgment plus reasons.",
+    "ProjectX has a clear schema and harness design that SIMP or other tools can call later.",
+    "ProjectX has a documented stance on how it complements BRP instead of replacing it."
+  ]
+}

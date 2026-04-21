@@ -1,0 +1,39 @@
+{
+  "signal_id": "adj_gate1_5_1776177995",
+  "processing_time": "2026-04-14T14:46:35.734342",
+  "opportunity": {
+    "opportunity_id": "9a06ceeb-c590-4441-bbdb-70777b7eab51",
+    "signal": {
+      "signal_id": "adj_gate1_5_1776177995",
+      "arb_type": "cross_venue",
+      "symbol_a": "BTC-USD",
+      "symbol_b": "BTC-USD",
+      "venue_a": "coinbase_sandbox",
+      "venue_b": "coinbase_sandbox",
+      "spread_pct": 0.3,
+      "expected_return_pct": 0.27999999999999997,
+      "timestamp": "2026-04-14T14:46:35.732947",
+      "confidence": 0.65,
+      "metadata": {
+        "gate": 1,
+        "test": true,
+        "adjusted_scoring": true
+      }
+    },
+    "decision": "execute",
+    "decision_reason": "Approved: spread=0.3000%, risk=0.67",
+    "position_size_usd": 0.1,
+    "expected_pnl_usd": 0.00025,
+    "max_slippage_pct": 0.03,
+    "risk_score": 0.67,
+    "timestamp": "2026-04-14T14:46:35.733543"
+  },
+  "engine_state": {
+    "status": "operational",
+    "phase": 4,
+    "trading_mode": "microscopic",
+    "max_position_usd": 0.1,
+    "min_spread_pct": 0.01,
+    "timestamp": "2026-04-14T14:46:35.734663"
+  }
+}

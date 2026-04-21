@@ -1,0 +1,9 @@
+{
+  "session_type": "gate2_sol_microscopic_completion",
+  "start_time": "2026-04-14T16:40:59Z",
+  "config_file": "config/live_phase2_sol_microscopic.json",
+  "target_trades": 100,
+  "min_trades_for_success": 80,
+  "max_session_loss": 1.00,
+  "status": "starting"
+}

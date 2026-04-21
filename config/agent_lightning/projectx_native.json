@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "proxy_url": "http://localhost:8235",
+  "store_url": "http://localhost:43887",
+  "model": "glm-4-plus",
+  "enable_apo": true,
+  "trace_agent": true,
+  "agent_id": "projectx_native",
+  "agent_type": "maintenance",
+  "llm_methods_to_trace": [
+    "health_check",
+    "security_scan",
+    "performance_audit"
+  ],
+  "optimization_focus_areas": [
+    "system_analysis",
+    "audit_reporting"
+  ]
+}
