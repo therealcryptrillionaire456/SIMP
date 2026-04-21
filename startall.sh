@@ -141,6 +141,27 @@ wait_for_http() {
     return 1
 }
 
+stabilize_http_service() {
+    local url="$1"
+    local pattern="$2"
+    local timeout="$3"
+    local interval="${4:-2}"
+    local elapsed=0
+
+    while [ "${elapsed}" -lt "${timeout}" ]; do
+        if ! http_ok "${url}"; then
+            return 1
+        fi
+        if [ -n "${pattern}" ] && ! process_running "${pattern}"; then
+            return 1
+        fi
+        sleep "${interval}"
+        elapsed=$((elapsed + interval))
+    done
+
+    return 0
+}
+
 process_running() {
     local pattern="$1"
     pgrep -f "${pattern}" > /dev/null 2>&1
@@ -178,8 +199,12 @@ start_http_service() {
     shift 6
 
     if http_ok "${health_url}"; then
-        log "✓ ${name} already healthy at ${health_url}"
-        return 0
+        if stabilize_http_service "${health_url}" "${pattern}" 6 2; then
+            log "✓ ${name} already healthy at ${health_url}"
+            return 0
+        fi
+        warn "${name} answered health checks briefly but did not remain stable; restarting"
+        stop_matching_processes "${pattern}" "${name}"
     fi
 
     if process_running "${pattern}"; then
@@ -194,7 +219,7 @@ start_http_service() {
         echo $! > "${PID_ROOT}/${slug}.pid"
     )
 
-    if wait_for_http "${health_url}" "${timeout}"; then
+    if wait_for_http "${health_url}" "${timeout}" && stabilize_http_service "${health_url}" "${pattern}" 6 2; then
         log "✓ ${name} is healthy"
         return 0
     fi
@@ -290,10 +315,14 @@ start_projectx_guard() {
         "projectx" \
         "ProjectX" \
         "${PROJECTX_GUARD_URL}/health" \
-        "projectx_guard_server.py" \
+        "projectx_supervisor.sh" \
         45 \
-        "/Users/kaseymarcelle/ProjectX" \
-        env SIMP_API_KEY="${SIMP_API_KEY:-}" python3.10 /Users/kaseymarcelle/ProjectX/projectx_guard_server.py --register --simp-url "${SIMP_BROKER_URL}"
+        "${ROOT_DIR}" \
+        env \
+            SIMP_API_KEY="${SIMP_API_KEY:-}" \
+            SIMP_BROKER_URL="${SIMP_BROKER_URL}" \
+            PROJECTX_GUARD_URL="${PROJECTX_GUARD_URL}" \
+            bash "${ROOT_DIR}/scripts/projectx_supervisor.sh"
 }
 
 ensure_projectx_registered() {
@@ -360,7 +389,7 @@ reconcile_projectx_guard() {
 
     if http_ok "${PROJECTX_GUARD_URL}/health" && projectx_registered && ! projectx_self_registered; then
         warn "ProjectX broker registration is healthy but /health reports registered=false; forcing clean restart"
-        stop_matching_processes "projectx_guard_server.py" "ProjectX"
+        stop_matching_processes "projectx_supervisor.sh|projectx_guard_server.py" "ProjectX"
     fi
 
     start_projectx_guard
@@ -368,7 +397,7 @@ reconcile_projectx_guard() {
 
     if ! projectx_self_registered; then
         warn "ProjectX still reports registered=false after broker reconciliation; restarting once more"
-        stop_matching_processes "projectx_guard_server.py" "ProjectX"
+        stop_matching_processes "projectx_supervisor.sh|projectx_guard_server.py" "ProjectX"
         start_projectx_guard
         ensure_projectx_registered
     fi
