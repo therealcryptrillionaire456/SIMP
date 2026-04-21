@@ -2235,6 +2235,14 @@
       case 'activity':
         renderActivity(msg.data);
         break;
+      case 'brp':
+        if (msg.data) {
+          renderBrpStatus(msg.data.status);
+          renderBrpEvaluations(msg.data.evaluations);
+          renderBrpAdaptiveRules(msg.data.adaptive_rules);
+          renderBrpInsights(msg.data.insights);
+        }
+        break;
       case 'heartbeat':
       case 'pong':
         break;

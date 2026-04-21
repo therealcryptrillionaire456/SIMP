@@ -359,6 +359,15 @@ def _brp_insights_payload(limit: int = 10) -> dict[str, Any]:
     }
 
 
+def _brp_ws_payload() -> dict[str, Any]:
+    return {
+        "status": _brp_status_payload(recent_limit=25),
+        "evaluations": _brp_filtered_evaluations_payload(limit=12),
+        "adaptive_rules": _brp_adaptive_rules_payload(limit=12),
+        "insights": _brp_insights_payload(limit=12),
+    }
+
+
 def _cached_entry_fresh(entry: dict[str, Any] | None, ttl: float) -> bool:
     if not entry:
         return False
@@ -1210,6 +1219,7 @@ async def _poll_broker() -> None:
                         "count": len(activity_buffer),
                         "events": list(activity_buffer),
                     })
+                    await _broadcast_ws("brp", _redact(_brp_ws_payload()))
         if new_snap:
             _last_snapshot = new_snap
         await asyncio.sleep(POLL_INTERVAL)
