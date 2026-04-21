@@ -31,6 +31,11 @@ from typing import Optional, Dict, Any
 
 import requests
 
+try:
+    from coinbase.rest import RESTClient  # type: ignore
+except ImportError:
+    RESTClient = None  # type: ignore
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 logging.basicConfig(
@@ -63,6 +68,7 @@ TARGET_ASSETS = ["BTC-USD", "ETH-USD", "SOL-USD"]
 # Position sizing constraints (matches gate4_real metadata: "$1-$10")
 MIN_POSITION_USD = 1.0
 MAX_POSITION_USD = 10.0
+QUOTE_CURRENCIES = ("USD", "USDC")
 
 
 # ─── Broker helpers ───────────────────────────────────────────────────────────
@@ -169,6 +175,149 @@ def query_qip(broker: str, problem: str) -> Optional[dict]:
     return None
 
 
+def _coinbase_client() -> Optional[RESTClient]:
+    if RESTClient is None:
+        return None
+
+    api_key = os.environ.get("COINBASE_API_KEY_NAME", "").strip()
+    api_secret = os.environ.get("COINBASE_API_PRIVATE_KEY", "").strip()
+    if not api_key or not api_secret:
+        return None
+    if api_secret.startswith(("'", '"')) and api_secret.endswith(("'", '"')):
+        api_secret = api_secret[1:-1]
+    if "\\n" in api_secret:
+        api_secret = api_secret.replace("\\n", "\n")
+
+    try:
+        return RESTClient(api_key=api_key, api_secret=api_secret, timeout=30)
+    except Exception as exc:
+        logger.warning(f"Coinbase client unavailable for funding-aware routing: {exc}")
+        return None
+
+
+def _account_balances(client: RESTClient) -> Dict[str, float]:
+    try:
+        resp = client.get_accounts()
+    except Exception as exc:
+        logger.warning(f"balance lookup failed: {exc}")
+        return {}
+
+    if isinstance(resp, dict):
+        accounts = resp.get("accounts") or resp.get("data") or []
+    else:
+        accounts = getattr(resp, "accounts", None) or getattr(resp, "data", None) or []
+
+    balances: Dict[str, float] = {}
+    for account in accounts:
+        row = account if isinstance(account, dict) else getattr(account, "__dict__", {})
+        currency = str(row.get("currency") or row.get("asset") or "").upper()
+        available = row.get("available_balance") or row.get("available") or {}
+        if isinstance(available, dict):
+            raw = available.get("value") or available.get("amount") or 0
+        else:
+            raw = available or 0
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            continue
+        if currency and value > 0:
+            balances[currency] = value
+    return balances
+
+
+def _market_price(client: RESTClient, product_id: str) -> Optional[float]:
+    try:
+        resp = client.get_product(product_id=product_id)
+    except Exception:
+        try:
+            resp = client.get_product_ticker(product_id=product_id)
+        except Exception as exc:
+            logger.warning(f"price lookup failed for {product_id}: {exc}")
+            return None
+
+    payload = resp if isinstance(resp, dict) else getattr(resp, "__dict__", {})
+    for key in ("price", "last_price"):
+        value = payload.get(key)
+        if value:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                pass
+    return None
+
+
+def _apply_funding_constraints(signal: Dict[str, Any]) -> Dict[str, Any]:
+    client = _coinbase_client()
+    if client is None:
+        signal["metadata"]["funding_mode"] = "blind"
+        return signal
+
+    balances = _account_balances(client)
+    quote_balance = sum(balances.get(ccy, 0.0) for ccy in QUOTE_CURRENCIES)
+    metadata = signal.setdefault("metadata", {})
+
+    if quote_balance >= MIN_POSITION_USD:
+        budget = max(MIN_POSITION_USD, min(MAX_POSITION_USD, round(quote_balance, 2)))
+        buy_assets = {
+            asset: leg for asset, leg in signal.get("assets", {}).items()
+            if (leg.get("action") or "").lower() == "buy"
+        }
+        total_weight = sum(float(leg.get("weight", 0.0) or 0.0) for leg in buy_assets.values())
+        if total_weight > 0:
+            for asset, leg in signal["assets"].items():
+                if asset not in buy_assets:
+                    continue
+                weight = float(leg.get("weight", 0.0) or 0.0)
+                scaled = round((weight / total_weight) * budget, 2)
+                leg["position_usd"] = max(MIN_POSITION_USD, min(budget, scaled))
+        metadata["funding_mode"] = "quote_funded"
+        metadata["quote_balance_usd"] = round(quote_balance, 4)
+        metadata["quote_budget_usd"] = budget
+        return signal
+
+    best_asset = None
+    best_notional = 0.0
+    for symbol in TARGET_ASSETS:
+        base = symbol.split("-", 1)[0]
+        base_balance = balances.get(base, 0.0)
+        if base_balance <= 0:
+            continue
+        price = _market_price(client, symbol)
+        if not price:
+            continue
+        notional = base_balance * price
+        if notional > best_notional:
+            best_asset = symbol
+            best_notional = notional
+
+    if best_asset and best_notional >= MIN_POSITION_USD:
+        sell_notional = round(min(MAX_POSITION_USD, max(MIN_POSITION_USD, best_notional * 0.25)), 2)
+        signal["assets"] = {
+            best_asset: {
+                "weight": 1.0,
+                "position_usd": sell_notional,
+                "action": "sell",
+            }
+        }
+        metadata["funding_mode"] = "bootstrap_sell"
+        metadata["bootstrap_asset"] = best_asset
+        metadata["bootstrap_notional_usd"] = sell_notional
+        metadata["quote_balance_usd"] = round(quote_balance, 4)
+        return signal
+
+    metadata["funding_mode"] = "hold_no_capital"
+    metadata["quote_balance_usd"] = round(quote_balance, 4)
+    signal["assets"] = {
+        asset: {
+            **leg,
+            "action": "hold",
+            "position_usd": 0.0,
+        }
+        for asset, leg in signal.get("assets", {}).items()
+    }
+    return signal
+
+
 # ─── Signal generation ────────────────────────────────────────────────────────
 
 def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
@@ -180,7 +329,7 @@ def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
         # Even on QIP failure, extract what we can for a fallback signal
         logger.warning(f"QIP returned failure: {qip_payload.get('error_code', 'unknown')}")
         # Fallback: equal weight allocation
-        return _equal_weight_signal("qip_fallback")
+        return _apply_funding_constraints(_equal_weight_signal("qip_fallback"))
 
     result = qip_payload.get("result", "")
     metadata = qip_payload.get("metadata", {})
@@ -220,7 +369,7 @@ def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
             "action": "buy" if weight > 0.2 else "hold",
         }
 
-    return signal
+    return _apply_funding_constraints(signal)
 
 
 def _parse_allocations(result_text: str) -> Dict[str, float]:
@@ -371,7 +520,7 @@ class QuantumSignalBridge:
                     signal = parse_qip_response(qip_response)
                 else:
                     logger.warning("No QIP response — using equal-weight fallback")
-                    signal = _equal_weight_signal("timeout_fallback")
+                    signal = _apply_funding_constraints(_equal_weight_signal("timeout_fallback"))
 
                 if signal:
                     delivered = deliver_signal(signal, self.broker)
@@ -407,7 +556,7 @@ def main():
         register_and_subscribe(args.broker)
         problem = f"optimize {TARGET_ASSETS} portfolio for live Coinbase trading"
         qip = query_qip(args.broker, problem)
-        signal = parse_qip_response(qip) if qip else _equal_weight_signal("once_fallback")
+        signal = parse_qip_response(qip) if qip else _apply_funding_constraints(_equal_weight_signal("once_fallback"))
         deliver_signal(signal, args.broker)
         print(json.dumps(signal, indent=2))
         return

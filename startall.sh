@@ -35,25 +35,54 @@ DASHBOARD_PORT="${DASHBOARD_PORT:-8050}"
 KTC_HOST="${KTC_HOST:-127.0.0.1}"
 KTC_PORT="${KTC_PORT:-8765}"
 QUANTUMARB_PHASE4_CONFIG="${QUANTUMARB_PHASE4_CONFIG:-config/phase4_microscopic.json}"
+QUANTUMARB_HOT_CONFIG="${QUANTUMARB_HOT_CONFIG:-config/live_phase2_sol_microscopic.json}"
+SOLANA_SEEKER_CONFIG="${SOLANA_SEEKER_CONFIG:-config/solana_seeker_config.json}"
+
+BOOT_SIMP_BROKER_URL="${SIMP_BROKER_URL}"
+BOOT_PROJECTX_GUARD_URL="${PROJECTX_GUARD_URL}"
+BOOT_DASHBOARD_HOST="${DASHBOARD_HOST}"
+BOOT_DASHBOARD_PORT="${DASHBOARD_PORT}"
+BOOT_KTC_HOST="${KTC_HOST}"
+BOOT_KTC_PORT="${KTC_PORT}"
 
 START_KTC=1
 START_QUANTUM=1
 START_EXTERNAL=1
+START_GATE4=0
+START_SOLANA=0
+HOT_MODE=0
+RESET_GATE4_STATE=0
 
 usage() {
     cat <<EOF
 Usage: bash startall.sh [options]
 
 Options:
+  --hot            Arm live-mode services and load live trading env files
+  --with-gate4     Start the Gate4 live Coinbase consumer
+  --with-solana    Start the Solana Seeker daemon
   --no-ktc         Skip KTC startup
   --no-quantum     Skip the quantum stack bootstrap
   --no-external    Skip ProjectX, BullBear, and Gemma external services
+  --reset-gate4-state
+                   Archive Gate4 breaker state before startup
   --help           Show this help
 EOF
 }
 
 for arg in "$@"; do
     case "$arg" in
+        --hot)
+            HOT_MODE=1
+            START_GATE4=1
+            START_SOLANA=1
+            ;;
+        --with-gate4)
+            START_GATE4=1
+            ;;
+        --with-solana)
+            START_SOLANA=1
+            ;;
         --no-ktc)
             START_KTC=0
             ;;
@@ -62,6 +91,9 @@ for arg in "$@"; do
             ;;
         --no-external)
             START_EXTERNAL=0
+            ;;
+        --reset-gate4-state)
+            RESET_GATE4_STATE=1
             ;;
         --help|-h)
             usage
@@ -195,6 +227,133 @@ start_optional_http_service() {
     start_http_service "${slug}" "${name}" "${health_url}" "${pattern}" "${timeout}" "${workdir}" "$@"
 }
 
+load_env_file() {
+    local env_file="$1"
+    local label="$2"
+
+    if [ ! -f "${env_file}" ]; then
+        warn "Skipping ${label} env file; not found: ${env_file}"
+        return 0
+    fi
+
+    log "Loading ${label} environment from ${env_file}"
+    while IFS='=' read -r key value || [ -n "${key:-}" ]; do
+        if [[ "${key:-}" =~ ^[[:space:]]*# ]] || [[ -z "${key:-}" ]]; then
+            continue
+        fi
+        key="$(printf '%s' "${key}" | xargs)"
+        value="$(printf '%s' "${value:-}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+        export "${key}=${value}"
+    done < "${env_file}"
+}
+
+projectx_registered() {
+    local url="${SIMP_BROKER_URL}/agents/projectx_native"
+    if [ -n "${SIMP_API_KEY:-}" ]; then
+        curl -fsS -H "Authorization: Bearer ${SIMP_API_KEY}" -H "X-API-Key: ${SIMP_API_KEY}" "${url}" 2>/dev/null \
+            | grep -q '"agent_id"[[:space:]]*:[[:space:]]*"projectx_native"'
+    else
+        curl -fsS "${url}" 2>/dev/null | grep -q '"agent_id"[[:space:]]*:[[:space:]]*"projectx_native"'
+    fi
+}
+
+ensure_projectx_registered() {
+    if ! http_ok "${PROJECTX_GUARD_URL}/health"; then
+        fail "ProjectX health endpoint is unavailable; cannot verify registration"
+    fi
+
+    if projectx_registered; then
+        log "✓ ProjectX registered with broker"
+        return 0
+    fi
+
+    log "ProjectX is healthy but not broker-registered; reconciling registration..."
+
+    local payload
+    payload="$(cat <<EOF
+{
+  "agent_id": "projectx_native",
+  "agent_type": "native_maintenance",
+  "endpoint": "http://127.0.0.1:8771",
+  "metadata": {
+    "name": "projectx_native",
+    "version": "0.1.0",
+    "description": "ProjectX native bounded maintenance and remediation agent.",
+    "dry_run_safe": true,
+    "capabilities": [
+      "native_agent_repo_scan",
+      "native_agent_health_check",
+      "native_agent_code_maintenance",
+      "native_agent_provider_repair",
+      "native_agent_task_audit",
+      "native_agent_security_audit",
+      "projectx_query"
+    ]
+  }
+}
+EOF
+)"
+
+    local -a curl_args
+    curl_args=(-fsS -X POST "${SIMP_BROKER_URL}/agents/register" -H "Content-Type: application/json" -d "${payload}")
+    if [ -n "${SIMP_API_KEY:-}" ]; then
+        curl_args+=(-H "Authorization: Bearer ${SIMP_API_KEY}" -H "X-API-Key: ${SIMP_API_KEY}")
+    fi
+
+    if ! curl "${curl_args[@]}" > /dev/null 2>&1; then
+        fail "ProjectX registration POST failed"
+    fi
+
+    sleep 2
+    if projectx_registered; then
+        log "✓ ProjectX registration reconciled"
+        return 0
+    fi
+
+    fail "ProjectX remained unregistered after reconciliation"
+}
+
+gate4_env_ready() {
+    env_value_ready "${COINBASE_API_KEY_NAME:-}" && env_value_ready "${COINBASE_API_PRIVATE_KEY:-}"
+}
+
+quantumarb_live_env_ready() {
+    (
+        env_value_ready "${COINBASE_API_KEY:-}" &&
+        env_value_ready "${COINBASE_API_SECRET:-}" &&
+        env_value_ready "${COINBASE_API_PASSPHRASE:-}"
+    ) || (
+        env_value_ready "${COINBASE_PRODUCTION_API_KEY:-}" &&
+        env_value_ready "${COINBASE_PRODUCTION_API_SECRET:-}" &&
+        env_value_ready "${COINBASE_PRODUCTION_PASSPHRASE:-}"
+    )
+}
+
+solana_env_ready() {
+    env_value_ready "${SOLANA_SEEKER_API_KEY:-}" && env_value_ready "${SOLANA_WALLET_ADDRESS:-}"
+}
+
+env_value_ready() {
+    local value="$1"
+    [ -n "${value}" ] || return 1
+    [[ "${value}" != your_* ]] || return 1
+    [[ "${value}" != YOUR_* ]] || return 1
+    [[ "${value}" != placeholder* ]] || return 1
+    [[ "${value}" != PLACEHOLDER* ]] || return 1
+    return 0
+}
+
+reset_gate4_state_if_requested() {
+    local state_file="${ROOT_DIR}/data/gate4_consumer_state.json"
+    if [ "${RESET_GATE4_STATE}" -ne 1 ] || [ ! -f "${state_file}" ]; then
+        return 0
+    fi
+
+    local archived="${state_file}.bak.${TIMESTAMP}"
+    mv "${state_file}" "${archived}"
+    log "Archived Gate4 state to ${archived}"
+}
+
 bootstrap_quantum_stack() {
     local log_file="${LOG_ROOT}/quantum_stack.log"
     local required_processes=(
@@ -226,6 +385,9 @@ show_summary() {
     log "Bring-up summary"
     log "  Broker:    ${SIMP_BROKER_URL}"
     log "  Dashboard: http://127.0.0.1:${DASHBOARD_PORT}/health"
+    if [ "${HOT_MODE}" -eq 1 ]; then
+        log "  Mode:      HOT"
+    fi
 
     if [ "${START_KTC}" -eq 1 ]; then
         if http_ok "http://${KTC_HOST}:${KTC_PORT}/health"; then
@@ -253,6 +415,22 @@ show_summary() {
         warn "QuantumArb Phase 4 agent not running"
     fi
 
+    if [ "${START_GATE4}" -eq 1 ]; then
+        if process_running "gate4_inbox_consumer.py"; then
+            log "  Gate4:     gate4_inbox_consumer.py"
+        else
+            warn "Gate4 consumer requested but not running"
+        fi
+    fi
+
+    if [ "${START_SOLANA}" -eq 1 ]; then
+        if process_running "scripts/solana_seeker_integration.py"; then
+            log "  Solana:    scripts/solana_seeker_integration.py"
+        else
+            warn "Solana Seeker requested but not running"
+        fi
+    fi
+
     if [ "${START_QUANTUM}" -eq 1 ]; then
         local quantum_checks=(
             "quantum_mesh_consumer.py"
@@ -278,6 +456,54 @@ log "Starting canonical SIMP bring-up"
 log "Session log: ${SESSION_LOG}"
 log "Python: ${PYTHON_BIN}"
 log "Broker URL: ${SIMP_BROKER_URL}"
+
+if [ "${HOT_MODE}" -eq 1 ]; then
+    load_env_file "${ROOT_DIR}/.env.multi_exchange" "multi-exchange"
+    load_env_file "${ROOT_DIR}/.env.solana_seeker" "solana"
+
+    export SIMP_BROKER_URL="${BOOT_SIMP_BROKER_URL}"
+    export PROJECTX_GUARD_URL="${BOOT_PROJECTX_GUARD_URL}"
+    export DASHBOARD_HOST="${BOOT_DASHBOARD_HOST}"
+    export DASHBOARD_PORT="${BOOT_DASHBOARD_PORT}"
+    export KTC_HOST="${BOOT_KTC_HOST}"
+    export KTC_PORT="${BOOT_KTC_PORT}"
+    SIMP_BROKER_URL="${BOOT_SIMP_BROKER_URL}"
+    PROJECTX_GUARD_URL="${BOOT_PROJECTX_GUARD_URL}"
+    DASHBOARD_HOST="${BOOT_DASHBOARD_HOST}"
+    DASHBOARD_PORT="${BOOT_DASHBOARD_PORT}"
+    KTC_HOST="${BOOT_KTC_HOST}"
+    KTC_PORT="${BOOT_KTC_PORT}"
+
+    if gate4_env_ready; then
+        log "Hot mode: Gate4 live Coinbase credentials detected"
+    else
+        warn "Hot mode: Gate4 Coinbase credentials not detected"
+    fi
+
+    if quantumarb_live_env_ready; then
+        log "Hot mode: QuantumArb live Coinbase credentials detected"
+        export QUANTUMARB_PHASE4_CONFIG="${QUANTUMARB_HOT_CONFIG}"
+        export QUANTUMARB_ALLOW_LIVE_TRADING="${QUANTUMARB_ALLOW_LIVE_TRADING:-true}"
+    else
+        warn "Hot mode: QuantumArb live credentials not detected; Gate4 will be the live Coinbase path"
+        export QUANTUMARB_ALLOW_LIVE_TRADING="false"
+    fi
+
+    if ! gate4_env_ready && ! quantumarb_live_env_ready; then
+        fail "Hot mode requested but no live Coinbase credentials were loaded"
+    fi
+
+    if [ "${START_SOLANA}" -eq 1 ] && ! solana_env_ready; then
+        warn "Hot mode: Solana credentials not detected; Solana Seeker will be skipped"
+        START_SOLANA=0
+    fi
+
+    if [ -f "${ROOT_DIR}/data/gate4_consumer_state.json" ] && [ "${RESET_GATE4_STATE}" -ne 1 ]; then
+        warn "Hot mode: existing Gate4 breaker state may still block signals; use --reset-gate4-state to archive it"
+    fi
+fi
+
+reset_gate4_state_if_requested
 
 start_http_service \
     "broker" \
@@ -327,8 +553,20 @@ start_background_service \
     env \
         PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
         SIMP_BROKER_URL="${SIMP_BROKER_URL}" \
+        QUANTUMARB_ALLOW_LIVE_TRADING="${QUANTUMARB_ALLOW_LIVE_TRADING:-false}" \
         "${PYTHON_BIN}" simp/agents/quantumarb_agent_phase4.py \
         --config "${QUANTUMARB_PHASE4_CONFIG}"
+
+if [ "${START_GATE4}" -eq 1 ]; then
+    start_background_service \
+        "gate4_consumer" \
+        "Gate4 Live Consumer" \
+        "gate4_inbox_consumer.py" \
+        "${ROOT_DIR}" \
+        env \
+            PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+            "${PYTHON_BIN}" gate4_inbox_consumer.py
+fi
 
 if [ "${START_EXTERNAL}" -eq 1 ]; then
     start_optional_http_service \
@@ -339,7 +577,9 @@ if [ "${START_EXTERNAL}" -eq 1 ]; then
         "projectx_guard_server.py" \
         45 \
         "/Users/kaseymarcelle/ProjectX" \
-        python3.10 /Users/kaseymarcelle/ProjectX/projectx_guard_server.py
+        env SIMP_API_KEY="${SIMP_API_KEY:-}" python3.10 /Users/kaseymarcelle/ProjectX/projectx_guard_server.py --register --simp-url "${SIMP_BROKER_URL}"
+
+    ensure_projectx_registered
 
     start_optional_http_service \
         "/Users/kaseymarcelle/bullbear/agents/bullbear_simp_agent.py" \
@@ -360,6 +600,17 @@ if [ "${START_EXTERNAL}" -eq 1 ]; then
         45 \
         "/Users/kaseymarcelle/bullbear" \
         python3.10 agents/kashclaw_gemma_agent.py --port 8780
+fi
+
+if [ "${START_SOLANA}" -eq 1 ]; then
+    start_background_service \
+        "solana_seeker" \
+        "Solana Seeker" \
+        "scripts/solana_seeker_integration.py" \
+        "${ROOT_DIR}" \
+        env \
+            PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+            "${PYTHON_BIN}" scripts/solana_seeker_integration.py --daemon --config "${SOLANA_SEEKER_CONFIG}"
 fi
 
 if [ "${START_QUANTUM}" -eq 1 ]; then

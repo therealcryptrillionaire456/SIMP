@@ -69,6 +69,16 @@ def _resolve_tree(value: Any) -> Any:
     return _resolve_env(value)
 
 
+def _env_lookup(*names: Optional[str]) -> str:
+    for name in names:
+        if not name:
+            continue
+        value = os.getenv(name, "")
+        if value:
+            return value
+    return ""
+
+
 def _asset_to_symbol(asset: str) -> str:
     normalized = (asset or "SOL").strip().lower()
     mapping = {
@@ -282,9 +292,68 @@ class QuantumArbEnginePhase4:
             }
             normalized["pnl_ledger_path"] = raw.get("pnl_tracking", {}).get("ledger_path", "data/phase4_pnl_ledger.jsonl")
 
+        if "execution" in raw:
+            execution_cfg = raw["execution"]
+            normalized.setdefault("executor", {})
+            if "max_slippage_bps" in execution_cfg:
+                normalized["executor"]["max_slippage_bps"] = float(execution_cfg["max_slippage_bps"])
+            if execution_cfg.get("dry_run") is False:
+                normalized["executor"]["allow_live_trading"] = True
+
+        if "position_sizing" in raw:
+            sizing_cfg = raw["position_sizing"]
+            normalized.setdefault("risk", {})
+            normalized.setdefault("executor", {})
+            max_notional = (
+                sizing_cfg.get("max_notional")
+                or sizing_cfg.get("max_notional_usd")
+                or sizing_cfg.get("default_notional")
+            )
+            if max_notional is not None:
+                normalized["risk"].setdefault("max_position_size_usd", float(max_notional))
+                normalized["executor"].setdefault("max_position_size_usd", float(max_notional))
+
+        connectors = raw.get("connectors", {})
+        if connectors:
+            normalized.setdefault("exchanges", {})
+            normalized.setdefault("executor", {})
+            for connector_name, connector_cfg in connectors.items():
+                if connector_name != "coinbase":
+                    continue
+
+                use_sandbox = bool(connector_cfg.get("use_sandbox", not connector_cfg.get("live_trading", False)))
+                exchange_alias = f"{connector_name}_{'sandbox' if use_sandbox else 'live'}"
+                api_key = _env_lookup(
+                    connector_cfg.get("api_key_env"),
+                    "COINBASE_PRODUCTION_API_KEY",
+                    "COINBASE_LIVE_API_KEY",
+                )
+                api_secret = _env_lookup(
+                    connector_cfg.get("api_secret_env"),
+                    "COINBASE_PRODUCTION_API_SECRET",
+                    "COINBASE_LIVE_API_SECRET",
+                )
+                passphrase = _env_lookup(
+                    connector_cfg.get("api_passphrase_env"),
+                    "COINBASE_PRODUCTION_PASSPHRASE",
+                    "COINBASE_LIVE_PASSPHRASE",
+                )
+
+                normalized["exchanges"][exchange_alias] = {
+                    "driver": connector_name,
+                    "sandbox": use_sandbox,
+                    "enabled": True,
+                    "api_key": api_key,
+                    "api_secret": api_secret,
+                    "passphrase": passphrase,
+                }
+
+                if connector_cfg.get("live_trading") and not use_sandbox:
+                    normalized["executor"]["allow_live_trading"] = True
+
         exchanges = raw.get("exchanges", {})
         if exchanges:
-            normalized["exchanges"] = {}
+            normalized.setdefault("exchanges", {})
             for alias, config in exchanges.items():
                 if "environments" in config:
                     for env_name, env_cfg in config["environments"].items():
