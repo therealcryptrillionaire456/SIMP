@@ -3,6 +3,21 @@ from __future__ import annotations
 import quantum_signal_bridge as bridge
 
 
+def test_register_and_subscribe_tolerates_existing_broker_agent(monkeypatch) -> None:
+    calls = []
+
+    def fake_post_result(url, payload, timeout=10):
+        calls.append((url, payload))
+        return 400, {"status": "error", "error": "duplicate"}, "duplicate"
+
+    monkeypatch.setattr(bridge, "_post_result", fake_post_result)
+    monkeypatch.setattr(bridge, "_broker_has_agent", lambda broker, agent_id: True)
+    monkeypatch.setattr(bridge, "_bridge_poll_ready", lambda broker: True)
+
+    assert bridge.register_and_subscribe("http://broker") is True
+    assert len(calls) == 3
+
+
 def test_apply_funding_constraints_bootstraps_with_sell(monkeypatch) -> None:
     monkeypatch.setattr(bridge, "_coinbase_client", lambda: object())
     monkeypatch.setattr(bridge, "_account_balances", lambda client: {"ETH": 0.01})

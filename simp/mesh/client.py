@@ -90,7 +90,14 @@ class MeshClient:
         
         logger.info(f"MeshClient initialized for agent {agent_id} with broker {broker_url}")
     
-    def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
+    def _make_request(
+        self,
+        method: str,
+        endpoint: str,
+        data: Optional[Dict] = None,
+        *,
+        log_errors: bool = True,
+    ) -> Dict:
         """
         Make HTTP request to broker.
         
@@ -155,7 +162,8 @@ class MeshClient:
             return response.json()
             
         except Exception as e:
-            logger.error(f"HTTP request failed: {e}")
+            if log_errors:
+                logger.error(f"HTTP request failed: {e}")
             raise
     
     # ----------------------------------------------------------------------
@@ -426,6 +434,31 @@ class MeshClient:
             
             # Wait before polling again
             time_module.sleep(0.1)
+
+    def _agent_registered(self) -> bool:
+        try:
+            response = self._make_request("GET", f"/agents/{self.agent_id}", log_errors=False)
+        except Exception:
+            return False
+
+        agent = response.get("agent", response) if isinstance(response, dict) else {}
+        return str(agent.get("agent_id") or "") == self.agent_id
+
+    def _poll_ready(self) -> bool:
+        try:
+            response = self._make_request(
+                "GET",
+                "/mesh/poll",
+                data={"agent_id": self.agent_id, "max_messages": 1},
+                log_errors=False,
+            )
+        except Exception:
+            return False
+
+        return (
+            isinstance(response, dict)
+            and str(response.get("agent_id") or "") == self.agent_id
+        )
     
     # ----------------------------------------------------------------------
     # Channel Management
@@ -444,14 +477,25 @@ class MeshClient:
         Raises:
             Exception: If subscription fails
         """
-        response = self._make_request(
-            "POST",
-            "/mesh/subscribe",
-            data={
-                "agent_id": self.agent_id,
-                "channel": channel,
-            }
-        )
+        try:
+            response = self._make_request(
+                "POST",
+                "/mesh/subscribe",
+                data={
+                    "agent_id": self.agent_id,
+                    "channel": channel,
+                },
+                log_errors=False,
+            )
+        except Exception as exc:
+            if self._agent_registered() or self._poll_ready():
+                logger.info(
+                    "Subscribe for %s returned non-success but broker already knows %s; continuing",
+                    channel,
+                    self.agent_id,
+                )
+                return True
+            raise Exception(f"Failed to subscribe to channel {channel}: {exc}") from exc
         
         if response.get("status") == "success":
             logger.info(f"Subscribed to channel {channel}")

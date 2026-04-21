@@ -30,6 +30,7 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 
 import requests
+from requests import Response
 
 try:
     from coinbase.rest import RESTClient  # type: ignore
@@ -73,6 +74,13 @@ QUOTE_CURRENCIES = ("USD", "USDC")
 
 # ─── Broker helpers ───────────────────────────────────────────────────────────
 
+def _parse_response_json(response: Response) -> Optional[dict]:
+    try:
+        return response.json()
+    except ValueError:
+        return None
+
+
 def _post(url: str, payload: dict, timeout: int = 10) -> Optional[dict]:
     try:
         r = requests.post(url, json=payload, timeout=timeout)
@@ -93,8 +101,47 @@ def _get(url: str, params: dict = None, timeout: int = 10) -> Optional[dict]:
         return None
 
 
+def _post_result(url: str, payload: dict, timeout: int = 10) -> tuple[Optional[int], Optional[dict], str]:
+    try:
+        r = requests.post(url, json=payload, timeout=timeout)
+        return r.status_code, _parse_response_json(r), r.text
+    except Exception as exc:
+        logger.error(f"POST {url}: {exc}")
+        return None, None, str(exc)
+
+
+def _get_result(url: str, params: dict = None, timeout: int = 10) -> tuple[Optional[int], Optional[dict], str]:
+    try:
+        r = requests.get(url, params=params, timeout=timeout)
+        return r.status_code, _parse_response_json(r), r.text
+    except Exception as exc:
+        logger.error(f"GET {url}: {exc}")
+        return None, None, str(exc)
+
+
+def _broker_has_agent(broker: str, agent_id: str) -> bool:
+    status, body, _ = _get_result(f"{broker}/agents/{agent_id}")
+    if not status or status >= 400 or not isinstance(body, dict):
+        return False
+    agent = body.get("agent", body)
+    return str(agent.get("agent_id") or "") == agent_id
+
+
+def _bridge_poll_ready(broker: str) -> bool:
+    status, body, _ = _get_result(
+        f"{broker}/mesh/poll",
+        params={"agent_id": BRIDGE_AGENT_ID, "max_messages": 1},
+    )
+    return bool(
+        status
+        and status < 400
+        and isinstance(body, dict)
+        and str(body.get("agent_id") or "") == BRIDGE_AGENT_ID
+    )
+
+
 def register_and_subscribe(broker: str) -> bool:
-    r = _post(f"{broker}/agents/register", {
+    status, body, raw = _post_result(f"{broker}/agents/register", {
         "agent_id": BRIDGE_AGENT_ID,
         "agent_type": "signal_bridge",
         "endpoint": "(file-based)",
@@ -105,15 +152,33 @@ def register_and_subscribe(broker: str) -> bool:
             "capabilities": ["quantum_signal_relay", "trade_signal_generation"],
         },
     })
-    ok = r and r.get("status") == "success"
+    ok = bool(status and status < 400 and body and body.get("status") == "success")
     if ok:
         logger.info(f"Registered as {BRIDGE_AGENT_ID}")
+    elif _broker_has_agent(broker, BRIDGE_AGENT_ID):
+        ok = True
+        logger.info(f"{BRIDGE_AGENT_ID} already registered with broker; continuing")
     else:
-        logger.warning(f"Registration: {r}")
+        logger.warning(f"Registration did not succeed: status={status} body={body or raw}")
 
     for ch in ["quantum", "trade_signals"]:
-        _post(f"{broker}/mesh/subscribe", {"agent_id": BRIDGE_AGENT_ID, "channel": ch})
-        logger.info(f"Subscribed to '{ch}'")
+        sub_status, sub_body, sub_raw = _post_result(
+            f"{broker}/mesh/subscribe",
+            {"agent_id": BRIDGE_AGENT_ID, "channel": ch},
+        )
+        if sub_status and sub_status < 400 and sub_body and sub_body.get("status") == "success":
+            logger.info(f"Subscribed to '{ch}'")
+            continue
+
+        if _bridge_poll_ready(broker):
+            logger.info(
+                f"Subscription to '{ch}' returned non-success but bridge polling is ready; continuing"
+            )
+            continue
+
+        logger.warning(
+            f"Subscription to '{ch}' did not succeed: status={sub_status} body={sub_body or sub_raw}"
+        )
     return ok
 
 

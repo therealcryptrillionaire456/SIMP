@@ -146,6 +146,28 @@ process_running() {
     pgrep -f "${pattern}" > /dev/null 2>&1
 }
 
+stop_matching_processes() {
+    local pattern="$1"
+    local name="$2"
+
+    if ! process_running "${pattern}"; then
+        return 0
+    fi
+
+    log "Stopping ${name}..."
+    pkill -f "${pattern}" > /dev/null 2>&1 || true
+
+    local elapsed=0
+    while process_running "${pattern}" && [ "${elapsed}" -lt 20 ]; do
+        sleep 1
+        elapsed=$((elapsed + 1))
+    done
+
+    if process_running "${pattern}"; then
+        fail "${name} did not stop cleanly"
+    fi
+}
+
 start_http_service() {
     local slug="$1"
     local name="$2"
@@ -257,6 +279,23 @@ projectx_registered() {
     fi
 }
 
+projectx_self_registered() {
+    curl -fsS "${PROJECTX_GUARD_URL}/health" 2>/dev/null \
+        | grep -q '"registered"[[:space:]]*:[[:space:]]*true'
+}
+
+start_projectx_guard() {
+    start_optional_http_service \
+        "/Users/kaseymarcelle/ProjectX/projectx_guard_server.py" \
+        "projectx" \
+        "ProjectX" \
+        "${PROJECTX_GUARD_URL}/health" \
+        "projectx_guard_server.py" \
+        45 \
+        "/Users/kaseymarcelle/ProjectX" \
+        env SIMP_API_KEY="${SIMP_API_KEY:-}" python3.10 /Users/kaseymarcelle/ProjectX/projectx_guard_server.py --register --simp-url "${SIMP_BROKER_URL}"
+}
+
 ensure_projectx_registered() {
     if ! http_ok "${PROJECTX_GUARD_URL}/health"; then
         fail "ProjectX health endpoint is unavailable; cannot verify registration"
@@ -311,6 +350,34 @@ EOF
     fi
 
     fail "ProjectX remained unregistered after reconciliation"
+}
+
+reconcile_projectx_guard() {
+    if [ ! -e "/Users/kaseymarcelle/ProjectX/projectx_guard_server.py" ]; then
+        warn "Skipping ProjectX; path not found: /Users/kaseymarcelle/ProjectX/projectx_guard_server.py"
+        return 0
+    fi
+
+    if http_ok "${PROJECTX_GUARD_URL}/health" && projectx_registered && ! projectx_self_registered; then
+        warn "ProjectX broker registration is healthy but /health reports registered=false; forcing clean restart"
+        stop_matching_processes "projectx_guard_server.py" "ProjectX"
+    fi
+
+    start_projectx_guard
+    ensure_projectx_registered
+
+    if ! projectx_self_registered; then
+        warn "ProjectX still reports registered=false after broker reconciliation; restarting once more"
+        stop_matching_processes "projectx_guard_server.py" "ProjectX"
+        start_projectx_guard
+        ensure_projectx_registered
+    fi
+
+    if projectx_self_registered; then
+        log "✓ ProjectX self-registration healthy"
+    else
+        warn "ProjectX broker registration is healthy but /health still reports registered=false"
+    fi
 }
 
 gate4_env_ready() {
@@ -569,17 +636,7 @@ if [ "${START_GATE4}" -eq 1 ]; then
 fi
 
 if [ "${START_EXTERNAL}" -eq 1 ]; then
-    start_optional_http_service \
-        "/Users/kaseymarcelle/ProjectX/projectx_guard_server.py" \
-        "projectx" \
-        "ProjectX" \
-        "${PROJECTX_GUARD_URL}/health" \
-        "projectx_guard_server.py" \
-        45 \
-        "/Users/kaseymarcelle/ProjectX" \
-        env SIMP_API_KEY="${SIMP_API_KEY:-}" python3.10 /Users/kaseymarcelle/ProjectX/projectx_guard_server.py --register --simp-url "${SIMP_BROKER_URL}"
-
-    ensure_projectx_registered
+    reconcile_projectx_guard
 
     start_optional_http_service \
         "/Users/kaseymarcelle/bullbear/agents/bullbear_simp_agent.py" \

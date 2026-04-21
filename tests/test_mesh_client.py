@@ -476,6 +476,7 @@ class TestMeshClientChannelManagement:
             "error": "Agent not found"
         })
         mock_http.post.return_value = mock_response
+        mock_http.get.side_effect = Exception("lookup failed")
         
         client = MeshClient(
             agent_id="agent_a",
@@ -485,6 +486,26 @@ class TestMeshClientChannelManagement:
         
         with pytest.raises(Exception, match="HTTP error 400"):
             client.subscribe("test_channel")
+
+    def test_subscribe_tolerates_existing_agent_after_http_400(self):
+        """Duplicate-ish subscribe failures should not abort if the broker already knows the agent."""
+        mock_http = Mock()
+        mock_http.post.return_value = MockResponse(400, {
+            "status": "error",
+            "error": "already subscribed"
+        })
+        mock_http.get.return_value = MockResponse(200, {
+            "status": "success",
+            "agent": {"agent_id": "agent_a"}
+        })
+
+        client = MeshClient(
+            agent_id="agent_a",
+            broker_url="http://test:5555",
+            http_client=mock_http
+        )
+
+        assert client.subscribe("test_channel") is True
     
     def test_unsubscribe(self):
         """Test unsubscribe method."""
