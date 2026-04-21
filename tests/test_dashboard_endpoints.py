@@ -362,6 +362,25 @@ class TestBRPEndpoints:
         assert evaluation["predictive_score_boost"] == 0.16
         assert evaluation["multimodal_detections"] == 1
 
+    def test_brp_evaluations_filters_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/evaluations?decision=ALLOW&query=quantumarb_phase4")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["count"] == 1
+        assert data["filters"]["decision"] == "ALLOW"
+        assert data["filters"]["query"] == "quantumarb_phase4"
+        assert data["evaluations"][0]["event_id"] == "evt-001"
+
+    def test_brp_evaluation_detail_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/evaluations/evt-001")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["detail"]["evaluation"]["event_id"] == "evt-001"
+        assert data["detail"]["source_record"]["source_agent"] == "quantumarb_phase4"
+        assert len(data["detail"]["related_observations"]) == 1
+
     def test_brp_adaptive_rules_endpoint(self, client, brp_sample_data):
         response = client.get("/api/brp/adaptive-rules")
         assert response.status_code == 200

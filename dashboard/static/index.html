@@ -161,6 +161,25 @@
     <section class="section" id="brp-section">
       <h2 class="section-title">BRP Operator View</h2>
       <p class="section-description">Predictive safety posture, recent BRP decisions, and adaptive rule evolution</p>
+      <div class="filter-controls">
+        <select id="brp-decision-filter" class="filter-select">
+          <option value="">All Decisions</option>
+          <option value="ALLOW">Allow</option>
+          <option value="SHADOW_ALLOW">Shadow Allow</option>
+          <option value="ELEVATE">Elevate</option>
+          <option value="DENY">Deny</option>
+          <option value="LOG_ONLY">Log Only</option>
+        </select>
+        <select id="brp-severity-filter" class="filter-select">
+          <option value="">All Severities</option>
+          <option value="critical">Critical</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+          <option value="info">Info</option>
+        </select>
+        <input type="text" id="brp-source-filter" placeholder="Filter by source agent or action..." class="filter-input">
+      </div>
       <div class="cards-grid" id="brp-overview-cards">
         <div class="card"><div class="card-label">Responses Reviewed</div><div class="card-value mono" id="val-brp-responses">--</div></div>
         <div class="card"><div class="card-label">Active Adaptive Rules</div><div class="card-value mono" id="val-brp-active-rules">--</div></div>
@@ -639,6 +658,42 @@
       <div class="intent-drawer-section">
         <div class="card-label">Operator Actions</div>
         <div id="intent-drawer-actions" class="diagnostic-list"></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="intent-drawer-backdrop" id="brp-drawer-backdrop" hidden></div>
+  <aside class="intent-drawer" id="brp-drawer" hidden>
+    <div class="intent-drawer-header">
+      <div>
+        <div class="card-label">BRP Evaluation</div>
+        <div class="mono intent-drawer-title" id="brp-drawer-title">--</div>
+      </div>
+      <button class="refresh-btn" id="brp-drawer-close" type="button">Close</button>
+    </div>
+    <div class="intent-drawer-body">
+      <div class="diagnostic-pairs" id="brp-drawer-summary"></div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Source Record</div>
+        <div class="diagnostic-pairs" id="brp-drawer-source"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Signals</div>
+        <div class="diagnostic-pairs" id="brp-drawer-signals"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Threat Tags</div>
+        <div id="brp-drawer-tags" class="brp-chip-list">
+          <div class="empty-state">No threat tags.</div>
+        </div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Related Observations</div>
+        <div id="brp-drawer-observations" class="diagnostic-list"></div>
+      </div>
+      <div class="intent-drawer-section">
+        <div class="card-label">Related Adaptive Rules</div>
+        <div id="brp-drawer-rules" class="diagnostic-list"></div>
       </div>
     </div>
   </aside>

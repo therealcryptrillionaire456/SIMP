@@ -345,15 +345,31 @@ class BRPBridge:
         cls,
         data_dir: Optional[str] = None,
         limit: int = 25,
+        decision: Optional[str] = None,
+        severity: Optional[str] = None,
+        source_agent: Optional[str] = None,
+        action: Optional[str] = None,
+        query: Optional[str] = None,
+        event_id: Optional[str] = None,
+        record_type: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Read normalized BRP evaluations for dashboard/operator views."""
         brp_dir = cls._resolve_data_dir(data_dir)
         safe_limit = max(1, min(limit, 200))
-        responses = cls._load_jsonl_tail(brp_dir / "responses.jsonl", limit=safe_limit)
-        events = cls._load_jsonl_tail(brp_dir / "events.jsonl", limit=max(safe_limit * 4, 200))
-        plans = cls._load_jsonl_tail(brp_dir / "plans.jsonl", limit=max(safe_limit * 4, 200))
+        search_limit = max(safe_limit * 8, 400)
+        responses = cls._load_jsonl_tail(brp_dir / "responses.jsonl", limit=search_limit)
+        events = cls._load_jsonl_tail(brp_dir / "events.jsonl", limit=max(search_limit * 2, 400))
+        plans = cls._load_jsonl_tail(brp_dir / "plans.jsonl", limit=max(search_limit * 2, 400))
         event_index = {str(record.get("event_id")): record for record in events}
         plan_index = {str(record.get("plan_id")): record for record in plans}
+
+        decision_filter = str(decision or "").strip().upper()
+        severity_filter = str(severity or "").strip().lower()
+        source_filter = str(source_agent or "").strip().lower()
+        action_filter = str(action or "").strip().lower()
+        query_filter = str(query or "").strip().lower()
+        event_id_filter = str(event_id or "").strip()
+        record_type_filter = str(record_type or "").strip().lower()
 
         evaluations: List[Dict[str, Any]] = []
         for response in responses:
@@ -410,8 +426,85 @@ class BRPBridge:
                 }
             )
 
-        evaluations.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
-        return evaluations[:safe_limit]
+        filtered = []
+        for item in evaluations:
+            if decision_filter and str(item.get("decision") or "").upper() != decision_filter:
+                continue
+            if severity_filter and str(item.get("severity") or "").lower() != severity_filter:
+                continue
+            if source_filter and source_filter not in str(item.get("source_agent") or "").lower():
+                continue
+            if action_filter and action_filter not in str(item.get("action") or item.get("event_type") or "").lower():
+                continue
+            if query_filter:
+                haystack = " ".join(
+                    [
+                        str(item.get("source_agent") or ""),
+                        str(item.get("action") or ""),
+                        str(item.get("event_type") or ""),
+                        " ".join(str(tag) for tag in (item.get("threat_tags") or [])),
+                    ]
+                ).lower()
+                if query_filter not in haystack:
+                    continue
+            if event_id_filter and str(item.get("event_id") or "") != event_id_filter:
+                continue
+            if record_type_filter and str(item.get("record_type") or "").lower() != record_type_filter:
+                continue
+            filtered.append(item)
+
+        filtered.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
+        return filtered[:safe_limit]
+
+    @classmethod
+    def read_operator_evaluation_detail(
+        cls,
+        event_id: str,
+        data_dir: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Return a single operator-facing BRP evaluation detail bundle."""
+        lookup_event_id = str(event_id or "").strip()
+        if not lookup_event_id:
+            return None
+
+        brp_dir = cls._resolve_data_dir(data_dir)
+        evaluations = cls.read_operator_evaluations(
+            data_dir=str(brp_dir),
+            limit=1,
+            event_id=lookup_event_id,
+        )
+        if not evaluations:
+            return None
+
+        evaluation = evaluations[0]
+        events = cls._load_jsonl_tail(brp_dir / "events.jsonl", limit=800)
+        plans = cls._load_jsonl_tail(brp_dir / "plans.jsonl", limit=800)
+        observations = cls._load_jsonl_tail(brp_dir / "observations.jsonl", limit=800)
+        adaptive_rules = cls.read_operator_adaptive_rules(data_dir=str(brp_dir), limit=200)
+
+        event_record = next((record for record in reversed(events) if str(record.get("event_id") or "") == lookup_event_id), None)
+        plan_record = next((record for record in reversed(plans) if str(record.get("plan_id") or "") == lookup_event_id), None)
+        related_observations = [
+            record for record in observations
+            if str(record.get("event_id") or "") == lookup_event_id
+        ][-20:]
+
+        action_name = str(evaluation.get("action") or "").strip().lower()
+        related_rules = []
+        for rule in adaptive_rules:
+            key = str(rule.get("key") or "").lower()
+            if action_name and f"action:{action_name}" in key:
+                related_rules.append(rule)
+                continue
+            if any(str(tag).lower() in key for tag in evaluation.get("threat_tags", []) or []):
+                related_rules.append(rule)
+
+        return {
+            "evaluation": evaluation,
+            "source_record": event_record or plan_record,
+            "related_observations": related_observations,
+            "related_rules": related_rules[:20],
+        }
 
     @classmethod
     def read_operator_adaptive_rules(

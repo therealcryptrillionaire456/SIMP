@@ -255,6 +255,57 @@ def _brp_evaluations_payload(limit: int = 25) -> dict[str, Any]:
     }
 
 
+def _brp_filtered_evaluations_payload(
+    *,
+    limit: int = 25,
+    decision: str = "",
+    severity: str = "",
+    source_agent: str = "",
+    action: str = "",
+    query: str = "",
+    record_type: str = "",
+) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 200))
+    evaluations = BRPBridge.read_operator_evaluations(
+        data_dir=str(_brp_data_dir()),
+        limit=safe_limit,
+        decision=decision,
+        severity=severity,
+        source_agent=source_agent,
+        action=action,
+        query=query,
+        record_type=record_type,
+    )
+    return {
+        "status": "success",
+        "count": len(evaluations),
+        "limit": safe_limit,
+        "filters": {
+            "decision": decision.strip() or None,
+            "severity": severity.strip() or None,
+            "source_agent": source_agent.strip() or None,
+            "action": action.strip() or None,
+            "query": query.strip() or None,
+            "record_type": record_type.strip() or None,
+        },
+        "evaluations": evaluations,
+    }
+
+
+def _brp_evaluation_detail_payload(event_id: str) -> dict[str, Any]:
+    detail = BRPBridge.read_operator_evaluation_detail(event_id=event_id, data_dir=str(_brp_data_dir()))
+    if detail is None:
+        return {
+            "status": "not_found",
+            "event_id": event_id,
+        }
+    return {
+        "status": "success",
+        "event_id": event_id,
+        "detail": detail,
+    }
+
+
 def _brp_adaptive_rules_payload(limit: int = 50) -> dict[str, Any]:
     safe_limit = max(1, min(limit, 500))
     rules = BRPBridge.read_operator_adaptive_rules(data_dir=str(_brp_data_dir()), limit=safe_limit)
@@ -1552,9 +1603,33 @@ async def api_brp_status():
 
 
 @app.get("/api/brp/evaluations")
-async def api_brp_evaluations(limit: int = 25):
+async def api_brp_evaluations(
+    limit: int = 25,
+    decision: str = "",
+    severity: str = "",
+    source_agent: str = "",
+    action: str = "",
+    query: str = "",
+    record_type: str = "",
+):
     """Recent BRP evaluation decisions with normalized metadata."""
-    return _redact(_brp_evaluations_payload(limit=limit))
+    return _redact(
+        _brp_filtered_evaluations_payload(
+            limit=limit,
+            decision=decision,
+            severity=severity,
+            source_agent=source_agent,
+            action=action,
+            query=query,
+            record_type=record_type,
+        )
+    )
+
+
+@app.get("/api/brp/evaluations/{event_id}")
+async def api_brp_evaluation_detail(event_id: str):
+    """Single BRP evaluation detail bundle for drawer/drill-down views."""
+    return _redact(_brp_evaluation_detail_payload(event_id=event_id))
 
 
 @app.get("/api/brp/adaptive-rules")

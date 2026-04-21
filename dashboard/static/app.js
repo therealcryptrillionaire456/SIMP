@@ -122,6 +122,19 @@
     brpSignalSummary: $("#brp-signal-summary"),
     brpEvaluationsTbody: $("#brp-evaluations-tbody"),
     brpRulesTbody: $("#brp-rules-tbody"),
+    brpDecisionFilter: $("#brp-decision-filter"),
+    brpSeverityFilter: $("#brp-severity-filter"),
+    brpSourceFilter: $("#brp-source-filter"),
+    brpDrawer: $("#brp-drawer"),
+    brpDrawerBackdrop: $("#brp-drawer-backdrop"),
+    brpDrawerTitle: $("#brp-drawer-title"),
+    brpDrawerSummary: $("#brp-drawer-summary"),
+    brpDrawerSource: $("#brp-drawer-source"),
+    brpDrawerSignals: $("#brp-drawer-signals"),
+    brpDrawerTags: $("#brp-drawer-tags"),
+    brpDrawerObservations: $("#brp-drawer-observations"),
+    brpDrawerRules: $("#brp-drawer-rules"),
+    brpDrawerClose: $("#brp-drawer-close"),
     projectxChatFeed: $("#projectx-chat-feed"),
     projectxChatForm: $("#projectx-chat-form"),
     projectxChatInput: $("#projectx-chat-input"),
@@ -190,6 +203,7 @@
   const UNREACHABLE_THRESHOLD = 3;
   let failedIntentData = { intents: [], summary: {} };
   let failedIntentFilter = { type: "all", value: null };
+  let brpFilterTimer = null;
 
   // -----------------------------------------------------------------------
   // Fetch helpers
@@ -217,6 +231,17 @@
     } catch {
       return null;
     }
+  }
+
+  function buildBrpEvaluationQuery() {
+    var params = new URLSearchParams();
+    params.set("limit", "12");
+    if (dom.brpDecisionFilter && dom.brpDecisionFilter.value) params.set("decision", dom.brpDecisionFilter.value);
+    if (dom.brpSeverityFilter && dom.brpSeverityFilter.value) params.set("severity", dom.brpSeverityFilter.value);
+    if (dom.brpSourceFilter && dom.brpSourceFilter.value.trim()) {
+      params.set("query", dom.brpSourceFilter.value.trim());
+    }
+    return params.toString();
   }
 
   // -----------------------------------------------------------------------
@@ -1436,7 +1461,7 @@
       if ((row.multimodal_score_boost || 0) > 0) signalLines.push("multimodal +" + Number(row.multimodal_score_boost).toFixed(2));
       if ((row.multimodal_detections || 0) > 0) signalLines.push(String(row.multimodal_detections) + " detections");
       return "<tr>"
-        + td(mono(escHtml(formatDate(row.timestamp))))
+        + td('<button type="button" class="intent-row-button mono brp-row-button" data-brp-event-id="' + escHtml(row.event_id || "") + '">' + escHtml(formatDate(row.timestamp)) + "</button>")
         + td(escHtml(source))
         + td('<div>' + escHtml(row.action || row.event_type || "--") + '</div><div class="brp-inline-tags">' + ((row.threat_tags || []).slice(0, 3).map(capPill).join("") || "") + '</div>')
         + td(brpDecisionBadge(row.decision))
@@ -1445,6 +1470,11 @@
         + td('<div class="brp-signal-stack">' + (signalLines.length ? signalLines.map(function(line) { return '<div class="brp-signal-line">' + escHtml(line) + '</div>'; }).join("") : '<div class="brp-signal-line">no extra signals</div>') + '</div>')
         + "</tr>";
     }).join("");
+    dom.brpEvaluationsTbody.querySelectorAll("[data-brp-event-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openBrpDrawer(button.getAttribute("data-brp-event-id"));
+      });
+    });
   }
 
   function renderBrpAdaptiveRules(data) {
@@ -1464,6 +1494,81 @@
         + td(mono(escHtml(formatDate(rule.last_seen))))
         + "</tr>";
     }).join("");
+  }
+
+  async function openBrpDrawer(eventId) {
+    if (!eventId) return;
+    var payload = await apiFetch("/api/brp/evaluations/" + encodeURIComponent(eventId));
+    var detail = payload && payload.detail;
+    if (!detail || !detail.evaluation) {
+      if (dom.brpDrawerTitle) dom.brpDrawerTitle.textContent = eventId;
+      renderDiagnosticPairs(dom.brpDrawerSummary, [{ label: "Status", value: "not found" }]);
+      renderDiagnosticPairs(dom.brpDrawerSource, []);
+      renderDiagnosticPairs(dom.brpDrawerSignals, []);
+      if (dom.brpDrawerTags) dom.brpDrawerTags.innerHTML = '<div class="empty-state">No threat tags.</div>';
+      renderDiagnosticList(dom.brpDrawerObservations, [], function() { return ""; });
+      renderDiagnosticList(dom.brpDrawerRules, [], function() { return ""; });
+    } else {
+      var evaluation = detail.evaluation || {};
+      var sourceRecord = detail.source_record || {};
+      var predictive = (evaluation.metadata || {}).predictive_assessment || {};
+      var multimodal = (evaluation.metadata || {}).multimodal_assessment || {};
+      var predictiveSteps = (evaluation.metadata || {}).predictive_steps || [];
+      var multimodalSteps = (evaluation.metadata || {}).multimodal_steps || [];
+      if (dom.brpDrawerTitle) dom.brpDrawerTitle.textContent = evaluation.event_id || eventId;
+      renderDiagnosticPairs(dom.brpDrawerSummary, [
+        { label: "Decision", value: evaluation.decision || "--" },
+        { label: "Severity", value: evaluation.severity || "--" },
+        { label: "Threat", value: evaluation.threat_score != null ? Number(evaluation.threat_score).toFixed(2) : "--" },
+        { label: "Confidence", value: evaluation.confidence != null ? Number(evaluation.confidence).toFixed(2) : "--" },
+        { label: "Mode", value: evaluation.mode || "--" },
+        { label: "Timestamp", value: formatDate(evaluation.timestamp) },
+      ]);
+      renderDiagnosticPairs(dom.brpDrawerSource, [
+        { label: "Source Agent", value: sourceRecord.source_agent || evaluation.source_agent || "--" },
+        { label: "Event Type", value: sourceRecord.event_type || evaluation.event_type || "--" },
+        { label: "Action", value: sourceRecord.action || evaluation.action || "--" },
+        { label: "Step Count", value: sourceRecord.steps ? String(sourceRecord.steps.length) : (evaluation.step_count != null ? String(evaluation.step_count) : "--") },
+      ]);
+      renderDiagnosticPairs(dom.brpDrawerSignals, [
+        { label: "Predictive Boost", value: evaluation.predictive_score_boost != null ? Number(evaluation.predictive_score_boost).toFixed(2) : "--" },
+        { label: "Multimodal Boost", value: evaluation.multimodal_score_boost != null ? Number(evaluation.multimodal_score_boost).toFixed(2) : "--" },
+        { label: "Multimodal Detections", value: evaluation.multimodal_detections != null ? String(evaluation.multimodal_detections) : "--" },
+        { label: "Predictive Domains", value: (predictive.domains || []).join(", ") || (predictiveSteps.length ? "step-derived" : "--") },
+        { label: "Predictive Matches", value: predictive.adaptive_rule_matches ? String(predictive.adaptive_rule_matches.length) : (predictiveSteps.length ? String(predictiveSteps.length) : "--") },
+        { label: "Multimodal Channels", value: ((multimodal.summary || {}).detection_breakdown ? Object.keys(multimodal.summary.detection_breakdown).filter(function(key) { return multimodal.summary.detection_breakdown[key]; }).join(", ") : (multimodalSteps.length ? "step-derived" : "--")) || "--" },
+      ]);
+      if (dom.brpDrawerTags) {
+        var tags = evaluation.threat_tags || [];
+        dom.brpDrawerTags.innerHTML = tags.length ? tags.map(function(tag) {
+          return '<div class="brp-chip"><span>' + escHtml(tag) + '</span></div>';
+        }).join("") : '<div class="empty-state">No threat tags.</div>';
+      }
+      renderDiagnosticList(dom.brpDrawerObservations, detail.related_observations || [], function(obs) {
+        return '<div class="diagnostic-row">'
+          + '<span class="mono">' + escHtml(formatDate(obs.timestamp)) + '</span>'
+          + '<span>' + escHtml(obs.outcome || "--") + '</span>'
+          + '<span class="mono">' + escHtml(obs.action || "--") + '</span>'
+          + '<span>' + escHtml(((obs.result_data || {}).error_message) || (((obs.result_data || {}).success) === true ? "success" : "--")) + '</span>'
+          + '</div>';
+      });
+      renderDiagnosticList(dom.brpDrawerRules, detail.related_rules || [], function(rule) {
+        return '<div class="diagnostic-row">'
+          + '<span class="mono">' + escHtml(rule.key || "--") + '</span>'
+          + '<span>' + escHtml(rule.severity || "--") + '</span>'
+          + '<span class="mono">' + escHtml(rule.boost != null ? Number(rule.boost).toFixed(2) : "--") + '</span>'
+          + '<span>' + escHtml(rule.active ? "active" : "inactive") + '</span>'
+          + '</div>';
+      });
+    }
+
+    if (dom.brpDrawerBackdrop) dom.brpDrawerBackdrop.hidden = false;
+    if (dom.brpDrawer) dom.brpDrawer.hidden = false;
+  }
+
+  function closeBrpDrawer() {
+    if (dom.brpDrawerBackdrop) dom.brpDrawerBackdrop.hidden = true;
+    if (dom.brpDrawer) dom.brpDrawer.hidden = true;
   }
 
   function renderAgentObservability(activityData, agentsData, capabilitiesData, failedIntentsData, smokeData) {
@@ -1920,6 +2025,7 @@
     setLoading('overview-section', true);
 
     // Fetch all endpoints in parallel
+    var brpQuery = buildBrpEvaluationQuery();
     const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, brpStatus, brpEvaluations, brpRules, brpInsights] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
@@ -1943,7 +2049,7 @@
       apiFetch("/api/projectx/actions"),
       apiFetch("/api/projectx/protocol-facts"),
       apiFetch("/api/brp/status"),
-      apiFetch("/api/brp/evaluations?limit=12"),
+      apiFetch("/api/brp/evaluations?" + brpQuery),
       apiFetch("/api/brp/adaptive-rules?limit=12"),
       apiFetch("/api/brp/insights?limit=12"),
     ]);
@@ -2210,6 +2316,12 @@
   if (dom.intentDrawerBackdrop) {
     dom.intentDrawerBackdrop.addEventListener("click", closeIntentDrawer);
   }
+  if (dom.brpDrawerClose) {
+    dom.brpDrawerClose.addEventListener("click", closeBrpDrawer);
+  }
+  if (dom.brpDrawerBackdrop) {
+    dom.brpDrawerBackdrop.addEventListener("click", closeBrpDrawer);
+  }
 
   if (dom.projectxChatForm) {
     dom.projectxChatForm.addEventListener("submit", function(event) {
@@ -2239,6 +2351,19 @@
   if (taskStatusFilterEl) {
     taskStatusFilterEl.addEventListener('change', function() {
       if (_lastTasksData) renderTasksWithFilter(_lastTasksData);
+    });
+  }
+
+  [dom.brpDecisionFilter, dom.brpSeverityFilter].forEach(function(el) {
+    if (!el) return;
+    el.addEventListener("change", function() {
+      refreshAll();
+    });
+  });
+  if (dom.brpSourceFilter) {
+    dom.brpSourceFilter.addEventListener("input", function() {
+      if (brpFilterTimer) clearTimeout(brpFilterTimer);
+      brpFilterTimer = setTimeout(refreshAll, 250);
     });
   }
 

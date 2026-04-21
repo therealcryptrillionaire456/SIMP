@@ -375,3 +375,37 @@ class TestOperatorReadHelpers:
         assert evaluations[0]["record_type"] in {"event", "plan"}
         assert any(item["event_id"] == event.event_id for item in evaluations)
         assert isinstance(rules, list)
+
+    def test_operator_evaluation_filters_and_detail(self, bridge, tmp_data_dir):
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="run_shell",
+            context={"projectx_action": "run_shell", "details": "autonomous fuzz bypass"},
+            tags=["projectx", "network"],
+        )
+        response = bridge.evaluate_event(event)
+        bridge.ingest_observation(
+            BRPObservation(
+                source_agent="projectx_native",
+                action="run_shell",
+                event_id=event.event_id,
+                outcome="failure",
+            )
+        )
+
+        filtered = BRPBridge.read_operator_evaluations(
+            data_dir=tmp_data_dir,
+            limit=10,
+            decision=response.decision,
+            query="projectx_native",
+        )
+        detail = BRPBridge.read_operator_evaluation_detail(
+            event_id=event.event_id,
+            data_dir=tmp_data_dir,
+        )
+
+        assert len(filtered) == 1
+        assert filtered[0]["event_id"] == event.event_id
+        assert detail is not None
+        assert detail["evaluation"]["event_id"] == event.event_id
+        assert len(detail["related_observations"]) == 1
