@@ -546,6 +546,12 @@ show_summary() {
             fi
         done
     fi
+
+    log "  Snapshot:  ${PYTHON_BIN} scripts/runtime_snapshot.py --format markdown"
+    if [ "${HOT_MODE}" -eq 1 ]; then
+        log "  Verify:    ${PYTHON_BIN} scripts/verify_revenue_path.py"
+        log "  Inject:    ${PYTHON_BIN} scripts/inject_quantum_signal.py --asset BTC-USD --side sell --usd 1.00"
+    fi
 }
 
 log "Starting canonical SIMP bring-up"

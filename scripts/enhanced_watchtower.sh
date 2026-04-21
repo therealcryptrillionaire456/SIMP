@@ -19,6 +19,7 @@ DASHBOARD_URL="http://127.0.0.1:8050"
 PROJECTX_URL="http://127.0.0.1:8771"
 TEST_AGENT_URL="http://127.0.0.1:8888"
 TIMEOUT=5
+TRADE_LOG="logs/gate4_trades.jsonl"
 
 # Check if jq is available
 if command -v jq &> /dev/null; then
@@ -282,9 +283,15 @@ if [ "$projectx_health" = "UNREACHABLE" ]; then
 else
     if $USE_JQ; then
         status=$(echo "$projectx_health" | jq -r '.status // "unknown"' 2>/dev/null || echo "INVALID_JSON")
+        registered=$(echo "$projectx_health" | jq -r '.registered // "unknown"' 2>/dev/null || echo "unknown")
         
         if [ "$status" = "healthy" ] || [ "$status" = "ok" ]; then
-            print_status "OK" "ProjectX healthy"
+            if [ "$registered" = "true" ]; then
+                print_status "OK" "ProjectX healthy and broker-registered"
+            else
+                print_status "WARN" "ProjectX healthy but registered=$registered"
+                ISSUES+=("ProjectX registered flag: $registered")
+            fi
         else
             print_status "WARN" "ProjectX status: $status"
             ISSUES+=("ProjectX status: $status")
@@ -294,12 +301,45 @@ else
     fi
 fi
 
-# 5. PROCESS CHECK
-print_header "5. PROCESS CHECK"
+# 5. GATE4 / REVENUE PATH CHECK
+print_header "5. GATE4 / REVENUE PATH"
+
+gate4_processes=$(ps aux | grep -v grep | grep -c "gate4_inbox_consumer.py" || true)
+if [ "$gate4_processes" -eq 0 ]; then
+    print_status "WARN" "Gate4 consumer process not running"
+    ISSUES+=("Gate4 consumer process not running")
+else
+    print_status "OK" "Gate4 consumer process running ($gate4_processes found)"
+fi
+
+if [ -f "$TRADE_LOG" ]; then
+    latest_trade=$(tail -n 1 "$TRADE_LOG")
+    if $USE_JQ; then
+        trade_result=$(printf '%s' "$latest_trade" | jq -r '.result // "unknown"' 2>/dev/null || echo "INVALID_JSON")
+        trade_symbol=$(printf '%s' "$latest_trade" | jq -r '.symbol // "unknown"' 2>/dev/null || echo "unknown")
+        trade_side=$(printf '%s' "$latest_trade" | jq -r '.side // "unknown"' 2>/dev/null || echo "unknown")
+        order_id=$(printf '%s' "$latest_trade" | jq -r '.response.success_response.order_id // "n/a"' 2>/dev/null || echo "n/a")
+        if [ "$trade_result" = "ok" ]; then
+            print_status "OK" "Latest Gate4 trade: $trade_symbol $trade_side (order $order_id)"
+        else
+            print_status "WARN" "Latest Gate4 trade result: $trade_result ($trade_symbol $trade_side)"
+            ISSUES+=("Latest Gate4 trade result: $trade_result")
+        fi
+    else
+        print_status "OK" "Gate4 trade log present"
+    fi
+else
+    print_status "WARN" "Gate4 trade log not found at $TRADE_LOG"
+    ISSUES+=("Gate4 trade log missing")
+fi
+
+# 6. PROCESS CHECK
+print_header "6. PROCESS CHECK"
 
 broker_processes=$(ps aux | grep -v grep | grep -c "python.*broker" || true)
 dashboard_processes=$(ps aux | grep -v grep | grep -c "python.*dashboard" || true)
 test_agent_processes=$(ps aux | grep -v grep | grep -c "test_agent.py.*8888" || true)
+projectx_supervisor_processes=$(ps aux | grep -v grep | grep -c "projectx_supervisor.sh" || true)
 
 if [ "$broker_processes" -eq 0 ]; then
     print_status "ERROR" "Broker process not running"
@@ -317,6 +357,13 @@ else
     print_status "OK" "Dashboard process running ($dashboard_processes found)"
 fi
 
+if [ "$projectx_supervisor_processes" -eq 0 ]; then
+    print_status "WARN" "ProjectX supervisor process not running"
+    ISSUES+=("ProjectX supervisor process not running")
+else
+    print_status "OK" "ProjectX supervisor process running ($projectx_supervisor_processes found)"
+fi
+
 if [ "$test_agent_processes" -eq 0 ]; then
     print_status "WARN" "Test agent process not running"
     ISSUES+=("Test agent process not running")
@@ -324,8 +371,8 @@ else
     print_status "OK" "Test agent process running ($test_agent_processes found)"
 fi
 
-# 6. PORT CHECK
-print_header "6. PORT AVAILABILITY"
+# 7. PORT CHECK
+print_header "7. PORT AVAILABILITY"
 
 check_port() {
     local port=$1
@@ -360,6 +407,7 @@ echo "  ✓ Broker health, stats, and agents"
 echo "  ✓ Dashboard health and API endpoints"
 echo "  ✓ Test agent status"
 echo "  ✓ ProjectX (if running)"
+echo "  ✓ Gate4 live revenue path"
 echo "  ✓ Process status"
 echo "  ✓ Port availability"
 
