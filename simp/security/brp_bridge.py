@@ -90,6 +90,7 @@ class BRPBridge:
         self.plans_log = self.data_dir / "plans.jsonl"
         self.observations_log = self.data_dir / "observations.jsonl"
         self.responses_log = self.data_dir / "responses.jsonl"
+        self.remediations_log = self.data_dir / "remediations.jsonl"
         self.adaptive_rules_file = self.data_dir / "adaptive_rules.json"
 
         self._predictive = PredictiveSafetyIntelligence()
@@ -280,6 +281,7 @@ class BRPBridge:
         brp_dir = cls._resolve_data_dir(data_dir)
         recent_evaluations = cls.read_operator_evaluations(data_dir=str(brp_dir), limit=recent_limit)
         recent_observations = cls._load_jsonl_tail(brp_dir / "observations.jsonl", limit=recent_limit)
+        recent_remediations = cls.read_operator_remediations(data_dir=str(brp_dir), limit=recent_limit)
         adaptive_rules = cls.read_operator_adaptive_rules(data_dir=str(brp_dir), limit=500)
 
         decision_counts: Dict[str, int] = {}
@@ -303,6 +305,7 @@ class BRPBridge:
         active_rules = [rule for rule in adaptive_rules if rule.get("active", True)]
         latest_evaluation = recent_evaluations[0].get("timestamp") if recent_evaluations else None
         latest_observation = recent_observations[-1].get("timestamp") if recent_observations else None
+        latest_remediation = recent_remediations[0].get("timestamp") if recent_remediations else None
         average_threat = round(total_threat / len(recent_evaluations), 4) if recent_evaluations else 0.0
 
         return {
@@ -313,6 +316,7 @@ class BRPBridge:
                     cls._count_jsonl(brp_dir / "plans.jsonl"),
                     cls._count_jsonl(brp_dir / "responses.jsonl"),
                     cls._count_jsonl(brp_dir / "observations.jsonl"),
+                    cls._count_jsonl(brp_dir / "remediations.jsonl"),
                     len(adaptive_rules),
                 )
             ),
@@ -322,6 +326,7 @@ class BRPBridge:
                 "plans": cls._count_jsonl(brp_dir / "plans.jsonl"),
                 "responses": cls._count_jsonl(brp_dir / "responses.jsonl"),
                 "observations": cls._count_jsonl(brp_dir / "observations.jsonl"),
+                "remediations": cls._count_jsonl(brp_dir / "remediations.jsonl"),
             },
             "recent": {
                 "window_size": recent_limit,
@@ -331,6 +336,7 @@ class BRPBridge:
                 "active_adaptive_rules": len(active_rules),
                 "last_evaluation_at": latest_evaluation,
                 "last_observation_at": latest_observation,
+                "last_remediation_at": latest_remediation,
                 "max_threat_score": max((float(item.get("threat_score") or 0.0) for item in recent_evaluations), default=0.0),
                 "average_threat_score": average_threat,
                 "top_threat_tags": [
@@ -507,7 +513,21 @@ class BRPBridge:
             ),
             None,
         )
-        related_playbook = cls._build_operator_playbook(related_alert) if related_alert else None
+        related_playbook = None
+        if related_alert:
+            related_playbook = next(
+                (
+                    playbook
+                    for playbook in cls.read_operator_playbooks(data_dir=str(brp_dir), limit=200)
+                    if str(playbook.get("alert_id") or "") == str(related_alert.get("alert_id") or "")
+                ),
+                None,
+            )
+        related_remediations = cls.read_operator_remediations(
+            data_dir=str(brp_dir),
+            limit=20,
+            event_id=lookup_event_id,
+        )
 
         return {
             "evaluation": evaluation,
@@ -516,6 +536,7 @@ class BRPBridge:
             "related_rules": related_rules[:20],
             "alert": related_alert,
             "playbook": related_playbook,
+            "remediations": related_remediations,
         }
 
     @classmethod
@@ -673,16 +694,14 @@ class BRPBridge:
         if alert is None:
             return None
 
-        state = cls._load_operator_alert_state(brp_dir)
-        state[lookup_alert_id] = {
-            "acknowledged": True,
-            "state": "acknowledged",
-            "acknowledged_at": datetime.utcnow().isoformat(),
-            "acknowledged_by": str(actor or "dashboard_ui"),
-            "ack_note": str(note or "").strip() or None,
-            "updated_at": datetime.utcnow().isoformat(),
-        }
-        cls._save_operator_alert_state(brp_dir, state)
+        cls._set_operator_alert_state(
+            brp_dir,
+            lookup_alert_id,
+            state="acknowledged",
+            actor=actor,
+            note=note,
+            acknowledged=True,
+        )
         return next(
             (
                 item
@@ -701,8 +720,102 @@ class BRPBridge:
         """Return derived remediation playbooks for current BRP alerts."""
         brp_dir = cls._resolve_data_dir(data_dir)
         alerts = cls.read_operator_alerts(data_dir=str(brp_dir), limit=max(limit * 3, 25))
-        playbooks = [cls._build_operator_playbook(alert) for alert in alerts]
+        remediations = cls.read_operator_remediations(data_dir=str(brp_dir), limit=200)
+        latest_by_alert = {}
+        for remediation in remediations:
+            alert_id = str(remediation.get("alert_id") or "")
+            if alert_id and alert_id not in latest_by_alert:
+                latest_by_alert[alert_id] = remediation
+
+        playbooks = []
+        for alert in alerts:
+            playbook = cls._build_operator_playbook(alert)
+            playbook["last_remediation"] = latest_by_alert.get(str(alert.get("alert_id") or ""))
+            playbooks.append(playbook)
         return playbooks[: max(1, min(limit, 50))]
+
+    @classmethod
+    def read_operator_remediations(
+        cls,
+        data_dir: Optional[str] = None,
+        limit: int = 25,
+        *,
+        alert_id: Optional[str] = None,
+        event_id: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Read persisted BRP remediation actions in reverse chronological order."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        remediations = cls._load_jsonl_tail(brp_dir / "remediations.jsonl", limit=max(limit * 8, 100))
+        alert_filter = str(alert_id or "").strip()
+        event_filter = str(event_id or "").strip()
+        status_filter = str(status or "").strip().lower()
+
+        filtered: List[Dict[str, Any]] = []
+        for remediation in remediations:
+            if alert_filter and str(remediation.get("alert_id") or "") != alert_filter:
+                continue
+            if event_filter and str(remediation.get("event_id") or "") != event_filter:
+                continue
+            if status_filter and str(remediation.get("status") or "").lower() != status_filter:
+                continue
+            filtered.append(remediation)
+
+        filtered.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
+        return filtered[: max(1, min(limit, 100))]
+
+    @classmethod
+    def record_operator_remediation(
+        cls,
+        *,
+        alert_id: str,
+        playbook_id: str,
+        actor: str,
+        job: str,
+        result: Dict[str, Any],
+        data_dir: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Persist an operator remediation execution and advance alert state."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        alerts = cls.read_operator_alerts(data_dir=str(brp_dir), limit=200)
+        playbooks = cls.read_operator_playbooks(data_dir=str(brp_dir), limit=200)
+        alert = next((item for item in alerts if str(item.get("alert_id") or "") == str(alert_id or "").strip()), None)
+        playbook = next((item for item in playbooks if str(item.get("playbook_id") or "") == str(playbook_id or "").strip()), None)
+        if alert is None or playbook is None:
+            return None
+
+        status_value = str(result.get("status") or "unknown").lower()
+        remediation_status = "completed" if status_value == "success" else "failed" if status_value == "error" else "unreachable"
+        response = result.get("response") if isinstance(result.get("response"), dict) else {}
+        record = {
+            "remediation_id": f"remediation::{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}",
+            "timestamp": datetime.utcnow().isoformat(),
+            "alert_id": alert["alert_id"],
+            "event_id": alert.get("event_id"),
+            "playbook_id": playbook["playbook_id"],
+            "actor": str(actor or "dashboard_ui"),
+            "job": job,
+            "status": remediation_status,
+            "routing_mode": result.get("routing_mode"),
+            "broker_intent_id": result.get("broker_intent_id"),
+            "delivery_status": result.get("delivery_status"),
+            "response_status": response.get("status") if isinstance(response, dict) else None,
+            "response": result.get("response"),
+            "summary": playbook.get("summary") or alert.get("summary"),
+        }
+        _append_jsonl(brp_dir / "remediations.jsonl", record)
+
+        next_state = "remediated" if remediation_status == "completed" else "acknowledged"
+        note = f"Remediation {remediation_status} via {job}"
+        cls._set_operator_alert_state(
+            brp_dir,
+            alert["alert_id"],
+            state=next_state,
+            actor=actor,
+            note=note,
+            acknowledged=True,
+        )
+        return record
 
     @classmethod
     def read_operator_report(
@@ -720,6 +833,7 @@ class BRPBridge:
             "alerts": cls.read_operator_alerts(data_dir=str(brp_dir), limit=limit),
             "incidents": cls.read_operator_incidents(data_dir=str(brp_dir), limit=limit),
             "playbooks": cls.read_operator_playbooks(data_dir=str(brp_dir), limit=min(limit, 10)),
+            "remediations": cls.read_operator_remediations(data_dir=str(brp_dir), limit=min(limit, 25)),
             "evaluations": cls.read_operator_evaluations(data_dir=str(brp_dir), limit=limit),
             "adaptive_rules": cls.read_operator_adaptive_rules(data_dir=str(brp_dir), limit=limit),
         }
@@ -983,6 +1097,31 @@ class BRPBridge:
             json.dump(state, handle, indent=2, sort_keys=True)
 
     @classmethod
+    def _set_operator_alert_state(
+        cls,
+        brp_dir: Path,
+        alert_id: str,
+        *,
+        state: str,
+        actor: str,
+        note: Optional[str],
+        acknowledged: bool,
+    ) -> None:
+        stored = cls._load_operator_alert_state(brp_dir)
+        current = stored.get(alert_id, {})
+        timestamp = datetime.utcnow().isoformat()
+        stored[alert_id] = {
+            **current,
+            "acknowledged": bool(acknowledged),
+            "state": state,
+            "acknowledged_at": current.get("acknowledged_at") or timestamp if acknowledged else current.get("acknowledged_at"),
+            "acknowledged_by": str(actor or "dashboard_ui") if acknowledged else current.get("acknowledged_by"),
+            "ack_note": str(note or "").strip() or current.get("ack_note"),
+            "updated_at": timestamp,
+        }
+        cls._save_operator_alert_state(brp_dir, stored)
+
+    @classmethod
     def _build_operator_playbook(cls, alert: Dict[str, Any]) -> Dict[str, Any]:
         actions: List[str] = [
             "Inspect the BRP evidence drawer and correlated observations.",
@@ -1016,13 +1155,25 @@ class BRPBridge:
             title = "Policy drift / safety hygiene review"
             category = "hygiene"
 
+        automation_job = "native_agent_task_audit"
+        automation_reason = "Audit current task and routing state before retrying the flow."
+        if severity == "critical" or decision == "DENY" or "restricted_action" in threat_tags:
+            automation_job = "native_agent_security_audit"
+            automation_reason = "Run the security audit path before allowing any retry or override."
+        elif "multimodal_code_risk" in threat_tags or "multimodal_network_risk" in threat_tags:
+            automation_job = "native_agent_repo_scan"
+            automation_reason = "Run a bounded repo scan to inspect code or network-related drift."
+        elif "predictive_pattern" in threat_tags or "predictive_sequence" in threat_tags:
+            automation_job = "native_agent_task_audit"
+            automation_reason = "Inspect recent task and event history for repeated unsafe patterns."
+
         deduped_actions = cls._dedupe_str_list(actions)
         return {
             "playbook_id": f"playbook::{alert.get('alert_id')}",
             "alert_id": alert.get("alert_id"),
             "event_id": alert.get("event_id"),
             "priority": severity,
-            "status": "acknowledged" if alert.get("acknowledged") else "open",
+            "status": alert.get("state") or ("acknowledged" if alert.get("acknowledged") else "open"),
             "title": title,
             "category": category,
             "summary": alert.get("summary"),
@@ -1034,6 +1185,11 @@ class BRPBridge:
             "decision": alert.get("decision"),
             "severity": severity,
             "timestamp": alert.get("timestamp"),
+            "automation": {
+                "job": automation_job,
+                "allowed": True,
+                "reason": automation_reason,
+            },
         }
 
     def _learn_from_observation(self, observation: Dict[str, Any]) -> List[str]:

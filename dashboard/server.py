@@ -345,6 +345,17 @@ def _brp_playbooks_payload(limit: int = 10) -> dict[str, Any]:
     }
 
 
+def _brp_remediations_payload(limit: int = 25) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 100))
+    remediations = BRPBridge.read_operator_remediations(data_dir=str(_brp_data_dir()), limit=safe_limit)
+    return {
+        "status": "success",
+        "count": len(remediations),
+        "limit": safe_limit,
+        "remediations": remediations,
+    }
+
+
 def _brp_report_payload(limit: int = 25) -> dict[str, Any]:
     safe_limit = max(1, min(limit, 100))
     return BRPBridge.read_operator_report(data_dir=str(_brp_data_dir()), limit=safe_limit)
@@ -398,6 +409,7 @@ def _brp_ws_payload() -> dict[str, Any]:
         "incidents": _brp_incidents_payload(limit=12),
         "alerts": _brp_alerts_payload(limit=12),
         "playbooks": _brp_playbooks_payload(limit=8),
+        "remediations": _brp_remediations_payload(limit=8),
         "evaluations": _brp_filtered_evaluations_payload(limit=12),
         "adaptive_rules": _brp_adaptive_rules_payload(limit=12),
         "insights": _brp_insights_payload(limit=12),
@@ -560,6 +572,89 @@ def _tail_operator_events(limit: int = 25) -> list[dict]:
         except json.JSONDecodeError:
             continue
     return rows[::-1]
+
+
+def _projectx_allowed_jobs() -> dict[str, dict[str, Any]]:
+    return {
+        "native_agent_health_check": {"intent_type": "native_agent_health_check", "params": {"quick": True}},
+        "native_agent_repo_scan": {"intent_type": "native_agent_repo_scan", "params": {"sync_protocol_facts": True}},
+        "native_agent_task_audit": {"intent_type": "native_agent_task_audit", "params": {"quick": True}},
+        "native_agent_security_audit": {"intent_type": "native_agent_security_audit", "params": {"persist": True}},
+    }
+
+
+async def _dispatch_projectx_job(
+    *,
+    job: str,
+    request_id: str,
+    source_intent_id: str | None = None,
+    plan_id: str | None = None,
+    source_agent: str = "dashboard_ui",
+    log_prefix: str = "dashboard.job",
+) -> dict[str, Any]:
+    allowed_jobs = _projectx_allowed_jobs()
+    if job not in allowed_jobs:
+        return {"status": "error", "error": "job_not_allowed", "job": job}
+
+    started = time.time()
+    payload = {
+        "source_agent": source_agent,
+        "target_agent": "projectx_native",
+        "intent_type": allowed_jobs[job]["intent_type"],
+        "params": {
+            **allowed_jobs[job]["params"],
+            "request_id": request_id,
+            "source_intent_id": source_intent_id,
+            "plan_id": plan_id,
+            "source_agent": source_agent,
+        },
+    }
+    _append_operator_event(
+        request_id=request_id,
+        intent_type=job,
+        action_type=f"{log_prefix}_request",
+        status="received",
+        summary=f"{source_agent} requested {job}",
+        source_agent=source_agent,
+        details={"job": job, "source_intent_id": source_intent_id, "plan_id": plan_id},
+    )
+    broker_response = await _broker_post("/intents/route", payload)
+    routing_mode = "broker" if broker_response is not None else "direct"
+    response = broker_response.get("delivery_response") if broker_response is not None else None
+    if broker_response is None:
+        direct_payload = {
+            "intent_id": request_id,
+            "source_agent": source_agent,
+            "target_agent": "projectx_native",
+            "intent_type": allowed_jobs[job]["intent_type"],
+            "params": payload["params"],
+        }
+        response = await _projectx_post("/intents/handle", direct_payload)
+    latency_ms = (time.time() - started) * 1000
+    final_status = "success" if response else "unreachable"
+    _append_operator_event(
+        request_id=request_id,
+        intent_type=job,
+        action_type=f"{log_prefix}_result",
+        status="ok" if response else "error",
+        summary=f"{source_agent} completed {job}",
+        source_agent=source_agent,
+        latency_ms=latency_ms,
+        details={
+            "response": response or {"status": "unreachable"},
+            "routing_mode": routing_mode,
+            "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+            "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+        },
+    )
+    return {
+        "status": final_status,
+        "mode": "job",
+        "routing_mode": routing_mode,
+        "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+        "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+        "response": _redact(response),
+    }
 
 
 def _detect_changes(old_snapshot: dict, new_snapshot: dict) -> list[dict]:
@@ -1706,6 +1801,12 @@ async def api_brp_playbooks(limit: int = 10):
     return _redact(_brp_playbooks_payload(limit=limit))
 
 
+@app.get("/api/brp/remediations")
+async def api_brp_remediations(limit: int = 25):
+    """Recent operator remediation executions derived from BRP playbooks."""
+    return _redact(_brp_remediations_payload(limit=limit))
+
+
 @app.get("/api/brp/insights")
 async def api_brp_insights(limit: int = 10):
     """Condensed BRP operator view combining recent decisions and active rules."""
@@ -1749,6 +1850,53 @@ async def api_brp_alert_acknowledge(alert_id: str, request: Request):
     )
     await _broadcast_ws("brp", _redact(_brp_ws_payload()))
     return _redact({"status": "success", "alert": alert})
+
+
+@app.post("/api/brp/playbooks/{playbook_id}/execute")
+async def api_brp_playbook_execute(playbook_id: str, request: Request):
+    """Execute a BRP playbook via allowlisted ProjectX job routing."""
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
+
+    actor = str(payload.get("actor") or "dashboard_ui").strip() or "dashboard_ui"
+    request_id = str(payload.get("request_id") or str(uuid.uuid4())).strip()
+    playbooks = BRPBridge.read_operator_playbooks(data_dir=str(_brp_data_dir()), limit=200)
+    playbook = next((item for item in playbooks if str(item.get("playbook_id") or "") == playbook_id), None)
+    if playbook is None:
+        return {"status": "not_found", "playbook_id": playbook_id}
+
+    automation = playbook.get("automation") if isinstance(playbook.get("automation"), dict) else {}
+    job = str(payload.get("job") or automation.get("job") or "").strip()
+    if not job:
+        return {"status": "error", "error": "playbook_not_executable", "playbook_id": playbook_id}
+
+    dispatch_result = await _dispatch_projectx_job(
+        job=job,
+        request_id=request_id,
+        source_intent_id=str(playbook.get("alert_id") or ""),
+        plan_id=str(playbook.get("event_id") or ""),
+        source_agent=actor,
+        log_prefix="dashboard.brp_playbook",
+    )
+    remediation = BRPBridge.record_operator_remediation(
+        alert_id=str(playbook.get("alert_id") or ""),
+        playbook_id=playbook_id,
+        actor=actor,
+        job=job,
+        result=dispatch_result,
+        data_dir=str(_brp_data_dir()),
+    )
+    await _broadcast_ws("brp", _redact(_brp_ws_payload()))
+    return _redact(
+        {
+            "status": dispatch_result.get("status", "error"),
+            "playbook": playbook,
+            "execution": dispatch_result,
+            "remediation": remediation,
+        }
+    )
 
 
 @app.get("/api/projectx/system")
@@ -1821,69 +1969,14 @@ async def api_projectx_chat(
         return {"status": "error", "error": "message_or_job_required"}
 
     if job:
-        allowed_jobs = {
-            "native_agent_health_check": {"intent_type": "native_agent_health_check", "params": {"quick": True}},
-            "native_agent_repo_scan": {"intent_type": "native_agent_repo_scan", "params": {"sync_protocol_facts": True}},
-            "native_agent_task_audit": {"intent_type": "native_agent_task_audit", "params": {"quick": True}},
-            "native_agent_security_audit": {"intent_type": "native_agent_security_audit", "params": {"persist": True}},
-        }
-        if job not in allowed_jobs:
-            return {"status": "error", "error": "job_not_allowed", "job": job}
-        payload = {
-            "source_agent": "dashboard_ui",
-            "target_agent": "projectx_native",
-            "intent_type": allowed_jobs[job]["intent_type"],
-            "params": {
-                **allowed_jobs[job]["params"],
-                "request_id": request_id,
-                "source_intent_id": source_intent_id,
-                "plan_id": plan_id,
-                "source_agent": "dashboard_ui",
-            },
-        }
-        _append_operator_event(
+        return await _dispatch_projectx_job(
+            job=job,
             request_id=request_id,
-            intent_type=job,
-            action_type="dashboard.job_request",
-            status="received",
-            summary=f"Dashboard requested {job}",
-            details={"job": job, "source_intent_id": source_intent_id, "plan_id": plan_id},
+            source_intent_id=source_intent_id,
+            plan_id=plan_id,
+            source_agent="dashboard_ui",
+            log_prefix="dashboard.job",
         )
-        broker_response = await _broker_post("/intents/route", payload)
-        routing_mode = "broker" if broker_response is not None else "direct"
-        response = broker_response.get("delivery_response") if broker_response is not None else None
-        if broker_response is None:
-            direct_payload = {
-                "intent_id": request_id,
-                "source_agent": "dashboard_ui",
-                "target_agent": "projectx_native",
-                "intent_type": allowed_jobs[job]["intent_type"],
-                "params": payload["params"],
-            }
-            response = await _projectx_post("/intents/handle", direct_payload)
-        latency_ms = (time.time() - started) * 1000
-        _append_operator_event(
-            request_id=request_id,
-            intent_type=job,
-            action_type="dashboard.job_result",
-            status="ok" if response else "error",
-            summary=f"Dashboard job completed: {job}",
-            latency_ms=latency_ms,
-            details={
-                "response": response or {"status": "unreachable"},
-                "routing_mode": routing_mode,
-                "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
-                "delivery_status": broker_response.get("delivery_status") if broker_response else None,
-            },
-        )
-        return {
-            "status": "success" if response else "unreachable",
-            "mode": "job",
-            "routing_mode": routing_mode,
-            "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
-            "delivery_status": broker_response.get("delivery_status") if broker_response else None,
-            "response": _redact(response),
-        }
 
     payload = {
         "source_agent": "dashboard_ui",

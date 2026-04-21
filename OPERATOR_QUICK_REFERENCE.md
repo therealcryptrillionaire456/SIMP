@@ -67,6 +67,9 @@ curl -s "http://127.0.0.1:8050/api/brp/incidents?limit=10" | python3 -m json.too
 # BRP remediation playbooks derived from current alerts
 curl -s "http://127.0.0.1:8050/api/brp/playbooks?limit=10" | python3 -m json.tool
 
+# BRP remediation execution history
+curl -s "http://127.0.0.1:8050/api/brp/remediations?limit=10" | python3 -m json.tool
+
 # Adaptive rules learned from observations
 curl -s http://127.0.0.1:8050/api/brp/adaptive-rules | python3 -m json.tool
 
@@ -77,6 +80,11 @@ curl -s "http://127.0.0.1:8050/api/brp/insights?limit=10" | python3 -m json.tool
 curl -s -X POST "http://127.0.0.1:8050/api/brp/alerts/brp-alert::plan-001/acknowledge" \
   -H "Content-Type: application/json" \
   -d '{"actor":"dashboard_ui","note":"triaged"}' | python3 -m json.tool
+
+# Execute a BRP playbook through the allowlisted ProjectX control path
+curl -s -X POST "http://127.0.0.1:8050/api/brp/playbooks/playbook::brp-alert::plan-001/execute" \
+  -H "Content-Type: application/json" \
+  -d '{"actor":"dashboard_ui"}' | python3 -m json.tool
 
 # Full BRP report bundle for export/snapshot
 curl -s "http://127.0.0.1:8050/api/brp/report?limit=25" | python3 -m json.tool

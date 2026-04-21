@@ -428,6 +428,7 @@ class TestOperatorReadHelpers:
         assert playbooks
         assert playbooks[0]["alert_id"].startswith("brp-alert::")
         assert playbooks[0]["actions"]
+        assert playbooks[0]["automation"]["job"]
 
         alert_id = incidents["alerts"][0]["alert_id"]
         acknowledged = BRPBridge.acknowledge_operator_alert(
@@ -443,6 +444,42 @@ class TestOperatorReadHelpers:
         refreshed = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=10)
         assert refreshed["acknowledged_alerts"] >= 1
 
+    def test_operator_remediations_are_persisted_and_linked(self, bridge, tmp_data_dir):
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="run_shell",
+            context={"projectx_action": "run_shell", "details": "autonomous fuzz bypass"},
+            tags=["projectx", "network"],
+        )
+        bridge.evaluate_event(event)
+
+        playbook = BRPBridge.read_operator_playbooks(data_dir=tmp_data_dir, limit=10)[0]
+        remediation = BRPBridge.record_operator_remediation(
+            alert_id=playbook["alert_id"],
+            playbook_id=playbook["playbook_id"],
+            actor="test_operator",
+            job=playbook["automation"]["job"],
+            result={
+                "status": "success",
+                "routing_mode": "broker",
+                "broker_intent_id": "intent-123",
+                "delivery_status": "delivered",
+                "response": {"status": "ok"},
+            },
+            data_dir=tmp_data_dir,
+        )
+
+        assert remediation is not None
+        assert remediation["status"] == "completed"
+        remediations = BRPBridge.read_operator_remediations(data_dir=tmp_data_dir, limit=10)
+        assert remediations
+        assert remediations[0]["playbook_id"] == playbook["playbook_id"]
+
+        detail = BRPBridge.read_operator_evaluation_detail(event_id=event.event_id, data_dir=tmp_data_dir)
+        assert detail is not None
+        assert detail["remediations"]
+        assert detail["playbook"]["last_remediation"]["status"] == "completed"
+
     def test_operator_report_includes_incident_state(self, bridge, tmp_data_dir):
         bridge.evaluate_event(
             BRPEvent(
@@ -457,5 +494,6 @@ class TestOperatorReadHelpers:
         assert report["status"] == "success"
         assert "incidents" in report
         assert "playbooks" in report
+        assert "remediations" in report
         assert report["incidents"]["count"] >= 1
         assert report["playbooks"]

@@ -126,6 +126,7 @@
     brpEvaluationsTbody: $("#brp-evaluations-tbody"),
     brpRulesTbody: $("#brp-rules-tbody"),
     brpAlertsFeed: $("#brp-alerts-feed"),
+    brpRemediationsFeed: $("#brp-remediations-feed"),
     brpDecisionFilter: $("#brp-decision-filter"),
     brpSeverityFilter: $("#brp-severity-filter"),
     brpSourceFilter: $("#brp-source-filter"),
@@ -1523,19 +1524,31 @@
       return;
     }
     dom.brpPlaybooksFeed.innerHTML = playbooks.slice(0, 8).map(function(playbook) {
+      var automation = playbook.automation || {};
       var inspectButton = playbook.event_id
         ? '<button type="button" class="intent-row-button" data-brp-event-id="' + escHtml(playbook.event_id) + '">inspect</button>'
         : '<span class="text-muted">playbook</span>';
+      var executeButton = automation.job
+        ? '<button type="button" class="intent-row-button" data-brp-playbook-id="' + escHtml(playbook.playbook_id || "") + '" data-brp-job="' + escHtml(automation.job) + '">run ' + escHtml(automation.job) + '</button>'
+        : '<span class="text-muted">manual</span>';
+      var remediationLine = playbook.last_remediation
+        ? 'last remediation: ' + String(playbook.last_remediation.status || "--") + ' via ' + String(playbook.last_remediation.job || "--")
+        : (automation.reason || "--");
       return '<div class="activity-item">'
         + '<span class="activity-ts">' + escHtml(formatDate(playbook.timestamp)) + '</span>'
         + '<span class="activity-type">' + brpSeverityBadge(playbook.priority || playbook.severity || "medium") + '</span>'
-        + '<span class="activity-result">' + escHtml(playbook.title || "--") + '<div class="brp-signal-line">' + escHtml(playbook.primary_action || "--") + '</div><div class="brp-signal-line">' + inspectButton + '</div></span>'
+        + '<span class="activity-result">' + escHtml(playbook.title || "--") + '<div class="brp-signal-line">' + escHtml(playbook.primary_action || "--") + '</div><div class="brp-signal-line">' + escHtml(remediationLine) + '</div><div class="brp-signal-line">' + inspectButton + ' ' + executeButton + '</div></span>'
         + '<span class="activity-status ' + (playbook.status === "acknowledged" ? "online" : "queued") + '">' + escHtml(playbook.status || "--") + '</span>'
         + '</div>';
     }).join("");
     dom.brpPlaybooksFeed.querySelectorAll("[data-brp-event-id]").forEach(function(button) {
       button.addEventListener("click", function() {
         openBrpDrawer(button.getAttribute("data-brp-event-id"));
+      });
+    });
+    dom.brpPlaybooksFeed.querySelectorAll("[data-brp-playbook-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        executeBrpPlaybook(button.getAttribute("data-brp-playbook-id"), button.getAttribute("data-brp-job"));
       });
     });
   }
@@ -1548,6 +1561,41 @@
     });
     if (!response || response.status !== "success") return;
     await refreshAll();
+  }
+
+  async function executeBrpPlaybook(playbookId, job) {
+    if (!playbookId || !job) return;
+    var response = await apiPost("/api/brp/playbooks/" + encodeURIComponent(playbookId) + "/execute", {
+      actor: "dashboard_ui",
+      job: job
+    });
+    if (!response || (response.status !== "success" && response.status !== "unreachable")) return;
+    await refreshAll();
+  }
+
+  function renderBrpRemediations(data) {
+    if (!dom.brpRemediationsFeed) return;
+    var remediations = (data && data.remediations) || [];
+    if (!remediations.length) {
+      dom.brpRemediationsFeed.innerHTML = '<div class="empty-state">No BRP remediations executed yet.</div>';
+      return;
+    }
+    dom.brpRemediationsFeed.innerHTML = remediations.slice(0, 8).map(function(item) {
+      var inspectButton = item.event_id
+        ? '<button type="button" class="intent-row-button" data-brp-event-id="' + escHtml(item.event_id) + '">inspect</button>'
+        : '<span class="text-muted">history</span>';
+      return '<div class="activity-item">'
+        + '<span class="activity-ts">' + escHtml(formatDate(item.timestamp)) + '</span>'
+        + '<span class="activity-type">' + statusBadge(item.status || "unknown") + '</span>'
+        + '<span class="activity-result">' + escHtml(item.summary || "--") + '<div class="brp-signal-line">' + escHtml((item.job || "--") + " • " + (item.routing_mode || "--")) + '</div><div class="brp-signal-line">' + inspectButton + '</div></span>'
+        + '<span class="activity-status ' + (item.status === "completed" ? "online" : item.status === "failed" ? "failed" : "queued") + '">' + escHtml(item.delivery_status || item.status || "--") + '</span>'
+        + '</div>';
+    }).join("");
+    dom.brpRemediationsFeed.querySelectorAll("[data-brp-event-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openBrpDrawer(button.getAttribute("data-brp-event-id"));
+      });
+    });
   }
 
   function renderBrpAlerts(data) {
@@ -1630,6 +1678,7 @@
         { label: "Multimodal Channels", value: ((multimodal.summary || {}).detection_breakdown ? Object.keys(multimodal.summary.detection_breakdown).filter(function(key) { return multimodal.summary.detection_breakdown[key]; }).join(", ") : (multimodalSteps.length ? "step-derived" : "--")) || "--" },
         { label: "Incident State", value: ((detail.alert || {}).state) || "--" },
         { label: "Primary Playbook", value: ((detail.playbook || {}).primary_action) || "--" },
+        { label: "Last Remediation", value: (((detail.remediations || [])[0] || {}).job) || "--" },
       ]);
       if (dom.brpDrawerTags) {
         var tags = evaluation.threat_tags || [];
@@ -2119,7 +2168,7 @@
 
     // Fetch all endpoints in parallel
     var brpQuery = buildBrpEvaluationQuery();
-    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, brpStatus, brpIncidents, brpAlerts, brpPlaybooks, brpEvaluations, brpRules, brpInsights] = await Promise.all([
+    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, brpStatus, brpIncidents, brpAlerts, brpPlaybooks, brpRemediations, brpEvaluations, brpRules, brpInsights] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -2145,6 +2194,7 @@
       apiFetch("/api/brp/incidents?limit=12"),
       apiFetch("/api/brp/alerts?limit=8"),
       apiFetch("/api/brp/playbooks?limit=8"),
+      apiFetch("/api/brp/remediations?limit=8"),
       apiFetch("/api/brp/evaluations?" + brpQuery),
       apiFetch("/api/brp/adaptive-rules?limit=12"),
       apiFetch("/api/brp/insights?limit=12"),
@@ -2179,6 +2229,7 @@
     renderBrpIncidents(brpIncidents);
     renderBrpAlerts(brpAlerts);
     renderBrpPlaybooks(brpPlaybooks);
+    renderBrpRemediations(brpRemediations);
     renderBrpEvaluations(brpEvaluations);
     renderBrpAdaptiveRules(brpRules);
     renderBrpInsights(brpInsights);
@@ -2340,6 +2391,7 @@
           renderBrpIncidents(msg.data.incidents);
           renderBrpAlerts(msg.data.alerts);
           renderBrpPlaybooks(msg.data.playbooks);
+          renderBrpRemediations(msg.data.remediations);
           renderBrpEvaluations(msg.data.evaluations);
           renderBrpAdaptiveRules(msg.data.adaptive_rules);
           renderBrpInsights(msg.data.insights);

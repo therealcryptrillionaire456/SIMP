@@ -13,6 +13,7 @@ import os
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+import dashboard.server as ds
 from dashboard.server import app
 from fastapi.testclient import TestClient
 
@@ -413,6 +414,14 @@ class TestBRPEndpoints:
         assert data["status"] == "success"
         assert data["count"] >= 1
         assert data["playbooks"][0]["actions"]
+        assert data["playbooks"][0]["automation"]["job"]
+
+    def test_brp_remediations_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/remediations?limit=5")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["count"] == 0
 
     def test_brp_alert_acknowledge_endpoint(self, client, brp_sample_data):
         response = client.post(
@@ -425,6 +434,40 @@ class TestBRPEndpoints:
         assert data["alert"]["acknowledged"] is True
         assert data["alert"]["acknowledged_by"] == "test_operator"
 
+    def test_brp_playbook_execute_endpoint(self, client, brp_sample_data, monkeypatch):
+        operator_events = []
+
+        async def fake_broker_post(path, payload):
+            assert path == "/intents/route"
+            assert payload["target_agent"] == "projectx_native"
+            return {
+                "intent_id": "broker-intent-1",
+                "delivery_status": "delivered",
+                "delivery_response": {
+                    "status": "ok",
+                    "response": {"ok": True, "intent_type": payload["intent_type"]},
+                },
+            }
+
+        monkeypatch.setattr(ds, "_broker_post", fake_broker_post)
+        monkeypatch.setattr(ds, "_append_operator_event", lambda **kwargs: operator_events.append(kwargs))
+
+        response = client.post(
+            "/api/brp/playbooks/playbook::brp-alert::plan-001/execute",
+            json={"actor": "test_operator"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["execution"]["routing_mode"] == "broker"
+        assert data["remediation"]["status"] == "completed"
+        assert len(operator_events) == 2
+
+        remediations = client.get("/api/brp/remediations?limit=5").json()
+        assert remediations["count"] == 1
+        assert remediations["remediations"][0]["actor"] == "test_operator"
+
     def test_brp_report_endpoint(self, client, brp_sample_data):
         response = client.get("/api/brp/report?limit=5")
         assert response.status_code == 200
@@ -434,6 +477,7 @@ class TestBRPEndpoints:
         assert "alerts" in data
         assert "incidents" in data
         assert "playbooks" in data
+        assert "remediations" in data
         assert "evaluations" in data
         assert "adaptive_rules" in data
 
@@ -460,6 +504,7 @@ class TestDashboardStaticFiles:
         assert "<!DOCTYPE html>" in response.text
         assert "BRP Operator View" in response.text
         assert "brp-playbooks-feed" in response.text
+        assert "brp-remediations-feed" in response.text
     
     def test_static_files_served(self, client):
         """Test static files (CSS, JS) are served correctly."""
