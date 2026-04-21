@@ -11,6 +11,7 @@ from typing import Any, Dict, Optional
 from simp.memory.task_memory import TaskMemory
 from simp.memory.knowledge_index import KnowledgeIndex
 from simp.memory.conversation_archive import ConversationArchive
+from simp.memory.system_memory import Episode, SystemMemoryStore
 
 
 logger = logging.getLogger("SIMP.MemoryHooks")
@@ -24,10 +25,12 @@ class MemoryHooks:
         task_memory: Optional[TaskMemory] = None,
         knowledge_index: Optional[KnowledgeIndex] = None,
         conversation_archive: Optional[ConversationArchive] = None,
+        system_memory_store: Optional[SystemMemoryStore] = None,
     ):
         self.task_memory = task_memory or TaskMemory()
         self.knowledge_index = knowledge_index or KnowledgeIndex()
         self.conversation_archive = conversation_archive or ConversationArchive()
+        self.system_memory_store = system_memory_store or SystemMemoryStore()
 
     def on_task_completed(self, task_data: Dict[str, Any]) -> None:
         """
@@ -43,6 +46,17 @@ class MemoryHooks:
                 "decisions": [f"Task '{title}' completed by {agent}"],
                 "tags": [task_type, "completed"],
             })
+            self.system_memory_store.add_episode(
+                Episode(
+                    episode_type="task_completed",
+                    source="memory_hooks",
+                    entity=task_data.get("task_id", title or task_type),
+                    summary=f"Task '{title}' completed by {agent}",
+                    occurred_at=task_data.get("completed_at") or task_data.get("timestamp") or "",
+                    payload=task_data,
+                    tags=["task", task_type, "completed", agent],
+                )
+            )
             logger.info(f"Memory updated for completed task: {title}")
         except Exception as exc:
             logger.warning(f"Failed to update memory on task completion: {exc}")
@@ -66,6 +80,17 @@ class MemoryHooks:
             notes = profile.get("notes", "")
             profile["notes"] = notes  # preserve existing notes
             self.knowledge_index.update_agent_profile(target_agent, profile)
+            self.system_memory_store.add_episode(
+                Episode(
+                    episode_type="intent_routed",
+                    source="memory_hooks",
+                    entity=intent_data.get("intent_id", intent_type),
+                    summary=f"Intent '{intent_type}' routed to {target_agent} ({delivery_status})",
+                    occurred_at=result.get("timestamp") or intent_data.get("timestamp") or "",
+                    payload={"intent": intent_data, "result": result},
+                    tags=["intent", intent_type, target_agent, delivery_status],
+                )
+            )
 
             logger.debug(
                 f"Memory updated for routed intent: {intent_type} -> {target_agent} "
@@ -98,6 +123,23 @@ class MemoryHooks:
                 "decisions": decisions,
                 "tags": tags,
             })
+            self.system_memory_store.add_episode(
+                Episode(
+                    episode_type="conversation_completed",
+                    source="memory_hooks",
+                    entity=conv_id or topic,
+                    summary=f"Conversation concluded for topic '{topic}'",
+                    occurred_at="",
+                    payload={
+                        "topic": topic,
+                        "summary": summary,
+                        "participants": participants,
+                        "decisions": decisions,
+                        "tags": tags,
+                    },
+                    tags=["conversation", topic, *tags],
+                )
+            )
 
             logger.info(f"Conversation archived: {conv_id}")
             return conv_id
@@ -119,6 +161,17 @@ class MemoryHooks:
                 self.task_memory.add_history_entry(
                     task_id, f"Session started by {agent_id}"
                 )
+            self.system_memory_store.add_episode(
+                Episode(
+                    episode_type="session_started",
+                    source="memory_hooks",
+                    entity=agent_id,
+                    summary=f"Session started by {agent_id}",
+                    occurred_at="",
+                    payload={"agent_id": agent_id, "task_id": task_id},
+                    tags=["session", agent_id],
+                )
+            )
 
             logger.info(f"Session start recorded: {agent_id}")
         except Exception as exc:

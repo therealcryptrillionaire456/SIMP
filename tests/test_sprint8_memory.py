@@ -12,6 +12,7 @@ from simp.memory.hooks import MemoryHooks
 from simp.memory.task_memory import TaskMemory
 from simp.memory.knowledge_index import KnowledgeIndex
 from simp.memory.conversation_archive import ConversationArchive
+from simp.memory.system_memory import SystemMemoryStore
 
 
 class TestMemoryHooksWired:
@@ -62,6 +63,26 @@ class TestMemoryComponents:
     def test_conversation_archive_importable(self):
         ca = ConversationArchive()
         assert ca is not None
+
+    def test_memory_hooks_persist_structured_episode(self, tmp_path):
+        hooks = MemoryHooks(
+            task_memory=TaskMemory(base_dir=str(tmp_path / "tasks")),
+            knowledge_index=KnowledgeIndex(index_path=str(tmp_path / "index.json")),
+            conversation_archive=ConversationArchive(base_dir=str(tmp_path / "conversations")),
+            system_memory_store=SystemMemoryStore(db_path=str(tmp_path / "system_memory.sqlite3")),
+        )
+
+        hooks.on_intent_routed(
+            {"intent_type": "trade_signal", "intent_id": "intent-123", "timestamp": "2026-04-21T17:00:00+00:00"},
+            {"target_agent": "gate4_live", "delivery_status": "success", "timestamp": "2026-04-21T17:00:01+00:00"},
+        )
+
+        episodes = hooks.system_memory_store.list_episodes(limit=5)
+        assert any(
+            episode["episode_type"] == "intent_routed"
+            and episode["entity"] == "intent-123"
+            for episode in episodes
+        )
 
 
 class TestDatetimeDeprecation:
