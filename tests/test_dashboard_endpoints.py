@@ -406,6 +406,7 @@ class TestBRPEndpoints:
         assert data["status"] == "success"
         assert data["count"] >= 1
         assert data["open_alerts"] >= 1
+        assert "state_counts" in data
 
     def test_brp_playbooks_endpoint(self, client, brp_sample_data):
         response = client.get("/api/brp/playbooks?limit=5")
@@ -415,6 +416,9 @@ class TestBRPEndpoints:
         assert data["count"] >= 1
         assert data["playbooks"][0]["actions"]
         assert data["playbooks"][0]["automation"]["job"]
+        assert data["playbooks"][0]["evidence"]["trigger"]["alert_id"]
+        assert data["playbooks"][0]["operator_checks"]
+        assert data["playbooks"][0]["guardrails"]
 
     def test_brp_remediations_endpoint(self, client, brp_sample_data):
         response = client.get("/api/brp/remediations?limit=5")
@@ -440,6 +444,8 @@ class TestBRPEndpoints:
         async def fake_broker_post(path, payload):
             assert path == "/intents/route"
             assert payload["target_agent"] == "projectx_native"
+            assert "brp_evidence" in payload["params"]
+            assert "brp_execution_context" in payload["params"]
             return {
                 "intent_id": "broker-intent-1",
                 "delivery_status": "delivered",
@@ -480,6 +486,7 @@ class TestBRPEndpoints:
         assert "remediations" in data
         assert "evaluations" in data
         assert "adaptive_rules" in data
+        assert "runtime_context" in data
 
     def test_brp_insights_endpoint(self, client, brp_sample_data):
         response = client.get("/api/brp/insights?limit=2")

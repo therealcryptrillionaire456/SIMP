@@ -279,11 +279,8 @@ class TestPredictiveSafety:
         predictive = resp.metadata["predictive_assessment"]
         assert predictive["near_miss_count"] >= 2
         assert predictive["adaptive_rule_matches"]
-
-        adaptive_rules = os.path.join(tmp_data_dir, "adaptive_rules.json")
-        with open(adaptive_rules, "r", encoding="utf-8") as handle:
-            persisted = json.load(handle)
-        assert "action:run_shell" in persisted
+        persisted = BRPBridge.read_operator_adaptive_rules(data_dir=tmp_data_dir, limit=20)
+        assert any(rule["key"] == "action:run_shell" for rule in persisted)
 
     def test_multimodal_event_analysis_enriches_bridge_metadata(self, bridge):
         event = BRPEvent(
@@ -409,7 +406,9 @@ class TestOperatorReadHelpers:
         assert detail is not None
         assert detail["evaluation"]["event_id"] == event.event_id
         assert len(detail["related_observations"]) == 1
+        assert detail["evaluation"]["controller_rounds"] >= 0
         assert detail["alert"] is not None
+        assert detail["incident"] is not None
         assert detail["playbook"] is not None
 
     def test_operator_incidents_playbooks_and_acknowledgements(self, bridge, tmp_data_dir):
@@ -423,12 +422,15 @@ class TestOperatorReadHelpers:
         incidents = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=10)
         assert incidents["count"] >= 1
         assert incidents["open_alerts"] >= 1
+        assert incidents["state_counts"]["open"] >= 1
 
         playbooks = BRPBridge.read_operator_playbooks(data_dir=tmp_data_dir, limit=10)
         assert playbooks
         assert playbooks[0]["alert_id"].startswith("brp-alert::")
         assert playbooks[0]["actions"]
         assert playbooks[0]["automation"]["job"]
+        assert playbooks[0]["evidence"]["incident_state"] in {"open", "acknowledged", "reopened", "remediated"}
+        assert playbooks[0]["guardrails"]
 
         alert_id = incidents["alerts"][0]["alert_id"]
         acknowledged = BRPBridge.acknowledge_operator_alert(
@@ -440,6 +442,7 @@ class TestOperatorReadHelpers:
         assert acknowledged is not None
         assert acknowledged["acknowledged"] is True
         assert acknowledged["acknowledged_by"] == "test_operator"
+        assert acknowledged["incident_state"] == "acknowledged"
 
         refreshed = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=10)
         assert refreshed["acknowledged_alerts"] >= 1
@@ -471,6 +474,7 @@ class TestOperatorReadHelpers:
 
         assert remediation is not None
         assert remediation["status"] == "completed"
+        assert remediation["incident_state"] == "remediated"
         remediations = BRPBridge.read_operator_remediations(data_dir=tmp_data_dir, limit=10)
         assert remediations
         assert remediations[0]["playbook_id"] == playbook["playbook_id"]
@@ -479,6 +483,7 @@ class TestOperatorReadHelpers:
         assert detail is not None
         assert detail["remediations"]
         assert detail["playbook"]["last_remediation"]["status"] == "completed"
+        assert detail["incident"]["incident_state"] == "remediated"
 
     def test_failed_remediation_feeds_back_into_predictive_learning(self, bridge, tmp_data_dir):
         event = BRPEvent(
@@ -506,6 +511,7 @@ class TestOperatorReadHelpers:
         )
 
         assert remediation is not None
+        assert remediation["incident_state"] == "reopened"
         observations_path = os.path.join(tmp_data_dir, "observations.jsonl")
         with open(observations_path, "r", encoding="utf-8") as handle:
             observations = [json.loads(line) for line in handle if line.strip()]
@@ -527,6 +533,8 @@ class TestOperatorReadHelpers:
         assert "adaptive_rule_match" in follow_up.threat_tags
         assert predictive["near_miss_count"] >= 1
         assert predictive["adaptive_rule_matches"]
+        incidents = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=10)
+        assert incidents["state_counts"]["reopened"] >= 1
 
     def test_operator_report_includes_incident_state(self, bridge, tmp_data_dir):
         bridge.evaluate_event(
@@ -545,3 +553,5 @@ class TestOperatorReadHelpers:
         assert "remediations" in report
         assert report["incidents"]["count"] >= 1
         assert report["playbooks"]
+        assert "runtime_context" in report
+        assert "runtime_cache" in report["runtime_context"]

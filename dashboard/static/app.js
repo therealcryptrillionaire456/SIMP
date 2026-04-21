@@ -1534,10 +1534,11 @@
       var remediationLine = playbook.last_remediation
         ? 'last remediation: ' + String(playbook.last_remediation.status || "--") + ' via ' + String(playbook.last_remediation.job || "--")
         : (automation.reason || "--");
+      var guardrailLine = ((playbook.guardrails || [])[0]) || ((playbook.operator_checks || [])[0]) || "review evidence bundle before execution";
       return '<div class="activity-item">'
         + '<span class="activity-ts">' + escHtml(formatDate(playbook.timestamp)) + '</span>'
         + '<span class="activity-type">' + brpSeverityBadge(playbook.priority || playbook.severity || "medium") + '</span>'
-        + '<span class="activity-result">' + escHtml(playbook.title || "--") + '<div class="brp-signal-line">' + escHtml(playbook.primary_action || "--") + '</div><div class="brp-signal-line">' + escHtml(remediationLine) + '</div><div class="brp-signal-line">' + inspectButton + ' ' + executeButton + '</div></span>'
+        + '<span class="activity-result">' + escHtml(playbook.title || "--") + '<div class="brp-signal-line">' + escHtml(playbook.primary_action || "--") + '</div><div class="brp-signal-line">' + escHtml(remediationLine) + '</div><div class="brp-signal-line">' + escHtml(guardrailLine) + '</div><div class="brp-signal-line">' + inspectButton + ' ' + executeButton + '</div></span>'
         + '<span class="activity-status ' + (playbook.status === "acknowledged" ? "online" : "queued") + '">' + escHtml(playbook.status || "--") + '</span>'
         + '</div>';
     }).join("");
@@ -1652,6 +1653,7 @@
       var sourceRecord = detail.source_record || {};
       var predictive = (evaluation.metadata || {}).predictive_assessment || {};
       var multimodal = (evaluation.metadata || {}).multimodal_assessment || {};
+      var controller = (evaluation.metadata || {}).controller_assessment || {};
       var predictiveSteps = (evaluation.metadata || {}).predictive_steps || [];
       var multimodalSteps = (evaluation.metadata || {}).multimodal_steps || [];
       if (dom.brpDrawerTitle) dom.brpDrawerTitle.textContent = evaluation.event_id || eventId;
@@ -1676,7 +1678,8 @@
         { label: "Predictive Domains", value: (predictive.domains || []).join(", ") || (predictiveSteps.length ? "step-derived" : "--") },
         { label: "Predictive Matches", value: predictive.adaptive_rule_matches ? String(predictive.adaptive_rule_matches.length) : (predictiveSteps.length ? String(predictiveSteps.length) : "--") },
         { label: "Multimodal Channels", value: ((multimodal.summary || {}).detection_breakdown ? Object.keys(multimodal.summary.detection_breakdown).filter(function(key) { return multimodal.summary.detection_breakdown[key]; }).join(", ") : (multimodalSteps.length ? "step-derived" : "--")) || "--" },
-        { label: "Incident State", value: ((detail.alert || {}).state) || "--" },
+        { label: "Incident State", value: ((detail.incident || {}).incident_state) || ((detail.alert || {}).state) || "--" },
+        { label: "Controller", value: controller.terminal_state || "--" },
         { label: "Primary Playbook", value: ((detail.playbook || {}).primary_action) || "--" },
         { label: "Last Remediation", value: (((detail.remediations || [])[0] || {}).job) || "--" },
       ]);

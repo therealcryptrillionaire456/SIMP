@@ -18,6 +18,8 @@ from .alert_orchestrator import AlertOrchestrator
 from .forecasting import PredictiveSafetyForecaster
 from .multimodal_analysis import MultiModalSafetyAnalyzer
 from .predictive_safety import PredictiveSafetyIntelligence
+from .deterministic_recurrent_controller import DeterministicRecurrentController
+from .cache_consistency_by_namespace import NamespacedRuntimeCache
 from .protocol_core import EnhancedBillRussellProtocol
 
 # Backwards-compatible export used by older scripts/tests.

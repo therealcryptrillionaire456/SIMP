@@ -591,6 +591,7 @@ async def _dispatch_projectx_job(
     plan_id: str | None = None,
     source_agent: str = "dashboard_ui",
     log_prefix: str = "dashboard.job",
+    extra_params: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     allowed_jobs = _projectx_allowed_jobs()
     if job not in allowed_jobs:
@@ -607,6 +608,7 @@ async def _dispatch_projectx_job(
             "source_intent_id": source_intent_id,
             "plan_id": plan_id,
             "source_agent": source_agent,
+            **(extra_params or {}),
         },
     }
     _append_operator_event(
@@ -1879,6 +1881,12 @@ async def api_brp_playbook_execute(playbook_id: str, request: Request):
         plan_id=str(playbook.get("event_id") or ""),
         source_agent=actor,
         log_prefix="dashboard.brp_playbook",
+        extra_params={
+            "brp_execution_context": playbook.get("execution_context"),
+            "brp_evidence": playbook.get("evidence"),
+            "brp_guardrails": playbook.get("guardrails"),
+            "brp_operator_checks": playbook.get("operator_checks"),
+        },
     )
     remediation = BRPBridge.record_operator_remediation(
         alert_id=str(playbook.get("alert_id") or ""),
