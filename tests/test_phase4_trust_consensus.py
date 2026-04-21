@@ -613,6 +613,35 @@ class TestBRPMeshGateway:
         allowed, reason = gateway.check_access("bad_agent", "target", "ch")
         assert allowed is False
 
+    def test_predictive_screening_can_escalate_clean_bases(self, tmp_dir):
+        from simp.mesh.brp_mesh_gateway import BRPMeshGateway
+
+        class _StubBRP:
+            def analyze_event(self, log_entry):
+                return {
+                    "threat_assessment": {"threat_level": "low", "confidence": 0.05},
+                    "pattern_details": [],
+                }
+
+        gateway = BRPMeshGateway(brp_db_path=str(tmp_dir / "brp.db"), dry_run=False)
+        gateway._get_brp = lambda: _StubBRP()
+
+        pkt = self._make_packet(
+            sender_id="projectx_native",
+            payload={
+                "type": "computer_use",
+                "projectx_action": "run_shell",
+                "details": "autonomous multi-step fuzz payload attempting sandbox bypass",
+            },
+        )
+
+        result = gateway.screen_packet(pkt)
+
+        assert result.allowed is False
+        assert result.threat_level in {"high", "critical"}
+        assert result.metadata["predictive_assessment"]["score_boost"] > 0.0
+        assert any(pattern["type"] == "zero_day_signal" for pattern in result.patterns)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ProjectX Mesh Bridge Tests (unit, no broker connection needed)

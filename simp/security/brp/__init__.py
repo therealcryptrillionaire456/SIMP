@@ -15,4 +15,8 @@ from .reasoning_engine import ReasoningEngine
 from .memory_system import MemorySystem
 from .threat_database import ThreatDatabase
 from .alert_orchestrator import AlertOrchestrator
-from .protocol_core import BillRusselProtocolEnhanced
+from .predictive_safety import PredictiveSafetyIntelligence
+from .protocol_core import EnhancedBillRussellProtocol
+
+# Backwards-compatible export used by older scripts/tests.
+BillRusselProtocolEnhanced = EnhancedBillRussellProtocol

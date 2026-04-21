@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import threading
+from collections import deque
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -27,6 +28,7 @@ from simp.security.brp_models import (
     BRPSeverity,
     RESTRICTED_ACTIONS,
 )
+from simp.security.brp.predictive_safety import PredictiveSafetyIntelligence
 
 logger = logging.getLogger("SIMP.BRP")
 
@@ -87,6 +89,13 @@ class BRPBridge:
         self.plans_log = self.data_dir / "plans.jsonl"
         self.observations_log = self.data_dir / "observations.jsonl"
         self.responses_log = self.data_dir / "responses.jsonl"
+        self.adaptive_rules_file = self.data_dir / "adaptive_rules.json"
+
+        self._predictive = PredictiveSafetyIntelligence()
+        self._recent_events = deque(maxlen=256)
+        self._recent_observations = deque(maxlen=256)
+        self._adaptive_rules: Dict[str, Dict[str, Any]] = {}
+        self._warm_history()
 
     # ------------------------------------------------------------------
     # Public API
@@ -102,6 +111,16 @@ class BRPBridge:
         """
         mode = event.mode or self.default_mode
         threat_score, severity, threat_tags = self._score_event(event)
+        predictive = self._predictive.evaluate(
+            event.to_dict(),
+            recent_events=list(self._recent_events),
+            recent_observations=list(self._recent_observations),
+            adaptive_rules=self._adaptive_rules,
+            sensitive_action_tier=self._extract_sensitive_action_tier(event.action, event.context),
+        )
+        threat_score = min(1.0, threat_score + predictive["score_boost"])
+        threat_tags = self._merge_tags(threat_tags, predictive["threat_tags"])
+        severity = self._severity_for(threat_score)
         decision = self._decide(threat_score, mode, event.action)
 
         response = BRPResponse(
@@ -113,11 +132,14 @@ class BRPBridge:
             confidence=self._confidence_for(threat_score),
             threat_tags=threat_tags,
             summary=self._build_summary(event.action, decision, threat_score),
+            metadata={"predictive_assessment": predictive},
         )
 
         # Persist
-        _append_jsonl(self.events_log, event.to_dict())
+        event_record = event.to_dict()
+        _append_jsonl(self.events_log, event_record)
         _append_jsonl(self.responses_log, response.to_dict())
+        self._recent_events.append(event_record)
 
         logger.info(
             "BRP event evaluated: %s -> %s (threat=%.2f, mode=%s)",
@@ -135,12 +157,30 @@ class BRPBridge:
         mode = plan.mode or self.default_mode
         max_threat = 0.0
         all_tags: List[str] = []
+        predictive_details: List[Dict[str, Any]] = []
 
         for step in plan.steps:
             action = step.get("action", "")
             t, _, tags = self._score_action(action, step)
-            max_threat = max(max_threat, t)
+            predictive = self._predictive.evaluate(
+                {
+                    "source_agent": plan.source_agent,
+                    "event_type": BRPEventType.PLAN_REVIEW.value,
+                    "action": action,
+                    "params": step,
+                    "context": plan.context,
+                    "tags": plan.tags,
+                },
+                recent_events=list(self._recent_events),
+                recent_observations=list(self._recent_observations),
+                adaptive_rules=self._adaptive_rules,
+                sensitive_action_tier=self._extract_sensitive_action_tier(action, plan.context),
+            )
+            step_threat = min(1.0, t + predictive["score_boost"])
+            max_threat = max(max_threat, step_threat)
             all_tags.extend(tags)
+            all_tags.extend(predictive["threat_tags"])
+            predictive_details.append({"action": action, **predictive})
 
         severity = self._severity_for(max_threat)
         decision = self._decide(max_threat, mode, "plan_review")
@@ -152,12 +192,23 @@ class BRPBridge:
             severity=severity,
             threat_score=max_threat,
             confidence=self._confidence_for(max_threat),
-            threat_tags=list(set(all_tags)),
+            threat_tags=self._merge_tags(all_tags, []),
             summary=self._build_summary("plan_review", decision, max_threat),
+            metadata={"predictive_steps": predictive_details},
         )
 
-        _append_jsonl(self.plans_log, plan.to_dict())
+        plan_record = plan.to_dict()
+        _append_jsonl(self.plans_log, plan_record)
         _append_jsonl(self.responses_log, response.to_dict())
+        self._recent_events.append(
+            {
+                "timestamp": plan_record["timestamp"],
+                "source_agent": plan_record["source_agent"],
+                "event_type": BRPEventType.PLAN_REVIEW.value,
+                "action": "plan_review",
+                "tags": response.threat_tags,
+            }
+        )
 
         logger.info(
             "BRP plan evaluated: %s -> %s (threat=%.2f, steps=%d)",
@@ -171,11 +222,20 @@ class BRPBridge:
 
         Observations are logged but do not produce a decision response.
         """
-        _append_jsonl(self.observations_log, observation.to_dict())
+        observation_record = observation.to_dict()
+        _append_jsonl(self.observations_log, observation_record)
+        self._recent_observations.append(observation_record)
+        learned_rules = self._learn_from_observation(observation_record)
         logger.info(
             "BRP observation ingested: %s (event=%s, outcome=%s)",
             observation.observation_id, observation.event_id, observation.outcome,
         )
+        if learned_rules:
+            logger.info(
+                "BRP adaptive rules updated from observation %s: %s",
+                observation.observation_id,
+                ", ".join(learned_rules),
+            )
 
     # ------------------------------------------------------------------
     # Scoring internals
@@ -248,6 +308,101 @@ class BRPBridge:
 
         severity = self._severity_for(threat_score)
         return threat_score, severity, threat_tags
+
+    def _warm_history(self) -> None:
+        self._adaptive_rules = self._load_adaptive_rules()
+
+        for record in self._load_jsonl_tail(self.events_log):
+            self._recent_events.append(record)
+        for record in self._load_jsonl_tail(self.observations_log):
+            self._recent_observations.append(record)
+
+    @staticmethod
+    def _load_jsonl_tail(filepath: Path, limit: int = 256) -> List[Dict[str, Any]]:
+        if not filepath.exists():
+            return []
+        records = []
+        with open(filepath, "r", encoding="utf-8") as handle:
+            for line in deque(handle, maxlen=limit):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    records.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+        return records
+
+    def _load_adaptive_rules(self) -> Dict[str, Dict[str, Any]]:
+        if not self.adaptive_rules_file.exists():
+            return {}
+        try:
+            with open(self.adaptive_rules_file, "r", encoding="utf-8") as handle:
+                data = json.load(handle)
+            if isinstance(data, dict):
+                return data
+        except (OSError, json.JSONDecodeError):
+            logger.warning("BRP adaptive rules file unreadable: %s", self.adaptive_rules_file)
+        return {}
+
+    def _save_adaptive_rules(self) -> None:
+        with open(self.adaptive_rules_file, "w", encoding="utf-8") as handle:
+            json.dump(self._adaptive_rules, handle, indent=2, sort_keys=True)
+
+    def _learn_from_observation(self, observation: Dict[str, Any]) -> List[str]:
+        learned = []
+        for proposal in self._predictive.derive_rules_from_observation(observation):
+            existing = self._adaptive_rules.get(proposal["key"])
+            if existing is None:
+                count = 1
+                self._adaptive_rules[proposal["key"]] = {
+                    **proposal,
+                    "count": count,
+                    "boost": self._predictive.rule_boost_for_count(count, proposal["severity"]),
+                    "last_seen": observation.get("timestamp"),
+                    "active": True,
+                }
+            else:
+                existing["count"] = int(existing.get("count", 0)) + 1
+                existing["severity"] = proposal["severity"]
+                existing["boost"] = self._predictive.rule_boost_for_count(
+                    existing["count"],
+                    proposal["severity"],
+                )
+                existing["last_seen"] = observation.get("timestamp")
+                existing["active"] = True
+            learned.append(proposal["key"])
+
+        if learned:
+            self._save_adaptive_rules()
+        return learned
+
+    @staticmethod
+    def _extract_sensitive_action_tier(action: str, context: Dict[str, Any]) -> Optional[int]:
+        action_name = str(
+            context.get("projectx_action")
+            or context.get("action")
+            or action
+            or ""
+        ).strip()
+        if not action_name:
+            return None
+        try:
+            from simp.projectx.computer import ACTION_TIERS
+        except Exception:
+            return None
+        return ACTION_TIERS.get(action_name)
+
+    @staticmethod
+    def _merge_tags(tags: List[str], extra_tags: List[str]) -> List[str]:
+        seen = set()
+        merged = []
+        for tag in list(tags) + list(extra_tags):
+            if tag in seen:
+                continue
+            seen.add(tag)
+            merged.append(tag)
+        return merged
 
     @staticmethod
     def _severity_for(threat_score: float) -> str:

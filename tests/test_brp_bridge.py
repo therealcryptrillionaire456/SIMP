@@ -233,3 +233,54 @@ class TestShadowAllow:
     def test_default_mode_is_shadow(self):
         bridge = BRPBridge(data_dir=tempfile.mkdtemp())
         assert bridge.default_mode == BRPMode.SHADOW.value
+
+
+class TestPredictiveSafety:
+    def test_predictive_keywords_raise_threat_and_metadata(self, bridge):
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="run_shell",
+            context={
+                "projectx_action": "run_shell",
+                "details": "autonomous multi-step fuzz payload trying sandbox bypass",
+            },
+            tags=["projectx", "mesh", "network"],
+        )
+
+        resp = bridge.evaluate_event(event)
+
+        assert resp.threat_score >= 0.45
+        assert "zero_day_signal" in resp.threat_tags
+        assert "autonomous_signal" in resp.threat_tags
+        predictive = resp.metadata["predictive_assessment"]
+        assert predictive["domains"]
+        assert predictive["score_boost"] > 0.0
+
+    def test_negative_observations_create_adaptive_rules(self, bridge, tmp_data_dir):
+        for _ in range(2):
+            bridge.ingest_observation(
+                BRPObservation(
+                    source_agent="projectx_native",
+                    action="run_shell",
+                    outcome="failure",
+                    tags=["projectx", "maintenance"],
+                )
+            )
+
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="run_shell",
+            context={"projectx_action": "run_shell"},
+            tags=["projectx"],
+        )
+        resp = bridge.evaluate_event(event)
+
+        assert "adaptive_rule_match" in resp.threat_tags
+        predictive = resp.metadata["predictive_assessment"]
+        assert predictive["near_miss_count"] >= 2
+        assert predictive["adaptive_rule_matches"]
+
+        adaptive_rules = os.path.join(tmp_data_dir, "adaptive_rules.json")
+        with open(adaptive_rules, "r", encoding="utf-8") as handle:
+            persisted = json.load(handle)
+        assert "action:run_shell" in persisted

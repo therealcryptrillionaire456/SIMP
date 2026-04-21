@@ -38,7 +38,9 @@ import logging
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+from simp.security.brp.predictive_safety import PredictiveSafetyIntelligence
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +93,7 @@ class ScreeningResult:
     agent_id:      str
     patterns:      List[Dict] = field(default_factory=list)
     action_taken:  str        = ""    # none | penalise | block | alert
+    metadata:      Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict:
         return {
@@ -101,6 +104,7 @@ class ScreeningResult:
             "agent_id":     self.agent_id,
             "patterns":     self.patterns,
             "action_taken": self.action_taken,
+            "metadata":     self.metadata,
         }
 
 
@@ -149,6 +153,7 @@ class BRPMeshGateway:
             "blocks_issued":     0,
             "blocks_expired":    0,
         }
+        self._predictive = PredictiveSafetyIntelligence()
 
         # Lazy-init BRP to avoid import cost on startup
         self._brp             = None
@@ -208,6 +213,25 @@ class BRPMeshGateway:
         threat_level = analysis.get("threat_assessment", {}).get("threat_level", "low")
         confidence   = analysis.get("threat_assessment", {}).get("confidence", 0.0)
         patterns     = analysis.get("pattern_details", [])
+        predictive = self._predictive.evaluate(
+            {
+                **log_entry,
+                "source_agent": agent_id,
+                "action": "mesh_packet",
+                "tags": [
+                    getattr(packet, "channel", ""),
+                    str(getattr(packet, "msg_type", "")),
+                    str((getattr(packet, "payload", {}) or {}).get("type", "")),
+                ],
+            },
+            recent_events=self._recent_predictive_events(),
+            recent_observations=[],
+            adaptive_rules={},
+            sensitive_action_tier=self._extract_sensitive_action_tier(getattr(packet, "payload", {}) or {}),
+        )
+        threat_level = self._max_threat_level(threat_level, predictive["threat_level"])
+        confidence = max(confidence, predictive["confidence"])
+        patterns = patterns + self._predictive.synthetic_patterns(predictive)
 
         # Determine action
         action_taken = "none"
@@ -252,6 +276,7 @@ class BRPMeshGateway:
             agent_id     = agent_id,
             patterns     = patterns,
             action_taken = action_taken,
+            metadata     = {"predictive_assessment": predictive},
         )
         self._log_screening(result)
         return result
@@ -411,6 +436,8 @@ class BRPMeshGateway:
             "routing_hops":  len(getattr(packet, "routing_history", []) or []),
             "timestamp":     str(getattr(packet, "timestamp", "")),
             "details":       json.dumps(payload)[:200],
+            "payload_type":  str(payload.get("type", "")),
+            "projectx_action": str(payload.get("projectx_action") or payload.get("action") or ""),
         }
 
     # ── BRP lazy init ─────────────────────────────────────────────────────────
@@ -440,6 +467,46 @@ class BRPMeshGateway:
             self._screening_log.append(entry)
             if len(self._screening_log) > self._max_log:
                 self._screening_log = self._screening_log[-self._max_log:]
+
+    def _recent_predictive_events(self) -> List[Dict[str, Any]]:
+        with self._lock:
+            recent = list(self._screening_log[-64:])
+        return [
+            {
+                "ts": item.get("ts"),
+                "source_agent": item.get("agent_id"),
+                "action": "mesh_packet",
+                "tags": [item.get("threat_level", "")] + [
+                    pattern.get("type", "")
+                    for pattern in item.get("patterns", [])
+                    if isinstance(pattern, dict)
+                ],
+            }
+            for item in recent
+        ]
+
+    @staticmethod
+    def _extract_sensitive_action_tier(payload: Dict[str, Any]) -> Optional[int]:
+        action_name = str(
+            payload.get("projectx_action")
+            or payload.get("action")
+            or payload.get("capability")
+            or ""
+        ).strip()
+        if not action_name:
+            return None
+        try:
+            from simp.projectx.computer import ACTION_TIERS
+        except Exception:
+            return None
+        return ACTION_TIERS.get(action_name)
+
+    @staticmethod
+    def _max_threat_level(current: str, predicted: str) -> str:
+        ranking = {"clean": 0, "low": 1, "medium": 2, "high": 3, "critical": 4, "unknown": -1}
+        if ranking.get(predicted, -1) > ranking.get(current, -1):
+            return predicted
+        return current
 
     def get_recent_screenings(self, limit: int = 50) -> List[Dict]:
         with self._lock:
