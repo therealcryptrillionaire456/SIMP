@@ -179,6 +179,7 @@
           <option value="info">Info</option>
         </select>
         <input type="text" id="brp-source-filter" placeholder="Filter by source agent or action..." class="filter-input">
+        <button type="button" class="refresh-btn" id="brp-export-btn">Open BRP Report</button>
       </div>
       <div class="cards-grid" id="brp-overview-cards">
         <div class="card"><div class="card-label">Responses Reviewed</div><div class="card-value mono" id="val-brp-responses">--</div></div>
@@ -187,6 +188,8 @@
         <div class="card"><div class="card-label">Average Threat</div><div class="card-value mono" id="val-brp-avg-threat">--</div></div>
         <div class="card"><div class="card-label">Last Evaluation</div><div class="card-value mono" id="val-brp-last-eval">--</div></div>
         <div class="card"><div class="card-label">Top Threat Tag</div><div class="card-value mono" id="val-brp-top-tag">--</div></div>
+        <div class="card"><div class="card-label">Open Alerts</div><div class="card-value mono" id="val-brp-open-alerts">--</div></div>
+        <div class="card"><div class="card-label">Acknowledged</div><div class="card-value mono" id="val-brp-acked-alerts">--</div></div>
       </div>
       <div class="diagnostic-grid">
         <div class="card diagnostic-card">
@@ -204,6 +207,15 @@
             <div class="empty-state">BRP insights not loaded.</div>
           </div>
         </div>
+        <div class="card diagnostic-card">
+          <div class="card-label">Remediation Playbooks</div>
+          <div id="brp-playbooks-feed" class="activity-feed">
+            <div class="empty-state">No BRP playbooks derived yet.</div>
+          </div>
+        </div>
+      </div>
+      <div class="activity-feed" id="brp-alerts-feed">
+        <div class="empty-state">No BRP alerts derived yet.</div>
       </div>
       <div class="table-wrap">
         <table class="agents-table">

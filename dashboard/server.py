@@ -1,8 +1,9 @@
 """
 SIMP Monitoring Dashboard — Read-Only FastAPI Backend
 
-Proxies existing SIMP broker endpoints (port 5555) for safe public exposure.
-All routes are GET-only. No write operations. No secrets exposed.
+ Proxies existing SIMP broker endpoints (port 5555) for safe public exposure.
+ Public routes are read-heavy; narrow BRP operator acknowledgement actions use
+ targeted POST endpoints. No secrets exposed.
 
 Run:
     python dashboard/server.py
@@ -165,7 +166,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -179,7 +180,7 @@ app.include_router(operator_router)
 activity_buffer: deque[dict] = deque(maxlen=ACTIVITY_BUFFER_SIZE)
 _last_snapshot: dict[str, Any] = {}
 _started_at = datetime.now(timezone.utc).isoformat()
-DASHBOARD_VERSION = "1.4.1"
+DASHBOARD_VERSION = "1.4.2"
 _broker_client: httpx.AsyncClient | None = None
 _projectx_client: httpx.AsyncClient | None = None
 _broker_cache: dict[str, dict[str, Any]] = {}
@@ -317,6 +318,38 @@ def _brp_adaptive_rules_payload(limit: int = 50) -> dict[str, Any]:
     }
 
 
+def _brp_alerts_payload(limit: int = 25) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 100))
+    alerts = BRPBridge.read_operator_alerts(data_dir=str(_brp_data_dir()), limit=safe_limit)
+    return {
+        "status": "success",
+        "count": len(alerts),
+        "limit": safe_limit,
+        "alerts": alerts,
+    }
+
+
+def _brp_incidents_payload(limit: int = 25) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 100))
+    return BRPBridge.read_operator_incidents(data_dir=str(_brp_data_dir()), limit=safe_limit)
+
+
+def _brp_playbooks_payload(limit: int = 10) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 50))
+    playbooks = BRPBridge.read_operator_playbooks(data_dir=str(_brp_data_dir()), limit=safe_limit)
+    return {
+        "status": "success",
+        "count": len(playbooks),
+        "limit": safe_limit,
+        "playbooks": playbooks,
+    }
+
+
+def _brp_report_payload(limit: int = 25) -> dict[str, Any]:
+    safe_limit = max(1, min(limit, 100))
+    return BRPBridge.read_operator_report(data_dir=str(_brp_data_dir()), limit=safe_limit)
+
+
 def _brp_insights_payload(limit: int = 10) -> dict[str, Any]:
     safe_limit = max(1, min(limit, 50))
     status = _brp_status_payload(recent_limit=max(25, safe_limit))
@@ -362,6 +395,9 @@ def _brp_insights_payload(limit: int = 10) -> dict[str, Any]:
 def _brp_ws_payload() -> dict[str, Any]:
     return {
         "status": _brp_status_payload(recent_limit=25),
+        "incidents": _brp_incidents_payload(limit=12),
+        "alerts": _brp_alerts_payload(limit=12),
+        "playbooks": _brp_playbooks_payload(limit=8),
         "evaluations": _brp_filtered_evaluations_payload(limit=12),
         "adaptive_rules": _brp_adaptive_rules_payload(limit=12),
         "insights": _brp_insights_payload(limit=12),
@@ -1183,7 +1219,8 @@ async def _broadcast_ws(event_type: str, data: dict):
             disconnected.add(ws)
     
     if disconnected:
-        _ws_clients -= disconnected
+        for ws in disconnected:
+            _ws_clients.discard(ws)
         logger.debug(f"Removed {len(disconnected)} disconnected WebSocket clients. Active: {len(_ws_clients)}")
 
 
@@ -1246,7 +1283,7 @@ async def api_health():
         broker_state = health_data.get("state", "paused" if health_data.get("paused") else broker_state)
         agents_registered = max(agents_registered, health_data.get("agents_online", 0))
 
-    return {
+    payload = {
         "status": "healthy" if broker_up else "degraded",
         "broker_reachable": broker_up,
         "dashboard_version": DASHBOARD_VERSION,
@@ -1254,6 +1291,9 @@ async def api_health():
         "agents_registered": agents_registered,
         "uptime_seconds": 0,
     }
+    if health_data and isinstance(health_data.get("brp"), dict):
+        payload["brp"] = _redact(health_data.get("brp"))
+    return payload
 
 
 @app.get("/health")
@@ -1648,10 +1688,67 @@ async def api_brp_adaptive_rules(limit: int = 50):
     return _redact(_brp_adaptive_rules_payload(limit=limit))
 
 
+@app.get("/api/brp/alerts")
+async def api_brp_alerts(limit: int = 25):
+    """Derived BRP alerts for operator triage."""
+    return _redact(_brp_alerts_payload(limit=limit))
+
+
+@app.get("/api/brp/incidents")
+async def api_brp_incidents(limit: int = 25):
+    """Current BRP incident state including open vs acknowledged alerts."""
+    return _redact(_brp_incidents_payload(limit=limit))
+
+
+@app.get("/api/brp/playbooks")
+async def api_brp_playbooks(limit: int = 10):
+    """Derived remediation playbooks for current BRP alerts."""
+    return _redact(_brp_playbooks_payload(limit=limit))
+
+
 @app.get("/api/brp/insights")
 async def api_brp_insights(limit: int = 10):
     """Condensed BRP operator view combining recent decisions and active rules."""
     return _redact(_brp_insights_payload(limit=limit))
+
+
+@app.get("/api/brp/report")
+async def api_brp_report(limit: int = 25):
+    """Combined BRP report bundle for exports and operator snapshots."""
+    return _redact(_brp_report_payload(limit=limit))
+
+
+@app.post("/api/brp/alerts/{alert_id}/acknowledge")
+async def api_brp_alert_acknowledge(alert_id: str, request: Request):
+    """Persist operator acknowledgement state for a BRP alert."""
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
+
+    actor = str(payload.get("actor") or "dashboard_ui").strip() or "dashboard_ui"
+    note = str(payload.get("note") or "").strip() or None
+    alert = BRPBridge.acknowledge_operator_alert(
+        alert_id,
+        actor=actor,
+        note=note,
+        data_dir=str(_brp_data_dir()),
+    )
+    if alert is None:
+        return {"status": "not_found", "alert_id": alert_id}
+
+    _append_operator_event(
+        request_id=str(uuid.uuid4()),
+        intent_type="brp_alert_acknowledge",
+        action_type="dashboard.brp_alert_acknowledged",
+        status="ok",
+        summary=f"BRP alert acknowledged: {alert_id}",
+        source_agent=actor,
+        target_agent="brp_bridge",
+        details={"alert_id": alert_id, "note": note},
+    )
+    await _broadcast_ws("brp", _redact(_brp_ws_payload()))
+    return _redact({"status": "success", "alert": alert})
 
 
 @app.get("/api/projectx/system")

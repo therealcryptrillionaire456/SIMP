@@ -117,14 +117,19 @@
     valBrpAvgThreat: $("#val-brp-avg-threat"),
     valBrpLastEval: $("#val-brp-last-eval"),
     valBrpTopTag: $("#val-brp-top-tag"),
+    valBrpOpenAlerts: $("#val-brp-open-alerts"),
+    valBrpAckedAlerts: $("#val-brp-acked-alerts"),
     brpPostureSummary: $("#brp-posture-summary"),
     brpThreatTags: $("#brp-threat-tags"),
     brpSignalSummary: $("#brp-signal-summary"),
+    brpPlaybooksFeed: $("#brp-playbooks-feed"),
     brpEvaluationsTbody: $("#brp-evaluations-tbody"),
     brpRulesTbody: $("#brp-rules-tbody"),
+    brpAlertsFeed: $("#brp-alerts-feed"),
     brpDecisionFilter: $("#brp-decision-filter"),
     brpSeverityFilter: $("#brp-severity-filter"),
     brpSourceFilter: $("#brp-source-filter"),
+    brpExportBtn: $("#brp-export-btn"),
     brpDrawer: $("#brp-drawer"),
     brpDrawerBackdrop: $("#brp-drawer-backdrop"),
     brpDrawerTitle: $("#brp-drawer-title"),
@@ -1429,6 +1434,20 @@
     }
   }
 
+  function renderBrpIncidents(data) {
+    if (!data) return;
+    var openAlerts = Number(data.open_alerts || 0);
+    var ackedAlerts = Number(data.acknowledged_alerts || 0);
+    if (dom.valBrpOpenAlerts) {
+      dom.valBrpOpenAlerts.textContent = String(openAlerts);
+      dom.valBrpOpenAlerts.className = openAlerts > 0 ? "card-value mono status-error" : "card-value mono";
+    }
+    if (dom.valBrpAckedAlerts) {
+      dom.valBrpAckedAlerts.textContent = String(ackedAlerts);
+      dom.valBrpAckedAlerts.className = ackedAlerts > 0 ? "card-value mono status-healthy" : "card-value mono";
+    }
+  }
+
   function renderBrpInsights(data) {
     if (!dom.brpSignalSummary) return;
     if (!data || data.status !== "success") {
@@ -1496,6 +1515,78 @@
     }).join("");
   }
 
+  function renderBrpPlaybooks(data) {
+    if (!dom.brpPlaybooksFeed) return;
+    var playbooks = (data && data.playbooks) || [];
+    if (!playbooks.length) {
+      dom.brpPlaybooksFeed.innerHTML = '<div class="empty-state">No BRP playbooks derived yet.</div>';
+      return;
+    }
+    dom.brpPlaybooksFeed.innerHTML = playbooks.slice(0, 8).map(function(playbook) {
+      var inspectButton = playbook.event_id
+        ? '<button type="button" class="intent-row-button" data-brp-event-id="' + escHtml(playbook.event_id) + '">inspect</button>'
+        : '<span class="text-muted">playbook</span>';
+      return '<div class="activity-item">'
+        + '<span class="activity-ts">' + escHtml(formatDate(playbook.timestamp)) + '</span>'
+        + '<span class="activity-type">' + brpSeverityBadge(playbook.priority || playbook.severity || "medium") + '</span>'
+        + '<span class="activity-result">' + escHtml(playbook.title || "--") + '<div class="brp-signal-line">' + escHtml(playbook.primary_action || "--") + '</div><div class="brp-signal-line">' + inspectButton + '</div></span>'
+        + '<span class="activity-status ' + (playbook.status === "acknowledged" ? "online" : "queued") + '">' + escHtml(playbook.status || "--") + '</span>'
+        + '</div>';
+    }).join("");
+    dom.brpPlaybooksFeed.querySelectorAll("[data-brp-event-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openBrpDrawer(button.getAttribute("data-brp-event-id"));
+      });
+    });
+  }
+
+  async function acknowledgeBrpAlert(alertId) {
+    if (!alertId) return;
+    var response = await apiPost("/api/brp/alerts/" + encodeURIComponent(alertId) + "/acknowledge", {
+      actor: "dashboard_ui",
+      note: "triaged via dashboard"
+    });
+    if (!response || response.status !== "success") return;
+    await refreshAll();
+  }
+
+  function renderBrpAlerts(data) {
+    if (!dom.brpAlertsFeed) return;
+    var alerts = (data && data.alerts) || [];
+    if (!alerts.length) {
+      dom.brpAlertsFeed.innerHTML = '<div class="empty-state">No BRP alerts derived yet.</div>';
+      return;
+    }
+    dom.brpAlertsFeed.innerHTML = alerts.slice(0, 8).map(function(alert) {
+      var statusClass = String(alert.severity || "").toLowerCase();
+      var severityBadge = brpSeverityBadge(alert.severity || "medium");
+      var openButton = alert.event_id
+        ? '<button type="button" class="intent-row-button" data-brp-event-id="' + escHtml(alert.event_id) + '">inspect</button>'
+        : '<span class="text-muted">summary</span>';
+      var ackButton = alert.acknowledged
+        ? '<span class="text-muted">acked by ' + escHtml(alert.acknowledged_by || "operator") + '</span>'
+        : '<button type="button" class="intent-row-button" data-brp-alert-id="' + escHtml(alert.alert_id || "") + '">acknowledge</button>';
+      var stateText = alert.state || (alert.acknowledged ? "acknowledged" : "open");
+      var lifecycleLabel = stateText + (alert.decision ? " • " + alert.decision : "");
+      return '<div class="activity-item">'
+        + '<span class="activity-ts">' + escHtml(formatDate(alert.timestamp)) + '</span>'
+        + '<span class="activity-type">' + severityBadge + '</span>'
+        + '<span class="activity-result">' + escHtml(alert.summary || "--") + '<div class="brp-signal-line">' + escHtml(alert.recommendation || "--") + '</div><div class="brp-signal-line">' + openButton + ' ' + ackButton + '</div></span>'
+        + '<span class="activity-status ' + (alert.acknowledged ? "online" : (statusClass === "critical" || statusClass === "high" ? "failed" : "queued")) + '">' + escHtml(lifecycleLabel) + '</span>'
+        + '</div>';
+    }).join("");
+    dom.brpAlertsFeed.querySelectorAll("[data-brp-event-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        openBrpDrawer(button.getAttribute("data-brp-event-id"));
+      });
+    });
+    dom.brpAlertsFeed.querySelectorAll("[data-brp-alert-id]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        acknowledgeBrpAlert(button.getAttribute("data-brp-alert-id"));
+      });
+    });
+  }
+
   async function openBrpDrawer(eventId) {
     if (!eventId) return;
     var payload = await apiFetch("/api/brp/evaluations/" + encodeURIComponent(eventId));
@@ -1537,6 +1628,8 @@
         { label: "Predictive Domains", value: (predictive.domains || []).join(", ") || (predictiveSteps.length ? "step-derived" : "--") },
         { label: "Predictive Matches", value: predictive.adaptive_rule_matches ? String(predictive.adaptive_rule_matches.length) : (predictiveSteps.length ? String(predictiveSteps.length) : "--") },
         { label: "Multimodal Channels", value: ((multimodal.summary || {}).detection_breakdown ? Object.keys(multimodal.summary.detection_breakdown).filter(function(key) { return multimodal.summary.detection_breakdown[key]; }).join(", ") : (multimodalSteps.length ? "step-derived" : "--")) || "--" },
+        { label: "Incident State", value: ((detail.alert || {}).state) || "--" },
+        { label: "Primary Playbook", value: ((detail.playbook || {}).primary_action) || "--" },
       ]);
       if (dom.brpDrawerTags) {
         var tags = evaluation.threat_tags || [];
@@ -2026,7 +2119,7 @@
 
     // Fetch all endpoints in parallel
     var brpQuery = buildBrpEvaluationQuery();
-    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, brpStatus, brpEvaluations, brpRules, brpInsights] = await Promise.all([
+    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, brpStatus, brpIncidents, brpAlerts, brpPlaybooks, brpEvaluations, brpRules, brpInsights] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -2049,6 +2142,9 @@
       apiFetch("/api/projectx/actions"),
       apiFetch("/api/projectx/protocol-facts"),
       apiFetch("/api/brp/status"),
+      apiFetch("/api/brp/incidents?limit=12"),
+      apiFetch("/api/brp/alerts?limit=8"),
+      apiFetch("/api/brp/playbooks?limit=8"),
       apiFetch("/api/brp/evaluations?" + brpQuery),
       apiFetch("/api/brp/adaptive-rules?limit=12"),
       apiFetch("/api/brp/insights?limit=12"),
@@ -2080,6 +2176,9 @@
     renderProjectXActions(projectxActions);
     renderProjectXProtocolFacts(projectxProtocolFacts);
     renderBrpStatus(brpStatus);
+    renderBrpIncidents(brpIncidents);
+    renderBrpAlerts(brpAlerts);
+    renderBrpPlaybooks(brpPlaybooks);
     renderBrpEvaluations(brpEvaluations);
     renderBrpAdaptiveRules(brpRules);
     renderBrpInsights(brpInsights);
@@ -2238,6 +2337,9 @@
       case 'brp':
         if (msg.data) {
           renderBrpStatus(msg.data.status);
+          renderBrpIncidents(msg.data.incidents);
+          renderBrpAlerts(msg.data.alerts);
+          renderBrpPlaybooks(msg.data.playbooks);
           renderBrpEvaluations(msg.data.evaluations);
           renderBrpAdaptiveRules(msg.data.adaptive_rules);
           renderBrpInsights(msg.data.insights);
@@ -2372,6 +2474,11 @@
     dom.brpSourceFilter.addEventListener("input", function() {
       if (brpFilterTimer) clearTimeout(brpFilterTimer);
       brpFilterTimer = setTimeout(refreshAll, 250);
+    });
+  }
+  if (dom.brpExportBtn) {
+    dom.brpExportBtn.addEventListener("click", function() {
+      window.open("/api/brp/report?limit=25", "_blank");
     });
   }
 

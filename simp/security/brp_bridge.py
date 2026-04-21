@@ -499,11 +499,23 @@ class BRPBridge:
             if any(str(tag).lower() in key for tag in evaluation.get("threat_tags", []) or []):
                 related_rules.append(rule)
 
+        related_alert = next(
+            (
+                alert
+                for alert in cls.read_operator_alerts(data_dir=str(brp_dir), limit=200)
+                if str(alert.get("event_id") or "") == lookup_event_id
+            ),
+            None,
+        )
+        related_playbook = cls._build_operator_playbook(related_alert) if related_alert else None
+
         return {
             "evaluation": evaluation,
             "source_record": event_record or plan_record,
             "related_observations": related_observations,
             "related_rules": related_rules[:20],
+            "alert": related_alert,
+            "playbook": related_playbook,
         }
 
     @classmethod
@@ -534,6 +546,183 @@ class BRPBridge:
             reverse=False,
         )
         return rules[: max(1, min(limit, 500))]
+
+    @classmethod
+    def read_operator_alerts(
+        cls,
+        data_dir: Optional[str] = None,
+        limit: int = 25,
+    ) -> List[Dict[str, Any]]:
+        """Derive operator-facing BRP alerts from recent evaluations and adaptive rules."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        evaluations = cls.read_operator_evaluations(data_dir=str(brp_dir), limit=max(limit * 4, 50))
+        rules = cls.read_operator_adaptive_rules(data_dir=str(brp_dir), limit=100)
+        alert_state = cls._load_operator_alert_state(brp_dir)
+
+        alerts: List[Dict[str, Any]] = []
+        for evaluation in evaluations:
+            severity = str(evaluation.get("severity") or "").lower()
+            decision = str(evaluation.get("decision") or "").upper()
+            score = float(evaluation.get("threat_score") or 0.0)
+            if severity not in {"high", "critical"} and decision not in {"ELEVATE", "DENY"} and score < 0.7:
+                continue
+
+            recommendation = "Review BRP detail and correlated observations."
+            if decision in {"ELEVATE", "DENY"}:
+                recommendation = "Inspect the BRP drawer, then verify whether the triggering action should remain blocked or elevated."
+            elif "restricted_action" in (evaluation.get("threat_tags") or []):
+                recommendation = "Confirm restricted-action policy and check whether the source flow is expected."
+            elif (evaluation.get("predictive_score_boost") or 0) > 0.0:
+                recommendation = "Inspect predictive matches and recent near-miss patterns for repeated unsafe behavior."
+
+            alerts.append(
+                {
+                    "alert_id": f"brp-alert::{evaluation.get('event_id')}",
+                    "event_id": evaluation.get("event_id"),
+                    "timestamp": evaluation.get("timestamp"),
+                    "severity": severity or "high",
+                    "decision": decision or "ELEVATE",
+                    "source_agent": evaluation.get("source_agent"),
+                    "action": evaluation.get("action") or evaluation.get("event_type"),
+                    "summary": evaluation.get("summary"),
+                    "threat_score": round(score, 4),
+                    "threat_tags": evaluation.get("threat_tags", []),
+                    "recommendation": recommendation,
+                }
+            )
+
+        active_rules = [rule for rule in rules if rule.get("active", True) and int(rule.get("count", 0)) >= 3]
+        if active_rules:
+            alerts.append(
+                {
+                    "alert_id": "brp-alert::adaptive-rules",
+                    "event_id": None,
+                    "timestamp": active_rules[0].get("last_seen"),
+                    "severity": "medium",
+                    "decision": "ADAPTIVE_RULE",
+                    "source_agent": "brp_bridge",
+                    "action": "adaptive_rule_growth",
+                    "summary": f"{len(active_rules)} adaptive BRP rules are active with repeated matches.",
+                    "threat_score": 0.55,
+                    "threat_tags": [rule.get("key") for rule in active_rules[:5]],
+                    "recommendation": "Review active adaptive rules for drift and confirm the rules still represent real threat signals.",
+                }
+            )
+
+        for alert in alerts:
+            state = alert_state.get(str(alert.get("alert_id") or ""), {})
+            acknowledged = bool(state.get("acknowledged"))
+            alert["state"] = str(state.get("state") or ("acknowledged" if acknowledged else "open"))
+            alert["acknowledged"] = acknowledged
+            alert["acknowledged_at"] = state.get("acknowledged_at")
+            alert["acknowledged_by"] = state.get("acknowledged_by")
+            alert["ack_note"] = state.get("ack_note")
+            alert["updated_at"] = state.get("updated_at")
+
+        alerts.sort(key=lambda item: (str(item.get("timestamp") or ""), float(item.get("threat_score") or 0.0)), reverse=True)
+        return alerts[: max(1, min(limit, 100))]
+
+    @classmethod
+    def read_operator_incidents(
+        cls,
+        data_dir: Optional[str] = None,
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Return operator incident counts plus current alert state."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        alerts = cls.read_operator_alerts(data_dir=str(brp_dir), limit=limit)
+        open_alerts = [alert for alert in alerts if not bool(alert.get("acknowledged"))]
+        critical_open = [
+            alert
+            for alert in open_alerts
+            if str(alert.get("severity") or "").lower() == "critical"
+        ]
+        return {
+            "status": "success",
+            "count": len(alerts),
+            "open_alerts": len(open_alerts),
+            "acknowledged_alerts": len(alerts) - len(open_alerts),
+            "critical_open_alerts": len(critical_open),
+            "latest_alert_at": alerts[0].get("timestamp") if alerts else None,
+            "alerts": alerts,
+        }
+
+    @classmethod
+    def acknowledge_operator_alert(
+        cls,
+        alert_id: str,
+        *,
+        actor: str = "dashboard_ui",
+        note: Optional[str] = None,
+        data_dir: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Persist alert acknowledgement metadata and return the merged alert."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        lookup_alert_id = str(alert_id or "").strip()
+        if not lookup_alert_id:
+            return None
+
+        alert = next(
+            (
+                item
+                for item in cls.read_operator_alerts(data_dir=str(brp_dir), limit=200)
+                if str(item.get("alert_id") or "") == lookup_alert_id
+            ),
+            None,
+        )
+        if alert is None:
+            return None
+
+        state = cls._load_operator_alert_state(brp_dir)
+        state[lookup_alert_id] = {
+            "acknowledged": True,
+            "state": "acknowledged",
+            "acknowledged_at": datetime.utcnow().isoformat(),
+            "acknowledged_by": str(actor or "dashboard_ui"),
+            "ack_note": str(note or "").strip() or None,
+            "updated_at": datetime.utcnow().isoformat(),
+        }
+        cls._save_operator_alert_state(brp_dir, state)
+        return next(
+            (
+                item
+                for item in cls.read_operator_alerts(data_dir=str(brp_dir), limit=200)
+                if str(item.get("alert_id") or "") == lookup_alert_id
+            ),
+            None,
+        )
+
+    @classmethod
+    def read_operator_playbooks(
+        cls,
+        data_dir: Optional[str] = None,
+        limit: int = 10,
+    ) -> List[Dict[str, Any]]:
+        """Return derived remediation playbooks for current BRP alerts."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        alerts = cls.read_operator_alerts(data_dir=str(brp_dir), limit=max(limit * 3, 25))
+        playbooks = [cls._build_operator_playbook(alert) for alert in alerts]
+        return playbooks[: max(1, min(limit, 50))]
+
+    @classmethod
+    def read_operator_report(
+        cls,
+        data_dir: Optional[str] = None,
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Return a combined BRP operator report bundle for exports and dashboards."""
+        brp_dir = cls._resolve_data_dir(data_dir)
+        return {
+            "status": "success",
+            "generated_at": datetime.utcnow().isoformat(),
+            "data_dir": str(brp_dir),
+            "status_summary": cls.read_operator_status(data_dir=str(brp_dir), recent_limit=max(limit, 25)),
+            "alerts": cls.read_operator_alerts(data_dir=str(brp_dir), limit=limit),
+            "incidents": cls.read_operator_incidents(data_dir=str(brp_dir), limit=limit),
+            "playbooks": cls.read_operator_playbooks(data_dir=str(brp_dir), limit=min(limit, 10)),
+            "evaluations": cls.read_operator_evaluations(data_dir=str(brp_dir), limit=limit),
+            "adaptive_rules": cls.read_operator_adaptive_rules(data_dir=str(brp_dir), limit=limit),
+        }
 
     # ------------------------------------------------------------------
     # Scoring internals
@@ -777,6 +966,75 @@ class BRPBridge:
     def _save_adaptive_rules(self) -> None:
         with open(self.adaptive_rules_file, "w", encoding="utf-8") as handle:
             json.dump(self._adaptive_rules, handle, indent=2, sort_keys=True)
+
+    @classmethod
+    def _operator_alert_state_file(cls, brp_dir: Path) -> Path:
+        return brp_dir / "alert_state.json"
+
+    @classmethod
+    def _load_operator_alert_state(cls, brp_dir: Path) -> Dict[str, Dict[str, Any]]:
+        data = cls._load_json_file(cls._operator_alert_state_file(brp_dir))
+        return data if isinstance(data, dict) else {}
+
+    @classmethod
+    def _save_operator_alert_state(cls, brp_dir: Path, state: Dict[str, Dict[str, Any]]) -> None:
+        filepath = cls._operator_alert_state_file(brp_dir)
+        with open(filepath, "w", encoding="utf-8") as handle:
+            json.dump(state, handle, indent=2, sort_keys=True)
+
+    @classmethod
+    def _build_operator_playbook(cls, alert: Dict[str, Any]) -> Dict[str, Any]:
+        actions: List[str] = [
+            "Inspect the BRP evidence drawer and correlated observations.",
+            "Validate that the source agent and requested action are expected for the current workflow.",
+        ]
+        threat_tags = {str(tag).lower() for tag in alert.get("threat_tags", []) or []}
+        decision = str(alert.get("decision") or "").upper()
+        severity = str(alert.get("severity") or "medium").lower()
+        action_name = str(alert.get("action") or "").strip().lower()
+
+        if decision in {"DENY", "ELEVATE"}:
+            actions.append("Confirm whether the elevated or denied action should remain blocked before retrying.")
+        if "restricted_action" in threat_tags or action_name in RESTRICTED_ACTIONS:
+            actions.append("Review restricted-action policy and verify whether a manual approval path is required.")
+        if any(tag.startswith("predictive") or tag.endswith("signal") for tag in threat_tags):
+            actions.append("Review predictive matches and recent adaptive rules for repeated near-miss behavior.")
+        if any(tag.startswith("multimodal_") for tag in threat_tags):
+            actions.append("Inspect multimodal detections to confirm the signal is not a false positive.")
+        if action_name in {"withdrawal", "fund_transfer"}:
+            actions.append("Confirm destination, amount, and authorization chain before allowing any financial transfer.")
+        if action_name in {"run_shell", "admin_delete"}:
+            actions.append("Pause high-risk operator execution until the requested command or deletion is manually reviewed.")
+
+        if severity == "critical":
+            title = "Immediate containment required"
+            category = "containment"
+        elif severity == "high":
+            title = "Escalated operator review"
+            category = "review"
+        else:
+            title = "Policy drift / safety hygiene review"
+            category = "hygiene"
+
+        deduped_actions = cls._dedupe_str_list(actions)
+        return {
+            "playbook_id": f"playbook::{alert.get('alert_id')}",
+            "alert_id": alert.get("alert_id"),
+            "event_id": alert.get("event_id"),
+            "priority": severity,
+            "status": "acknowledged" if alert.get("acknowledged") else "open",
+            "title": title,
+            "category": category,
+            "summary": alert.get("summary"),
+            "primary_action": deduped_actions[0] if deduped_actions else "Inspect BRP evidence.",
+            "actions": deduped_actions,
+            "recommendation": alert.get("recommendation"),
+            "source_agent": alert.get("source_agent"),
+            "action": alert.get("action"),
+            "decision": alert.get("decision"),
+            "severity": severity,
+            "timestamp": alert.get("timestamp"),
+        }
 
     def _learn_from_observation(self, observation: Dict[str, Any]) -> List[str]:
         learned = []

@@ -390,6 +390,53 @@ class TestBRPEndpoints:
         assert data["rules"][0]["key"] == "predictive_pattern::route_order"
         assert data["rules"][0]["active"] is True
 
+    def test_brp_alerts_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/alerts?limit=5")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["count"] >= 1
+        assert data["alerts"][0]["severity"] in {"high", "critical", "medium"}
+
+    def test_brp_incidents_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/incidents?limit=5")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["count"] >= 1
+        assert data["open_alerts"] >= 1
+
+    def test_brp_playbooks_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/playbooks?limit=5")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["count"] >= 1
+        assert data["playbooks"][0]["actions"]
+
+    def test_brp_alert_acknowledge_endpoint(self, client, brp_sample_data):
+        response = client.post(
+            "/api/brp/alerts/brp-alert::plan-001/acknowledge",
+            json={"actor": "test_operator", "note": "triaged"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["alert"]["acknowledged"] is True
+        assert data["alert"]["acknowledged_by"] == "test_operator"
+
+    def test_brp_report_endpoint(self, client, brp_sample_data):
+        response = client.get("/api/brp/report?limit=5")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert "status_summary" in data
+        assert "alerts" in data
+        assert "incidents" in data
+        assert "playbooks" in data
+        assert "evaluations" in data
+        assert "adaptive_rules" in data
+
     def test_brp_insights_endpoint(self, client, brp_sample_data):
         response = client.get("/api/brp/insights?limit=2")
         assert response.status_code == 200
@@ -412,6 +459,7 @@ class TestDashboardStaticFiles:
         assert "text/html" in response.headers["content-type"]
         assert "<!DOCTYPE html>" in response.text
         assert "BRP Operator View" in response.text
+        assert "brp-playbooks-feed" in response.text
     
     def test_static_files_served(self, client):
         """Test static files (CSS, JS) are served correctly."""

@@ -55,11 +55,31 @@ curl -s http://127.0.0.1:8050/api/brp/status | python3 -m json.tool
 # Recent BRP evaluations with predictive/multimodal metadata
 curl -s "http://127.0.0.1:8050/api/brp/evaluations?limit=10" | python3 -m json.tool
 
+# Filter BRP evaluations by decision or agent/action text
+curl -s "http://127.0.0.1:8050/api/brp/evaluations?decision=ELEVATE&query=projectx" | python3 -m json.tool
+
+# Derived BRP alerts for triage
+curl -s "http://127.0.0.1:8050/api/brp/alerts?limit=10" | python3 -m json.tool
+
+# BRP incident state with open vs acknowledged counts
+curl -s "http://127.0.0.1:8050/api/brp/incidents?limit=10" | python3 -m json.tool
+
+# BRP remediation playbooks derived from current alerts
+curl -s "http://127.0.0.1:8050/api/brp/playbooks?limit=10" | python3 -m json.tool
+
 # Adaptive rules learned from observations
 curl -s http://127.0.0.1:8050/api/brp/adaptive-rules | python3 -m json.tool
 
 # Condensed operator BRP insights
 curl -s "http://127.0.0.1:8050/api/brp/insights?limit=10" | python3 -m json.tool
+
+# Acknowledge a BRP alert after triage
+curl -s -X POST "http://127.0.0.1:8050/api/brp/alerts/brp-alert::plan-001/acknowledge" \
+  -H "Content-Type: application/json" \
+  -d '{"actor":"dashboard_ui","note":"triaged"}' | python3 -m json.tool
+
+# Full BRP report bundle for export/snapshot
+curl -s "http://127.0.0.1:8050/api/brp/report?limit=25" | python3 -m json.tool
 
 # Count BRP evaluations
 wc -l logs/quantumarb/brp/evaluations.jsonl

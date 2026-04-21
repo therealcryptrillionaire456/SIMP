@@ -409,3 +409,53 @@ class TestOperatorReadHelpers:
         assert detail is not None
         assert detail["evaluation"]["event_id"] == event.event_id
         assert len(detail["related_observations"]) == 1
+        assert detail["alert"] is not None
+        assert detail["playbook"] is not None
+
+    def test_operator_incidents_playbooks_and_acknowledgements(self, bridge, tmp_data_dir):
+        event = BRPEvent(
+            source_agent="projectx_native",
+            action="withdrawal",
+            mode=BRPMode.ADVISORY.value,
+        )
+        bridge.evaluate_event(event)
+
+        incidents = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=10)
+        assert incidents["count"] >= 1
+        assert incidents["open_alerts"] >= 1
+
+        playbooks = BRPBridge.read_operator_playbooks(data_dir=tmp_data_dir, limit=10)
+        assert playbooks
+        assert playbooks[0]["alert_id"].startswith("brp-alert::")
+        assert playbooks[0]["actions"]
+
+        alert_id = incidents["alerts"][0]["alert_id"]
+        acknowledged = BRPBridge.acknowledge_operator_alert(
+            alert_id,
+            actor="test_operator",
+            note="triaged",
+            data_dir=tmp_data_dir,
+        )
+        assert acknowledged is not None
+        assert acknowledged["acknowledged"] is True
+        assert acknowledged["acknowledged_by"] == "test_operator"
+
+        refreshed = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=10)
+        assert refreshed["acknowledged_alerts"] >= 1
+
+    def test_operator_report_includes_incident_state(self, bridge, tmp_data_dir):
+        bridge.evaluate_event(
+            BRPEvent(
+                source_agent="mother_goose",
+                action="withdrawal",
+                mode=BRPMode.ADVISORY.value,
+            )
+        )
+
+        report = BRPBridge.read_operator_report(data_dir=tmp_data_dir, limit=10)
+
+        assert report["status"] == "success"
+        assert "incidents" in report
+        assert "playbooks" in report
+        assert report["incidents"]["count"] >= 1
+        assert report["playbooks"]

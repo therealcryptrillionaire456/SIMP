@@ -1735,6 +1735,8 @@ class SimpBroker:
         except Exception:
             stats["timesfm"] = {"status": "unavailable"}
 
+        stats["brp"] = self._brp_operator_summary()
+
         return stats
 
     def get_logs(self, limit: int = 100) -> list:
@@ -1916,5 +1918,33 @@ class SimpBroker:
                 for r in self.intent_records.values()
                 if r.status == "pending"
             ),
+            "brp": self._brp_operator_summary(),
             "timestamp": _utcnow_iso(),
         }
+
+    def _brp_operator_summary(self) -> Dict[str, Any]:
+        """Small BRP summary for broker-facing health and stats surfaces."""
+        try:
+            status = self.brp_bridge.read_operator_status(data_dir=str(self.brp_bridge.data_dir), recent_limit=25)
+            incidents = self.brp_bridge.read_operator_incidents(data_dir=str(self.brp_bridge.data_dir), limit=25)
+            recent = status.get("recent", {})
+            return {
+                "enabled": True,
+                "mode": self.brp_bridge.default_mode,
+                "active_adaptive_rules": recent.get("active_adaptive_rules", 0),
+                "average_threat_score": recent.get("average_threat_score", 0.0),
+                "max_threat_score": recent.get("max_threat_score", 0.0),
+                "decision_counts": recent.get("decision_counts", {}),
+                "alert_count": incidents.get("count", 0),
+                "open_alert_count": incidents.get("open_alerts", 0),
+                "acknowledged_alert_count": incidents.get("acknowledged_alerts", 0),
+                "critical_open_alerts": incidents.get("critical_open_alerts", 0),
+                "last_evaluation_at": recent.get("last_evaluation_at"),
+            }
+        except Exception as exc:
+            self.logger.debug("[BRP] Failed to collect broker BRP summary: %s", exc)
+            return {
+                "enabled": False,
+                "mode": getattr(self.brp_bridge, "default_mode", BRPMode.SHADOW.value),
+                "error": "summary_unavailable",
+            }
