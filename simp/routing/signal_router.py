@@ -560,8 +560,8 @@ class AlpacaLiveOrgan:
     def __init__(self, dry_run: bool = False):
         self.dry_run   = dry_run
         self._api_key  = _env_or_file("ALPACA_API_KEY", "ALPACA_LIVE_API_KEY", "APCA_API_KEY_ID", "APCA_API_KEY")
-        self._secret   = _env_or_file("ALPACA_SECRET_KEY", "ALPACA_LIVE_SECRET_KEY", "APCA_API_SECRET_KEY")
-        is_live        = bool(_env_or_file("ALPACA_LIVE_API_KEY"))
+        self._secret   = _env_or_file("ALPACA_SECRET_KEY", "ALPACA_LIVE_SECRET_KEY", "APCA_API_SECRET_KEY", "APCA_SECRET_KEY")
+        is_live        = bool(_env_or_file("ALPACA_LIVE_API_KEY")) or bool(self._api_key)
         self._base_url = (
             "https://api.alpaca.markets"
             if is_live else

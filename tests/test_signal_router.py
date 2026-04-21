@@ -99,19 +99,12 @@ class TestOrganRegistry:
             assert "available" in v
             assert "dry_run"   in v
 
-    def test_unavailable_without_credentials(self):
-        env_backup = {}
-        for k in ("KALSHI_API_KEY_ID", "KALSHI_PRIVATE_KEY",
-                   "ALPACA_API_KEY", "ALPACA_SECRET_KEY"):
-            env_backup[k] = os.environ.pop(k, None)
-        try:
-            reg = OrganRegistry(dry_run=True)
-            assert not reg.get(Platform.KALSHI).available
-            assert not reg.get(Platform.ALPACA).available
-        finally:
-            for k, v in env_backup.items():
-                if v is not None:
-                    os.environ[k] = v
+    def test_unavailable_without_credentials(self, monkeypatch):
+        import simp.routing.signal_router as sr
+        monkeypatch.setattr(sr, "_env_or_file", lambda *args: "")
+        reg = OrganRegistry(dry_run=True)
+        assert not reg.get(Platform.KALSHI).available
+        assert not reg.get(Platform.ALPACA).available
 
 
 # ---------------------------------------------------------------------------
@@ -154,15 +147,15 @@ class TestCoinbaseLiveOrgan:
 # ---------------------------------------------------------------------------
 
 class TestKalshiLiveOrgan:
-    def test_unavailable_without_creds(self):
-        for k in ("KALSHI_API_KEY_ID", "KALSHI_PRIVATE_KEY", "KALSHI_PRODUCTION_PRIVATE_KEY"):
-            os.environ.pop(k, None)
+    def test_unavailable_without_creds(self, monkeypatch):
+        import simp.routing.signal_router as sr
+        monkeypatch.setattr(sr, "_env_or_file", lambda *args: "")
         organ = KalshiLiveOrgan(dry_run=True)
         assert not organ.available
 
-    def test_execute_returns_skipped_when_unavailable(self):
-        for k in ("KALSHI_API_KEY_ID", "KALSHI_PRIVATE_KEY", "KALSHI_PRODUCTION_PRIVATE_KEY"):
-            os.environ.pop(k, None)
+    def test_execute_returns_skipped_when_unavailable(self, monkeypatch):
+        import simp.routing.signal_router as sr
+        monkeypatch.setattr(sr, "_env_or_file", lambda *args: "")
         organ = KalshiLiveOrgan(dry_run=True)
         sig = RouterSignal.from_dict(SAMPLE_SIGNAL)
         result = _run(organ.execute(sig))
@@ -175,17 +168,15 @@ class TestKalshiLiveOrgan:
 # ---------------------------------------------------------------------------
 
 class TestAlpacaLiveOrgan:
-    def test_unavailable_without_creds(self):
-        for k in ("ALPACA_API_KEY", "ALPACA_SECRET_KEY", "ALPACA_LIVE_API_KEY",
-                   "ALPACA_LIVE_SECRET_KEY", "APCA_API_KEY", "APCA_API_SECRET_KEY"):
-            os.environ.pop(k, None)
+    def test_unavailable_without_creds(self, monkeypatch):
+        import simp.routing.signal_router as sr
+        monkeypatch.setattr(sr, "_env_or_file", lambda *args: "")
         organ = AlpacaLiveOrgan(dry_run=True)
         assert not organ.available
 
-    def test_execute_returns_skipped_when_unavailable(self):
-        for k in ("ALPACA_API_KEY", "ALPACA_SECRET_KEY", "ALPACA_LIVE_API_KEY",
-                   "ALPACA_LIVE_SECRET_KEY", "APCA_API_KEY", "APCA_API_SECRET_KEY"):
-            os.environ.pop(k, None)
+    def test_execute_returns_skipped_when_unavailable(self, monkeypatch):
+        import simp.routing.signal_router as sr
+        monkeypatch.setattr(sr, "_env_or_file", lambda *args: "")
         organ = AlpacaLiveOrgan(dry_run=True)
         sig = RouterSignal.from_dict(SAMPLE_SIGNAL)
         result = _run(organ.execute(sig))

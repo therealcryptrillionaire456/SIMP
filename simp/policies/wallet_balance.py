@@ -307,8 +307,8 @@ def _fetch_coinbase(report: BalanceReport) -> None:
 
 def _fetch_alpaca(report: BalanceReport) -> None:
     """Fetch USD cash balance from Alpaca. Mutates report."""
-    api_key = _env_first("ALPACA_API_KEY", "ALPACA_LIVE_API_KEY", "APCA_API_KEY_ID")
-    secret = _env_first("ALPACA_SECRET_KEY", "ALPACA_LIVE_SECRET_KEY", "APCA_API_SECRET_KEY")
+    api_key = _env_first("ALPACA_API_KEY", "ALPACA_LIVE_API_KEY", "APCA_API_KEY_ID", "APCA_API_KEY")
+    secret = _env_first("ALPACA_SECRET_KEY", "ALPACA_LIVE_SECRET_KEY", "APCA_API_SECRET_KEY", "APCA_SECRET_KEY")
 
     if not api_key or not secret:
         report.warnings.append(
