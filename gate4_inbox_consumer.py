@@ -53,6 +53,7 @@ except ImportError:
     sys.exit(2)
 
 from simp.exchange import CoinbaseOperationError, ResilientCoinbaseClient
+from simp.policies.trading_policy import check_trade_allowed, PolicyViolation
 
 # --- paths ------------------------------------------------------------------
 REPO = Path(__file__).resolve().parent
@@ -519,6 +520,15 @@ def process_signal(
             trade_record["result"] = "dry_run_ok"
             record_trade(trade_record)
             any_success = True
+            continue
+
+        # --- POLICY GATE (kill switch + risk limits) -----------------------
+        try:
+            check_trade_allowed(exchange="coinbase", size_usd=notional)
+        except PolicyViolation as pv:
+            log.error("POLICY BLOCKED %s %s $%.2f: %s", action.upper(), symbol, notional, pv.reason)
+            trade_record["result"] = f"policy_blocked: {pv.reason}"
+            record_trade(trade_record)
             continue
 
         # --- LIVE ORDER -----------------------------------------------------

@@ -71,6 +71,10 @@ MIN_POSITION_USD = 1.0
 MAX_POSITION_USD = 10.0
 QUOTE_CURRENCIES = ("USD", "USDC")
 
+# Minimum QIP quality score to generate a live signal (0.0-1.0).
+# Below this threshold, the cycle is skipped — no blind trades.
+MIN_QUALITY_SCORE = float(os.environ.get("SIMP_MIN_QIP_QUALITY", "0.5"))
+
 
 # ─── Broker helpers ───────────────────────────────────────────────────────────
 
@@ -391,13 +395,24 @@ def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
     Returns a signal dict ready for gate4_real's inbox.
     """
     if not qip_payload.get("success"):
-        # Even on QIP failure, extract what we can for a fallback signal
-        logger.warning(f"QIP returned failure: {qip_payload.get('error_code', 'unknown')}")
-        # Fallback: equal weight allocation
-        return _apply_funding_constraints(_equal_weight_signal("qip_fallback"))
+        # QIP returned failure — do not trade without real analysis
+        logger.warning(
+            "QIP returned failure: %s — skipping signal (qip_fallback suppressed)",
+            qip_payload.get("error_code", "unknown"),
+        )
+        return None
 
     result = qip_payload.get("result", "")
     metadata = qip_payload.get("metadata", {})
+
+    # Require minimum quality score — low-confidence responses don't trade
+    quality = float(metadata.get("quality_score", 0.0))
+    if quality < MIN_QUALITY_SCORE:
+        logger.warning(
+            "QIP quality_score %.2f < threshold %.2f — skipping signal",
+            quality, MIN_QUALITY_SCORE,
+        )
+        return None
 
     # Parse quantum recommendation from result text
     # QIP returns circuit output + recommendation in string form
@@ -584,8 +599,8 @@ class QuantumSignalBridge:
                 if qip_response is not None:
                     signal = parse_qip_response(qip_response)
                 else:
-                    logger.warning("No QIP response — using equal-weight fallback")
-                    signal = _apply_funding_constraints(_equal_weight_signal("timeout_fallback"))
+                    logger.warning("No QIP response — skipping this cycle (timeout_fallback suppressed)")
+                    signal = None
 
                 if signal:
                     delivered = deliver_signal(signal, self.broker)
