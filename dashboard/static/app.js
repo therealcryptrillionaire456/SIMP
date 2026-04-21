@@ -1706,11 +1706,13 @@
 
     if (dom.brpDrawerBackdrop) dom.brpDrawerBackdrop.hidden = false;
     if (dom.brpDrawer) dom.brpDrawer.hidden = false;
+    document.body.classList.add("brp-drawer-open");
   }
 
   function closeBrpDrawer() {
     if (dom.brpDrawerBackdrop) dom.brpDrawerBackdrop.hidden = true;
     if (dom.brpDrawer) dom.brpDrawer.hidden = true;
+    document.body.classList.remove("brp-drawer-open");
   }
 
   function renderAgentObservability(activityData, agentsData, capabilitiesData, failedIntentsData, smokeData) {
@@ -2542,6 +2544,9 @@
   // Initial fetch + countdown
   refreshAll();
   startCountdown();
+  window.requestAnimationFrame(function() {
+    document.body.classList.add("dashboard-ready");
+  });
 
 })();
 

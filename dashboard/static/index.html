@@ -158,102 +158,185 @@
       </div>
     </section>
 
-    <section class="section" id="brp-section">
-      <h2 class="section-title">BRP Operator View</h2>
-      <p class="section-description">Predictive safety posture, recent BRP decisions, and adaptive rule evolution</p>
-      <div class="filter-controls">
-        <select id="brp-decision-filter" class="filter-select">
-          <option value="">All Decisions</option>
-          <option value="ALLOW">Allow</option>
-          <option value="SHADOW_ALLOW">Shadow Allow</option>
-          <option value="ELEVATE">Elevate</option>
-          <option value="DENY">Deny</option>
-          <option value="LOG_ONLY">Log Only</option>
-        </select>
-        <select id="brp-severity-filter" class="filter-select">
-          <option value="">All Severities</option>
-          <option value="critical">Critical</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-          <option value="info">Info</option>
-        </select>
-        <input type="text" id="brp-source-filter" placeholder="Filter by source agent or action..." class="filter-input">
-        <button type="button" class="refresh-btn" id="brp-export-btn">Open BRP Report</button>
-      </div>
-      <div class="cards-grid" id="brp-overview-cards">
-        <div class="card"><div class="card-label">Responses Reviewed</div><div class="card-value mono" id="val-brp-responses">--</div></div>
-        <div class="card"><div class="card-label">Active Adaptive Rules</div><div class="card-value mono" id="val-brp-active-rules">--</div></div>
-        <div class="card"><div class="card-label">Elevated / Denied</div><div class="card-value mono" id="val-brp-elevated">--</div></div>
-        <div class="card"><div class="card-label">Average Threat</div><div class="card-value mono" id="val-brp-avg-threat">--</div></div>
-        <div class="card"><div class="card-label">Last Evaluation</div><div class="card-value mono" id="val-brp-last-eval">--</div></div>
-        <div class="card"><div class="card-label">Top Threat Tag</div><div class="card-value mono" id="val-brp-top-tag">--</div></div>
-        <div class="card"><div class="card-label">Open Alerts</div><div class="card-value mono" id="val-brp-open-alerts">--</div></div>
-        <div class="card"><div class="card-label">Acknowledged</div><div class="card-value mono" id="val-brp-acked-alerts">--</div></div>
-      </div>
-      <div class="diagnostic-grid">
-        <div class="card diagnostic-card">
-          <div class="card-label">Risk Posture</div>
-          <div id="brp-posture-summary" class="diagnostic-pairs">
-            <div class="empty-state">BRP status not loaded.</div>
+    <section class="section brp-stage" id="brp-section">
+      <div class="brp-stage-shell">
+        <div class="brp-stage-head">
+          <div class="brp-stage-intro">
+            <div class="section-title">BRP Operator View</div>
+            <div class="brp-stage-kicker">Bill Russell Protocol</div>
+            <h2 class="brp-stage-title">Live incident command surface for BRP enforcement, drift, and remediation flow.</h2>
+            <p class="brp-stage-copy">Track the current safety posture, investigate evidence, and move from alert to playbook execution without dropping into raw BRP logs.</p>
           </div>
-          <div id="brp-threat-tags" class="brp-chip-list">
-            <div class="empty-state">No threat tags observed.</div>
+          <div class="brp-stage-controls">
+            <div class="brp-stage-caption">Filter the active review lane</div>
+            <div class="filter-controls brp-filter-controls">
+              <select id="brp-decision-filter" class="filter-select">
+                <option value="">All Decisions</option>
+                <option value="ALLOW">Allow</option>
+                <option value="SHADOW_ALLOW">Shadow Allow</option>
+                <option value="ELEVATE">Elevate</option>
+                <option value="DENY">Deny</option>
+                <option value="LOG_ONLY">Log Only</option>
+              </select>
+              <select id="brp-severity-filter" class="filter-select">
+                <option value="">All Severities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="info">Info</option>
+              </select>
+              <input type="text" id="brp-source-filter" placeholder="Filter by source agent or action..." class="filter-input">
+              <button type="button" class="refresh-btn" id="brp-export-btn">Open BRP Report</button>
+            </div>
           </div>
         </div>
-        <div class="card diagnostic-card">
-          <div class="card-label">Predictive / Multimodal Signals</div>
-          <div id="brp-signal-summary" class="diagnostic-pairs">
-            <div class="empty-state">BRP insights not loaded.</div>
+
+        <div class="brp-stage-banner">
+          <div class="brp-stage-banner-copy">
+            <div class="brp-stage-banner-label">Operator Focus</div>
+            <p>Predictive safety posture, recent BRP decisions, adaptive rule evolution, and remediation pressure are combined here as one working surface.</p>
+          </div>
+          <div class="brp-stage-banner-note">
+            <span class="brp-live-dot"></span>
+            WebSocket and polling updates keep this lane current while the evidence drawer remains drill-down focused.
           </div>
         </div>
-        <div class="card diagnostic-card">
-          <div class="card-label">Remediation Playbooks</div>
-          <div id="brp-playbooks-feed" class="activity-feed">
-            <div class="empty-state">No BRP playbooks derived yet.</div>
-          </div>
+
+        <div class="brp-metric-strip cards-grid" id="brp-overview-cards">
+          <div class="card brp-metric"><div class="card-label">Responses Reviewed</div><div class="card-value mono" id="val-brp-responses">--</div></div>
+          <div class="card brp-metric"><div class="card-label">Active Adaptive Rules</div><div class="card-value mono" id="val-brp-active-rules">--</div></div>
+          <div class="card brp-metric"><div class="card-label">Elevated / Denied</div><div class="card-value mono" id="val-brp-elevated">--</div></div>
+          <div class="card brp-metric"><div class="card-label">Average Threat</div><div class="card-value mono" id="val-brp-avg-threat">--</div></div>
+          <div class="card brp-metric"><div class="card-label">Last Evaluation</div><div class="card-value mono" id="val-brp-last-eval">--</div></div>
+          <div class="card brp-metric"><div class="card-label">Top Threat Tag</div><div class="card-value mono" id="val-brp-top-tag">--</div></div>
+          <div class="card brp-metric"><div class="card-label">Open Alerts</div><div class="card-value mono" id="val-brp-open-alerts">--</div></div>
+          <div class="card brp-metric"><div class="card-label">Acknowledged</div><div class="card-value mono" id="val-brp-acked-alerts">--</div></div>
         </div>
-      </div>
-      <div class="activity-feed" id="brp-alerts-feed">
-        <div class="empty-state">No BRP alerts derived yet.</div>
-      </div>
-      <div class="activity-feed" id="brp-remediations-feed">
-        <div class="empty-state">No BRP remediations executed yet.</div>
-      </div>
-      <div class="table-wrap">
-        <table class="agents-table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Source</th>
-              <th>Action</th>
-              <th>Decision</th>
-              <th>Severity</th>
-              <th>Threat</th>
-              <th>Signals</th>
-            </tr>
-          </thead>
-          <tbody id="brp-evaluations-tbody">
-            <tr><td colspan="7" class="empty-row">Loading BRP evaluations...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="table-wrap" style="margin-top:16px;">
-        <table class="agents-table">
-          <thead>
-            <tr>
-              <th>Rule</th>
-              <th>Severity</th>
-              <th>Boost</th>
-              <th>Count</th>
-              <th>Active</th>
-              <th>Last Seen</th>
-            </tr>
-          </thead>
-          <tbody id="brp-rules-tbody">
-            <tr><td colspan="6" class="empty-row">Loading adaptive rules...</td></tr>
-          </tbody>
-        </table>
+
+        <div class="brp-workspace">
+          <div class="brp-primary-column">
+            <div class="brp-overview-grid">
+              <section class="brp-panel brp-panel-posture">
+                <div class="brp-panel-header">
+                  <div>
+                    <div class="card-label">Risk Posture</div>
+                    <h3 class="brp-panel-title">Current review surface</h3>
+                  </div>
+                </div>
+                <div id="brp-posture-summary" class="diagnostic-pairs">
+                  <div class="empty-state">BRP status not loaded.</div>
+                </div>
+                <div id="brp-threat-tags" class="brp-chip-list">
+                  <div class="empty-state">No threat tags observed.</div>
+                </div>
+              </section>
+
+              <section class="brp-panel brp-panel-signals">
+                <div class="brp-panel-header">
+                  <div>
+                    <div class="card-label">Predictive / Multimodal Signals</div>
+                    <h3 class="brp-panel-title">Why BRP is leaning</h3>
+                  </div>
+                </div>
+                <div id="brp-signal-summary" class="diagnostic-pairs">
+                  <div class="empty-state">BRP insights not loaded.</div>
+                </div>
+              </section>
+            </div>
+
+            <section class="brp-panel brp-panel-alerts">
+              <div class="brp-panel-header">
+                <div>
+                  <div class="card-label">Incident Feed</div>
+                  <h3 class="brp-panel-title">Open alerts and acknowledgement state</h3>
+                </div>
+              </div>
+              <div class="activity-feed brp-feed" id="brp-alerts-feed">
+                <div class="empty-state">No BRP alerts derived yet.</div>
+              </div>
+            </section>
+
+            <section class="brp-panel brp-panel-evaluations">
+              <div class="brp-panel-header">
+                <div>
+                  <div class="card-label">Decision Ledger</div>
+                  <h3 class="brp-panel-title">Recent evaluations</h3>
+                </div>
+              </div>
+              <div class="table-wrap brp-table-wrap">
+                <table class="agents-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Source</th>
+                      <th>Action</th>
+                      <th>Decision</th>
+                      <th>Severity</th>
+                      <th>Threat</th>
+                      <th>Signals</th>
+                    </tr>
+                  </thead>
+                  <tbody id="brp-evaluations-tbody">
+                    <tr><td colspan="7" class="empty-row">Loading BRP evaluations...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="brp-panel brp-panel-rules">
+              <div class="brp-panel-header">
+                <div>
+                  <div class="card-label">Adaptive Rules</div>
+                  <h3 class="brp-panel-title">Learned guardrails</h3>
+                </div>
+              </div>
+              <div class="table-wrap brp-table-wrap">
+                <table class="agents-table">
+                  <thead>
+                    <tr>
+                      <th>Rule</th>
+                      <th>Severity</th>
+                      <th>Boost</th>
+                      <th>Count</th>
+                      <th>Active</th>
+                      <th>Last Seen</th>
+                    </tr>
+                  </thead>
+                  <tbody id="brp-rules-tbody">
+                    <tr><td colspan="6" class="empty-row">Loading adaptive rules...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <aside class="brp-rail">
+            <section class="brp-panel brp-panel-playbooks">
+              <div class="brp-panel-header">
+                <div>
+                  <div class="card-label">Playbooks</div>
+                  <h3 class="brp-panel-title">Recommended execution paths</h3>
+                </div>
+              </div>
+              <div id="brp-playbooks-feed" class="activity-feed brp-feed">
+                <div class="empty-state">No BRP playbooks derived yet.</div>
+              </div>
+            </section>
+
+            <section class="brp-panel brp-panel-remediations">
+              <div class="brp-panel-header">
+                <div>
+                  <div class="card-label">Remediations</div>
+                  <h3 class="brp-panel-title">Execution history</h3>
+                </div>
+              </div>
+              <div class="activity-feed brp-feed" id="brp-remediations-feed">
+                <div class="empty-state">No BRP remediations executed yet.</div>
+              </div>
+            </section>
+          </aside>
+        </div>
       </div>
     </section>
 
