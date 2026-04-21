@@ -613,6 +613,15 @@ class QuantumSignalBridge:
                         }
                         logger.info(f"Signal #{self._signals_sent} delivered: {alloc_summary}")
 
+                    # Also route through multi-platform router
+                    # (Coinbase + Kalshi hedge + Alpaca mirror in parallel)
+                    try:
+                        from simp.routing.signal_router import route_signal
+                        router_result = route_signal(signal)
+                        logger.info("Router result: %s", router_result.summary())
+                    except Exception as _re:
+                        logger.warning("Multi-platform router error: %s", _re)
+
                 last_query = now
 
             time.sleep(2)
