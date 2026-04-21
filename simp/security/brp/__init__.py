@@ -15,6 +15,8 @@ from .reasoning_engine import ReasoningEngine
 from .memory_system import MemorySystem
 from .threat_database import ThreatDatabase
 from .alert_orchestrator import AlertOrchestrator
+from .forecasting import PredictiveSafetyForecaster
+from .multimodal_analysis import MultiModalSafetyAnalyzer
 from .predictive_safety import PredictiveSafetyIntelligence
 from .protocol_core import EnhancedBillRussellProtocol
 
