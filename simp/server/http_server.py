@@ -1702,6 +1702,27 @@ class SimpHttpServer:
                 self.logger.error(f"Error subscribing to mesh channel: {e}")
                 return jsonify({"status": "error", "error": str(e)}), 500
 
+        @self.app.route("/mesh/subscriptions", methods=["GET"])
+        @_require_api_key
+        def mesh_subscriptions():
+            """Return channel and per-agent subscription topology."""
+            try:
+                channels = self.broker.mesh_bus.get_all_subscriptions()
+                agent_channels = {
+                    agent_id: self.broker.mesh_bus.get_agent_channels(agent_id)
+                    for agent_id in self.broker.mesh_bus.get_registered_agents()
+                }
+                return jsonify(
+                    {
+                        "status": "success",
+                        "channels": channels,
+                        "agent_channels": agent_channels,
+                    }
+                ), 200
+            except Exception as e:
+                self.logger.error(f"Error listing mesh subscriptions: {e}")
+                return jsonify({"status": "error", "error": str(e)}), 500
+
         @self.app.route("/mesh/unsubscribe", methods=["POST"])
         @_require_api_key
         def mesh_unsubscribe():

@@ -177,12 +177,24 @@ class MeshBus:
         """
         with self._lock:
             if agent_id not in self._registered_agents:
-                logger.warning(f"Cannot subscribe unregistered agent {agent_id} to channel {channel}")
-                return False
-            
+                # Auto-attach agent to the in-memory mesh bus. The persistent
+                # AgentRegistry survives broker restarts but the mesh bus does
+                # not — so an agent that registered before the last restart
+                # can still be "known" while absent from _registered_agents.
+                # Rather than refuse the subscribe (which breaks bridges that
+                # already hold a valid session), lazily register the agent
+                # here and proceed.
+                logger.info(
+                    f"Auto-registering {agent_id} on mesh bus before subscribe "
+                    f"to {channel}"
+                )
+                self._registered_agents.add(agent_id)
+                if agent_id not in self._agent_queues:
+                    self._agent_queues[agent_id] = deque()
+
             if channel not in self._channel_subscribers:
                 self._channel_subscribers[channel] = set()
-            
+
             self._channel_subscribers[channel].add(agent_id)
             logger.debug(f"Agent {agent_id} subscribed to channel {channel}")
             return True
@@ -218,6 +230,28 @@ class MeshBus:
         with self._lock:
             subscribers = self._channel_subscribers.get(channel, set())
             return list(subscribers)
+
+    def get_all_subscriptions(self) -> Dict[str, List[str]]:
+        """Return channel -> sorted subscribers mapping."""
+        with self._lock:
+            return {
+                channel: sorted(subscribers)
+                for channel, subscribers in self._channel_subscribers.items()
+            }
+
+    def get_agent_channels(self, agent_id: str) -> List[str]:
+        """Return sorted list of channels an agent is subscribed to."""
+        with self._lock:
+            return sorted(
+                channel
+                for channel, subscribers in self._channel_subscribers.items()
+                if agent_id in subscribers
+            )
+
+    def get_registered_agents(self) -> List[str]:
+        """Return sorted list of registered mesh agents."""
+        with self._lock:
+            return sorted(self._registered_agents)
     
     # ----------------------------------------------------------------------
     # Message Sending

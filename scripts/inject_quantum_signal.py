@@ -60,7 +60,8 @@ def build_signal(
 
 def write_signal(signal: Dict[str, Any], inbox: Path) -> Path:
     inbox.mkdir(parents=True, exist_ok=True)
-    target = inbox / f"quantum_signal_{int(datetime.now(timezone.utc).timestamp())}.json"
+    signal_key = str(signal.get("signal_id") or uuid.uuid4()).replace("-", "")[:12]
+    target = inbox / f"quantum_signal_{int(datetime.now(timezone.utc).timestamp())}_{signal_key}.json"
     target.write_text(json.dumps(signal, indent=2), encoding="utf-8")
     return target
 

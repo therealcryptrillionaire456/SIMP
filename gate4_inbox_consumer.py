@@ -29,6 +29,8 @@ import os
 import re
 import shutil
 import signal
+import urllib.error
+import urllib.request
 import sys
 import time
 import uuid
@@ -50,6 +52,8 @@ except ImportError:
     )
     sys.exit(2)
 
+from simp.exchange import CoinbaseOperationError, ResilientCoinbaseClient
+
 # --- paths ------------------------------------------------------------------
 REPO = Path(__file__).resolve().parent
 INBOX = REPO / "data" / "inboxes" / "gate4_real"
@@ -59,7 +63,11 @@ STATE_FILE = REPO / "data" / "gate4_consumer_state.json"
 LOG_DIR = REPO / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 TRADE_LOG = LOG_DIR / "gate4_trades.jsonl"
+PNL_LEDGER = REPO / "data" / "phase4_pnl_ledger.jsonl"
 CONFIG_PATH = REPO / "config" / "live_production_config.json"
+BROKER_URL = os.environ.get("SIMP_BROKER_URL", "http://127.0.0.1:5555").rstrip("/")
+TRADE_RESULT_CHANNEL = "trade_updates"
+TRADE_RESULT_RECIPIENTS = ("projectx_quantum_advisor", "projectx_native")
 
 # --- logging ----------------------------------------------------------------
 logging.basicConfig(
@@ -93,6 +101,9 @@ def load_state() -> dict:
         "consecutive_losses": 0,
         "last_trade_at": None,
         "cooldown_until": None,
+        "transient_errors": 0,
+        "last_error_classification": None,
+        "last_transient_error_at": None,
     }
 
 
@@ -116,6 +127,29 @@ def prune_timestamps(state: dict) -> None:
     ]
 
 
+def reset_cooldown_if_expired(state: dict) -> bool:
+    cooldown_until = state.get("cooldown_until")
+    if not cooldown_until:
+        return False
+    try:
+        cooldown_dt = datetime.fromisoformat(cooldown_until)
+    except ValueError:
+        state["cooldown_until"] = None
+        return True
+    if datetime.now(timezone.utc) < cooldown_dt:
+        return False
+    state["cooldown_until"] = None
+    if state.get("consecutive_losses", 0):
+        log.info(
+            "cooldown expired at %s; resetting consecutive_losses from %s to 0",
+            cooldown_dt.isoformat(),
+            state.get("consecutive_losses", 0),
+        )
+    state["consecutive_losses"] = 0
+    state["last_error_classification"] = None
+    return True
+
+
 def circuit_breakers_open(state: dict, cfg: dict) -> tuple[bool, str]:
     """Return (tripped, reason)."""
     cb = cfg["risk_management"]["circuit_breakers"]
@@ -125,7 +159,7 @@ def circuit_breakers_open(state: dict, cfg: dict) -> tuple[bool, str]:
         cd = datetime.fromisoformat(state["cooldown_until"])
         if datetime.now(timezone.utc) < cd:
             return True, f"cooldown active until {cd.isoformat()}"
-        state["cooldown_until"] = None
+        reset_cooldown_if_expired(state)
 
     if len(state["trades_this_hour"]) >= cb["max_hourly_trades"]:
         return True, f"hourly trade cap hit ({cb['max_hourly_trades']})"
@@ -151,7 +185,7 @@ def is_trading_hours(cfg: dict) -> bool:
     return start <= cur <= end
 
 
-def build_client(cfg: dict) -> RESTClient:
+def build_client(cfg: dict) -> ResilientCoinbaseClient:
     ex = cfg["exchange_config"]
     # coinbase-advanced-py accepts CDP keys directly.
     # Use environment variable substitution for security
@@ -162,11 +196,12 @@ def build_client(cfg: dict) -> RESTClient:
     if "\\n" in api_secret:
         api_secret = api_secret.replace("\\n", "\n")
 
-    return RESTClient(
-        api_key=api_key_name,  # the organizations/.../apiKeys/... name
-        api_secret=api_secret,  # the PEM private key
+    raw_client = RESTClient(
+        api_key=api_key_name,
+        api_secret=api_secret,
         timeout=ex.get("timeout_seconds", 30),
     )
+    return ResilientCoinbaseClient(raw_client, logger=log)
 
 
 def _response_records(resp: Any) -> list[dict[str, Any]]:
@@ -183,30 +218,54 @@ def _response_records(resp: Any) -> list[dict[str, Any]]:
     return normalized
 
 
-def _available_balance(client: RESTClient, currency: str) -> float:
+def _balance_snapshot(client: ResilientCoinbaseClient, currency: str) -> dict[str, float]:
     try:
         records = _response_records(client.get_accounts())
+    except CoinbaseOperationError:
+        raise
     except Exception as exc:
-        log.warning("balance lookup failed for %s: %s", currency, exc)
-        return 0.0
+        raise CoinbaseOperationError(
+            message=f"balance lookup failed for {currency}: {exc}",
+            classification="fatal",
+            attempts=1,
+            exception_type=type(exc).__name__,
+            last_error=str(exc),
+        ) from exc
 
     for record in records:
         asset = str(record.get("currency") or record.get("asset") or "").upper()
         if asset != currency.upper():
             continue
+        total_raw = record.get("balance") or record.get("available_balance") or {}
         balance = record.get("available_balance") or record.get("available") or {}
+        hold = record.get("hold") or record.get("held_balance") or {}
         if isinstance(balance, dict):
             raw = balance.get("value") or balance.get("amount") or 0
         else:
             raw = balance or 0
+        if isinstance(total_raw, dict):
+            total_value = total_raw.get("value") or total_raw.get("amount") or raw
+        else:
+            total_value = total_raw or raw
+        if isinstance(hold, dict):
+            hold_value = hold.get("value") or hold.get("amount") or 0
+        else:
+            hold_value = hold or 0
         try:
-            return float(raw)
+            available = float(raw)
+            total = float(total_value)
+            held = float(hold_value)
+            return {
+                "available": available,
+                "total": total if total > 0 else available,
+                "held": held,
+            }
         except (TypeError, ValueError):
-            return 0.0
-    return 0.0
+            return {"available": 0.0, "total": 0.0, "held": 0.0}
+    return {"available": 0.0, "total": 0.0, "held": 0.0}
 
 
-def _market_price(client: RESTClient, product_id: str) -> float:
+def _market_price(client: ResilientCoinbaseClient, product_id: str) -> float:
     try:
         resp = client.get_product(product_id=product_id)
     except Exception:
@@ -224,12 +283,161 @@ def _market_price(client: RESTClient, product_id: str) -> float:
             first = bids[0]
             if isinstance(first, dict) and first.get("price"):
                 return float(first["price"])
-    raise ValueError(f"could not resolve market price for {product_id}")
+    raise CoinbaseOperationError(
+        message=f"could not resolve market price for {product_id}",
+        classification="fatal",
+        attempts=1,
+        exception_type="MarketPriceUnavailable",
+        last_error=product_id,
+    )
+
+
+def _append_jsonl(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(_json_safe(payload)) + "\n")
+
+
+def _extract_order_id(payload: dict[str, Any]) -> str | None:
+    response = payload.get("response") or {}
+    if not isinstance(response, dict):
+        return None
+    return response.get("order_id") or (response.get("success_response") or {}).get("order_id")
+
+
+def _extract_fee_usd(payload: dict[str, Any]) -> float | None:
+    response = payload.get("response") or {}
+    if not isinstance(response, dict):
+        return None
+    candidates = [
+        response.get("total_fees"),
+        response.get("commission"),
+        (response.get("success_response") or {}).get("total_fees"),
+        (response.get("success_response") or {}).get("commission"),
+    ]
+    for candidate in candidates:
+        if candidate in (None, ""):
+            continue
+        try:
+            return float(candidate)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def _estimate_entry_px(payload: dict[str, Any]) -> float | None:
+    market_price = payload.get("market_price")
+    if market_price:
+        try:
+            return float(market_price)
+        except (TypeError, ValueError):
+            return None
+
+    base_size = payload.get("base_size")
+    executed_usd = payload.get("executed_usd")
+    try:
+        if base_size and executed_usd:
+            return round(float(executed_usd) / float(base_size), 8)
+    except (TypeError, ValueError, ZeroDivisionError):
+        return None
+    return None
+
+
+def append_pnl_entry(payload: dict[str, Any]) -> None:
+    order_id = _extract_order_id(payload)
+    entry = {
+        "ts": payload.get("ts"),
+        "exec_ts": payload.get("ts"),
+        "signal_id": payload.get("signal_id"),
+        "symbol": payload.get("symbol"),
+        "side": payload.get("side"),
+        "notional_usd": payload.get("executed_usd"),
+        "exec_usd": payload.get("executed_usd"),
+        "entry_px": _estimate_entry_px(payload),
+        "fees_usd": _extract_fee_usd(payload),
+        "client_order_id": payload.get("client_order_id"),
+        "order_id": order_id,
+        "source": "gate4_inbox_consumer",
+    }
+    _append_jsonl(PNL_LEDGER, entry)
+
+
+def backfill_pnl_ledger() -> None:
+    if not TRADE_LOG.exists():
+        return
+    known_ids: set[str] = set()
+    if PNL_LEDGER.exists():
+        for line in PNL_LEDGER.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if record.get("client_order_id"):
+                known_ids.add(str(record["client_order_id"]))
+
+    backfilled = 0
+    for line in TRADE_LOG.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        client_order_id = str(record.get("client_order_id") or "")
+        if not client_order_id or client_order_id in known_ids or record.get("result") != "ok":
+            continue
+        append_pnl_entry(record)
+        known_ids.add(client_order_id)
+        backfilled += 1
+    if backfilled:
+        log.info("backfilled %d Gate4 fills into %s", backfilled, PNL_LEDGER)
+
+
+def _emit_trade_ack(payload: dict[str, Any]) -> None:
+    if not BROKER_URL:
+        return
+    ack_payload = {
+        "event": "gate4_trade_result",
+        "signal_id": payload.get("signal_id"),
+        "symbol": payload.get("symbol"),
+        "side": payload.get("side"),
+        "result": payload.get("result"),
+        "order_id": _extract_order_id(payload),
+        "client_order_id": payload.get("client_order_id"),
+        "executed_usd": payload.get("executed_usd"),
+        "error": payload.get("error"),
+        "error_classification": payload.get("error_classification"),
+        "timestamp": payload.get("ts"),
+    }
+    body = {
+        "sender_id": "gate4_real",
+        "channel": TRADE_RESULT_CHANNEL,
+        "payload": ack_payload,
+        "ttl_seconds": 120,
+    }
+    for recipient in TRADE_RESULT_RECIPIENTS:
+        body["recipient_id"] = recipient
+        request = urllib.request.Request(
+            f"{BROKER_URL}/mesh/send",
+            data=json.dumps(body).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=3):  # noqa: S310
+                pass
+        except (urllib.error.URLError, TimeoutError, OSError):
+            continue
 
 
 def record_trade(payload: dict) -> None:
-    with TRADE_LOG.open("a") as f:
-        f.write(json.dumps(_json_safe(payload)) + "\n")
+    safe_payload = _json_safe(payload)
+    _append_jsonl(TRADE_LOG, safe_payload)
+    if safe_payload.get("result") == "ok":
+        append_pnl_entry(safe_payload)
+    _emit_trade_ack(safe_payload)
 
 
 # --- signal processing ------------------------------------------------------
@@ -240,7 +448,7 @@ def clamp_notional(usd: float, cfg: dict) -> float:
 
 def process_signal(
     path: Path,
-    client: RESTClient,
+    client: ResilientCoinbaseClient,
     cfg: dict,
     state: dict,
     dry_run: bool,
@@ -315,7 +523,14 @@ def process_signal(
 
         # --- LIVE ORDER -----------------------------------------------------
         try:
+            price_hint: float | None = None
             if action == "buy":
+                try:
+                    price_hint = _market_price(client, symbol)
+                except CoinbaseOperationError:
+                    price_hint = None
+                if price_hint:
+                    trade_record["market_price"] = price_hint
                 resp = client.market_order_buy(
                     client_order_id=client_order_id,
                     product_id=symbol,
@@ -323,20 +538,39 @@ def process_signal(
                 )
             else:
                 base_currency = symbol.split("-", 1)[0]
-                available_base = _available_balance(client, base_currency)
-                if available_base <= 0:
-                    log.warning("signal %s: no %s balance available for SELL %s", sig_id, base_currency, symbol)
-                    trade_record["result"] = "rejected_operational"
-                    trade_record["error"] = f"no_balance:{base_currency}"
+                balance = _balance_snapshot(client, base_currency)
+                available_base = balance["available"]
+                held_balance = max(balance["available"], balance["total"])
+                if available_base <= 0 or held_balance <= 0:
+                    log.warning(
+                        "signal %s: insufficient %s balance for SELL %s (available=%.8f total=%.8f)",
+                        sig_id,
+                        base_currency,
+                        symbol,
+                        available_base,
+                        held_balance,
+                    )
+                    trade_record["result"] = "insufficient_balance"
+                    trade_record["error"] = f"insufficient_balance:{base_currency}"
                     record_trade(trade_record)
                     continue
 
                 price = _market_price(client, symbol)
-                base_size = min(available_base, round(notional / price, 8))
+                trade_record["market_price"] = price
+                requested_base = round(notional / price, 8)
+                safe_sellable = round(min(available_base, held_balance) * 0.99, 8)
+                base_size = min(requested_base, safe_sellable)
                 if base_size <= 0:
-                    log.warning("signal %s: computed zero sell size for %s at %.8f", sig_id, symbol, price)
-                    trade_record["result"] = "rejected_operational"
-                    trade_record["error"] = f"zero_base_size:{symbol}"
+                    log.warning(
+                        "signal %s: computed insufficient sell size for %s at %.8f (available=%.8f total=%.8f)",
+                        sig_id,
+                        symbol,
+                        price,
+                        available_base,
+                        held_balance,
+                    )
+                    trade_record["result"] = "insufficient_balance"
+                    trade_record["error"] = f"insufficient_balance:{symbol}"
                     record_trade(trade_record)
                     continue
 
@@ -363,22 +597,43 @@ def process_signal(
                 state["consecutive_losses"] = 0
                 save_state(state)
                 trade_record["result"] = "ok"
+                trade_record["error_classification"] = None
                 any_success = True
             else:
+                classification = _classify_response(resp_dict)
                 log.error("LIVE %s %s $%.2f FAILED  resp=%s",
                           action.upper(), symbol, notional, resp_dict)
-                if _counts_as_loss(resp_dict):
+                trade_record["result"] = classification["result"]
+                trade_record["error_classification"] = classification["classification"]
+                state["last_error_classification"] = classification["classification"]
+                if classification["classification"] == "transient":
+                    state["transient_errors"] = state.get("transient_errors", 0) + 1
+                    state["last_transient_error_at"] = datetime.now(timezone.utc).isoformat()
+                    save_state(state)
+                elif classification["counts_as_loss"]:
                     state["consecutive_losses"] += 1
                     save_state(state)
-                    trade_record["result"] = "rejected"
-                else:
-                    trade_record["result"] = "rejected_operational"
+        except CoinbaseOperationError as e:
+            log.exception("exchange error on %s %s classified=%s: %s", symbol, action, e.classification, e)
+            trade_record["result"] = f"exception:{e.exception_type}"
+            trade_record["error"] = e.last_error
+            trade_record["error_classification"] = e.classification
+            trade_record["attempts"] = e.attempts
+            state["last_error_classification"] = e.classification
+            if e.classification == "transient":
+                state["transient_errors"] = state.get("transient_errors", 0) + 1
+                state["last_transient_error_at"] = datetime.now(timezone.utc).isoformat()
+            else:
+                state["consecutive_losses"] += 1
+            save_state(state)
         except Exception as e:
             log.exception("exchange error on %s %s: %s", symbol, action, e)
             state["consecutive_losses"] += 1
+            state["last_error_classification"] = "fatal"
             save_state(state)
             trade_record["result"] = f"exception:{type(e).__name__}"
             trade_record["error"] = str(e)
+            trade_record["error_classification"] = "fatal"
 
         record_trade(trade_record)
 
@@ -438,10 +693,41 @@ def _counts_as_loss(resp_dict: dict[str, Any]) -> bool:
     return True
 
 
+def _classify_response(resp_dict: dict[str, Any]) -> dict[str, Any]:
+    code, reason = _response_error_details(resp_dict)
+    merged = f"{code} {reason}"
+    if not merged.strip():
+        return {
+            "classification": "fatal",
+            "counts_as_loss": True,
+            "result": "rejected",
+        }
+    if "INSUFFICIENT" in merged:
+        return {
+            "classification": "operational",
+            "counts_as_loss": False,
+            "result": "insufficient_balance",
+        }
+    transient_markers = ("RATE_LIMIT", "TOO_MANY_REQUESTS", "TEMPORARY", "SERVICE_UNAVAILABLE", "TIMEOUT", "429", "503", "504", "502")
+    if any(marker in merged for marker in transient_markers):
+        return {
+            "classification": "transient",
+            "counts_as_loss": False,
+            "result": "rejected_transient",
+        }
+    return {
+        "classification": "fatal",
+        "counts_as_loss": True,
+        "result": "rejected",
+    }
+
+
 # --- main loop --------------------------------------------------------------
-def drain_once(client: RESTClient, cfg: dict, state: dict, dry_run: bool) -> int:
+def drain_once(client: ResilientCoinbaseClient, cfg: dict, state: dict, dry_run: bool) -> int:
     PROCESSED.mkdir(parents=True, exist_ok=True)
     FAILED.mkdir(parents=True, exist_ok=True)
+    if reset_cooldown_if_expired(state):
+        save_state(state)
 
     if not is_trading_hours(cfg):
         log.info("outside trading hours; sleeping")
@@ -504,6 +790,7 @@ def main() -> int:
              cb["max_consecutive_losses"], cb["cool_down_minutes"])
 
     client = build_client(cfg)
+    backfill_pnl_ledger()
 
     # graceful shutdown
     stop = {"flag": False}

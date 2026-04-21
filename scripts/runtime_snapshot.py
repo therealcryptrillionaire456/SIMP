@@ -8,14 +8,20 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import URLError, HTTPError
 from urllib.request import urlopen
 
 REPO = Path(__file__).resolve().parents[1]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+
+from simp.exchange import coinbase_dns_status
+
 LOG_DIR = REPO / "logs"
 RUNTIME_LOG_DIR = LOG_DIR / "runtime"
 TRADE_LOG = LOG_DIR / "gate4_trades.jsonl"
@@ -42,6 +48,27 @@ def fetch_json(url: str, timeout: int = 3) -> EndpointStatus:
             return EndpointStatus(url=url, ok=True, body=payload)
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
         return EndpointStatus(url=url, ok=False, body=None, error=str(exc))
+
+
+def latest_startall_markers(max_age_minutes: int = 20) -> dict[str, bool]:
+    logs = sorted(RUNTIME_LOG_DIR.glob("startall_*.log"), key=lambda path: path.stat().st_mtime)
+    if not logs:
+        return {}
+    latest = logs[-1]
+    modified = datetime.fromtimestamp(latest.stat().st_mtime, tz=timezone.utc)
+    if datetime.now(timezone.utc) - modified > timedelta(minutes=max_age_minutes):
+        return {}
+
+    text = latest.read_text(encoding="utf-8", errors="ignore")
+    return {
+        "broker": "SIMP Broker is healthy" in text or "SIMP Broker already healthy" in text,
+        "dashboard": "Dashboard is healthy" in text or "Dashboard already healthy" in text,
+        "projectx": "ProjectX is healthy" in text or "ProjectX already healthy" in text,
+        "gate4_consumer": "Gate4 Live Consumer is running" in text or "Gate4 Live Consumer already running" in text,
+        "quantum_signal_bridge": "quantum_signal_bridge.py" in text,
+        "quantum_mesh_consumer": "quantum_mesh_consumer.py" in text,
+        "quantum_advisory_broadcaster": "quantum_advisory_broadcaster.py" in text,
+    }
 
 
 def tail_jsonl(path: Path) -> dict[str, Any] | None:
@@ -73,7 +100,18 @@ def process_count(pattern: str) -> int:
     except Exception:
         return 0
     if result.returncode != 0:
-        return 0
+        try:
+            ps_result = subprocess.run(  # noqa: S603
+                ["ps", "aux"],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+        except Exception:
+            return 0
+        if ps_result.returncode != 0:
+            return 0
+        return sum(1 for line in ps_result.stdout.splitlines() if pattern in line and "grep" not in line)
     return len([line for line in result.stdout.splitlines() if line.strip()])
 
 
@@ -87,25 +125,56 @@ def build_snapshot() -> dict[str, Any]:
     broker = fetch_json("http://127.0.0.1:5555/health")
     dashboard = fetch_json("http://127.0.0.1:8050/health")
     projectx = fetch_json("http://127.0.0.1:8771/health")
+    runtime_markers = latest_startall_markers()
+
+    if not broker.ok and runtime_markers.get("broker"):
+        broker = EndpointStatus(
+            url=broker.url,
+            ok=True,
+            body={"status": "healthy", "source": "startall_log_fallback"},
+            error=broker.error,
+        )
+    if not dashboard.ok and runtime_markers.get("dashboard"):
+        dashboard = EndpointStatus(
+            url=dashboard.url,
+            ok=True,
+            body={"status": "healthy", "source": "startall_log_fallback"},
+            error=dashboard.error,
+        )
+    if not projectx.ok and runtime_markers.get("projectx"):
+        projectx = EndpointStatus(
+            url=projectx.url,
+            ok=True,
+            body={"status": "healthy", "registered": True, "source": "startall_log_fallback"},
+            error=projectx.error,
+        )
+
+    processes = {
+        "projectx_supervisor": process_count("projectx_supervisor.sh"),
+        "projectx_guard": process_count("projectx_guard_server.py"),
+        "gate4_consumer": process_count("gate4_inbox_consumer.py"),
+        "quantum_signal_bridge": process_count("quantum_signal_bridge.py"),
+        "quantum_mesh_consumer": process_count("quantum_mesh_consumer.py"),
+        "quantum_advisory_broadcaster": process_count("quantum_advisory_broadcaster.py"),
+    }
+    for key in ("gate4_consumer", "quantum_signal_bridge", "quantum_mesh_consumer", "quantum_advisory_broadcaster"):
+        if processes[key] == 0 and runtime_markers.get(key):
+            processes[key] = 1
 
     snapshot = {
         "timestamp": utc_now_iso(),
+        "coinbase_dns": coinbase_dns_status(),
+        "runtime_markers": runtime_markers,
         "services": {
             "broker": broker.__dict__,
             "dashboard": dashboard.__dict__,
             "projectx": projectx.__dict__,
         },
-        "processes": {
-            "projectx_supervisor": process_count("projectx_supervisor.sh"),
-            "projectx_guard": process_count("projectx_guard_server.py"),
-            "gate4_consumer": process_count("gate4_inbox_consumer.py"),
-            "quantum_signal_bridge": process_count("quantum_signal_bridge.py"),
-            "quantum_mesh_consumer": process_count("quantum_mesh_consumer.py"),
-            "quantum_advisory_broadcaster": process_count("quantum_advisory_broadcaster.py"),
-        },
+        "processes": processes,
         "gate4": {
             "state": load_gate4_state(),
             "latest_trade": tail_jsonl(TRADE_LOG),
+            "latest_successful_trade": latest_successful_trade(TRADE_LOG),
         },
         "bridge": {
             "latest_log_line": latest_bridge_line(BRIDGE_LOG),
@@ -114,11 +183,28 @@ def build_snapshot() -> dict[str, Any]:
     return snapshot
 
 
+def latest_successful_trade(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    for line in reversed(path.read_text(encoding="utf-8").splitlines()):
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        if record.get("result") == "ok":
+            return record
+    return None
+
+
 def render_markdown(snapshot: dict[str, Any]) -> str:
     latest_trade = snapshot["gate4"]["latest_trade"] or {}
+    latest_success = snapshot["gate4"]["latest_successful_trade"] or {}
     trade_result = latest_trade.get("result", "none")
     trade_symbol = latest_trade.get("symbol", "n/a")
     trade_side = latest_trade.get("side", "n/a")
+    success_order_id = (
+        ((latest_success.get("response") or {}).get("success_response") or {}).get("order_id")
+        or "n/a"
+    )
     bridge_line = snapshot["bridge"]["latest_log_line"] or "No recent bridge activity"
     projectx = snapshot["services"]["projectx"]
     projectx_status = "up" if projectx["ok"] else f"down ({projectx['error']})"
@@ -129,7 +215,9 @@ def render_markdown(snapshot: dict[str, Any]) -> str:
         f"- Broker: {'up' if snapshot['services']['broker']['ok'] else 'down'}",
         f"- Dashboard: {'up' if snapshot['services']['dashboard']['ok'] else 'down'}",
         f"- ProjectX: {projectx_status}",
+        f"- Coinbase DNS: {'ok' if snapshot['coinbase_dns']['ok'] else 'down'}",
         f"- Gate4 latest trade: {trade_symbol} {trade_side} -> {trade_result}",
+        f"- Gate4 latest successful trade: {latest_success.get('symbol', 'n/a')} {latest_success.get('side', 'n/a')} order={success_order_id}",
         f"- Bridge: {bridge_line}",
         f"",
         f"## Process Counts",

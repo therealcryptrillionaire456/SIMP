@@ -34,6 +34,7 @@ def test_verify_revenue_path_report_uses_latest_trade(monkeypatch) -> None:
         verify_revenue_path,
         "build_snapshot",
         lambda: {
+            "coinbase_dns": {"ok": True, "addresses": ["104.18.35.15"]},
             "services": {
                 "broker": {"ok": True},
                 "dashboard": {"ok": True},
@@ -44,6 +45,12 @@ def test_verify_revenue_path_report_uses_latest_trade(monkeypatch) -> None:
                 "quantum_signal_bridge": 1,
             },
             "gate4": {
+                "state": {
+                    "consecutive_losses": 0,
+                    "cooldown_until": None,
+                    "transient_errors": 1,
+                    "last_error_classification": None,
+                },
                 "latest_trade": {
                     "ts": "2026-04-21T10:52:00+00:00",
                     "result": "ok",
@@ -54,7 +61,18 @@ def test_verify_revenue_path_report_uses_latest_trade(monkeypatch) -> None:
                             "order_id": "abc-order",
                         }
                     },
-                }
+                },
+                "latest_successful_trade": {
+                    "ts": "2026-04-21T10:52:00+00:00",
+                    "result": "ok",
+                    "symbol": "BTC-USD",
+                    "side": "SELL",
+                    "response": {
+                        "success_response": {
+                            "order_id": "abc-order",
+                        }
+                    },
+                },
             },
         },
     )
@@ -77,5 +95,5 @@ def test_verify_revenue_path_report_uses_latest_trade(monkeypatch) -> None:
     report = verify_revenue_path.build_report(max_trade_age_minutes=10)
 
     assert report["ok"] is True
-    assert report["checks"]["latest_trade_successful"]["order_id"] == "abc-order"
-    assert report["checks"]["latest_trade_fresh"]["ok"] is True
+    assert report["checks"]["latest_successful_trade_has_order_id"]["order_id"] == "abc-order"
+    assert report["checks"]["latest_successful_trade_fresh"]["ok"] is True

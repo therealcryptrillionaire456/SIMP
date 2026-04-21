@@ -7,13 +7,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+REPO = Path(__file__).resolve().parents[1]
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+
+from simp.exchange import coinbase_dns_status
 from runtime_snapshot import build_snapshot
 
-REPO = Path(__file__).resolve().parents[1]
 TRADE_LOG = REPO / "logs" / "gate4_trades.jsonl"
 
 
@@ -26,6 +31,8 @@ def parse_iso(value: str | None) -> datetime | None:
 def build_report(max_trade_age_minutes: int = 30) -> dict[str, Any]:
     snapshot = build_snapshot()
     latest_trade = snapshot["gate4"]["latest_trade"] or {}
+    latest_success = snapshot["gate4"]["latest_successful_trade"] or {}
+    state = snapshot["gate4"]["state"] or {}
 
     checks: dict[str, dict[str, Any]] = {
         "broker_up": {"ok": snapshot["services"]["broker"]["ok"]},
@@ -33,30 +40,47 @@ def build_report(max_trade_age_minutes: int = 30) -> dict[str, Any]:
         "projectx_up": {"ok": snapshot["services"]["projectx"]["ok"]},
         "gate4_consumer_running": {"ok": snapshot["processes"]["gate4_consumer"] > 0},
         "quantum_bridge_running": {"ok": snapshot["processes"]["quantum_signal_bridge"] > 0},
+        "coinbase_dns_ok": {"ok": snapshot["coinbase_dns"]["ok"], "addresses": snapshot["coinbase_dns"]["addresses"]},
         "latest_trade_present": {"ok": bool(latest_trade)},
+        "latest_successful_trade_present": {"ok": bool(latest_success)},
     }
 
-    latest_trade_ts = parse_iso(latest_trade.get("ts"))
-    if latest_trade_ts:
-        age = datetime.now(timezone.utc) - latest_trade_ts
-        checks["latest_trade_fresh"] = {
+    latest_success_ts = parse_iso(latest_success.get("ts"))
+    if latest_success_ts:
+        age = datetime.now(timezone.utc) - latest_success_ts
+        checks["latest_successful_trade_fresh"] = {
             "ok": age <= timedelta(minutes=max_trade_age_minutes),
             "age_seconds": round(age.total_seconds(), 2),
         }
-        checks["latest_trade_successful"] = {
-            "ok": latest_trade.get("result") == "ok",
-            "result": latest_trade.get("result"),
-            "symbol": latest_trade.get("symbol"),
-            "side": latest_trade.get("side"),
+        checks["latest_successful_trade_has_order_id"] = {
+            "ok": bool(
+                ((latest_success.get("response") or {}).get("success_response") or {}).get("order_id")
+            ),
+            "result": latest_success.get("result"),
+            "symbol": latest_success.get("symbol"),
+            "side": latest_success.get("side"),
             "order_id": (
-                (latest_trade.get("response") or {})
+                (latest_success.get("response") or {})
                 .get("success_response", {})
                 .get("order_id")
             ),
         }
     else:
-        checks["latest_trade_fresh"] = {"ok": False, "reason": "no trade timestamp"}
-        checks["latest_trade_successful"] = {"ok": False, "reason": "no trade"}
+        checks["latest_successful_trade_fresh"] = {"ok": False, "reason": "no successful trade timestamp"}
+        checks["latest_successful_trade_has_order_id"] = {"ok": False, "reason": "no successful trade"}
+
+    checks["breaker_reset_state"] = {
+        "ok": not (
+            state.get("cooldown_until")
+            and parse_iso(state.get("cooldown_until"))
+            and parse_iso(state.get("cooldown_until")) <= datetime.now(timezone.utc)
+            and state.get("consecutive_losses", 0) > 0
+        ),
+        "cooldown_until": state.get("cooldown_until"),
+        "consecutive_losses": state.get("consecutive_losses", 0),
+        "transient_errors": state.get("transient_errors", 0),
+        "last_error_classification": state.get("last_error_classification"),
+    }
 
     overall_ok = all(item["ok"] for item in checks.values())
     return {
@@ -64,6 +88,9 @@ def build_report(max_trade_age_minutes: int = 30) -> dict[str, Any]:
         "ok": overall_ok,
         "checks": checks,
         "latest_trade": latest_trade,
+        "latest_successful_trade": latest_success,
+        "gate4_state": state,
+        "coinbase_dns": coinbase_dns_status(),
     }
 
 

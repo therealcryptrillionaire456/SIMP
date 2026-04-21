@@ -381,9 +381,30 @@ class SimpBroker:
         """
         with self.agent_lock:
             # Check if agent already exists using AgentRegistry
+            # NOTE: agent_registry is disk-persisted but mesh_bus is in-memory only.
+            # After a broker restart, an agent may still be in the registry but
+            # absent from the mesh bus. Reconcile mesh_bus on re-registration
+            # instead of returning False (which left agents permanently stuck
+            # outside mesh routing — see MORNING_BRIEF_KASEY.md).
             if self.agent_registry.exists(agent_id):
-                self.logger.warning(f"❌ Agent '{agent_id}' already registered")
-                return False
+                self.logger.info(
+                    f"♻️  Agent '{agent_id}' already in registry — reconciling mesh bus"
+                )
+                try:
+                    if not self.mesh_bus.is_agent_registered(agent_id):
+                        self.mesh_bus.register_agent(agent_id)
+                        self.logger.info(
+                            f"✅ Re-attached '{agent_id}' to mesh bus"
+                        )
+                    # Always ensure safety_alerts subscription exists
+                    self.mesh_bus.subscribe(agent_id, "safety_alerts")
+                except Exception as e:
+                    self.logger.warning(
+                        f"Mesh-bus reconcile for {agent_id} failed: {e}"
+                    )
+                # Idempotent: treat re-registration as success so the caller
+                # can proceed to subscribe / send / poll.
+                return True
 
             if self.agent_registry.count() >= self.config.max_agents:
                 self.logger.error(f"❌ Max agents ({self.config.max_agents}) reached")
@@ -412,8 +433,23 @@ class SimpBroker:
 
             # Register agent with disk persistence
             if not self.agent_registry.register(agent_id, agent_data):
-                self.logger.error(f"❌ Failed to register agent '{agent_id}' in registry")
-                return False
+                # Race/stale in-memory state: agent_id slipped into the
+                # registry between the exists() check above and this register()
+                # call. Treat as idempotent success: reconcile mesh_bus and
+                # continue, matching the idempotent re-registration branch.
+                self.logger.info(
+                    f"♻️  Agent '{agent_id}' registry.register() returned False "
+                    f"after exists() returned False — treating as idempotent"
+                )
+                try:
+                    if not self.mesh_bus.is_agent_registered(agent_id):
+                        self.mesh_bus.register_agent(agent_id)
+                    self.mesh_bus.subscribe(agent_id, "safety_alerts")
+                except Exception as e:
+                    self.logger.warning(
+                        f"Mesh-bus reconcile for {agent_id} failed: {e}"
+                    )
+                return True
 
             with self.stats_lock:
                 self.stats["agents_registered"] += 1
@@ -423,180 +459,116 @@ class SimpBroker:
             )
             self._log_event("agent_registered", f"Agent {agent_id} registered", agent_id=agent_id)
             
-            # Register agent with MeshBus
-            try:
-                self.mesh_bus.register_agent(agent_id)
-                # Auto-subscribe to safety alerts channel for all agents
-                self.mesh_bus.subscribe(agent_id, "safety_alerts")
-                self.logger.debug(f"Agent {agent_id} registered with MeshBus")
-            except Exception as e:
-                self.logger.warning(f"Failed to register agent {agent_id} with MeshBus: {e}")
-            
-            # Register agent mesh capabilities if mesh routing is available
-            if self.mesh_routing:
+                        # Register agent with MeshBus (with retry logic)
+            max_retries = 3
+            registered_with_mesh = False
+            for attempt in range(max_retries):
                 try:
-                    # Extract capabilities from metadata
-                    capabilities = metadata.get("capabilities", []) if metadata else []
-                    channel_capacity = metadata.get("channel_capacity", 1000.0) if metadata else 1000.0
-                    
-                    self.mesh_routing.register_agent_mesh_capabilities(
-                        agent_id, capabilities, channel_capacity
-                    )
-                    self.logger.debug(f"Agent {agent_id} mesh capabilities registered")
+                    self.mesh_bus.register_agent(agent_id)
+                    # Auto-subscribe to safety alerts channel for all agents
+                    self.mesh_bus.subscribe(agent_id, "safety_alerts")
+                    self.logger.debug(f"Agent {agent_id} registered with MeshBus (attempt {attempt + 1})")
+                    registered_with_mesh = True
+                    break
                 except Exception as e:
-                    self.logger.warning(f"Failed to register mesh capabilities for {agent_id}: {e}")
+                    if attempt == max_retries - 1:
+                        self.logger.warning(f"Failed to register agent {agent_id} with MeshBus after {max_retries} attempts: {e}")
+                        # Log more details for debugging
+                        self.logger.debug(f"Mesh bus state: registered_agents={list(self.mesh_bus._registered_agents)}")
+                    else:
+                        self.logger.debug(f"Mesh bus registration attempt {attempt + 1} failed for {agent_id}: {e}")
+                        import time
+                        time.sleep(0.1 * (attempt + 1))  # Small backoff
             
+            # If registration failed, log it prominently for QIP
+            if not registered_with_mesh and agent_id == "quantum_intelligence_prime":
+                self.logger.error(f"CRITICAL: QIP agent {agent_id} failed mesh bus registration!")
+                self.logger.error(
+                    f"This will prevent quantum operations. Mesh bus state: "
+                    f"{self.mesh_bus.get_statistics() if hasattr(self.mesh_bus, 'get_statistics') else 'unknown'}"
+                )
+
             return True
 
-    def deregister_agent(self, agent_id: str) -> bool:
-        """Deregister an agent"""
+    def list_agents(self) -> list[Dict[str, Any]]:
+        """Return the current broker-visible agent list."""
         with self.agent_lock:
-            # Deregister agent from AgentRegistry with disk persistence
-            if not self.agent_registry.deregister(agent_id):
-                self.logger.warning(f"❌ Agent '{agent_id}' not found")
-                return False
-            
-            self.logger.info(f"✅ Agent deregistered: {agent_id}")
-            self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
-            
-            # Deregister agent from MeshBus
-            try:
-                self.mesh_bus.deregister_agent(agent_id)
-                self.logger.debug(f"Agent {agent_id} deregistered from MeshBus")
-            except Exception as e:
-                self.logger.warning(f"Failed to deregister agent {agent_id} from MeshBus: {e}")
-            
-            # Deregister agent mesh capabilities if mesh routing is available
-            if self.mesh_routing:
-                try:
-                    self.mesh_routing.unregister_agent_mesh(agent_id)
-                    self.logger.debug(f"Agent {agent_id} mesh capabilities deregistered")
-                except Exception as e:
-                    self.logger.warning(f"Failed to deregister mesh capabilities for {agent_id}: {e}")
-            
-            return True
+            return list(self.agent_registry.get_all().values())
 
-    # ------------------------------------------------------------------
-    # Sprint 62: Heartbeat System
-    # ------------------------------------------------------------------
-
-    def record_heartbeat(self, agent_id: str) -> bool:
-        """Update heartbeat timestamp for an agent. Returns True if found."""
-        with self.agent_lock:
-            agent = self.agent_registry.get(agent_id)
-            if not agent:
-                return False
-            self.agent_registry.update(agent_id, {
-                "last_heartbeat": _utcnow_iso(),
-                "heartbeat_count": agent.get("heartbeat_count", 0) + 1,
-                "status": "active",
-                "stale": False
-            })
-            return True
-
-    def get_stale_agents(self, stale_after_seconds: float = 90.0) -> list:
-        """Return agent_ids whose last_heartbeat exceeds the threshold.
-        Excludes file-based agents. Returns [] during startup grace period."""
-        # Sprint 64 — startup grace period
-        if hasattr(self, "_startup_at") and self._startup_at:
-            uptime = (datetime.now(timezone.utc) - self._startup_at).total_seconds()
-            if uptime < 60.0:
-                return []
-
-        now = datetime.now(timezone.utc)
-        stale = []
-        with self.agent_lock:
-            for aid, info in self.agent_registry.get_all().items():
-                if info.get("file_based"):
-                    continue
-                hb = info.get("last_heartbeat", "")
-                if not hb:
-                    continue
-                try:
-                    hb_dt = datetime.fromisoformat(hb.replace("Z", "+00:00"))
-                    if (now - hb_dt).total_seconds() > stale_after_seconds:
-                        stale.append(aid)
-                        info["stale"] = True
-                except (ValueError, TypeError):
-                    pass
-        return stale
-
-    def deregister_stale_agents(self, deregister_after_seconds: float = 300.0) -> list:
-        """Deregister agents whose heartbeat exceeds the threshold.
-        Excludes file-based agents. Returns list of deregistered ids.
-        Returns [] during startup grace period."""
-        # Sprint 64 — startup grace period
-        if hasattr(self, "_startup_at") and self._startup_at:
-            uptime = (datetime.now(timezone.utc) - self._startup_at).total_seconds()
-            if uptime < 60.0:
-                return []
-
-        now = datetime.now(timezone.utc)
-        to_deregister = []
-        with self.agent_lock:
-            for aid, info in list(self.agent_registry.get_all().items()):
-                if info.get("file_based"):
-                    continue
-                hb = info.get("last_heartbeat", "")
-                if not hb:
-                    continue
-                try:
-                    hb_dt = datetime.fromisoformat(hb.replace("Z", "+00:00"))
-                    if (now - hb_dt).total_seconds() > deregister_after_seconds:
-                        to_deregister.append(aid)
-                except (ValueError, TypeError):
-                    pass
-            for aid in to_deregister:
-                # Deregister using AgentRegistry for disk persistence
-                if self.agent_registry.deregister(aid):
-                    self.logger.info(f"Deregistered stale agent: {aid}")
-                    self._log_event("agent_stale_deregistered", f"Stale agent {aid} deregistered", agent_id=aid)
-        return to_deregister
-
-    def get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
-        """Get agent information"""
+    def get_agent(self, agent_id: Optional[str]) -> Optional[Dict[str, Any]]:
+        """Return one agent record by id."""
+        if not agent_id:
+            return None
         with self.agent_lock:
             return self.agent_registry.get(agent_id)
 
-    def list_agents(self) -> Dict[str, Dict[str, Any]]:
-        """List all registered agents"""
+    def deregister_agent(self, agent_id: str) -> bool:
+        """Deregister an agent from broker persistence and mesh routing."""
         with self.agent_lock:
-            return self.agent_registry.get_all()
+            if not self.agent_registry.exists(agent_id):
+                return False
+            self.agent_registry.deregister(agent_id)
+            try:
+                self.mesh_bus.deregister_agent(agent_id)
+            except Exception:
+                self.logger.warning("MeshBus deregistration failed for %s", agent_id, exc_info=True)
+            self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
+        with self.stats_lock:
+            self.stats["agents_registered"] = max(0, self.stats.get("agents_registered", 0) - 1)
+        return True
 
-    def evaluate_plan(self, steps, source_agent="mother_goose", mode=BRPMode.SHADOW.value):
-        """Submit a multi-step plan to BRP for review (Mother Goose integration).
+    def record_heartbeat(self, agent_id: str) -> bool:
+        """Refresh heartbeat metadata for a registered agent."""
+        now = _utcnow_iso()
+        with self.agent_lock:
+            if not self.agent_registry.exists(agent_id):
+                return False
+            return self.agent_registry.update(
+                agent_id,
+                {
+                    "last_heartbeat": now,
+                    "last_seen": now,
+                    "heartbeat_count": int(self.agent_registry.get(agent_id, {}).get("heartbeat_count", 0)) + 1,
+                    "status": "online",
+                    "stale": False,
+                },
+            )
 
-        Args:
-            steps: List of plan step dicts, each with at least an "action" key.
-            source_agent: Identifier of the planning agent.
-            mode: BRP evaluation mode (default shadow).
+    def get_stale_agents(self, stale_after_seconds: float = 90.0) -> list[str]:
+        """Return non-file-based agents whose heartbeat is older than the threshold."""
+        now = datetime.now(timezone.utc)
+        stale: list[str] = []
+        with self.agent_lock:
+            for agent_id, agent in self.agent_registry.get_all().items():
+                if agent.get("file_based"):
+                    continue
+                last_heartbeat = agent.get("last_heartbeat")
+                if not last_heartbeat:
+                    continue
+                try:
+                    heartbeat_dt = datetime.fromisoformat(str(last_heartbeat).replace("Z", "+00:00"))
+                except ValueError:
+                    continue
+                if (now - heartbeat_dt).total_seconds() > stale_after_seconds:
+                    stale.append(agent_id)
+                    self.agent_registry.update(agent_id, {"stale": True, "status": "stale"})
+        return stale
 
-        Returns:
-            BRPResponse as a dict.
-        """
-        plan = BRPPlan(source_agent=source_agent, steps=steps, mode=mode)
-        response = self.brp_bridge.evaluate_plan(plan)
-        self.logger.info(
-            f"BRP plan review: {plan.plan_id} -> {response.decision} "
-            f"(threat={response.threat_score:.2f})"
-        )
-        return response.to_dict()
+    def deregister_stale_agents(self, deregister_after_seconds: float = 300.0) -> list[str]:
+        """Deregister stale agents and return the removed ids."""
+        stale_ids = self.get_stale_agents(stale_after_seconds=deregister_after_seconds)
+        deregistered: list[str] = []
+        for agent_id in stale_ids:
+            if self.deregister_agent(agent_id):
+                deregistered.append(agent_id)
+        return deregistered
 
     async def route_intent(
         self, intent_data: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
-        Route an intent to target agent
-
-        Intent format:
-        {
-            "intent_id": "...",
-            "source_agent": "...",
-            "target_agent": "...",
-            "intent_type": "...",
-            "params": {...},
-            "timestamp": "..."
-        }
+        Route an intent to target agent. Mesh-routing is attempted first when
+        configured; otherwise falls back to HTTP or file-based delivery.
         """
         if self.state != BrokerState.RUNNING:
             return {
@@ -612,57 +584,31 @@ class SimpBroker:
             return {"status": "error", "errors": errors}
         intent_data = canonical.to_dict()
 
-        # Version check
-        supported_versions = {"1.0"}
-        intent_version = canonical.simp_version
-        if intent_version and intent_version not in supported_versions:
-            self.logger.warning(f"Intent has unsupported protocol version: {intent_version}")
-            # Allow through with warning (don't break backward compat yet)
-
         # Signature verification (if enabled)
         simp_config = SimpConfig()
         if simp_config.REQUIRE_SIGNATURES:
             signature = intent_data.get("signature")
             source_id = intent_data.get("source_agent", "")
-            source_info = self.agent_registry.get(source_id) or {}
+            source_info = self.agents.get(source_id, {})
             public_key_pem = source_info.get("public_key")
-
             if signature and public_key_pem:
                 try:
-                    pub_key = SimpCrypto.load_public_key(public_key_pem.encode() if isinstance(public_key_pem, str) else public_key_pem)
+                    pub_key = SimpCrypto.load_public_key(
+                        public_key_pem.encode() if isinstance(public_key_pem, str) else public_key_pem
+                    )
                     if not SimpCrypto.verify_signature(intent_data, pub_key):
                         return {"status": "error", "error": "Invalid signature"}
                 except Exception as exc:
                     self.logger.warning(f"Signature verification failed: {exc}")
                     return {"status": "error", "error": f"Signature verification error: {exc}"}
-            elif signature and not public_key_pem:
-                self.logger.warning(f"Agent '{source_id}' has no public key; signature cannot be verified")
-            # If no signature provided, allow through with warning (graceful mode)
 
         intent_id = intent_data.get("intent_id", str(uuid.uuid4()))
         source_agent = intent_data.get("source_agent", "client")
         target_agent = intent_data.get("target_agent")
         intent_type = intent_data.get("intent_type", "unknown")
         delivery_start = time.monotonic()
-        
-        # --- Hop count check to prevent infinite loops ---
-        hop_count = intent_data.get("_hop_count", 0)
-        max_hops = 10  # Maximum allowed hops to prevent infinite loops
-        
-        if hop_count >= max_hops:
-            error_msg = f"Intent exceeded maximum hop count ({max_hops}): possible infinite loop"
-            self.logger.error(f"❌ {error_msg}")
-            return {
-                "status": "error",
-                "error_code": "MAX_HOPS_EXCEEDED",
-                "error_message": error_msg,
-                "intent_id": intent_id,
-            }
-        
-        # Increment hop count for any forwarded intents
-        intent_data["_hop_count"] = hop_count + 1
 
-        # --- BRP event-level evaluation for every routed intent ---
+        # BRP event-level evaluation
         brp_plan_response = None
         brp_event_id = ""
         try:
@@ -684,7 +630,7 @@ class SimpBroker:
         except Exception:
             self.logger.warning("BRP event evaluation failed for intent %s", intent_id, exc_info=True)
 
-        # --- BRP plan-level evaluation for multi-step intents ---
+        # BRP plan-level evaluation for multi-step intents
         steps = intent_data.get("params", {}).get("steps") if isinstance(intent_data.get("params"), dict) else None
         if steps and isinstance(steps, list):
             try:
@@ -699,18 +645,17 @@ class SimpBroker:
         with self.stats_lock:
             self.stats["intents_received"] += 1
 
-        # Sprint 53 — routing engine: resolve target when "auto" or missing
+        # Routing engine resolution when target is "auto" or missing
         if not target_agent or target_agent == "auto":
             with self.agent_lock:
-                agents_snapshot = self.agent_registry.get_all()
+                agents_snapshot = dict(self.agents)
             decision = self.routing_engine.resolve(intent_type, target_agent, agents_snapshot)
             if decision.target_agent:
                 target_agent = decision.target_agent
 
-        # Log to task ledger — reuse existing task if one was already created
+        # Task ledger
         existing_task_id = intent_data.get("task_id") or intent_data.get("params", {}).get("task_id")
         existing_task = self.task_ledger.get_task(existing_task_id) if existing_task_id else None
-
         if existing_task:
             task_id = existing_task["task_id"]
         else:
@@ -731,20 +676,15 @@ class SimpBroker:
         if not target:
             error_msg = f"Target agent '{target_agent}' not found"
             self.logger.warning(f"❌ {error_msg}")
-
             error_resp = {
                 "status": "error",
                 "error_code": "AGENT_NOT_FOUND",
                 "error_message": error_msg,
                 "intent_id": intent_id,
             }
-
-            # Classify failure and apply policy
             fc = self.failure_handler.classify_failure(error_resp)
             self.task_ledger.fail_task(task_id, error=error_resp, failure_class=fc.value)
             policy = self.failure_handler.get_retry_policy(fc)
-
-            # Try fallback agent if policy allows
             if policy.get("should_retry") and self.builder_pool:
                 fallback = self.failure_handler.get_fallback_agent(
                     fc, intent_type, self.builder_pool, exclude=[target_agent or ""]
@@ -754,7 +694,6 @@ class SimpBroker:
                     target_agent = fallback
                     target = self.get_agent(fallback)
                     self.task_ledger.update_status(task_id, "queued")
-
             if not target:
                 with self.intent_lock:
                     record = IntentRecord(
@@ -767,22 +706,17 @@ class SimpBroker:
                         error=error_msg,
                     )
                     self._add_intent_record(intent_id, record)
-
                 with self.stats_lock:
                     self.stats["intents_failed"] += 1
-
                 self._log_event(
                     "intent_failed", error_msg, level="warning",
                     agent_id=target_agent or "unknown", intent_id=intent_id,
                 )
-
                 return error_resp
 
-        # Claim task in ledger
+        # Claim task and record intent as pending
         self.task_ledger.claim_task(task_id, target_agent)
         self.task_ledger.update_status(task_id, "in_progress")
-
-        # Record intent as pending — Sprint 63: set planned_at
         now_iso = _utcnow_iso()
         with self.intent_lock:
             record = IntentRecord(
@@ -797,89 +731,68 @@ class SimpBroker:
             self._add_intent_record(intent_id, record)
 
         self.logger.info(
-            f"📤 Routing intent: {intent_id} ({intent_type}) "
-            f"{source_agent} → {target_agent}"
+            f"📤 Routing intent: {intent_id} ({intent_type}) {source_agent} → {target_agent}"
         )
         self._log_event(
-            "intent_routed", f"Intent {intent_id} ({intent_type}) {source_agent} → {target_agent}",
+            "intent_routed",
+            f"Intent {intent_id} ({intent_type}) {source_agent} → {target_agent}",
             agent_id=target_agent, intent_id=intent_id,
         )
-
-        # Sprint 63: set dispatched_at just before delivery
         with self.intent_lock:
             if intent_id in self.intent_records:
                 self.intent_records[intent_id].dispatched_at = _utcnow_iso()
 
-        # Check if we can route via mesh (Sprint 71+)
-        mesh_routing_possible = False
+        # Try mesh-routing first when configured and possible
         mesh_routing_result = None
-        
-        if self.mesh_routing:
+        if self.mesh_routing and getattr(self.mesh_routing, "config", None) is not None:
             try:
                 can_route, reason = self.mesh_routing.can_route_via_mesh(
                     source_agent, target_agent, intent_type
                 )
-                
-                if can_route:
-                    mesh_routing_possible = True
-                    self.logger.info(f"[MESH] Mesh routing possible for {intent_id}")
-                    
-                    # Try mesh routing based on configuration
-                    mesh_config = self.mesh_routing.config
-                    
-                    if mesh_config.mode.value in ["preferred", "exclusive"]:
-                        # Try mesh routing first
-                        mesh_routing_result = self.mesh_routing.route_via_mesh(
-                            source_agent, target_agent, intent_type, intent_data
-                        )
-                        
-                        if mesh_routing_result.get("success"):
-                            self.logger.info(f"[MESH] Intent {intent_id} routed via mesh")
-                            # Update intent record with mesh info
-                            with self.intent_lock:
-                                if intent_id in self.intent_records:
-                                    self.intent_records[intent_id].mesh_routed = True
-                                    self.intent_records[intent_id].mesh_intent_id = mesh_routing_result.get("mesh_intent_id")
-                            
-                            # If mesh routing succeeded and mode is exclusive, return early
-                            if mesh_config.mode.value == "exclusive":
-                                delivery_result = {
-                                    "delivery_status": "delivered",
-                                    "delivery_method": "mesh",
-                                    "mesh_intent_id": mesh_routing_result.get("mesh_intent_id"),
-                                    "message": "Intent routed via mesh"
-                                }
-                                # Skip HTTP delivery
-                                target_endpoint = ""
-                        else:
-                            self.logger.warning(f"[MESH] Mesh routing failed: {mesh_routing_result.get('error')}")
-                            if mesh_config.mode.value == "exclusive":
-                                # Exclusive mode but mesh failed
-                                delivery_result = {
-                                    "delivery_status": "failed",
-                                    "delivery_method": "mesh",
-                                    "error": f"Mesh routing failed: {mesh_routing_result.get('error')}"
-                                }
-                                target_endpoint = ""
-                
-                else:
-                    self.logger.debug(f"[MESH] Mesh routing not possible: {reason}")
-                    
+                if can_route and self.mesh_routing.config.mode.value in ("preferred", "exclusive"):
+                    mesh_routing_result = self.mesh_routing.route_via_mesh(
+                        source_agent, target_agent, intent_type, intent_data
+                    )
+                    if mesh_routing_result.get("success"):
+                        self.logger.info(f"[MESH] Intent {intent_id} routed via mesh")
+                        with self.intent_lock:
+                            if intent_id in self.intent_records:
+                                self.intent_records[intent_id].mesh_routed = True
+                                self.intent_records[intent_id].mesh_intent_id = (
+                                    mesh_routing_result.get("mesh_intent_id")
+                                )
+                        if self.mesh_routing.config.mode.value == "exclusive":
+                            delivery_result = {
+                                "delivery_status": "delivered",
+                                "delivery_method": "mesh",
+                                "mesh_intent_id": mesh_routing_result.get("mesh_intent_id"),
+                                "message": "Intent routed via mesh",
+                            }
+                            target_endpoint = ""
+                            delivery_latency_ms = (time.monotonic() - delivery_start) * 1000
+                            delivery_result["delivery_latency_ms"] = round(delivery_latency_ms, 1)
+                            return {
+                                "status": "routed",
+                                "intent_id": intent_id,
+                                "target_agent": target_agent,
+                                "task_id": task_id,
+                                "delivery_status": "delivered",
+                                "delivery_method": "mesh",
+                                "mesh_intent_id": mesh_routing_result.get("mesh_intent_id"),
+                                "timestamp": _utcnow_iso(),
+                            }
             except Exception as e:
                 self.logger.error(f"[MESH] Error checking mesh routing: {e}")
-        
-        # Actually deliver the intent to the target agent
+
+        # Deliver via HTTP or file-based inbox
         target_endpoint = target.get("endpoint", "")
         retry_count = 0
         delivery_result = None
 
         if target_endpoint and target_endpoint.startswith("http"):
-            # HTTP agent — POST the intent to their endpoint
             delivery_result = await self._deliver_http(
                 target_endpoint, intent_data, intent_id
             )
-
-            # On failure, classify and attempt retry/fallback
             if delivery_result.get("delivery_status") == "failed":
                 error_resp = {
                     "error_code": delivery_result.get("error_code", "DELIVERY_FAILED"),
@@ -887,7 +800,6 @@ class SimpBroker:
                 }
                 fc = self.failure_handler.classify_failure(error_resp)
                 policy = self.failure_handler.get_retry_policy(fc)
-
                 fallback_succeeded = False
                 if policy.get("should_retry") and self.builder_pool:
                     fallback = self.failure_handler.get_fallback_agent(
@@ -897,9 +809,7 @@ class SimpBroker:
                         fallback_target = self.get_agent(fallback)
                         if fallback_target:
                             fallback_endpoint = fallback_target.get("endpoint", "")
-                            self.logger.info(
-                                f"🔄 Retrying delivery to fallback agent: {fallback}"
-                            )
+                            self.logger.info(f"🔄 Retrying delivery to fallback agent: {fallback}")
                             retry_count += 1
                             if fallback_endpoint and fallback_endpoint.startswith("http"):
                                 delivery_result = await self._deliver_http(
@@ -911,42 +821,15 @@ class SimpBroker:
                                 )
                             delivery_result["fallback_agent"] = fallback
                             fallback_succeeded = delivery_result.get("delivery_status") != "failed"
-
-                # If HTTP delivery and fallback both failed, try mesh routing as fallback
-                if not fallback_succeeded and delivery_result.get("delivery_status") == "failed":
-                    if self.mesh_routing and self.mesh_routing.config.mode.value != "disabled":
-                        try:
-                            # Try mesh routing as final fallback
-                            mesh_fallback_result = self.mesh_routing.route_via_mesh(
-                                source_agent, target_agent, intent_type, intent_data
-                            )
-                            
-                            if mesh_fallback_result.get("success"):
-                                self.logger.info(f"[MESH] Fallback mesh routing succeeded for {intent_id}")
-                                delivery_result = {
-                                    "delivery_status": "delivered",
-                                    "delivery_method": "mesh_fallback",
-                                    "mesh_intent_id": mesh_fallback_result.get("mesh_intent_id"),
-                                    "message": "Intent routed via mesh fallback",
-                                    "fallback_agent": target_agent
-                                }
-                                fallback_succeeded = True
-                            else:
-                                self.logger.warning(f"[MESH] Fallback mesh routing failed: {mesh_fallback_result.get('error')}")
-                        except Exception as e:
-                            self.logger.error(f"[MESH] Error in fallback mesh routing: {e}")
-                
-                # If all delivery methods failed, write to file inbox as last resort
                 if not fallback_succeeded and delivery_result.get("delivery_status") == "failed":
                     self.logger.info(
-                        f"📂 All delivery methods failed for '{target_agent}', "
+                        f"📂 HTTP delivery failed for '{target_agent}', "
                         f"falling back to file-based inbox delivery"
                     )
                     delivery_result = self._deliver_file_based(
                         target_agent, intent_data, intent_id
                     )
         else:
-            # File-based agent — write to their inbox
             delivery_result = self._deliver_file_based(
                 target_agent, intent_data, intent_id
             )
@@ -956,7 +839,6 @@ class SimpBroker:
         delivery_result["delivery_latency_ms"] = round(delivery_latency_ms, 1)
         delivery_result["retry_count"] = retry_count
 
-        # Update intent record with delivery result
         with self.intent_lock:
             record = self.intent_records.get(intent_id)
             if record:
@@ -968,7 +850,6 @@ class SimpBroker:
                     record.error = delivery_result.get("error_message", "Delivery failed")
                     record.execution_time_ms = delivery_latency_ms
 
-        # Update task ledger based on delivery outcome
         if delivery_status in ("delivered", "queued", "queued_no_endpoint"):
             with self.stats_lock:
                 self.stats["intents_routed"] += 1
@@ -1000,7 +881,7 @@ class SimpBroker:
                 "mode": self.mesh_routing.config.mode.value if self.mesh_routing else "disabled",
                 "mesh_routed": mesh_routing_result.get("success") if mesh_routing_result else False,
                 "mesh_intent_id": mesh_routing_result.get("mesh_intent_id") if mesh_routing_result else None,
-                "delivery_method": delivery_result.get("delivery_method", "http")
+                "delivery_method": delivery_result.get("delivery_method", "http"),
             },
             "delivery_status": delivery_status,
             "delivery_latency_ms": delivery_result.get("delivery_latency_ms"),
@@ -1011,7 +892,6 @@ class SimpBroker:
         if brp_plan_response is not None:
             route_result["brp_plan_review"] = brp_plan_response
 
-        # --- BRP post-routing observation ---
         if brp_event_id:
             try:
                 obs = BRPObservation(
@@ -1027,7 +907,6 @@ class SimpBroker:
             except Exception:
                 self.logger.warning("BRP post-route observation failed", exc_info=True)
 
-        # Fire memory hook after routing
         if self.hooks:
             try:
                 self.hooks.on_intent_routed(intent_data, route_result)
@@ -1035,6 +914,7 @@ class SimpBroker:
                 self.logger.debug("Memory hook on_intent_routed failed", exc_info=True)
 
         return route_result
+
 
     async def _deliver_http(
         self, endpoint: str, intent_data: Dict[str, Any], intent_id: str

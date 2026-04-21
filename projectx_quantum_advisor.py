@@ -59,6 +59,7 @@ QIP_TIMEOUT         = 30        # seconds to wait for QIP
 
 # ProjectX inbox for quantum recommendations
 PROJECTX_QUANTUM_INBOX = Path("data/inboxes/projectx_quantum")
+TRADE_RESULT_LOG = Path("logs/quantum/projectx_trade_updates.jsonl")
 
 # Capability → quantum analysis type mapping
 CAPABILITY_QUANTUM_MAP = {
@@ -187,7 +188,7 @@ def setup(broker: str):
     })
     logger.info(f"Registered as {ADVISOR_AGENT_ID}")
 
-    for ch in ["projectx_tasks", "maintenance_requests", "quantum_advisory"]:
+    for ch in ["projectx_tasks", "maintenance_requests", "quantum_advisory", "trade_updates"]:
         _post(f"{broker}/mesh/subscribe", {"agent_id": ADVISOR_AGENT_ID, "channel": ch})
         logger.info(f"Subscribed to '{ch}'")
 
@@ -299,6 +300,12 @@ def deliver_recommendation(capability: str, task_id: str,
     })
 
 
+def record_trade_update(update: Dict[str, Any]) -> None:
+    TRADE_RESULT_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with TRADE_RESULT_LOG.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(update) + "\n")
+
+
 # ─── Proactive scanning ───────────────────────────────────────────────────────
 
 def run_proactive_scan(broker: str):
@@ -382,6 +389,24 @@ class ProjectXQuantumAdvisor:
                 payload = msg.get("payload", {})
                 sender = msg.get("sender_id", "")
                 channel = msg.get("channel", "")
+
+                if channel == "trade_updates":
+                    record_trade_update(
+                        {
+                            "received_at": datetime.now(timezone.utc).isoformat(),
+                            "sender": sender,
+                            "channel": channel,
+                            "payload": payload,
+                        }
+                    )
+                    logger.info(
+                        "Trade update mirrored from %s: symbol=%s side=%s result=%s",
+                        sender,
+                        payload.get("symbol"),
+                        payload.get("side"),
+                        payload.get("result"),
+                    )
+                    continue
 
                 if channel not in {"projectx_tasks", "maintenance_requests", "system_health"}:
                     continue
