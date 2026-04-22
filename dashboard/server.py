@@ -2034,6 +2034,38 @@ async def api_projectx_swarm_recommendations():
     return _redact(data)
 
 
+@app.get("/api/projectx/swarm/history")
+async def api_projectx_swarm_history():
+    data = await _projectx_get("/swarm/history")
+    if data is None:
+        return {"status": "unreachable", "missions": [], "count": 0}
+    return _redact(data)
+
+
+@app.get("/api/projectx/swarm/activity")
+async def api_projectx_swarm_activity():
+    data = await _projectx_get("/swarm/activity")
+    if data is None:
+        return {"status": "unreachable", "events": [], "count": 0}
+    return _redact(data)
+
+
+@app.get("/api/projectx/swarm/mesh")
+async def api_projectx_swarm_mesh():
+    data = await _projectx_get("/swarm/mesh")
+    if data is None:
+        return {"status": "unreachable", "mesh_available": False, "events": []}
+    return _redact(data)
+
+
+@app.get("/api/projectx/swarm/topology")
+async def api_projectx_swarm_topology():
+    data = await _projectx_get("/swarm/topology")
+    if data is None:
+        return {"status": "unreachable", "broker_reachable": False, "mesh_available": False}
+    return _redact(data)
+
+
 @app.post("/api/projectx/swarm/plan")
 async def api_projectx_swarm_plan(request: Request):
     payload = await request.json()

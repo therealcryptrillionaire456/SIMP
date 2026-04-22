@@ -17,6 +17,7 @@ NC='\033[0m' # No Color
 BROKER_URL="http://127.0.0.1:5555"
 DASHBOARD_URL="http://127.0.0.1:8050"
 PROJECTX_URL="http://127.0.0.1:8771"
+PROJECTX_SWARM_URL="http://127.0.0.1:8771"
 TEST_AGENT_URL="http://127.0.0.1:8888"
 TIMEOUT=5
 TRADE_LOG="logs/gate4_trades.jsonl"
@@ -335,6 +336,69 @@ else
         fi
     else
         print_status "OK" "ProjectX responding"
+    fi
+fi
+
+projectx_swarm=$(check_endpoint "$PROJECTX_SWARM_URL" "/swarm/mesh" "ProjectX swarm mesh")
+if [ "$projectx_swarm" = "UNREACHABLE" ]; then
+    print_status "WARN" "ProjectX swarm mesh endpoint unreachable"
+    ISSUES+=("ProjectX swarm mesh endpoint unreachable")
+else
+    if $USE_JQ; then
+        mesh_available=$(echo "$projectx_swarm" | jq -r '.mesh_available // "false"' 2>/dev/null || echo "false")
+        swarm_events=$(echo "$projectx_swarm" | jq -r '(.events // []) | length' 2>/dev/null || echo "0")
+        if [ "$mesh_available" = "true" ]; then
+            print_status "OK" "ProjectX swarm mesh available ($swarm_events recent event(s))"
+        else
+            print_status "WARN" "ProjectX swarm mesh unavailable"
+            ISSUES+=("ProjectX swarm mesh unavailable")
+        fi
+    else
+        print_status "OK" "ProjectX swarm mesh responding"
+    fi
+fi
+
+projectx_swarm_activity=$(check_endpoint "$PROJECTX_SWARM_URL" "/swarm/activity" "ProjectX swarm activity")
+if [ "$projectx_swarm_activity" = "UNREACHABLE" ]; then
+    print_status "WARN" "ProjectX swarm activity endpoint unreachable"
+    ISSUES+=("ProjectX swarm activity endpoint unreachable")
+else
+    if $USE_JQ; then
+        activity_count=$(echo "$projectx_swarm_activity" | jq -r '.count // 0' 2>/dev/null || echo "0")
+        if [ "${activity_count:-0}" -gt 0 ]; then
+            print_status "OK" "ProjectX swarm activity available ($activity_count event(s))"
+        else
+            print_status "WARN" "ProjectX swarm activity is stale"
+            ISSUES+=("ProjectX swarm activity is stale")
+        fi
+    else
+        print_status "OK" "ProjectX swarm activity responding"
+    fi
+fi
+
+projectx_swarm_topology=$(check_endpoint "$PROJECTX_SWARM_URL" "/swarm/topology" "ProjectX swarm topology")
+if [ "$projectx_swarm_topology" = "UNREACHABLE" ]; then
+    print_status "WARN" "ProjectX swarm topology endpoint unreachable"
+    ISSUES+=("ProjectX swarm topology endpoint unreachable")
+else
+    if $USE_JQ; then
+        broker_reachable=$(echo "$projectx_swarm_topology" | jq -r '.broker_reachable // "false"' 2>/dev/null || echo "false")
+        mesh_registered=$(echo "$projectx_swarm_topology" | jq -r '.projectx_mesh_registered // "false"' 2>/dev/null || echo "false")
+        swarm_subscribers=$(echo "$projectx_swarm_topology" | jq -r '.projectx_swarm_subscriber_count // 0' 2>/dev/null || echo "0")
+        if [ "$broker_reachable" != "true" ]; then
+            print_status "WARN" "ProjectX swarm topology cannot reach broker mesh state"
+            ISSUES+=("ProjectX swarm topology cannot reach broker mesh state")
+        elif [ "$mesh_registered" != "true" ]; then
+            print_status "WARN" "ProjectX is not registered on the broker mesh"
+            ISSUES+=("ProjectX is not registered on the broker mesh")
+        elif [ "${swarm_subscribers:-0}" -lt 1 ]; then
+            print_status "WARN" "ProjectX swarm channel has no subscribers"
+            ISSUES+=("ProjectX swarm channel has no subscribers")
+        else
+            print_status "OK" "ProjectX topology healthy (registered, $swarm_subscribers swarm subscriber(s))"
+        fi
+    else
+        print_status "OK" "ProjectX swarm topology responding"
     fi
 fi
 

@@ -404,6 +404,74 @@ class TestProjectXEndpoints:
         data = response.json()
         assert data["recommendations"][0]["id"] == "bootstrap_native_kernel"
 
+    def test_projectx_swarm_history_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/history"
+            return {
+                "status": "ok",
+                "count": 1,
+                "missions": [{"mission_id": "mission-history-1"}],
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/history")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 1
+        assert data["missions"][0]["mission_id"] == "mission-history-1"
+
+    def test_projectx_swarm_activity_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/activity"
+            return {
+                "status": "ok",
+                "count": 1,
+                "events": [{"event_type": "swarm.mission_planned"}],
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/activity")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 1
+        assert data["events"][0]["event_type"] == "swarm.mission_planned"
+
+    def test_projectx_swarm_mesh_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/mesh"
+            return {
+                "status": "ok",
+                "mesh_available": True,
+                "events": [{"event_type": "mission_planned"}],
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/mesh")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["mesh_available"] is True
+        assert data["events"][0]["event_type"] == "mission_planned"
+
+    def test_projectx_swarm_topology_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/topology"
+            return {
+                "status": "ok",
+                "broker_reachable": True,
+                "projectx_swarm_subscriber_count": 1,
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/topology")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["broker_reachable"] is True
+        assert data["projectx_swarm_subscriber_count"] == 1
+
     def test_projectx_swarm_plan_endpoint(self, client, monkeypatch):
         async def fake_dispatch(*, intent_type, params, request_id, source_agent="dashboard_ui", action_prefix=""):
             assert intent_type == "projectx_swarm_plan"
