@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional
 
 from monitoring_alerting_system import AlertSeverity, MonitoringSystem
 
+from simp.memory import Episode, SystemMemoryStore, load_active_system_policies
 from simp.organs.quantumarb.exchange_connector import (
     ExchangeConnector,
     OrderSide,
@@ -202,6 +203,7 @@ class QuantumArbEnginePhase4:
         self.monitoring_system = MonitoringSystem()
         self.exchange_connectors: Dict[str, ExchangeConnector] = {}
         self.default_exchange_name = "coinbase_sandbox"
+        self.policy_state: Dict[str, Any] = {}
         self._init_exchange_connectors()
         executor_config = dict(self.config["executor"])
         executor_config.setdefault(
@@ -220,6 +222,11 @@ class QuantumArbEnginePhase4:
             config=executor_config,
         )
         self.pnl_ledger = PNLLedger(self.config["pnl_ledger_path"])
+        self.refresh_policy_state()
+
+    def refresh_policy_state(self) -> Dict[str, Any]:
+        self.policy_state = load_active_system_policies()
+        return self.policy_state
 
     def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
         default_config: Dict[str, Any] = {
@@ -274,6 +281,9 @@ class QuantumArbEnginePhase4:
             if passthrough in raw:
                 normalized[passthrough] = raw[passthrough]
 
+        if "default_exchange_name" in raw:
+            normalized["default_exchange_name"] = raw["default_exchange_name"]
+
         if "risk_parameters" in raw:
             rp = raw["risk_parameters"]
             normalized["risk"] = {
@@ -298,6 +308,47 @@ class QuantumArbEnginePhase4:
             if "max_slippage_bps" in execution_cfg:
                 normalized["executor"]["max_slippage_bps"] = float(execution_cfg["max_slippage_bps"])
             if execution_cfg.get("dry_run") is False:
+                normalized["executor"]["allow_live_trading"] = True
+
+        if "exchange_config" in raw:
+            exchange_cfg = raw["exchange_config"]
+            normalized.setdefault("exchanges", {})
+            api_key = _env_lookup(
+                exchange_cfg.get("api_key_env"),
+                exchange_cfg.get("api_key_name"),
+                "COINBASE_API_KEY",
+                "COINBASE_PRODUCTION_API_KEY",
+                "COINBASE_LIVE_API_KEY",
+            )
+            api_secret = _env_lookup(
+                exchange_cfg.get("api_secret_env"),
+                exchange_cfg.get("api_secret"),
+                "COINBASE_API_SECRET",
+                "COINBASE_PRODUCTION_API_SECRET",
+                "COINBASE_LIVE_API_SECRET",
+                "COINBASE_API_PRIVATE_KEY",
+            )
+            passphrase = _env_lookup(
+                exchange_cfg.get("api_passphrase_env"),
+                exchange_cfg.get("passphrase"),
+                "COINBASE_API_PASSPHRASE",
+                "COINBASE_PRODUCTION_PASSPHRASE",
+                "COINBASE_LIVE_PASSPHRASE",
+            )
+            environment = str(raw.get("environment", "sandbox")).lower()
+            sandbox = environment not in {"prod", "production", "live"}
+            alias = f"coinbase_{'sandbox' if sandbox else 'live'}"
+            normalized["exchanges"][alias] = {
+                "driver": "coinbase",
+                "sandbox": sandbox,
+                "enabled": True,
+                "api_key": api_key,
+                "api_secret": api_secret,
+                "passphrase": passphrase,
+            }
+            normalized["default_exchange_name"] = alias
+            if not sandbox:
+                normalized.setdefault("executor", {})
                 normalized["executor"]["allow_live_trading"] = True
 
         if "position_sizing" in raw:
@@ -350,6 +401,7 @@ class QuantumArbEnginePhase4:
 
                 if connector_cfg.get("live_trading") and not use_sandbox:
                     normalized["executor"]["allow_live_trading"] = True
+                    normalized["default_exchange_name"] = exchange_alias
 
         exchanges = raw.get("exchanges", {})
         if exchanges:
@@ -404,7 +456,20 @@ class QuantumArbEnginePhase4:
             self.exchange_connectors[alias] = connector
         if not self.exchange_connectors:
             raise RuntimeError("No enabled exchange connectors configured")
-        self.default_exchange_name = next(iter(self.exchange_connectors.keys()))
+        preferred = self.config.get("default_exchange_name")
+        if preferred in self.exchange_connectors:
+            self.default_exchange_name = preferred
+        else:
+            self.default_exchange_name = next(iter(self.exchange_connectors.keys()))
+
+    def _preferred_execution_exchange(self, requested_exchange: Optional[str] = None) -> str:
+        if requested_exchange and requested_exchange in self.exchange_connectors:
+            return requested_exchange
+        if self.trade_executor.allow_live_trading:
+            for alias, connector in self.exchange_connectors.items():
+                if not getattr(connector, "sandbox", True):
+                    return alias
+        return self.default_exchange_name
 
     def _estimate_slippage_pct(self, symbol: str, exchange_name: str, side: OrderSide, amount_usd: float) -> float:
         connector = self.exchange_connectors[exchange_name]
@@ -413,6 +478,23 @@ class QuantumArbEnginePhase4:
         return connector.estimate_slippage(symbol, side, quantity) / 100.0
 
     def evaluate(self, signal: ArbitrageSignal) -> ArbitrageOpportunity:
+        policy_state = self.refresh_policy_state()
+        execution_quality = policy_state.get("execution_quality") or {}
+        if execution_quality.get("enabled", False):
+            min_quality = float(execution_quality.get("min_quality_score", 0.0) or 0.0)
+            if signal.confidence < min_quality:
+                return ArbitrageOpportunity(
+                    opportunity_id=str(uuid.uuid4()),
+                    signal=signal,
+                    decision=ArbDecision.REJECT_RISK,
+                    decision_reason=f"Signal confidence {signal.confidence:.2f} below policy quality floor {min_quality:.2f}",
+                    position_size_usd=0.0,
+                    expected_pnl_usd=0.0,
+                    max_slippage_pct=0.0,
+                    risk_score=0.0,
+                    timestamp=_utcnow(),
+                )
+
         min_spread = float(self.config["risk"]["min_spread_pct"])
         if signal.spread_pct < min_spread:
             return ArbitrageOpportunity(
@@ -572,7 +654,7 @@ class QuantumArbEnginePhase4:
         return result
 
     async def execute_investment_request(self, request: InvestmentRequest) -> ExecutionResult:
-        exchange_name = request.exchange or self.default_exchange_name
+        exchange_name = self._preferred_execution_exchange(request.exchange)
         connector = self.exchange_connectors[exchange_name]
         ticker = connector.get_ticker(request.symbol)
         quantity = request.amount_usd / max(ticker.ask, 1e-9)
@@ -609,6 +691,7 @@ class QuantumArbAgentPhase4:
         self.inbox_dir.mkdir(parents=True, exist_ok=True)
         self.outbox_dir.mkdir(parents=True, exist_ok=True)
         self.brp_bridge = BRPBridge()
+        self.system_memory_store = SystemMemoryStore()
 
     async def run(self) -> None:
         logger.info("Starting QuantumArbAgentPhase4")
@@ -645,20 +728,44 @@ class QuantumArbAgentPhase4:
 
     def _process_arbitrage_signal(self, intent: Dict[str, Any]) -> None:
         signal = ArbitrageSignal.from_intent(intent.get("payload", {}))
+        policy_state = self.engine.refresh_policy_state()
+        lineage = self._extract_lineage(intent, signal.signal_id, policy_state)
         opportunity = self.engine.evaluate(signal)
-        self._log_decision_summary(signal.signal_id, opportunity.decision.value, opportunity.decision_reason)
+        self._log_decision_summary(
+            signal.signal_id,
+            opportunity.decision.value,
+            opportunity.decision_reason,
+            lineage=lineage,
+            policy_state_version=policy_state.get("generated_at"),
+        )
+        self._record_episode(
+            "quantumarb_signal_evaluated",
+            signal.signal_id,
+            f"QuantumArb signal evaluated decision={opportunity.decision.value}",
+            {
+                "signal": asdict(signal),
+                "opportunity": asdict(opportunity),
+                "lineage": lineage,
+                "policy_state_version": policy_state.get("generated_at"),
+            },
+            tags=["quantumarb", "signal", opportunity.decision.value],
+        )
         self._emit_brp_shadow("arbitrage_signal", signal.signal_id, "success", {"decision": opportunity.decision.value})
         if opportunity.decision == ArbDecision.EXECUTE:
-            asyncio.create_task(self._execute_approved_opportunity(opportunity))
+            asyncio.create_task(self._execute_approved_opportunity(opportunity, lineage, policy_state.get("generated_at")))
         self._write_json(self.outbox_dir / f"result_{signal.signal_id}.json", {
             "signal_id": signal.signal_id,
             "processing_time": _utcnow(),
             "opportunity": asdict(opportunity),
             "engine_state": self.engine.get_performance_metrics(),
+            "lineage": lineage,
+            "policy_state_version": policy_state.get("generated_at"),
         })
 
     def _process_investment_request(self, intent: Dict[str, Any]) -> None:
         request = InvestmentRequest.from_intent(intent)
+        policy_state = self.engine.refresh_policy_state()
+        lineage = self._extract_lineage(intent, request.intent_id, policy_state)
         if request.review_required:
             self._write_json(self.outbox_dir / f"investment_{request.intent_id}.json", {
                 "intent_id": request.intent_id,
@@ -666,11 +773,18 @@ class QuantumArbAgentPhase4:
                 "reason": "KTC routing marked request for human review",
                 "request": asdict(request),
                 "timestamp": _utcnow(),
+                "lineage": lineage,
+                "policy_state_version": policy_state.get("generated_at"),
             })
             return
-        asyncio.create_task(self._execute_investment_request(request))
+        asyncio.create_task(self._execute_investment_request(request, lineage, policy_state.get("generated_at")))
 
-    async def _execute_approved_opportunity(self, opportunity: ArbitrageOpportunity) -> None:
+    async def _execute_approved_opportunity(
+        self,
+        opportunity: ArbitrageOpportunity,
+        lineage: Dict[str, Any],
+        policy_state_version: Optional[str],
+    ) -> None:
         result = await self.engine.execute_opportunity(opportunity)
         self._emit_brp_shadow("arbitrage_execution", opportunity.opportunity_id, "success" if result.success else "failure", result.to_dict())
         self._write_json(self.outbox_dir / f"execution_{opportunity.opportunity_id}.json", {
@@ -678,9 +792,28 @@ class QuantumArbAgentPhase4:
             "execution_time": _utcnow(),
             "result": result.to_dict(),
             "performance_impact": self.engine.get_performance_metrics(),
+            "lineage": lineage,
+            "policy_state_version": policy_state_version,
         })
+        self._record_episode(
+            "quantumarb_execution_result",
+            opportunity.opportunity_id,
+            f"QuantumArb execution success={result.success}",
+            {
+                "opportunity_id": opportunity.opportunity_id,
+                "result": result.to_dict(),
+                "lineage": lineage,
+                "policy_state_version": policy_state_version,
+            },
+            tags=["quantumarb", "execution", "success" if result.success else "failure"],
+        )
 
-    async def _execute_investment_request(self, request: InvestmentRequest) -> None:
+    async def _execute_investment_request(
+        self,
+        request: InvestmentRequest,
+        lineage: Dict[str, Any],
+        policy_state_version: Optional[str],
+    ) -> None:
         result = await self.engine.execute_investment_request(request)
         status = "executed" if result.success else "failed"
         self._emit_brp_shadow("ktc_investment_request", request.intent_id, status, result.to_dict())
@@ -690,7 +823,21 @@ class QuantumArbAgentPhase4:
             "request": asdict(request),
             "result": result.to_dict(),
             "timestamp": _utcnow(),
+            "lineage": lineage,
+            "policy_state_version": policy_state_version,
         })
+        self._record_episode(
+            "quantumarb_investment_result",
+            request.intent_id,
+            f"QuantumArb investment request status={status}",
+            {
+                "request": asdict(request),
+                "result": result.to_dict(),
+                "lineage": lineage,
+                "policy_state_version": policy_state_version,
+            },
+            tags=["quantumarb", "investment", status],
+        )
 
     def _process_status_query(self, intent: Dict[str, Any]) -> None:
         query_id = intent.get("query_id", str(uuid.uuid4()))
@@ -711,11 +858,45 @@ class QuantumArbAgentPhase4:
             {"status": "updated", "timestamp": _utcnow(), "updates_applied": list(updates.keys())},
         )
 
-    def _log_decision_summary(self, signal_id: str, decision: str, reason: str) -> None:
+    def _log_decision_summary(
+        self,
+        signal_id: str,
+        decision: str,
+        reason: str,
+        *,
+        lineage: Optional[Dict[str, Any]] = None,
+        policy_state_version: Optional[str] = None,
+    ) -> None:
         self._append_jsonl(
             self.base_dir / "decisions.jsonl",
-            {"signal_id": signal_id, "decision": decision, "reason": reason, "timestamp": _utcnow()},
+            {
+                "signal_id": signal_id,
+                "decision": decision,
+                "reason": reason,
+                "timestamp": _utcnow(),
+                "lineage": lineage or {},
+                "policy_state_version": policy_state_version,
+            },
         )
+
+    def _extract_lineage(
+        self,
+        intent: Dict[str, Any],
+        entity_id: str,
+        policy_state: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        metadata = intent.get("metadata") or {}
+        payload = intent.get("payload") or {}
+        lineage = dict(metadata.get("lineage") or payload.get("lineage") or {})
+        lineage.setdefault("intent_id", intent.get("intent_id", entity_id))
+        lineage.setdefault("source_agent", intent.get("source_agent"))
+        lineage.setdefault("entity_id", entity_id)
+        lineage.setdefault("policy_state_version", policy_state.get("generated_at"))
+        if metadata.get("plan_id") or payload.get("plan_id"):
+            lineage.setdefault("plan_id", metadata.get("plan_id") or payload.get("plan_id"))
+        if metadata.get("qip_trace_id") or payload.get("qip_trace_id"):
+            lineage.setdefault("qip_trace_id", metadata.get("qip_trace_id") or payload.get("qip_trace_id"))
+        return lineage
 
     def _emit_brp_shadow(self, action: str, event_id: str, outcome: str, result_data: Dict[str, Any]) -> None:
         try:
@@ -750,6 +931,30 @@ class QuantumArbAgentPhase4:
     def _append_jsonl(self, path: Path, payload: Dict[str, Any]) -> None:
         with open(path, "a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload) + "\n")
+
+    def _record_episode(
+        self,
+        episode_type: str,
+        entity: str,
+        summary: str,
+        payload: Dict[str, Any],
+        *,
+        tags: Optional[List[str]] = None,
+    ) -> None:
+        try:
+            self.system_memory_store.add_episode(
+                Episode(
+                    episode_type=episode_type,
+                    source="quantumarb_phase4",
+                    entity=entity,
+                    summary=summary,
+                    occurred_at=_utcnow(),
+                    payload=payload,
+                    tags=tags or ["quantumarb", episode_type],
+                )
+            )
+        except Exception as exc:
+            logger.debug("Failed to record structured Quantumarb episode: %s", exc)
 
 
 def register_with_simp(agent_id: str = "quantumarb_phase4") -> bool:

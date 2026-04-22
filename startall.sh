@@ -600,6 +600,12 @@ if [ "${HOT_MODE}" -eq 1 ]; then
     if [ "${START_SOLANA}" -eq 1 ] && ! solana_env_ready; then
         warn "Hot mode: Solana credentials not detected; Solana Seeker will be skipped"
         START_SOLANA=0
+    elif [ "${START_SOLANA}" -eq 1 ]; then
+        if [ "${SOLANA_SEEKER_LIVE:-false}" = "true" ]; then
+            log "Hot mode: Solana Seeker live mode armed"
+        else
+            warn "Hot mode: Solana Seeker will start in dry-run mode unless SOLANA_SEEKER_LIVE=true"
+        fi
     fi
 
     if [ -f "${ROOT_DIR}/data/gate4_consumer_state.json" ] && [ "${RESET_GATE4_STATE}" -ne 1 ]; then
@@ -697,6 +703,10 @@ if [ "${START_EXTERNAL}" -eq 1 ]; then
 fi
 
 if [ "${START_SOLANA}" -eq 1 ]; then
+    solana_mode_arg="--dry-run"
+    if [ "${SOLANA_SEEKER_LIVE:-false}" = "true" ]; then
+        solana_mode_arg="--live"
+    fi
     start_background_service \
         "solana_seeker" \
         "Solana Seeker" \
@@ -704,7 +714,7 @@ if [ "${START_SOLANA}" -eq 1 ]; then
         "${ROOT_DIR}" \
         env \
             PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
-            "${PYTHON_BIN}" scripts/solana_seeker_integration.py --daemon --config "${SOLANA_SEEKER_CONFIG}"
+            "${PYTHON_BIN}" scripts/solana_seeker_integration.py --daemon "${solana_mode_arg}" --config "${SOLANA_SEEKER_CONFIG}"
 fi
 
 start_background_service \

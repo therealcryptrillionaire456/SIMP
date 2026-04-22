@@ -20,6 +20,7 @@ PROJECTX_URL="http://127.0.0.1:8771"
 TEST_AGENT_URL="http://127.0.0.1:8888"
 TIMEOUT=5
 TRADE_LOG="logs/gate4_trades.jsonl"
+SOLANA_TRADE_LOG="logs/solana_seeker_trades.jsonl"
 POLICY_STATE_FILE="memory/active_system_policies.json"
 REFLECTION_STATUS_FILE="memory/reflection_status.json"
 LATEST_STARTALL_LOG=$(ls -t logs/runtime/startall_*.log 2>/dev/null | head -n 1)
@@ -374,6 +375,28 @@ if [ -f "$TRADE_LOG" ]; then
 else
     print_status "WARN" "Gate4 trade log not found at $TRADE_LOG"
     ISSUES+=("Gate4 trade log missing")
+fi
+
+solana_processes=$(ps aux | grep -v grep | grep -c "scripts/solana_seeker_integration.py" || true)
+if [ "$solana_processes" -eq 0 ]; then
+    print_status "WARN" "Solana Seeker process not running"
+    ISSUES+=("Solana Seeker process not running")
+else
+    print_status "OK" "Solana Seeker process running ($solana_processes found)"
+fi
+
+if [ -f "$SOLANA_TRADE_LOG" ]; then
+    if $USE_JQ; then
+        latest_solana=$(tail -n 1 "$SOLANA_TRADE_LOG")
+        solana_result=$(printf '%s' "$latest_solana" | jq -r '.result // "unknown"' 2>/dev/null || echo "unknown")
+        solana_symbol=$(printf '%s' "$latest_solana" | jq -r '.symbol // "unknown"' 2>/dev/null || echo "unknown")
+        print_status "OK" "Latest Solana trade record: $solana_result ($solana_symbol)"
+    else
+        print_status "OK" "Solana trade log present"
+    fi
+else
+    print_status "WARN" "Solana trade log not found at $SOLANA_TRADE_LOG"
+    ISSUES+=("Solana trade log missing")
 fi
 
 # 6. PROCESS CHECK
