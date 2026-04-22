@@ -369,6 +369,26 @@ class TestProjectXEndpoints:
         data = response.json()
         assert data["recent_missions"][0]["mission_id"] == "mission-2"
 
+    def test_projectx_swarm_mission_detail_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/missions/mission-3"
+            return {
+                "status": "ok",
+                "mission": {
+                    "mission_id": "mission-3",
+                    "task_summary": {"total": 6},
+                    "tasks": [{"task_id": "task-1"}],
+                },
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/missions/mission-3")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["mission"]["mission_id"] == "mission-3"
+        assert data["mission"]["tasks"][0]["task_id"] == "task-1"
+
     def test_projectx_swarm_recommendations_endpoint(self, client, monkeypatch):
         async def fake_projectx_get(path: str):
             assert path == "/swarm/recommendations"
@@ -428,6 +448,27 @@ class TestProjectXEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert data["response"]["guardrails"]["self_modification_scope"] == "bounded"
+
+    def test_projectx_swarm_accept_recommendation_endpoint(self, client, monkeypatch):
+        async def fake_dispatch(*, intent_type, params, request_id, source_agent="dashboard_ui", action_prefix=""):
+            assert intent_type == "projectx_swarm_accept_recommendation"
+            assert params["recommendation_id"] == "bootstrap_native_kernel"
+            return {
+                "status": "success",
+                "response": {
+                    "mission": {"mission_id": "mission-accepted"},
+                },
+            }
+
+        monkeypatch.setattr(ds, "_dispatch_projectx_intent", fake_dispatch)
+
+        response = client.post(
+            "/api/projectx/swarm/recommendations/accept",
+            json={"recommendation_id": "bootstrap_native_kernel"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["response"]["mission"]["mission_id"] == "mission-accepted"
 
 
 class TestBRPEndpoints:

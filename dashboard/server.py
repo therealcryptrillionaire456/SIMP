@@ -2018,6 +2018,14 @@ async def api_projectx_swarm_missions():
     return _redact(data)
 
 
+@app.get("/api/projectx/swarm/missions/{mission_id}")
+async def api_projectx_swarm_mission_detail(mission_id: str):
+    data = await _projectx_get(f"/swarm/missions/{mission_id}")
+    if data is None:
+        return {"status": "unreachable", "mission": None}
+    return _redact(data)
+
+
 @app.get("/api/projectx/swarm/recommendations")
 async def api_projectx_swarm_recommendations():
     data = await _projectx_get("/swarm/recommendations")
@@ -2063,6 +2071,25 @@ async def api_projectx_recursive_improvement(request: Request):
         },
         request_id=request_id,
         action_prefix="dashboard.projectx_recursive_improvement",
+    )
+
+
+@app.post("/api/projectx/swarm/recommendations/accept")
+async def api_projectx_swarm_accept_recommendation(request: Request):
+    payload = await request.json()
+    recommendation_id = str(payload.get("recommendation_id", "")).strip()
+    if not recommendation_id:
+        return {"status": "error", "error": "recommendation_id_required"}
+    constraints = payload.get("constraints") if isinstance(payload.get("constraints"), dict) else {}
+    request_id = str(payload.get("request_id") or uuid.uuid4())
+    return await _dispatch_projectx_intent(
+        intent_type="projectx_swarm_accept_recommendation",
+        params={
+            "recommendation_id": recommendation_id,
+            "constraints": constraints,
+        },
+        request_id=request_id,
+        action_prefix="dashboard.projectx_swarm_accept_recommendation",
     )
 
 
