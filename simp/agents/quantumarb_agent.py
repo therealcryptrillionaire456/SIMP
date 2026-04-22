@@ -84,19 +84,22 @@ def _emit_brp_shadow_observation(
             return
         from simp.security.brp_models import BRPEvent, BRPEventType, BRPMode, BRPObservation
 
-        brp_event = BRPEvent(
-            source_agent="quantumarb",
-            event_type=BRPEventType.ARBITRAGE.value,
-            action=action,
-            params=result_data,
-            mode=BRPMode.SHADOW.value,
-            tags=tags or ["quantumarb", "shadow"],
-        )
-        bridge.evaluate_event(brp_event)
+        resolved_event_id = str(event_id or "").strip()
+        if not resolved_event_id:
+            brp_event = BRPEvent(
+                source_agent="quantumarb",
+                event_type=BRPEventType.ARBITRAGE.value,
+                action=action,
+                params=result_data,
+                mode=BRPMode.SHADOW.value,
+                tags=tags or ["quantumarb", "shadow"],
+            )
+            bridge.evaluate_event(brp_event)
+            resolved_event_id = brp_event.event_id
 
         obs = BRPObservation(
             source_agent="quantumarb",
-            event_id=brp_event.event_id,
+            event_id=resolved_event_id,
             action=action,
             outcome=outcome,
             result_data=result_data,

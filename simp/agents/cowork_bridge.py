@@ -108,6 +108,52 @@ def _get_brp_bridge():
     return _brp_bridge
 
 
+def _serialize_brp_metadata(event_id: str, brp_response: Any, bridge: Any) -> Dict[str, Any]:
+    """Return additive BRP metadata for sync and queued peer-intent responses."""
+    metadata = brp_response.metadata if isinstance(getattr(brp_response, "metadata", None), dict) else {}
+    predictive = metadata.get("predictive_assessment") if isinstance(metadata.get("predictive_assessment"), dict) else {}
+    multimodal = metadata.get("multimodal_assessment") if isinstance(metadata.get("multimodal_assessment"), dict) else {}
+    controller = metadata.get("controller_assessment") if isinstance(metadata.get("controller_assessment"), dict) else {}
+    payload = {
+        "event_id": event_id,
+        "decision": brp_response.decision,
+        "mode": brp_response.mode,
+        "severity": brp_response.severity,
+        "threat_score": brp_response.threat_score,
+        "confidence": getattr(brp_response, "confidence", 1.0),
+        "threat_tags": getattr(brp_response, "threat_tags", []),
+        "summary": brp_response.summary,
+        "review_required": str(brp_response.decision or "").upper() == "ELEVATE",
+        "runtime": {
+            "predictive_score_boost": round(float(predictive.get("score_boost") or 0.0), 4),
+            "multimodal_score_boost": round(float(multimodal.get("score_boost") or 0.0), 4),
+            "controller_rounds": int(controller.get("controller_rounds") or 0),
+            "controller_score_delta": round(float(controller.get("score_delta") or 0.0), 4),
+            "controller_confidence_delta": round(float(controller.get("confidence_delta") or 0.0), 4),
+            "controller_terminal_state": controller.get("terminal_state"),
+            "controller_reasoning_tags": controller.get("reasoning_tags", []),
+        },
+    }
+    try:
+        detail = bridge.read_operator_evaluation_detail(
+            event_id=event_id,
+            data_dir=str(bridge.data_dir),
+        )
+    except Exception:
+        detail = {}
+    incident = (detail or {}).get("incident")
+    if isinstance(incident, dict):
+        payload["incident"] = {
+            "alert_id": incident.get("alert_id"),
+            "incident_state": incident.get("incident_state") or incident.get("state"),
+            "severity": incident.get("severity"),
+            "acknowledged": bool(incident.get("acknowledged")),
+            "reopen_count": int(incident.get("reopen_count") or 0),
+            "last_seen_at": incident.get("last_seen_at"),
+        }
+    return payload
+
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
@@ -435,6 +481,7 @@ class CoWorkBridge:
 
             self._stats["requests_received"] += 1
             intent_type = data.get("intent_type", "")
+            brp_meta: Dict[str, Any] = {}
 
             # Layer 1: hard firewall (trading types)
             firewall_reason = self._firewall_check(intent_type)
@@ -483,6 +530,7 @@ class CoWorkBridge:
                     )
                     brp_event_id = brp_event.event_id
                     brp_resp = bridge.evaluate_event(brp_event)
+                    brp_meta = _serialize_brp_metadata(brp_event_id, brp_resp, bridge)
 
                     # In enforced mode, DENY blocks the intent
                     if brp_resp.mode == BRPMode.ENFORCED.value and brp_resp.decision == BRPDecision.DENY.value:
@@ -503,6 +551,8 @@ class CoWorkBridge:
             # Layer 3: sync intents answered immediately
             if intent_type in SYNC_INTENTS:
                 result = self._handle_sync(intent_type, data)
+                if brp_meta:
+                    result["brp"] = brp_meta
                 # BRP post-action observation
                 try:
                     bridge = _get_brp_bridge()
@@ -524,6 +574,8 @@ class CoWorkBridge:
 
             # Layer 4: queue for async CoWork processing
             queue_result = self._queue_intent(data)
+            if brp_meta:
+                queue_result["brp"] = brp_meta
             # BRP post-action observation
             try:
                 bridge = _get_brp_bridge()

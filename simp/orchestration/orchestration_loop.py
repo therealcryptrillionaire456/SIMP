@@ -31,6 +31,54 @@ def _get_brp_bridge():
     return _brp_bridge
 
 
+def _serialize_brp_metadata(event_id: str, brp_response: Any, bridge: Any) -> Dict[str, Any]:
+    """Return additive BRP metadata for downstream routing and operators."""
+    metadata = brp_response.metadata if isinstance(getattr(brp_response, "metadata", None), dict) else {}
+    predictive = metadata.get("predictive_assessment") if isinstance(metadata.get("predictive_assessment"), dict) else {}
+    multimodal = metadata.get("multimodal_assessment") if isinstance(metadata.get("multimodal_assessment"), dict) else {}
+    controller = metadata.get("controller_assessment") if isinstance(metadata.get("controller_assessment"), dict) else {}
+    payload = {
+        "event_id": event_id,
+        "decision": brp_response.decision,
+        "mode": brp_response.mode,
+        "severity": brp_response.severity,
+        "threat_score": brp_response.threat_score,
+        "confidence": getattr(brp_response, "confidence", 1.0),
+        "threat_tags": getattr(brp_response, "threat_tags", []),
+        "summary": brp_response.summary,
+        "review_required": str(brp_response.decision or "").upper() == "ELEVATE",
+        "routing_allowed": str(brp_response.decision or "").upper() != "DENY",
+        "runtime": {
+            "predictive_score_boost": round(float(predictive.get("score_boost") or 0.0), 4),
+            "multimodal_score_boost": round(float(multimodal.get("score_boost") or 0.0), 4),
+            "controller_rounds": int(controller.get("controller_rounds") or 0),
+            "controller_score_delta": round(float(controller.get("score_delta") or 0.0), 4),
+            "controller_confidence_delta": round(float(controller.get("confidence_delta") or 0.0), 4),
+            "controller_terminal_state": controller.get("terminal_state"),
+            "controller_reasoning_tags": controller.get("reasoning_tags", []),
+        },
+    }
+    try:
+        detail = bridge.read_operator_evaluation_detail(
+            event_id=event_id,
+            data_dir=str(bridge.data_dir),
+        )
+    except Exception:
+        detail = {}
+    incident = (detail or {}).get("incident")
+    if isinstance(incident, dict):
+        payload["incident"] = {
+            "alert_id": incident.get("alert_id"),
+            "incident_state": incident.get("incident_state") or incident.get("state"),
+            "severity": incident.get("severity"),
+            "acknowledged": bool(incident.get("acknowledged")),
+            "reopen_count": int(incident.get("reopen_count") or 0),
+            "last_seen_at": incident.get("last_seen_at"),
+            "recommendation": incident.get("recommendation"),
+        }
+    return payload
+
+
 # ── DeerFlow upgrades: lazy-loaded, non-blocking if scaffolding absent ────────
 _deerflow_runtime = None
 
@@ -214,11 +262,7 @@ class OrchestrationLoop:
                     )
                     brp_event_id = brp_event.event_id
                     brp_resp = bridge.evaluate_event(brp_event)
-                    intent_data["brp"] = {
-                        "event_id": brp_event_id,
-                        "decision": brp_resp.decision,
-                        "threat_score": brp_resp.threat_score,
-                    }
+                    intent_data["brp"] = _serialize_brp_metadata(brp_event_id, brp_resp, bridge)
 
                     # In enforced mode, DENY blocks the task assignment
                     if brp_resp.mode == BRPMode.ENFORCED.value and brp_resp.decision == BRPDecision.DENY.value:
@@ -283,8 +327,56 @@ class OrchestrationLoop:
                     if fallback and self.broker.get_agent(fallback):
                         self.builder_pool.report_task_assigned(fallback)
                         intent_data["target_agent"] = fallback
+                        retry_brp_event_id = brp_event_id
+                        try:
+                            bridge = _get_brp_bridge()
+                            if bridge is not None:
+                                from simp.security.brp_models import BRPEvent, BRPEventType, BRPMode
+                                retry_brp_event = BRPEvent(
+                                    source_agent=fallback,
+                                    event_type=BRPEventType.TASK_ASSIGNMENT.value,
+                                    action=task_type,
+                                    context={
+                                        "task_id": task_id,
+                                        "priority": priority,
+                                        "builder": fallback,
+                                        "title": task.get("title", ""),
+                                    },
+                                    mode=BRPMode.SHADOW.value,
+                                    tags=["orchestration_loop", "task_assignment", task_type, "fallback"],
+                                )
+                                retry_brp_event_id = retry_brp_event.event_id
+                                retry_brp_resp = bridge.evaluate_event(retry_brp_event)
+                                intent_data["brp"] = _serialize_brp_metadata(
+                                    retry_brp_event_id,
+                                    retry_brp_resp,
+                                    bridge,
+                                )
+                        except Exception:
+                            pass
                         retry_result = await self.broker.route_intent(intent_data)
                         retry_status = retry_result.get("delivery_status", "")
+                        try:
+                            bridge = _get_brp_bridge()
+                            if bridge is not None:
+                                from simp.security.brp_models import BRPObservation, BRPMode
+                                retry_obs = BRPObservation(
+                                    source_agent="orchestration_loop",
+                                    event_id=retry_brp_event_id,
+                                    action=task_type,
+                                    outcome="success" if retry_status in ("delivered", "queued", "queued_no_endpoint") else "failure",
+                                    result_data={
+                                        "delivery_status": retry_status,
+                                        "task_id": task_id,
+                                        "builder": fallback,
+                                        "fallback": True,
+                                    },
+                                    mode=BRPMode.SHADOW.value,
+                                    tags=["orchestration_loop", "task_assignment", "fallback"],
+                                )
+                                bridge.ingest_observation(retry_obs)
+                        except Exception:
+                            pass
                         if retry_status in ("delivered", "queued", "queued_no_endpoint"):
                             self.tasks_assigned += 1
                             summary["tasks_assigned"] += 1

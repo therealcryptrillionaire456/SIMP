@@ -10,6 +10,7 @@ or via mocks where full infrastructure (Flask, broker) is impractical.
 """
 
 import asyncio
+import copy
 import json
 import os
 import tempfile
@@ -100,6 +101,44 @@ class TestKloutbotStrategyBRPEvent:
             assert obs_record["outcome"] == "success"
             assert obs_record["event_id"] == brp_event.event_id
 
+    def test_kloutbot_strategy_response_includes_runtime_brp_metadata(self, bridge):
+        from simp.agents.kloutbot_agent import KloutbotAgent
+
+        agent = KloutbotAgent(agent_id="kloutbot-test")
+        mock_tree = MagicMock()
+        mock_tree.to_dict.return_value = {"action": "hold", "confidence": 0.7}
+        agent.compiler = MagicMock()
+        agent.compiler.compile_intent = AsyncMock(return_value=mock_tree)
+        agent.compiler.get_action_params.return_value = {"position_size": 0.5}
+        agent.compiler.iteration_count = 2
+        agent.compiler.improvement_history = [0.1]
+
+        with patch("simp.agents.kloutbot_agent._get_brp_bridge", return_value=bridge):
+            with patch.object(
+                agent,
+                "_get_strategy_horizon_advice",
+                AsyncMock(
+                    return_value={
+                        "recommended_horizon": "medium",
+                        "recommended_horizon_steps": 16,
+                        "timesfm_horizon_applied": False,
+                        "timesfm_horizon_rationale": "insufficient history",
+                    }
+                ),
+            ):
+                result = asyncio.run(
+                    agent.handle_generate_strategy(
+                        {
+                            "foresight": {"affinity": 0.72, "drift_risk": 0.18},
+                            "deltas": {"momentum": 0.4},
+                        }
+                    )
+                )
+
+        assert result["status"] == "success"
+        assert "runtime" in result["brp"]
+        assert "controller_terminal_state" in result["brp"]["runtime"]
+
 
 # ---------------------------------------------------------------------------
 # 2. Kloutbot — goal decomposition BRP plan
@@ -141,6 +180,35 @@ class TestKloutbotGoalBRPPlan:
         assert record["source_agent"] == "kloutbot"
         assert len(record["steps"]) == 3
 
+    def test_kloutbot_goal_response_includes_runtime_brp_metadata(self, bridge):
+        from simp.agents.kloutbot_agent import KloutbotAgent
+
+        agent = KloutbotAgent(agent_id="kloutbot-goal-test")
+        with patch("simp.agents.kloutbot_agent._get_brp_bridge", return_value=bridge):
+            with patch.object(agent, "_get_spawner", return_value=None):
+                result = asyncio.run(agent.handle_submit_goal({"goal": "Build a data pipeline"}))
+
+        assert result["status"] == "decomposed"
+        assert "runtime" in result["brp"]
+        assert result["brp"]["plan_id"]
+
+    def test_kloutbot_goal_status_and_replan_preserve_brp_metadata(self, bridge):
+        from simp.agents.kloutbot_agent import KloutbotAgent
+
+        agent = KloutbotAgent(agent_id="kloutbot-goal-state-test")
+        with patch("simp.agents.kloutbot_agent._get_brp_bridge", return_value=bridge):
+            with patch.object(agent, "_get_spawner", return_value=None):
+                created = asyncio.run(agent.handle_submit_goal({"goal": "Build a data pipeline"}))
+                status = asyncio.run(agent.handle_check_status({"goal_id": created["goal_id"]}))
+                replanned = asyncio.run(
+                    agent.handle_replan({"goal_id": created["goal_id"], "reason": "dependency changed"})
+                )
+
+        assert "brp" in status
+        assert status["brp"]["plan_id"]
+        assert "brp" in replanned
+        assert replanned["brp"]["plan_id"]
+
 
 # ---------------------------------------------------------------------------
 # 3. CoWork Bridge — BRP gate on peer intent
@@ -176,6 +244,30 @@ class TestCoWorkBridgeBRPGate:
         record = json.loads(lines[0])
         assert record["event_type"] == "peer_intent"
         assert record["action"] == "code_task"
+
+    def test_cowork_bridge_sync_response_includes_runtime_brp_metadata(self, bridge):
+        from simp.agents.cowork_bridge import CoWorkBridge
+
+        cowork = CoWorkBridge(port=8877)
+        with patch("simp.agents.cowork_bridge._get_brp_bridge", return_value=bridge):
+            app = cowork._build_app()
+            client = app.test_client()
+            response = client.post(
+                "/intent",
+                json={
+                    "intent_id": "ping-1",
+                    "intent_type": "ping",
+                    "source_agent": "simp_router",
+                    "target_agent": "claude_cowork",
+                    "params": {},
+                },
+            )
+
+        assert response.status_code == 200
+        payload = response.get_json()
+        assert "brp" in payload
+        assert "runtime" in payload["brp"]
+        assert "controller_rounds" in payload["brp"]["runtime"]
 
 
 # ---------------------------------------------------------------------------
@@ -261,6 +353,101 @@ class TestOrchestrationLoopBRPEvent:
         with open(obs_log) as f:
             lines = f.readlines()
         assert len(lines) == 1
+
+    def test_orchestration_loop_routes_runtime_brp_metadata(self, bridge):
+        from simp.orchestration.orchestration_loop import OrchestrationLoop
+
+        broker = MagicMock()
+        broker.get_agent.return_value = {"agent_id": "builder_alpha"}
+        broker.route_intent = AsyncMock(return_value={"delivery_status": "queued"})
+
+        task_ledger = MagicMock()
+        task_ledger.get_queue.return_value = [
+            {
+                "task_id": "task-7",
+                "task_type": "implementation",
+                "priority": "high",
+                "title": "Implement runtime metadata",
+                "description": "Wire BRP metadata through orchestration",
+            }
+        ]
+        task_ledger.list_tasks.return_value = []
+
+        builder_pool = MagicMock()
+        builder_pool.get_builder.return_value = "builder_alpha"
+
+        failure_handler = MagicMock()
+        failure_handler.classify_failure.return_value = MagicMock()
+        failure_handler.get_retry_policy.return_value = {"should_retry": False}
+
+        loop = OrchestrationLoop(
+            broker=broker,
+            task_ledger=task_ledger,
+            builder_pool=builder_pool,
+            failure_handler=failure_handler,
+        )
+
+        with patch("simp.orchestration.orchestration_loop._get_brp_bridge", return_value=bridge):
+            with patch("simp.orchestration.orchestration_loop._get_deerflow_runtime", return_value=None):
+                summary = asyncio.run(loop.run_once())
+
+        assert summary["tasks_assigned"] == 1
+        routed_intent = broker.route_intent.await_args.args[0]
+        assert "runtime" in routed_intent["brp"]
+        assert "controller_terminal_state" in routed_intent["brp"]["runtime"]
+
+    def test_orchestration_loop_refreshes_brp_metadata_for_fallback_builder(self, bridge):
+        from simp.orchestration.orchestration_loop import OrchestrationLoop
+
+        routed_intents = []
+
+        async def _route_intent(intent):
+            routed_intents.append(copy.deepcopy(intent))
+            if len(routed_intents) == 1:
+                return {"delivery_status": "failed", "error_code": "DELIVERY_FAILED"}
+            return {"delivery_status": "queued"}
+
+        broker = MagicMock()
+        broker.get_agent.side_effect = lambda agent_id: {"agent_id": agent_id}
+        broker.route_intent = AsyncMock(side_effect=_route_intent)
+
+        task_ledger = MagicMock()
+        task_ledger.get_queue.return_value = [
+            {
+                "task_id": "task-8",
+                "task_type": "implementation",
+                "priority": "high",
+                "title": "Implement fallback BRP",
+                "description": "Retry with a different builder",
+            }
+        ]
+        task_ledger.list_tasks.return_value = []
+
+        builder_pool = MagicMock()
+        builder_pool.get_builder.return_value = "builder_alpha"
+
+        failure_handler = MagicMock()
+        failure_handler.classify_failure.return_value = MagicMock()
+        failure_handler.get_retry_policy.return_value = {"should_retry": True}
+        failure_handler.get_fallback_agent.return_value = "builder_beta"
+
+        loop = OrchestrationLoop(
+            broker=broker,
+            task_ledger=task_ledger,
+            builder_pool=builder_pool,
+            failure_handler=failure_handler,
+        )
+
+        with patch("simp.orchestration.orchestration_loop._get_brp_bridge", return_value=bridge):
+            with patch("simp.orchestration.orchestration_loop._get_deerflow_runtime", return_value=None):
+                summary = asyncio.run(loop.run_once())
+
+        assert summary["tasks_assigned"] == 1
+        first_route = routed_intents[0]
+        second_route = routed_intents[1]
+        assert first_route["target_agent"] == "builder_alpha"
+        assert second_route["target_agent"] == "builder_beta"
+        assert first_route["brp"]["event_id"] != second_route["brp"]["event_id"]
 
 
 # ---------------------------------------------------------------------------

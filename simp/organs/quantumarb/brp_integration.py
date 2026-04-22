@@ -94,6 +94,8 @@ class QuantumArbBRPIntegrator:
             "allows": 0,
             "errors": 0,
         }
+        self._last_event_id = ""
+        self._recent_trade_events: Dict[str, Dict[str, Any]] = {}
         
         log.info(f"QuantumArb BRP Integrator initialized in {mode.value} mode")
     
@@ -118,6 +120,63 @@ class QuantumArbBRPIntegrator:
         }:
             return "allow"
         return "allow"
+
+    @staticmethod
+    def _trade_cache_key(market: str, action: TradeAction) -> str:
+        return f"{str(market or '').strip().lower()}::{action.value}"
+
+    def _read_incident_snapshot(self, event_id: str) -> Optional[Dict[str, Any]]:
+        if not event_id:
+            return None
+        try:
+            detail = self.bridge.read_operator_evaluation_detail(
+                event_id=event_id,
+                data_dir=str(self.bridge.data_dir),
+            )
+        except Exception:
+            return None
+        incident = (detail or {}).get("incident")
+        if not isinstance(incident, dict):
+            return None
+        return {
+            "alert_id": incident.get("alert_id"),
+            "incident_state": incident.get("incident_state") or incident.get("state"),
+            "severity": incident.get("severity"),
+            "acknowledged": bool(incident.get("acknowledged")),
+            "reopen_count": int(incident.get("reopen_count") or 0),
+            "last_seen_at": incident.get("last_seen_at"),
+            "recommendation": incident.get("recommendation"),
+        }
+
+    def _serialize_runtime_metadata(self, event: BRPEvent, response: BRPResponse) -> Dict[str, Any]:
+        metadata = response.metadata if isinstance(getattr(response, "metadata", None), dict) else {}
+        predictive = metadata.get("predictive_assessment") if isinstance(metadata.get("predictive_assessment"), dict) else {}
+        multimodal = metadata.get("multimodal_assessment") if isinstance(metadata.get("multimodal_assessment"), dict) else {}
+        controller = metadata.get("controller_assessment") if isinstance(metadata.get("controller_assessment"), dict) else {}
+        payload = {
+            "event_id": event.event_id,
+            "decision": response.decision,
+            "mode": response.mode,
+            "severity": response.severity,
+            "threat_score": response.threat_score,
+            "confidence": response.confidence,
+            "threat_tags": response.threat_tags,
+            "summary": response.summary,
+            "review_required": str(response.decision or "").upper() == BRPDecision.ELEVATE.value,
+            "runtime": {
+                "predictive_score_boost": round(float(predictive.get("score_boost") or 0.0), 4),
+                "multimodal_score_boost": round(float(multimodal.get("score_boost") or 0.0), 4),
+                "controller_rounds": int(controller.get("controller_rounds") or 0),
+                "controller_score_delta": round(float(controller.get("score_delta") or 0.0), 4),
+                "controller_confidence_delta": round(float(controller.get("confidence_delta") or 0.0), 4),
+                "controller_terminal_state": controller.get("terminal_state"),
+                "controller_reasoning_tags": controller.get("reasoning_tags", []),
+            },
+        }
+        incident = self._read_incident_snapshot(event.event_id)
+        if incident is not None:
+            payload["incident"] = incident
+        return payload
     
     def evaluate_trade_action(self, context: TradeContext) -> Tuple[bool, BRPResponse]:
         """
@@ -144,6 +203,15 @@ class QuantumArbBRPIntegrator:
             
             # Evaluate with BRP
             response = self.bridge.evaluate_event(event)
+            response.event_id = response.event_id or event.event_id
+            runtime_metadata = self._serialize_runtime_metadata(event, response)
+            response.metadata = {
+                **(response.metadata if isinstance(response.metadata, dict) else {}),
+                "integrator_runtime": runtime_metadata.get("runtime", {}),
+                "integrator_incident": runtime_metadata.get("incident"),
+            }
+            self._last_event_id = event.event_id
+            self._recent_trade_events[self._trade_cache_key(context.market, context.action)] = runtime_metadata
             
             # Record observation
             observation = BRPObservation(
@@ -156,6 +224,8 @@ class QuantumArbBRPIntegrator:
                     "threat_score": response.threat_score,
                     "severity": response.severity,
                     "summary": response.summary,
+                    "runtime": runtime_metadata.get("runtime", {}),
+                    "incident_state": ((runtime_metadata.get("incident") or {}).get("incident_state")),
                 },
                 mode=self.mode.value,
                 tags=context.tags or ["quantumarb", context.action.value],
@@ -163,7 +233,7 @@ class QuantumArbBRPIntegrator:
             self.bridge.ingest_observation(observation)
             
             # Log the evaluation
-            self._log_evaluation(event, response, context)
+            self._log_evaluation(event, response, context, runtime_metadata)
             
             # Update statistics
             interpreted_decision = self._interpret_brp_decision(response.decision)
@@ -282,7 +352,8 @@ class QuantumArbBRPIntegrator:
         action: TradeAction,
         success: bool,
         outcome_data: Dict[str, Any],
-        tags: Optional[List[str]] = None
+        tags: Optional[List[str]] = None,
+        event_id: str = "",
     ) -> None:
         """
         Record the outcome of a trade action for BRP learning.
@@ -293,16 +364,26 @@ class QuantumArbBRPIntegrator:
             success: Whether the action was successful
             outcome_data: Data about the outcome
             tags: Additional tags
+            event_id: Original BRP event id, if known
         """
         try:
+            cached_runtime = self._recent_trade_events.get(self._trade_cache_key(market, action), {})
+            resolved_event_id = (
+                str(event_id or "").strip()
+                or str(cached_runtime.get("event_id") or "").strip()
+                or str(self._last_event_id or "").strip()
+                or str(uuid4())
+            )
             observation = BRPObservation(
                 source_agent=self.agent_id,
-                event_id=str(uuid4()),
+                event_id=resolved_event_id,
                 action=action.value,
                 outcome="success" if success else "failure",
                 result_data={
                     "market": market,
                     "success": success,
+                    "runtime": cached_runtime.get("runtime", {}),
+                    "incident_state": ((cached_runtime.get("incident") or {}).get("incident_state")),
                     **outcome_data,
                 },
                 mode=self.mode.value,
@@ -316,10 +397,13 @@ class QuantumArbBRPIntegrator:
             with open(log_file, "a") as f:
                 record = {
                     "timestamp": datetime.utcnow().isoformat(),
+                    "event_id": resolved_event_id,
                     "market": market,
                     "action": action.value,
                     "success": success,
                     "outcome_data": outcome_data,
+                    "runtime": cached_runtime.get("runtime", {}),
+                    "incident": cached_runtime.get("incident"),
                     "tags": tags or [],
                 }
                 f.write(json.dumps(record) + "\n")
@@ -327,7 +411,13 @@ class QuantumArbBRPIntegrator:
         except Exception as e:
             log.error(f"Failed to record trade outcome: {e}", exc_info=True)
     
-    def _log_evaluation(self, event: BRPEvent, response: BRPResponse, context: TradeContext) -> None:
+    def _log_evaluation(
+        self,
+        event: BRPEvent,
+        response: BRPResponse,
+        context: TradeContext,
+        runtime_metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """Log BRP evaluation to file."""
         try:
             log_file = self._log_dir / "evaluations.jsonl"
@@ -343,6 +433,8 @@ class QuantumArbBRPIntegrator:
                     "summary": response.summary,
                     "context": context.to_dict(),
                     "mode": self.mode.value,
+                    "runtime": ((runtime_metadata or {}).get("runtime") or {}),
+                    "incident": ((runtime_metadata or {}).get("incident")),
                 }
                 f.write(json.dumps(record) + "\n")
         except Exception as e:

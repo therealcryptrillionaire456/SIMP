@@ -45,6 +45,53 @@ def _get_brp_bridge():
     return _brp_bridge
 
 
+def _serialize_brp_metadata(event_id: str, brp_response: Any, bridge: Any) -> Dict[str, Any]:
+    """Return additive BRP metadata for Kloutbot strategy and plan flows."""
+    metadata = brp_response.metadata if isinstance(getattr(brp_response, "metadata", None), dict) else {}
+    predictive = metadata.get("predictive_assessment") if isinstance(metadata.get("predictive_assessment"), dict) else {}
+    multimodal = metadata.get("multimodal_assessment") if isinstance(metadata.get("multimodal_assessment"), dict) else {}
+    controller = metadata.get("controller_assessment") if isinstance(metadata.get("controller_assessment"), dict) else {}
+    payload = {
+        "event_id": event_id,
+        "decision": brp_response.decision,
+        "mode": brp_response.mode,
+        "severity": brp_response.severity,
+        "threat_score": brp_response.threat_score,
+        "confidence": getattr(brp_response, "confidence", 1.0),
+        "threat_tags": getattr(brp_response, "threat_tags", []),
+        "summary": brp_response.summary,
+        "review_required": str(brp_response.decision or "").upper() == "ELEVATE",
+        "runtime": {
+            "predictive_score_boost": round(float(predictive.get("score_boost") or 0.0), 4),
+            "multimodal_score_boost": round(float(multimodal.get("score_boost") or 0.0), 4),
+            "controller_rounds": int(controller.get("controller_rounds") or 0),
+            "controller_score_delta": round(float(controller.get("score_delta") or 0.0), 4),
+            "controller_confidence_delta": round(float(controller.get("confidence_delta") or 0.0), 4),
+            "controller_terminal_state": controller.get("terminal_state"),
+            "controller_reasoning_tags": controller.get("reasoning_tags", []),
+        },
+    }
+    try:
+        detail = bridge.read_operator_evaluation_detail(
+            event_id=event_id,
+            data_dir=str(bridge.data_dir),
+        )
+    except Exception:
+        detail = {}
+    incident = (detail or {}).get("incident")
+    if isinstance(incident, dict):
+        payload["incident"] = {
+            "alert_id": incident.get("alert_id"),
+            "incident_state": incident.get("incident_state") or incident.get("state"),
+            "severity": incident.get("severity"),
+            "acknowledged": bool(incident.get("acknowledged")),
+            "reopen_count": int(incident.get("reopen_count") or 0),
+            "last_seen_at": incident.get("last_seen_at"),
+            "recommendation": incident.get("recommendation"),
+        }
+    return payload
+
+
 class KloutbotAgent(SimpAgent):
     """
     Autonomous Kloutbot Agent
@@ -277,12 +324,7 @@ class KloutbotAgent(SimpAgent):
                 )
                 brp_event_id = brp_event.event_id
                 brp_resp = bridge.evaluate_event(brp_event)
-                brp_meta = {
-                    "event_id": brp_event_id,
-                    "decision": brp_resp.decision,
-                    "threat_score": brp_resp.threat_score,
-                    "mode": brp_resp.mode,
-                }
+                brp_meta = _serialize_brp_metadata(brp_event_id, brp_resp, bridge)
         except Exception:
             pass
 
@@ -392,7 +434,8 @@ class KloutbotAgent(SimpAgent):
             return {
                 "status": "error",
                 "error_code": "STRATEGY_GENERATION_FAILED",
-                "error_message": str(e)
+                "error_message": str(e),
+                "brp": brp_meta,
             }
 
     async def handle_analyze_signals(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -655,12 +698,8 @@ class KloutbotAgent(SimpAgent):
                         tags=["kloutbot", "goal_decomposition"],
                     )
                     brp_resp = bridge.evaluate_plan(brp_plan)
-                    brp_plan_meta = {
-                        "plan_id": brp_plan.plan_id,
-                        "decision": brp_resp.decision,
-                        "threat_score": brp_resp.threat_score,
-                        "mode": brp_resp.mode,
-                    }
+                    brp_plan_meta = _serialize_brp_metadata(brp_plan.plan_id, brp_resp, bridge)
+                    brp_plan_meta["plan_id"] = brp_plan_meta.pop("event_id", brp_plan.plan_id)
             except Exception:
                 pass
 
@@ -776,6 +815,7 @@ class KloutbotAgent(SimpAgent):
                 "remaining": total - completed - failed,
             },
             "subtasks": subtasks,
+            "brp": goal_state.get("brp", {}),
             "timestamp": datetime.utcnow().isoformat(),
         }
 
@@ -822,6 +862,27 @@ class KloutbotAgent(SimpAgent):
         goal_state["subtasks"] = completed_tasks + remaining
         goal_state["status"] = "in_progress"
         goal_state["replanned_at"] = datetime.utcnow().isoformat()
+        previous_brp = goal_state.get("brp", {})
+        try:
+            bridge = _get_brp_bridge()
+            if bridge is not None:
+                from simp.security.brp_models import BRPMode, BRPPlan
+                brp_plan = BRPPlan(
+                    source_agent="kloutbot",
+                    steps=[
+                        {"action": st.get("task_type", "unknown"), "description": st.get("description", "")}
+                        for st in goal_state["subtasks"]
+                    ],
+                    context={"goal": goal_state["goal"], "goal_type": goal_state["goal_type"]},
+                    mode=BRPMode.SHADOW.value,
+                    tags=["kloutbot", "goal_replan"],
+                )
+                brp_resp = bridge.evaluate_plan(brp_plan)
+                goal_state["previous_brp"] = previous_brp
+                goal_state["brp"] = _serialize_brp_metadata(brp_plan.plan_id, brp_resp, bridge)
+                goal_state["brp"]["plan_id"] = goal_state["brp"].pop("event_id", brp_plan.plan_id)
+        except Exception:
+            goal_state["brp"] = previous_brp
 
         return {
             "status": "success",
@@ -830,6 +891,7 @@ class KloutbotAgent(SimpAgent):
             "kept_completed": len(completed_tasks),
             "new_remaining": len(remaining),
             "subtasks": goal_state["subtasks"],
+            "brp": goal_state.get("brp", {}),
             "timestamp": datetime.utcnow().isoformat(),
         }
 
