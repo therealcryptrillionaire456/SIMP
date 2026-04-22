@@ -502,6 +502,41 @@ class SimpBroker:
         with self.agent_lock:
             return self.agent_registry.get(agent_id)
 
+    def evaluate_plan(
+        self,
+        steps,
+        source_agent: str = "mother_goose",
+        mode: str = BRPMode.SHADOW.value,
+    ) -> Dict[str, Any]:
+        """Submit a multi-step plan to BRP and return an additive review payload."""
+        plan = BRPPlan(source_agent=source_agent, steps=steps, mode=mode)
+        response = self.brp_bridge.evaluate_plan(plan)
+        payload = {
+            **response.to_dict(),
+            "review_required": response.decision == "ELEVATE",
+        }
+        detail = self.brp_bridge.read_operator_evaluation_detail(
+            event_id=plan.plan_id,
+            data_dir=str(self.brp_bridge.data_dir),
+        )
+        incident = (detail or {}).get("incident")
+        if isinstance(incident, dict):
+            payload["incident"] = {
+                "alert_id": incident.get("alert_id"),
+                "incident_state": incident.get("incident_state") or incident.get("state"),
+                "severity": incident.get("severity"),
+                "acknowledged": bool(incident.get("acknowledged")),
+                "reopen_count": int(incident.get("reopen_count") or 0),
+                "last_seen_at": incident.get("last_seen_at"),
+            }
+        self.logger.info(
+            "BRP plan review: %s -> %s (threat=%.2f)",
+            plan.plan_id,
+            response.decision,
+            response.threat_score,
+        )
+        return payload
+
     def deregister_agent(self, agent_id: str) -> bool:
         """Deregister an agent from broker persistence and mesh routing."""
         with self.agent_lock:
@@ -606,41 +641,8 @@ class SimpBroker:
         source_agent = intent_data.get("source_agent", "client")
         target_agent = intent_data.get("target_agent")
         intent_type = intent_data.get("intent_type", "unknown")
+        brp_mode = intent_data.get("brp_mode", self.brp_bridge.default_mode)
         delivery_start = time.monotonic()
-
-        # BRP event-level evaluation
-        brp_plan_response = None
-        brp_event_id = ""
-        try:
-            brp_mode = intent_data.get("brp_mode", self.brp_bridge.default_mode)
-            brp_event = BRPEvent(
-                source_agent=source_agent,
-                event_type=BRPEventType.PEER_INTENT.value,
-                action=intent_type,
-                context={
-                    "intent_id": intent_id,
-                    "target_agent": intent_data.get("target_agent", ""),
-                    "params": intent_data.get("params", {}),
-                },
-                mode=brp_mode,
-                tags=["broker", "route_intent", intent_type],
-            )
-            brp_event_id = brp_event.event_id
-            self.brp_bridge.evaluate_event(brp_event)
-        except Exception:
-            self.logger.warning("BRP event evaluation failed for intent %s", intent_id, exc_info=True)
-
-        # BRP plan-level evaluation for multi-step intents
-        steps = intent_data.get("params", {}).get("steps") if isinstance(intent_data.get("params"), dict) else None
-        if steps and isinstance(steps, list):
-            try:
-                brp_plan_response = self.evaluate_plan(
-                    steps=steps,
-                    source_agent=source_agent,
-                    mode=intent_data.get("brp_mode", self.brp_bridge.default_mode),
-                )
-            except Exception:
-                self.logger.warning("BRP plan evaluation failed for intent %s", intent_id, exc_info=True)
 
         with self.stats_lock:
             self.stats["intents_received"] += 1
@@ -667,9 +669,198 @@ class SimpBroker:
                 tags=["intent", intent_type],
             )
 
-        # Handle computer_use intents via ProjectX
+        # BRP event-level evaluation
+        brp_plan_response = None
+        brp_event_id = ""
+        brp_event_review = None
+        brp_review_required = False
+        brp_route_denied = False
+        brp_event_mode = brp_mode
+        try:
+            brp_event = BRPEvent(
+                source_agent=source_agent,
+                event_type=BRPEventType.PEER_INTENT.value,
+                action=intent_type,
+                params=intent_data.get("params", {}) if isinstance(intent_data.get("params"), dict) else {},
+                context={
+                    "intent_id": intent_id,
+                    "task_id": task_id,
+                    "source_agent": source_agent,
+                    "target_agent": target_agent or "",
+                    "intent_type": intent_type,
+                    "routing_mode": (
+                        self.mesh_routing.config.mode.value
+                        if self.mesh_routing and getattr(self.mesh_routing, "config", None)
+                        else "disabled"
+                    ),
+                },
+                mode=brp_mode,
+                tags=["broker", "route_intent", intent_type],
+            )
+            brp_event_id = brp_event.event_id
+            brp_response = self.brp_bridge.evaluate_event(brp_event)
+            brp_event_mode = brp_response.mode
+            brp_event_review = self._serialize_brp_evaluation(brp_event, brp_response)
+            brp_route_denied = brp_response.decision == "DENY"
+            brp_review_required = brp_response.decision == "ELEVATE"
+        except Exception:
+            self.logger.warning("BRP event evaluation failed for intent %s", intent_id, exc_info=True)
+
+        # BRP plan-level evaluation for multi-step intents
+        steps = intent_data.get("params", {}).get("steps") if isinstance(intent_data.get("params"), dict) else None
+        if steps and isinstance(steps, list):
+            try:
+                brp_plan_response = self.evaluate_plan(
+                    steps=steps,
+                    source_agent=source_agent,
+                    mode=brp_mode,
+                )
+            except Exception:
+                self.logger.warning("BRP plan evaluation failed for intent %s", intent_id, exc_info=True)
+        brp_plan_decision = str((brp_plan_response or {}).get("decision") or "")
+        brp_plan_review_required = bool((brp_plan_response or {}).get("review_required"))
+        brp_plan_denied = brp_plan_decision == "DENY"
+
+        if brp_route_denied:
+            error_msg = (
+                brp_event_review.get("summary")
+                if isinstance(brp_event_review, dict)
+                else f"BRP denied intent '{intent_type}'"
+            )
+            error_resp = {
+                "status": "error",
+                "error_code": "BRP_DENIED",
+                "error_message": error_msg,
+                "intent_id": intent_id,
+                "target_agent": target_agent,
+                "task_id": task_id,
+                "timestamp": _utcnow_iso(),
+            }
+            if brp_event_review is not None:
+                error_resp["brp_evaluation"] = brp_event_review
+                error_resp["brp_review_required"] = bool(brp_event_review.get("review_required"))
+            self.task_ledger.fail_task(
+                task_id,
+                error={"error_code": "BRP_DENIED", "error_message": error_msg},
+                failure_class="policy_denied",
+            )
+            with self.intent_lock:
+                record = IntentRecord(
+                    intent_id=intent_id,
+                    source_agent=source_agent,
+                    target_agent=target_agent or "unknown",
+                    intent_type=intent_type,
+                    timestamp=_utcnow_iso(),
+                    status="failed",
+                    error=error_msg,
+                )
+                self._add_intent_record(intent_id, record)
+            with self.stats_lock:
+                self.stats["intents_failed"] += 1
+            self._log_event(
+                "intent_denied",
+                error_msg,
+                level="warning",
+                agent_id=target_agent or "unknown",
+                intent_id=intent_id,
+            )
+            if brp_event_id:
+                self._ingest_brp_route_observation(
+                    event_id=brp_event_id,
+                    intent_type=intent_type,
+                    target_agent=target_agent or "unknown",
+                    task_id=task_id,
+                    outcome="denied",
+                    mode=brp_event_mode,
+                    brp_evaluation=brp_event_review,
+                    delivery_method="broker_policy",
+                    delivery_status="denied",
+                )
+            return error_resp
+
         if intent_type.startswith("computer_use") and self._projectx:
-            return await self._handle_computer_use_intent(intent_data, task_id)
+            if brp_plan_denied:
+                deny_error = {
+                    "status": "error",
+                    "error_code": "BRP_DENIED",
+                    "error_message": "Computer-use intent denied by BRP plan review",
+                    "intent_id": intent_id,
+                    "target_agent": target_agent,
+                    "task_id": task_id,
+                    "brp_evaluation": brp_event_review,
+                    "brp_review_required": False,
+                    "timestamp": _utcnow_iso(),
+                }
+                if brp_plan_response is not None:
+                    deny_error["brp_plan_review"] = brp_plan_response
+                    deny_error["brp_plan_review_required"] = False
+                self.task_ledger.fail_task(
+                    task_id,
+                    error={"error_code": "BRP_DENIED", "error_message": deny_error["error_message"]},
+                    failure_class="policy_denied",
+                )
+                if brp_event_id:
+                    self._ingest_brp_route_observation(
+                        event_id=brp_event_id,
+                        intent_type=intent_type,
+                        target_agent=target_agent or "projectx_native",
+                        task_id=task_id,
+                        outcome="denied",
+                        mode=brp_event_mode,
+                        brp_evaluation=brp_event_review,
+                        delivery_method="projectx",
+                        delivery_status="blocked",
+                    )
+                return deny_error
+
+            if brp_review_required or brp_plan_review_required:
+                review_error = {
+                    "status": "error",
+                    "error_code": "BRP_REVIEW_REQUIRED",
+                    "error_message": "Computer-use intent requires BRP operator review before execution",
+                    "intent_id": intent_id,
+                    "target_agent": target_agent,
+                    "task_id": task_id,
+                    "brp_evaluation": brp_event_review,
+                    "brp_review_required": True,
+                    "timestamp": _utcnow_iso(),
+                }
+                if brp_plan_response is not None:
+                    review_error["brp_plan_review"] = brp_plan_response
+                    review_error["brp_plan_review_required"] = brp_plan_review_required
+                self.task_ledger.fail_task(
+                    task_id,
+                    error={"error_code": "BRP_REVIEW_REQUIRED", "error_message": review_error["error_message"]},
+                    failure_class="policy_denied",
+                )
+                if brp_event_id:
+                    self._ingest_brp_route_observation(
+                        event_id=brp_event_id,
+                        intent_type=intent_type,
+                        target_agent=target_agent or "projectx_native",
+                        task_id=task_id,
+                        outcome="review_required",
+                        mode=brp_event_mode,
+                        brp_evaluation=brp_event_review,
+                        delivery_method="projectx",
+                        delivery_status="blocked",
+                    )
+                return review_error
+
+            result = await self._handle_computer_use_intent(
+                intent_data,
+                task_id,
+                brp_event_id=brp_event_id,
+                brp_mode=brp_event_mode,
+                brp_evaluation=brp_event_review,
+            )
+            if brp_event_review is not None:
+                result["brp_evaluation"] = brp_event_review
+                result["brp_review_required"] = False
+            if brp_plan_response is not None:
+                result["brp_plan_review"] = brp_plan_response
+                result["brp_plan_review_required"] = brp_plan_review_required
+            return result
 
         # Validate target agent exists
         target = self.get_agent(target_agent)
@@ -750,9 +941,20 @@ class SimpBroker:
                     source_agent, target_agent, intent_type
                 )
                 if can_route and self.mesh_routing.config.mode.value in ("preferred", "exclusive"):
-                    mesh_routing_result = self.mesh_routing.route_via_mesh(
-                        source_agent, target_agent, intent_type, intent_data
-                    )
+                    if brp_review_required or brp_plan_review_required:
+                        mesh_routing_result = {
+                            "success": False,
+                            "mesh_routed": False,
+                            "brp_blocked": True,
+                            "review_required": True,
+                            "error_code": "BRP_REVIEW_REQUIRED",
+                            "error": "Broker BRP review required before mesh dispatch",
+                            "brp_evaluation": brp_event_review,
+                        }
+                    else:
+                        mesh_routing_result = self.mesh_routing.route_via_mesh(
+                            source_agent, target_agent, intent_type, intent_data
+                        )
                     if mesh_routing_result.get("success"):
                         self.logger.info(f"[MESH] Intent {intent_id} routed via mesh")
                         with self.intent_lock:
@@ -779,8 +981,75 @@ class SimpBroker:
                                 "delivery_status": "delivered",
                                 "delivery_method": "mesh",
                                 "mesh_intent_id": mesh_routing_result.get("mesh_intent_id"),
+                                "mesh_routing": {
+                                    "enabled": True,
+                                    "mode": self.mesh_routing.config.mode.value,
+                                    "mesh_routed": True,
+                                    "mesh_intent_id": mesh_routing_result.get("mesh_intent_id"),
+                                    "delivery_method": "mesh",
+                                    "brp_blocked": False,
+                                    "review_required": False,
+                                    "brp_evaluation": mesh_routing_result.get("brp_evaluation"),
+                                },
+                                "brp_evaluation": brp_event_review,
+                                "brp_review_required": brp_review_required,
                                 "timestamp": _utcnow_iso(),
                             }
+                    if (
+                        self.mesh_routing.config.mode.value == "exclusive"
+                        and mesh_routing_result.get("brp_blocked")
+                    ):
+                        blocked_message = mesh_routing_result.get("error") or "Mesh routing blocked"
+                        self.task_ledger.fail_task(
+                            task_id,
+                            error={
+                                "error_code": mesh_routing_result.get("error_code", "MESH_ROUTE_BLOCKED"),
+                                "error_message": blocked_message,
+                            },
+                            failure_class="policy_denied",
+                        )
+                        with self.intent_lock:
+                            record = self.intent_records.get(intent_id)
+                            if record:
+                                record.status = "failed"
+                                record.error = blocked_message
+                        with self.stats_lock:
+                            self.stats["intents_failed"] += 1
+                        if brp_event_id:
+                            self._ingest_brp_route_observation(
+                                event_id=brp_event_id,
+                                intent_type=intent_type,
+                                target_agent=target_agent,
+                                task_id=task_id,
+                                outcome="mesh_blocked",
+                                mode=brp_event_mode,
+                                brp_evaluation=mesh_routing_result.get("brp_evaluation") or brp_event_review,
+                                delivery_method="mesh",
+                                delivery_status="blocked",
+                            )
+                        return {
+                            "status": "error",
+                            "error_code": mesh_routing_result.get("error_code", "MESH_ROUTE_BLOCKED"),
+                            "error_message": blocked_message,
+                            "intent_id": intent_id,
+                            "target_agent": target_agent,
+                            "task_id": task_id,
+                            "delivery_status": "blocked",
+                            "mesh_routing": {
+                                "enabled": True,
+                                "mode": self.mesh_routing.config.mode.value,
+                                "mesh_routed": False,
+                                "mesh_intent_id": None,
+                                "delivery_method": "mesh",
+                                "brp_blocked": True,
+                                "review_required": bool(mesh_routing_result.get("review_required")),
+                                "error_code": mesh_routing_result.get("error_code"),
+                                "brp_evaluation": mesh_routing_result.get("brp_evaluation"),
+                            },
+                            "brp_evaluation": brp_event_review,
+                            "brp_review_required": brp_review_required,
+                            "timestamp": _utcnow_iso(),
+                        }
             except Exception as e:
                 self.logger.error(f"[MESH] Error checking mesh routing: {e}")
 
@@ -882,6 +1151,10 @@ class SimpBroker:
                 "mesh_routed": mesh_routing_result.get("success") if mesh_routing_result else False,
                 "mesh_intent_id": mesh_routing_result.get("mesh_intent_id") if mesh_routing_result else None,
                 "delivery_method": delivery_result.get("delivery_method", "http"),
+                "brp_blocked": bool(mesh_routing_result.get("brp_blocked")) if mesh_routing_result else False,
+                "review_required": bool(mesh_routing_result.get("review_required")) if mesh_routing_result else False,
+                "error_code": mesh_routing_result.get("error_code") if mesh_routing_result else None,
+                "brp_evaluation": mesh_routing_result.get("brp_evaluation") if mesh_routing_result else None,
             },
             "delivery_status": delivery_status,
             "delivery_latency_ms": delivery_result.get("delivery_latency_ms"),
@@ -889,23 +1162,26 @@ class SimpBroker:
             "fallback_agent": delivery_result.get("fallback_agent"),
             "timestamp": _utcnow_iso(),
         }
+        if brp_event_review is not None:
+            route_result["brp_evaluation"] = brp_event_review
+            route_result["brp_review_required"] = brp_review_required
+            route_result["brp_routing_allowed"] = bool(brp_event_review.get("routing_allowed"))
         if brp_plan_response is not None:
             route_result["brp_plan_review"] = brp_plan_response
+            route_result["brp_plan_review_required"] = brp_plan_review_required
 
         if brp_event_id:
-            try:
-                obs = BRPObservation(
-                    source_agent="simp_broker",
-                    event_id=brp_event_id,
-                    action=intent_type,
-                    outcome=delivery_status,
-                    result_data={"target_agent": target_agent, "task_id": task_id},
-                    mode=self.brp_bridge.default_mode,
-                    tags=["broker", "route_intent", "post_route"],
-                )
-                self.brp_bridge.ingest_observation(obs)
-            except Exception:
-                self.logger.warning("BRP post-route observation failed", exc_info=True)
+            self._ingest_brp_route_observation(
+                event_id=brp_event_id,
+                intent_type=intent_type,
+                target_agent=target_agent,
+                task_id=task_id,
+                outcome=delivery_status,
+                mode=brp_event_mode,
+                brp_evaluation=brp_event_review,
+                delivery_method=delivery_result.get("delivery_method", "http"),
+                delivery_status=delivery_status,
+            )
 
         if self.hooks:
             try:
@@ -914,6 +1190,105 @@ class SimpBroker:
                 self.logger.debug("Memory hook on_intent_routed failed", exc_info=True)
 
         return route_result
+
+    def _serialize_brp_evaluation(self, brp_event: BRPEvent, brp_response: Any) -> Dict[str, Any]:
+        """Return an additive, runtime-safe BRP evaluation snapshot."""
+        metadata = brp_response.metadata if isinstance(getattr(brp_response, "metadata", None), dict) else {}
+        predictive = metadata.get("predictive_assessment") if isinstance(metadata.get("predictive_assessment"), dict) else {}
+        multimodal = metadata.get("multimodal_assessment") if isinstance(metadata.get("multimodal_assessment"), dict) else {}
+        controller = metadata.get("controller_assessment") if isinstance(metadata.get("controller_assessment"), dict) else {}
+        payload = {
+            "event_id": brp_event.event_id,
+            "event_type": brp_event.event_type,
+            "decision": brp_response.decision,
+            "mode": brp_response.mode,
+            "severity": brp_response.severity,
+            "threat_score": brp_response.threat_score,
+            "confidence": brp_response.confidence,
+            "threat_tags": brp_response.threat_tags,
+            "summary": brp_response.summary,
+            "review_required": brp_response.decision == "ELEVATE",
+            "routing_allowed": brp_response.decision != "DENY",
+            "runtime": {
+                "predictive_score_boost": round(float(predictive.get("score_boost") or 0.0), 4),
+                "multimodal_score_boost": round(float(multimodal.get("score_boost") or 0.0), 4),
+                "controller_rounds": int(controller.get("controller_rounds") or 0),
+                "controller_score_delta": round(float(controller.get("score_delta") or 0.0), 4),
+                "controller_confidence_delta": round(float(controller.get("confidence_delta") or 0.0), 4),
+                "controller_terminal_state": controller.get("terminal_state"),
+                "controller_reasoning_tags": controller.get("reasoning_tags", []),
+            },
+        }
+        incident = self._read_brp_incident_snapshot(brp_event.event_id)
+        if incident is not None:
+            payload["incident"] = incident
+        return payload
+
+    def _read_brp_incident_snapshot(self, event_id: str) -> Optional[Dict[str, Any]]:
+        """Return the lifecycle-backed incident snapshot for a BRP event."""
+        try:
+            detail = self.brp_bridge.read_operator_evaluation_detail(
+                event_id=event_id,
+                data_dir=str(self.brp_bridge.data_dir),
+            )
+        except Exception:
+            self.logger.debug("[BRP] Failed to read evaluation detail for %s", event_id, exc_info=True)
+            return None
+
+        incident = (detail or {}).get("incident")
+        if not isinstance(incident, dict):
+            return None
+
+        return {
+            "alert_id": incident.get("alert_id"),
+            "incident_state": incident.get("incident_state") or incident.get("state"),
+            "severity": incident.get("severity"),
+            "decision": incident.get("decision"),
+            "acknowledged": bool(incident.get("acknowledged")),
+            "reopen_count": int(incident.get("reopen_count") or 0),
+            "first_seen_at": incident.get("first_seen_at"),
+            "last_seen_at": incident.get("last_seen_at"),
+            "updated_at": incident.get("updated_at"),
+            "recommendation": incident.get("recommendation"),
+        }
+
+    def _ingest_brp_route_observation(
+        self,
+        *,
+        event_id: str,
+        intent_type: str,
+        target_agent: str,
+        task_id: str,
+        outcome: str,
+        mode: str,
+        brp_evaluation: Optional[Dict[str, Any]],
+        delivery_method: str,
+        delivery_status: str,
+    ) -> None:
+        """Persist a broker post-route BRP observation with lifecycle context."""
+        try:
+            obs = BRPObservation(
+                source_agent="simp_broker",
+                event_id=event_id,
+                action=intent_type,
+                outcome=outcome,
+                result_data={
+                    "target_agent": target_agent,
+                    "task_id": task_id,
+                    "delivery_method": delivery_method,
+                    "delivery_status": delivery_status,
+                    "brp_decision": (brp_evaluation or {}).get("decision"),
+                },
+                context={
+                    "incident_state": ((brp_evaluation or {}).get("incident") or {}).get("incident_state"),
+                    "review_required": bool((brp_evaluation or {}).get("review_required")),
+                },
+                mode=mode,
+                tags=["broker", "route_intent", "post_route"],
+            )
+            self.brp_bridge.ingest_observation(obs)
+        except Exception:
+            self.logger.warning("BRP post-route observation failed", exc_info=True)
 
 
     async def _deliver_http(
@@ -1145,20 +1520,41 @@ class SimpBroker:
         return {"delivery_status": "failed", "error_message": f"All retry attempts exhausted: {last_error}"}
 
     async def _handle_computer_use_intent(
-        self, intent_data: Dict[str, Any], task_id: str
+        self,
+        intent_data: Dict[str, Any],
+        task_id: str,
+        *,
+        brp_event_id: str = "",
+        brp_mode: str = BRPMode.SHADOW.value,
+        brp_evaluation: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Handle a computer_use intent by delegating to ProjectX."""
         params = intent_data.get("params", {})
         steps = params.get("steps", [])
+        intent_type = str(intent_data.get("intent_type") or "computer_use")
+        target_agent = str(intent_data.get("target_agent") or "projectx_native")
 
         if not steps:
             # Design-only intent (like our design review) — no execution
-            return {
+            result = {
                 "status": "acknowledged",
-                "intent_type": intent_data.get("intent_type", ""),
+                "intent_type": intent_type,
                 "message": "Computer-use intent acknowledged (no execution steps provided)",
                 "task_id": task_id,
             }
+            if brp_event_id:
+                self._ingest_brp_route_observation(
+                    event_id=brp_event_id,
+                    intent_type=intent_type,
+                    target_agent=target_agent,
+                    task_id=task_id,
+                    outcome="acknowledged",
+                    mode=brp_mode,
+                    brp_evaluation=brp_evaluation,
+                    delivery_method="projectx",
+                    delivery_status="acknowledged",
+                )
+            return result
 
         results = []
         for step in steps:
@@ -1181,13 +1577,26 @@ class SimpBroker:
             "completed" if all_success else "failed",
         )
 
-        return {
+        final_result = {
             "status": "completed" if all_success else "failed",
             "task_id": task_id,
             "steps_executed": len(results),
             "steps_total": len(steps),
             "results": results,
         }
+        if brp_event_id:
+            self._ingest_brp_route_observation(
+                event_id=brp_event_id,
+                intent_type=intent_type,
+                target_agent=target_agent,
+                task_id=task_id,
+                outcome="success" if all_success else "failure",
+                mode=brp_mode,
+                brp_evaluation=brp_evaluation,
+                delivery_method="projectx",
+                delivery_status="completed" if all_success else "failed",
+            )
+        return final_result
 
     # ------------------------------------------------------------------
     # Agent Health Check System
@@ -1807,19 +2216,47 @@ class SimpBroker:
         try:
             status = self.brp_bridge.read_operator_status(data_dir=str(self.brp_bridge.data_dir), recent_limit=25)
             incidents = self.brp_bridge.read_operator_incidents(data_dir=str(self.brp_bridge.data_dir), limit=25)
+            runtime_context = self.brp_bridge.read_runtime_predictive_context(
+                data_dir=str(self.brp_bridge.data_dir),
+                recent_limit=25,
+            )
             recent = status.get("recent", {})
+            latest_alert = incidents.get("alerts", [None])[0] if incidents.get("alerts") else None
             return {
                 "enabled": True,
                 "mode": self.brp_bridge.default_mode,
+                "has_data": bool(status.get("has_data")),
+                "counts": status.get("counts", {}),
                 "active_adaptive_rules": recent.get("active_adaptive_rules", 0),
                 "average_threat_score": recent.get("average_threat_score", 0.0),
                 "max_threat_score": recent.get("max_threat_score", 0.0),
                 "decision_counts": recent.get("decision_counts", {}),
+                "severity_counts": recent.get("severity_counts", {}),
+                "mode_counts": recent.get("mode_counts", {}),
+                "top_threat_tags": recent.get("top_threat_tags", []),
                 "alert_count": incidents.get("count", 0),
                 "open_alert_count": incidents.get("open_alerts", 0),
                 "acknowledged_alert_count": incidents.get("acknowledged_alerts", 0),
                 "critical_open_alerts": incidents.get("critical_open_alerts", 0),
+                "incident_state_counts": incidents.get("state_counts", {}),
+                "has_open_incidents": bool(incidents.get("open_alerts", 0)),
+                "latest_alert_at": incidents.get("latest_alert_at"),
                 "last_evaluation_at": recent.get("last_evaluation_at"),
+                "last_observation_at": recent.get("last_observation_at"),
+                "last_remediation_at": recent.get("last_remediation_at"),
+                "runtime_cache_namespaces": len(runtime_context.get("runtime_cache", {})),
+                "runtime_cache": runtime_context.get("runtime_cache", {}),
+                "latest_incident": {
+                    "alert_id": latest_alert.get("alert_id"),
+                    "incident_state": latest_alert.get("incident_state") or latest_alert.get("state"),
+                    "severity": latest_alert.get("severity"),
+                    "decision": latest_alert.get("decision"),
+                    "source_agent": latest_alert.get("source_agent"),
+                    "action": latest_alert.get("action"),
+                    "reopen_count": int(latest_alert.get("reopen_count") or 0),
+                    "recommendation": latest_alert.get("recommendation"),
+                    "last_seen_at": latest_alert.get("last_seen_at"),
+                } if isinstance(latest_alert, dict) else None,
             }
         except Exception as exc:
             self.logger.debug("[BRP] Failed to collect broker BRP summary: %s", exc)

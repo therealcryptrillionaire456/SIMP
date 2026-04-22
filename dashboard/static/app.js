@@ -1439,13 +1439,20 @@
     if (!data) return;
     var openAlerts = Number(data.open_alerts || 0);
     var ackedAlerts = Number(data.acknowledged_alerts || 0);
+    var stateCounts = data.state_counts || {};
+    var reopened = Number(stateCounts.reopened || 0);
+    var remediated = Number(stateCounts.remediated || 0);
+    var monitoring = Number(stateCounts.monitoring || 0);
+    var closed = Number(stateCounts.closed || 0);
     if (dom.valBrpOpenAlerts) {
-      dom.valBrpOpenAlerts.textContent = String(openAlerts);
+      dom.valBrpOpenAlerts.textContent = String(openAlerts) + (reopened > 0 ? ' +' + String(reopened) + 'R' : '');
       dom.valBrpOpenAlerts.className = openAlerts > 0 ? "card-value mono status-error" : "card-value mono";
+      dom.valBrpOpenAlerts.title = 'open=' + String(openAlerts) + ', reopened=' + String(reopened);
     }
     if (dom.valBrpAckedAlerts) {
-      dom.valBrpAckedAlerts.textContent = String(ackedAlerts);
+      dom.valBrpAckedAlerts.textContent = String(ackedAlerts) + ((remediated + monitoring + closed) > 0 ? ' +' + String(remediated + monitoring + closed) + 'C' : '');
       dom.valBrpAckedAlerts.className = ackedAlerts > 0 ? "card-value mono status-healthy" : "card-value mono";
+      dom.valBrpAckedAlerts.title = 'acknowledged=' + String(ackedAlerts) + ', remediated=' + String(remediated) + ', monitoring=' + String(monitoring) + ', closed=' + String(closed);
     }
   }
 
@@ -1531,14 +1538,17 @@
       var executeButton = automation.job
         ? '<button type="button" class="intent-row-button" data-brp-playbook-id="' + escHtml(playbook.playbook_id || "") + '" data-brp-job="' + escHtml(automation.job) + '">run ' + escHtml(automation.job) + '</button>'
         : '<span class="text-muted">manual</span>';
+      var evidence = playbook.evidence || {};
+      var trigger = evidence.trigger || {};
       var remediationLine = playbook.last_remediation
         ? 'last remediation: ' + String(playbook.last_remediation.status || "--") + ' via ' + String(playbook.last_remediation.job || "--")
         : (automation.reason || "--");
+      var evidenceLine = 'incident ' + String(evidence.incident_state || "--") + ' · threat ' + String(trigger.threat_score != null ? Number(trigger.threat_score).toFixed(2) : "--");
       var guardrailLine = ((playbook.guardrails || [])[0]) || ((playbook.operator_checks || [])[0]) || "review evidence bundle before execution";
       return '<div class="activity-item">'
         + '<span class="activity-ts">' + escHtml(formatDate(playbook.timestamp)) + '</span>'
         + '<span class="activity-type">' + brpSeverityBadge(playbook.priority || playbook.severity || "medium") + '</span>'
-        + '<span class="activity-result">' + escHtml(playbook.title || "--") + '<div class="brp-signal-line">' + escHtml(playbook.primary_action || "--") + '</div><div class="brp-signal-line">' + escHtml(remediationLine) + '</div><div class="brp-signal-line">' + escHtml(guardrailLine) + '</div><div class="brp-signal-line">' + inspectButton + ' ' + executeButton + '</div></span>'
+        + '<span class="activity-result">' + escHtml(playbook.title || "--") + '<div class="brp-signal-line">' + escHtml(playbook.primary_action || "--") + '</div><div class="brp-signal-line">' + escHtml(evidenceLine) + '</div><div class="brp-signal-line">' + escHtml(remediationLine) + '</div><div class="brp-signal-line">' + escHtml(guardrailLine) + '</div><div class="brp-signal-line">' + inspectButton + ' ' + executeButton + '</div></span>'
         + '<span class="activity-status ' + (playbook.status === "acknowledged" ? "online" : "queued") + '">' + escHtml(playbook.status || "--") + '</span>'
         + '</div>';
     }).join("");
@@ -1679,8 +1689,12 @@
         { label: "Predictive Matches", value: predictive.adaptive_rule_matches ? String(predictive.adaptive_rule_matches.length) : (predictiveSteps.length ? String(predictiveSteps.length) : "--") },
         { label: "Multimodal Channels", value: ((multimodal.summary || {}).detection_breakdown ? Object.keys(multimodal.summary.detection_breakdown).filter(function(key) { return multimodal.summary.detection_breakdown[key]; }).join(", ") : (multimodalSteps.length ? "step-derived" : "--")) || "--" },
         { label: "Incident State", value: ((detail.incident || {}).incident_state) || ((detail.alert || {}).state) || "--" },
+        { label: "Reopen Count", value: ((detail.incident || {}).reopen_count) != null ? String((detail.incident || {}).reopen_count || 0) : "--" },
+        { label: "Linked Events", value: (((detail.incident || {}).linked_event_ids) || []).join(", ") || "--" },
         { label: "Controller", value: controller.terminal_state || "--" },
+        { label: "Operator Note", value: ((detail.incident || {}).ack_note) || "--" },
         { label: "Primary Playbook", value: ((detail.playbook || {}).primary_action) || "--" },
+        { label: "Guardrails", value: (((detail.playbook || {}).guardrails) || []).join("; ") || "--" },
         { label: "Last Remediation", value: (((detail.remediations || [])[0] || {}).job) || "--" },
       ]);
       if (dom.brpDrawerTags) {

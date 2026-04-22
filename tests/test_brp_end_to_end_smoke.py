@@ -17,9 +17,11 @@ method is tested via the BRP bridge directly.
 import json
 import os
 import tempfile
+from pathlib import Path
 
 import pytest
 
+from simp.security.brp.atomic_state_checkpointing import load_checkpoint_payload
 from simp.security.brp_models import (
     BRPDecision,
     BRPEvent,
@@ -319,3 +321,84 @@ class TestFeatureFlags:
         )
         resp = bridge.evaluate_event(event)
         assert resp.decision == BRPDecision.ALLOW.value
+
+
+class TestLifecycleAndRuntimeControlSmoke:
+    def test_event_flow_persists_incident_checkpoint_and_runtime_context(self, bridge, brp_dir):
+        """Restricted-action flow produces lifecycle state and runtime context."""
+        event = BRPEvent(
+            source_agent="mother_goose",
+            event_type=BRPEventType.PEER_INTENT.value,
+            action="fund_transfer",
+            context={"intent_id": "intent-7", "target_agent": "projectx_native"},
+            mode=BRPMode.ADVISORY.value,
+            tags=["broker", "smoke"],
+        )
+
+        response = bridge.evaluate_event(event)
+
+        assert response.decision == BRPDecision.ELEVATE.value
+        assert "controller_assessment" in response.metadata
+
+        detail = BRPBridge.read_operator_evaluation_detail(event.event_id, data_dir=brp_dir)
+        assert detail is not None
+        assert detail["incident"] is not None
+        assert detail["incident"]["incident_state"] in {"open", "reopened"}
+
+        incident_state = load_checkpoint_payload(
+            Path(brp_dir) / "incident_state.json",
+            default={},
+            expected_kind="incident_state",
+        )
+        assert detail["incident"]["alert_id"] in incident_state
+
+        runtime_context = BRPBridge.read_runtime_predictive_context(data_dir=brp_dir, recent_limit=32)
+        assert "runtime_cache" in runtime_context
+        assert any(name.startswith("event:mother_goose:fund_transfer") for name in runtime_context["runtime_cache"])
+
+    def test_ack_and_remediation_survive_checkpoint_round_trip(self, bridge, brp_dir):
+        """Operator lifecycle changes survive checkpoint-backed persistence."""
+        event = BRPEvent(
+            source_agent="projectx_native",
+            event_type=BRPEventType.PEER_INTENT.value,
+            action="withdrawal",
+            context={"intent_id": "intent-8", "target_agent": "projectx_native"},
+            mode=BRPMode.ADVISORY.value,
+            tags=["projectx", "smoke"],
+        )
+        bridge.evaluate_event(event)
+
+        incidents = BRPBridge.read_operator_incidents(data_dir=brp_dir, limit=10)
+        alert = incidents["alerts"][0]
+        acknowledged = BRPBridge.acknowledge_operator_alert(
+            str(alert["alert_id"]),
+            actor="smoke_operator",
+            note="validated",
+            data_dir=brp_dir,
+        )
+        assert acknowledged is not None
+        assert acknowledged["incident_state"] == "acknowledged"
+
+        playbook = BRPBridge.read_operator_playbooks(data_dir=brp_dir, limit=10)[0]
+        remediation = BRPBridge.record_operator_remediation(
+            alert_id=str(playbook["alert_id"]),
+            playbook_id=str(playbook["playbook_id"]),
+            actor="smoke_operator",
+            job=str(playbook["automation"]["job"]),
+            result={
+                "status": "success",
+                "intent_id": "intent-remediate-1",
+                "delivery_status": "delivered",
+                "response": {"status": "ok"},
+            },
+            data_dir=brp_dir,
+        )
+        assert remediation is not None
+        assert remediation["incident_state"] == "remediated"
+
+        incident_state = load_checkpoint_payload(
+            Path(brp_dir) / "incident_state.json",
+            default={},
+            expected_kind="incident_state",
+        )
+        assert incident_state[str(playbook["alert_id"])]["state"] == "remediated"

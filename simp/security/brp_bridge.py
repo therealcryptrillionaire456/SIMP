@@ -561,6 +561,8 @@ class BRPBridge:
             if any(str(tag).lower() in key for tag in evaluation.get("threat_tags", []) or []):
                 related_rules.append(rule)
 
+        incident_state = cls._load_operator_incident_state(brp_dir)
+        alert_state = cls._load_operator_alert_state(brp_dir)
         related_alert = next(
             (
                 alert
@@ -569,14 +571,32 @@ class BRPBridge:
             ),
             None,
         )
-        related_playbook = None
+        related_incident = None
         if related_alert:
-            related_playbook = cls._build_operator_playbook(related_alert)
+            related_incident = cls._canonical_incident_from_alert(
+                related_alert,
+                incident_state=incident_state,
+                legacy_alert_state=alert_state,
+            )
+        else:
+            related_incident = next(
+                (
+                    cls._canonical_incident_record(record)
+                    for record in incident_state.values()
+                    if str(record.get("event_id") or "") == lookup_event_id
+                    or lookup_event_id in {str(item) for item in record.get("linked_event_ids", []) or []}
+                ),
+                None,
+            )
+        related_playbook = None
+        if related_alert or related_incident:
+            playbook_source = related_alert or related_incident
+            related_playbook = cls._build_operator_playbook(playbook_source)
             related_playbook["last_remediation"] = next(
                 (
                     remediation
                     for remediation in cls.read_operator_remediations(data_dir=str(brp_dir), limit=200)
-                    if str(remediation.get("alert_id") or "") == str(related_alert.get("alert_id") or "")
+                    if str(remediation.get("alert_id") or "") == str((playbook_source or {}).get("alert_id") or "")
                 ),
                 None,
             )
@@ -591,7 +611,7 @@ class BRPBridge:
             "source_record": event_record or plan_record,
             "related_observations": related_observations,
             "related_rules": related_rules[:20],
-            "incident": related_alert,
+            "incident": related_incident,
             "alert": related_alert,
             "playbook": related_playbook,
             "remediations": related_remediations,
@@ -686,26 +706,50 @@ class BRPBridge:
     ) -> Dict[str, Any]:
         """Return operator incident counts plus lifecycle-backed alert state."""
         brp_dir = cls._resolve_data_dir(data_dir)
-        alerts = cls.read_operator_alerts(data_dir=str(brp_dir), limit=limit)
-        open_alerts = [alert for alert in alerts if str(alert.get("incident_state") or alert.get("state") or "open") in {"open", "reopened"}]
+        incident_state = cls._load_operator_incident_state(brp_dir)
+        alert_state = cls._load_operator_alert_state(brp_dir)
+        scan_limit = max(max(1, min(limit, 100)) * 8, len(incident_state) + 50, 200)
+        all_alerts = cls.read_operator_alerts(data_dir=str(brp_dir), limit=scan_limit)
+        incidents_by_id: Dict[str, Dict[str, Any]] = {}
+        for alert in all_alerts:
+            alert_id = str(alert.get("alert_id") or "")
+            if not alert_id:
+                continue
+            incidents_by_id[alert_id] = cls._canonical_incident_from_alert(
+                alert,
+                incident_state=incident_state,
+                legacy_alert_state=alert_state,
+            )
+        for alert_id, record in incident_state.items():
+            if alert_id not in incidents_by_id:
+                incidents_by_id[alert_id] = cls._canonical_incident_record(record)
+
+        incidents = sorted(
+            incidents_by_id.values(),
+            key=lambda item: (str(item.get("last_seen_at") or item.get("timestamp") or ""), float(item.get("threat_score") or 0.0)),
+            reverse=True,
+        )
+        alerts = all_alerts[: max(1, min(limit, 100))]
+        open_alerts = [incident for incident in incidents if str(incident.get("incident_state") or incident.get("state") or "open") in {"open", "reopened"}]
         critical_open = [
-            alert
-            for alert in open_alerts
-            if str(alert.get("severity") or "").lower() == "critical"
+            incident
+            for incident in open_alerts
+            if str(incident.get("priority") or incident.get("severity") or "").lower() == "critical"
         ]
         state_counts: Dict[str, int] = {}
-        for alert in alerts:
-            key = str(alert.get("incident_state") or alert.get("state") or "open")
+        for incident in incidents:
+            key = str(incident.get("incident_state") or incident.get("state") or "open")
             state_counts[key] = state_counts.get(key, 0) + 1
         return {
             "status": "success",
-            "count": len(alerts),
+            "count": len(incidents),
             "open_alerts": len(open_alerts),
-            "acknowledged_alerts": sum(1 for alert in alerts if bool(alert.get("acknowledged"))),
+            "acknowledged_alerts": sum(1 for incident in incidents if bool(incident.get("acknowledged"))),
             "critical_open_alerts": len(critical_open),
-            "latest_alert_at": alerts[0].get("timestamp") if alerts else None,
+            "latest_alert_at": incidents[0].get("last_seen_at") if incidents else None,
             "state_counts": state_counts,
             "alerts": alerts,
+            "incidents": incidents[: max(1, min(limit, 100))],
         }
 
     @classmethod
@@ -1462,6 +1506,75 @@ class BRPBridge:
             "reopen_count": int(incident.get("reopen_count") or 0),
             "linked_event_ids": incident.get("linked_event_ids") or ([alert.get("event_id")] if alert.get("event_id") else []),
             "last_remediation": incident.get("last_remediation"),
+        }
+
+    @classmethod
+    def _canonical_incident_record(cls, incident: Dict[str, Any]) -> Dict[str, Any]:
+        state_value = str(incident.get("state") or incident.get("incident_state") or "open")
+        return {
+            **incident,
+            "state": state_value,
+            "incident_state": state_value,
+            "severity": incident.get("severity") or incident.get("priority") or "high",
+            "priority": incident.get("priority") or incident.get("severity") or "high",
+            "history": list(incident.get("history", []) or []),
+            "linked_event_ids": cls._dedupe_str_list([str(item) for item in incident.get("linked_event_ids", []) or [] if str(item)]),
+            "reopen_count": int(incident.get("reopen_count") or 0),
+        }
+
+    @classmethod
+    def _canonical_incident_from_alert(
+        cls,
+        alert: Dict[str, Any],
+        *,
+        incident_state: Dict[str, Dict[str, Any]],
+        legacy_alert_state: Dict[str, Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        alert_id = str(alert.get("alert_id") or "")
+        incident = cls._canonical_incident_record(dict(incident_state.get(alert_id) or {}))
+        legacy = legacy_alert_state.get(alert_id, {})
+        state_value = str(
+            incident.get("state")
+            or incident.get("incident_state")
+            or legacy.get("state")
+            or alert.get("incident_state")
+            or alert.get("state")
+            or "open"
+        )
+        linked_event_ids = cls._dedupe_str_list(
+            [
+                *[str(item) for item in incident.get("linked_event_ids", []) or [] if str(item)],
+                str(alert.get("event_id") or ""),
+            ]
+        )
+        return {
+            **alert,
+            **incident,
+            "incident_id": incident.get("incident_id") or alert_id,
+            "alert_id": alert_id,
+            "event_id": incident.get("event_id") or alert.get("event_id"),
+            "state": state_value,
+            "incident_state": state_value,
+            "severity": alert.get("severity") or incident.get("severity") or incident.get("priority") or "high",
+            "priority": incident.get("priority") or alert.get("severity") or alert.get("priority") or "high",
+            "summary": incident.get("summary") or alert.get("summary"),
+            "recommendation": incident.get("recommendation") or alert.get("recommendation"),
+            "source_agent": incident.get("source_agent") or alert.get("source_agent"),
+            "action": incident.get("action") or alert.get("action"),
+            "decision": incident.get("decision") or alert.get("decision"),
+            "threat_score": incident.get("threat_score") if incident.get("threat_score") is not None else alert.get("threat_score"),
+            "threat_tags": cls._dedupe_str_list(list(incident.get("threat_tags", []) or []) + list(alert.get("threat_tags", []) or [])),
+            "acknowledged": bool(incident.get("acknowledged", legacy.get("acknowledged", alert.get("acknowledged")))),
+            "acknowledged_at": incident.get("acknowledged_at") or legacy.get("acknowledged_at") or alert.get("acknowledged_at"),
+            "acknowledged_by": incident.get("acknowledged_by") or legacy.get("acknowledged_by") or alert.get("acknowledged_by"),
+            "ack_note": incident.get("ack_note") or legacy.get("ack_note") or alert.get("ack_note"),
+            "first_seen_at": incident.get("first_seen_at") or alert.get("first_seen_at") or alert.get("timestamp"),
+            "last_seen_at": incident.get("last_seen_at") or alert.get("last_seen_at") or alert.get("timestamp"),
+            "updated_at": incident.get("updated_at") or alert.get("updated_at"),
+            "reopen_count": int(incident.get("reopen_count") or alert.get("reopen_count") or 0),
+            "linked_event_ids": linked_event_ids,
+            "last_remediation": incident.get("last_remediation") or alert.get("last_remediation"),
+            "history": list(incident.get("history", []) or []),
         }
 
     @classmethod

@@ -409,6 +409,7 @@ class TestOperatorReadHelpers:
         assert detail["evaluation"]["controller_rounds"] >= 0
         assert detail["alert"] is not None
         assert detail["incident"] is not None
+        assert "history" in detail["incident"]
         assert detail["playbook"] is not None
 
     def test_operator_incidents_playbooks_and_acknowledgements(self, bridge, tmp_data_dir):
@@ -423,6 +424,7 @@ class TestOperatorReadHelpers:
         assert incidents["count"] >= 1
         assert incidents["open_alerts"] >= 1
         assert incidents["state_counts"]["open"] >= 1
+        assert incidents["incidents"][0]["incident_state"] == "open"
 
         playbooks = BRPBridge.read_operator_playbooks(data_dir=tmp_data_dir, limit=10)
         assert playbooks
@@ -446,6 +448,24 @@ class TestOperatorReadHelpers:
 
         refreshed = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=10)
         assert refreshed["acknowledged_alerts"] >= 1
+        assert refreshed["incidents"][0]["history"]
+
+    def test_operator_incident_counts_use_canonical_state_not_page_limit(self, bridge, tmp_data_dir):
+        for idx in range(3):
+            bridge.evaluate_event(
+                BRPEvent(
+                    source_agent=f"agent_{idx}",
+                    action="withdrawal",
+                    mode=BRPMode.ADVISORY.value,
+                )
+            )
+
+        incidents = BRPBridge.read_operator_incidents(data_dir=tmp_data_dir, limit=1)
+
+        assert incidents["count"] == 3
+        assert incidents["open_alerts"] == 3
+        assert len(incidents["alerts"]) == 1
+        assert len(incidents["incidents"]) == 1
 
     def test_operator_remediations_are_persisted_and_linked(self, bridge, tmp_data_dir):
         event = BRPEvent(

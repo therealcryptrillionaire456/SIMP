@@ -220,19 +220,46 @@ class MeshRoutingManager:
                 tags=["mesh", "route_via_mesh", self.config.mode.value, intent_type],
             )
             brp_response = self.brp_bridge.evaluate_event(brp_event)
+            brp_evaluation = self._serialize_brp_response(brp_event, brp_response)
+            incident = self._read_brp_incident_snapshot(brp_event.event_id)
+            if incident is not None:
+                brp_evaluation["incident"] = incident
+            controller_state = str(((brp_evaluation.get("runtime") or {}).get("controller_terminal_state") or "")).lower()
+            controller_review_required = controller_state == "escalate_bias" and float(brp_response.threat_score or 0.0) >= 0.6
 
-            if brp_response.decision not in {
-                BRPDecision.ALLOW.value,
-                BRPDecision.SHADOW_ALLOW.value,
-                BRPDecision.LOG_ONLY.value,
-            }:
+            if brp_response.decision == BRPDecision.DENY.value:
                 logger.warning(
-                    "[BRP][MESH] Elevated mesh intent %s -> %s (decision=%s threat=%.2f)",
+                    "[BRP][MESH] Denied mesh intent %s -> %s (threat=%.2f)",
                     source_agent,
                     target_agent,
-                    brp_response.decision,
                     brp_response.threat_score,
                 )
+                return {
+                    "success": False,
+                    "mesh_routed": False,
+                    "brp_blocked": True,
+                    "review_required": False,
+                    "error_code": "BRP_DENIED",
+                    "error": "Mesh routing denied by BRP",
+                    "brp_evaluation": brp_evaluation,
+                }
+
+            if brp_response.decision == BRPDecision.ELEVATE.value or controller_review_required:
+                logger.warning(
+                    "[BRP][MESH] Review required for mesh intent %s -> %s (threat=%.2f)",
+                    source_agent,
+                    target_agent,
+                    brp_response.threat_score,
+                )
+                return {
+                    "success": False,
+                    "mesh_routed": False,
+                    "brp_blocked": True,
+                    "review_required": True,
+                    "error_code": "BRP_REVIEW_REQUIRED",
+                    "error": "Mesh routing requires operator review",
+                    "brp_evaluation": brp_evaluation,
+                }
 
             # Create mesh intent
             mesh_intent_id = self.mesh_router.route_intent(
@@ -249,14 +276,18 @@ class MeshRoutingManager:
                     "mesh_intent_id": mesh_intent_id,
                     "stake_amount": self.config.mesh_stake_amount,
                     "message": f"Intent routed via mesh to {target_agent}",
-                    "brp_evaluation": self._serialize_brp_response(brp_event, brp_response),
+                    "brp_blocked": False,
+                    "review_required": False,
+                    "brp_evaluation": brp_evaluation,
                 }
             else:
                 return {
                     "success": False,
                     "mesh_routed": False,
                     "error": "Mesh routing failed - no intent ID returned",
-                    "brp_evaluation": self._serialize_brp_response(brp_event, brp_response),
+                    "brp_blocked": False,
+                    "review_required": False,
+                    "brp_evaluation": brp_evaluation,
                 }
         except Exception as e:
             logger.error(f"Error routing via mesh: {e}")
@@ -325,6 +356,10 @@ class MeshRoutingManager:
     @staticmethod
     def _serialize_brp_response(brp_event: BRPEvent, brp_response: Any) -> Dict[str, Any]:
         """Return a compact BRP payload for mesh routing responses."""
+        metadata = brp_response.metadata if isinstance(getattr(brp_response, "metadata", None), dict) else {}
+        predictive = metadata.get("predictive_assessment") if isinstance(metadata.get("predictive_assessment"), dict) else {}
+        multimodal = metadata.get("multimodal_assessment") if isinstance(metadata.get("multimodal_assessment"), dict) else {}
+        controller = metadata.get("controller_assessment") if isinstance(metadata.get("controller_assessment"), dict) else {}
         return {
             "event_id": brp_event.event_id,
             "event_type": brp_event.event_type,
@@ -335,6 +370,39 @@ class MeshRoutingManager:
             "confidence": brp_response.confidence,
             "threat_tags": brp_response.threat_tags,
             "summary": brp_response.summary,
+            "review_required": brp_response.decision == BRPDecision.ELEVATE.value,
+            "mesh_allowed": brp_response.decision in {
+                BRPDecision.ALLOW.value,
+                BRPDecision.SHADOW_ALLOW.value,
+                BRPDecision.LOG_ONLY.value,
+            },
+            "runtime": {
+                "predictive_score_boost": round(float(predictive.get("score_boost") or 0.0), 4),
+                "multimodal_score_boost": round(float(multimodal.get("score_boost") or 0.0), 4),
+                "controller_rounds": int(controller.get("controller_rounds") or 0),
+                "controller_score_delta": round(float(controller.get("score_delta") or 0.0), 4),
+                "controller_confidence_delta": round(float(controller.get("confidence_delta") or 0.0), 4),
+                "controller_terminal_state": controller.get("terminal_state"),
+                "controller_reasoning_tags": controller.get("reasoning_tags", []),
+            },
+        }
+
+    def _read_brp_incident_snapshot(self, event_id: str) -> Optional[Dict[str, Any]]:
+        """Return the lifecycle-backed incident snapshot for a mesh BRP event."""
+        detail = self.brp_bridge.read_operator_evaluation_detail(
+            event_id=event_id,
+            data_dir=str(self.brp_bridge.data_dir),
+        )
+        incident = (detail or {}).get("incident")
+        if not isinstance(incident, dict):
+            return None
+        return {
+            "alert_id": incident.get("alert_id"),
+            "incident_state": incident.get("incident_state") or incident.get("state"),
+            "severity": incident.get("severity"),
+            "acknowledged": bool(incident.get("acknowledged")),
+            "reopen_count": int(incident.get("reopen_count") or 0),
+            "last_seen_at": incident.get("last_seen_at"),
         }
     
     def get_mesh_agent_info(self, agent_id: str) -> Optional[Dict[str, Any]]:

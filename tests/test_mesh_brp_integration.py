@@ -70,6 +70,7 @@ def test_route_via_mesh_triggers_brp_event(tmp_path, monkeypatch):
     assert "mesh_intent" in result["brp_evaluation"]["threat_tags"]
     assert "low_mesh_trust" in result["brp_evaluation"]["threat_tags"]
     assert "low_mesh_reputation" in result["brp_evaluation"]["threat_tags"]
+    assert "controller_terminal_state" in result["brp_evaluation"]["runtime"]
 
     with open(tmp_path / "brp" / "events.jsonl", "r", encoding="utf-8") as handle:
         events = [json.loads(line) for line in handle]
@@ -93,3 +94,22 @@ def test_route_via_mesh_includes_brp_metadata_on_failure(tmp_path, monkeypatch):
     assert result["success"] is False
     assert result["brp_evaluation"]["event_type"] == BRPEventType.MESH_INTENT.value
     assert result["brp_evaluation"]["decision"] == "SHADOW_ALLOW"
+
+
+def test_route_via_mesh_returns_incident_snapshot_when_review_required(tmp_path):
+    manager = _build_manager(tmp_path)
+    manager.mesh_agents["quantumarb_test"]["capabilities"].append("fund_transfer")
+    manager.mesh_agents["kashclaw_test"]["capabilities"].append("fund_transfer")
+
+    result = manager.route_via_mesh(
+        source_agent="quantumarb_test",
+        target_agent="kashclaw_test",
+        intent_type="fund_transfer",
+        payload={"intent_id": "mesh-test-3", "params": {"amount": 5000}, "brp_mode": "advisory"},
+    )
+
+    assert result["success"] is False
+    assert result["review_required"] is True
+    assert result["error_code"] == "BRP_REVIEW_REQUIRED"
+    assert result["brp_evaluation"]["decision"] == "ELEVATE"
+    assert result["brp_evaluation"]["incident"]["incident_state"] in {"open", "reopened"}

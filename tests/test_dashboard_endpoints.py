@@ -407,6 +407,9 @@ class TestBRPEndpoints:
         assert data["count"] >= 1
         assert data["open_alerts"] >= 1
         assert "state_counts" in data
+        assert "incidents" in data
+        assert data["incidents"][0]["incident_state"] in {"open", "acknowledged", "reopened", "remediated"}
+        assert "history" in data["incidents"][0]
 
     def test_brp_playbooks_endpoint(self, client, brp_sample_data):
         response = client.get("/api/brp/playbooks?limit=5")
@@ -446,6 +449,8 @@ class TestBRPEndpoints:
             assert payload["target_agent"] == "projectx_native"
             assert "brp_evidence" in payload["params"]
             assert "brp_execution_context" in payload["params"]
+            assert "brp_guardrails" in payload["params"]
+            assert "brp_operator_checks" in payload["params"]
             return {
                 "intent_id": "broker-intent-1",
                 "delivery_status": "delivered",
