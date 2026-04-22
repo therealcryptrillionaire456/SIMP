@@ -336,6 +336,99 @@ class TestProjectXEndpoints:
         # Protocol facts endpoint returns protocol_facts
         assert "protocol_facts" in data
 
+    def test_projectx_swarm_status_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/status"
+            return {
+                "status": "ok",
+                "active_mission_count": 2,
+                "recent_missions": [{"mission_id": "mission-1"}],
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/status")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["active_mission_count"] == 2
+        assert data["recent_missions"][0]["mission_id"] == "mission-1"
+
+    def test_projectx_swarm_missions_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/missions"
+            return {
+                "status": "ok",
+                "active_mission_count": 1,
+                "recent_missions": [{"mission_id": "mission-2"}],
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/missions")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["recent_missions"][0]["mission_id"] == "mission-2"
+
+    def test_projectx_swarm_recommendations_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/recommendations"
+            return {
+                "status": "ok",
+                "recommendations": [{"id": "bootstrap_native_kernel"}],
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/recommendations")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["recommendations"][0]["id"] == "bootstrap_native_kernel"
+
+    def test_projectx_swarm_plan_endpoint(self, client, monkeypatch):
+        async def fake_dispatch(*, intent_type, params, request_id, source_agent="dashboard_ui", action_prefix=""):
+            assert intent_type == "projectx_swarm_plan"
+            assert params["objective"] == "Upgrade ProjectX kernel"
+            assert params["mission_type"] == "projectx_upgrade"
+            return {
+                "status": "success",
+                "response": {
+                    "mission": {"mission_id": "mission-123", "objective": params["objective"]},
+                },
+            }
+
+        monkeypatch.setattr(ds, "_dispatch_projectx_intent", fake_dispatch)
+
+        response = client.post(
+            "/api/projectx/swarm/plan",
+            json={"objective": "Upgrade ProjectX kernel", "mission_type": "projectx_upgrade"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "success"
+        assert data["response"]["mission"]["mission_id"] == "mission-123"
+
+    def test_projectx_recursive_improvement_endpoint(self, client, monkeypatch):
+        async def fake_dispatch(*, intent_type, params, request_id, source_agent="dashboard_ui", action_prefix=""):
+            assert intent_type == "projectx_recursive_improvement"
+            assert params["objective"] == "Improve ProjectX safely"
+            assert params["evidence"]["source"] == "operator"
+            return {
+                "status": "success",
+                "response": {
+                    "guardrails": {"self_modification_scope": "bounded"},
+                },
+            }
+
+        monkeypatch.setattr(ds, "_dispatch_projectx_intent", fake_dispatch)
+
+        response = client.post(
+            "/api/projectx/swarm/recursive-improvement",
+            json={"objective": "Improve ProjectX safely", "evidence": {"source": "operator"}},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["response"]["guardrails"]["self_modification_scope"] == "bounded"
+
 
 class TestBRPEndpoints:
     """Test operator-visible BRP dashboard endpoints."""

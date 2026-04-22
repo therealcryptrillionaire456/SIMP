@@ -659,6 +659,71 @@ async def _dispatch_projectx_job(
     }
 
 
+async def _dispatch_projectx_intent(
+    *,
+    intent_type: str,
+    params: dict[str, Any],
+    request_id: str,
+    source_agent: str = "dashboard_ui",
+    action_prefix: str = "dashboard.projectx",
+) -> dict[str, Any]:
+    started = time.time()
+    payload = {
+        "source_agent": source_agent,
+        "target_agent": "projectx_native",
+        "intent_type": intent_type,
+        "params": {
+            **params,
+            "request_id": request_id,
+            "source_agent": source_agent,
+        },
+    }
+    _append_operator_event(
+        request_id=request_id,
+        intent_type=intent_type,
+        action_type=f"{action_prefix}_request",
+        status="received",
+        summary=f"{source_agent} requested {intent_type}",
+        source_agent=source_agent,
+        details={"params": _redact(params)},
+    )
+    broker_response = await _broker_post("/intents/route", payload)
+    routing_mode = "broker" if broker_response is not None else "direct"
+    response = broker_response.get("delivery_response") if broker_response is not None else None
+    if broker_response is None:
+        direct_payload = {
+            "intent_id": request_id,
+            "source_agent": source_agent,
+            "target_agent": "projectx_native",
+            "intent_type": intent_type,
+            "params": payload["params"],
+        }
+        response = await _projectx_post("/intents/handle", direct_payload)
+    latency_ms = (time.time() - started) * 1000
+    _append_operator_event(
+        request_id=request_id,
+        intent_type=intent_type,
+        action_type=f"{action_prefix}_result",
+        status="ok" if response else "error",
+        summary=f"{source_agent} completed {intent_type}",
+        source_agent=source_agent,
+        latency_ms=latency_ms,
+        details={
+            "response": response or {"status": "unreachable"},
+            "routing_mode": routing_mode,
+            "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+            "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+        },
+    )
+    return {
+        "status": "success" if response else "unreachable",
+        "routing_mode": routing_mode,
+        "broker_intent_id": broker_response.get("intent_id") if broker_response else None,
+        "delivery_status": broker_response.get("delivery_status") if broker_response else None,
+        "response": _redact(response),
+    }
+
+
 def _detect_changes(old_snapshot: dict, new_snapshot: dict) -> list[dict]:
     """Compare two broker snapshots and produce activity events for changes."""
     events: list[dict] = []
@@ -1935,6 +2000,70 @@ async def api_projectx_actions():
     if data is None:
         return {"status": "unreachable", "actions": []}
     return _redact(data)
+
+
+@app.get("/api/projectx/swarm/status")
+async def api_projectx_swarm_status():
+    data = await _projectx_get("/swarm/status")
+    if data is None:
+        return {"status": "unreachable", "active_mission_count": 0, "recent_missions": []}
+    return _redact(data)
+
+
+@app.get("/api/projectx/swarm/missions")
+async def api_projectx_swarm_missions():
+    data = await _projectx_get("/swarm/missions")
+    if data is None:
+        return {"status": "unreachable", "active_mission_count": 0, "recent_missions": []}
+    return _redact(data)
+
+
+@app.get("/api/projectx/swarm/recommendations")
+async def api_projectx_swarm_recommendations():
+    data = await _projectx_get("/swarm/recommendations")
+    if data is None:
+        return {"status": "unreachable", "recommendations": []}
+    return _redact(data)
+
+
+@app.post("/api/projectx/swarm/plan")
+async def api_projectx_swarm_plan(request: Request):
+    payload = await request.json()
+    objective = str(payload.get("objective", "")).strip()
+    if not objective:
+        return {"status": "error", "error": "objective_required"}
+    mission_type = str(payload.get("mission_type") or "projectx_upgrade")
+    constraints = payload.get("constraints") if isinstance(payload.get("constraints"), dict) else {}
+    request_id = str(payload.get("request_id") or uuid.uuid4())
+    return await _dispatch_projectx_intent(
+        intent_type="projectx_swarm_plan",
+        params={
+            "objective": objective,
+            "mission_type": mission_type,
+            "constraints": constraints,
+        },
+        request_id=request_id,
+        action_prefix="dashboard.projectx_swarm_plan",
+    )
+
+
+@app.post("/api/projectx/swarm/recursive-improvement")
+async def api_projectx_recursive_improvement(request: Request):
+    payload = await request.json()
+    objective = str(payload.get("objective", "")).strip()
+    if not objective:
+        return {"status": "error", "error": "objective_required"}
+    evidence = payload.get("evidence") if isinstance(payload.get("evidence"), dict) else {}
+    request_id = str(payload.get("request_id") or uuid.uuid4())
+    return await _dispatch_projectx_intent(
+        intent_type="projectx_recursive_improvement",
+        params={
+            "objective": objective,
+            "evidence": evidence,
+        },
+        request_id=request_id,
+        action_prefix="dashboard.projectx_recursive_improvement",
+    )
 
 
 @app.get("/api/projectx/protocol-facts")
