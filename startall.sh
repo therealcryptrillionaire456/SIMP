@@ -37,6 +37,7 @@ KTC_PORT="${KTC_PORT:-8765}"
 QUANTUMARB_PHASE4_CONFIG="${QUANTUMARB_PHASE4_CONFIG:-config/phase4_microscopic.json}"
 QUANTUMARB_HOT_CONFIG="${QUANTUMARB_HOT_CONFIG:-config/live_phase2_sol_microscopic.json}"
 SOLANA_SEEKER_CONFIG="${SOLANA_SEEKER_CONFIG:-config/solana_seeker_config.json}"
+CLOSED_LOOP_INTERVAL="${CLOSED_LOOP_INTERVAL:-900}"
 
 BOOT_SIMP_BROKER_URL="${SIMP_BROKER_URL}"
 BOOT_PROJECTX_GUARD_URL="${PROJECTX_GUARD_URL}"
@@ -537,6 +538,7 @@ show_summary() {
             "brp_audit_consumer.py"
             "agent_coordination.py"
             "quantum_advisory_broadcaster.py"
+            "scripts/closed_loop_scheduler.py"
         )
         for pattern in "${quantum_checks[@]}"; do
             if process_running "${pattern}"; then
@@ -704,6 +706,15 @@ if [ "${START_SOLANA}" -eq 1 ]; then
             PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
             "${PYTHON_BIN}" scripts/solana_seeker_integration.py --daemon --config "${SOLANA_SEEKER_CONFIG}"
 fi
+
+start_background_service \
+    "closed_loop_scheduler" \
+    "Closed-Loop Scheduler" \
+    "scripts/closed_loop_scheduler.py" \
+    "${ROOT_DIR}" \
+    env \
+        PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+        "${PYTHON_BIN}" scripts/closed_loop_scheduler.py --interval "${CLOSED_LOOP_INTERVAL}"
 
 if [ "${START_QUANTUM}" -eq 1 ]; then
     bootstrap_quantum_stack

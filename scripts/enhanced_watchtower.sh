@@ -20,6 +20,8 @@ PROJECTX_URL="http://127.0.0.1:8771"
 TEST_AGENT_URL="http://127.0.0.1:8888"
 TIMEOUT=5
 TRADE_LOG="logs/gate4_trades.jsonl"
+POLICY_STATE_FILE="memory/active_system_policies.json"
+REFLECTION_STATUS_FILE="memory/reflection_status.json"
 LATEST_STARTALL_LOG=$(ls -t logs/runtime/startall_*.log 2>/dev/null | head -n 1)
 
 # Check if jq is available
@@ -439,6 +441,46 @@ check_port 5555 "Broker" "SIMP Broker is healthy\|SIMP Broker already healthy"
 check_port 8050 "Dashboard" "Dashboard is healthy\|Dashboard already healthy"
 check_port 8888 "Test Agent"
 check_port 8771 "ProjectX" "ProjectX is healthy\|ProjectX already healthy"
+
+# 8. CLOSED-LOOP REFLECTION
+print_header "8. CLOSED-LOOP REFLECTION"
+
+reflection_processes=$(ps aux | grep -v grep | grep -c "scripts/closed_loop_scheduler.py" || true)
+if [ "$reflection_processes" -eq 0 ]; then
+    print_status "WARN" "Closed-loop scheduler process not running"
+    ISSUES+=("Closed-loop scheduler process not running")
+else
+    print_status "OK" "Closed-loop scheduler process running ($reflection_processes found)"
+fi
+
+if [ -f "$REFLECTION_STATUS_FILE" ]; then
+    reflection_epoch=$(stat -f %m "$REFLECTION_STATUS_FILE" 2>/dev/null || echo "0")
+    now_epoch=$(date +%s)
+    reflection_age=$((now_epoch - reflection_epoch))
+    if [ "$reflection_age" -le 1800 ]; then
+        print_status "OK" "Reflection status fresh (${reflection_age}s old)"
+    else
+        print_status "WARN" "Reflection status stale (${reflection_age}s old)"
+        ISSUES+=("Reflection status stale")
+    fi
+else
+    print_status "WARN" "Reflection status file missing at $REFLECTION_STATUS_FILE"
+    ISSUES+=("Reflection status file missing")
+fi
+
+if [ -f "$POLICY_STATE_FILE" ]; then
+    if $USE_JQ; then
+        active_lessons=$(jq -r '.active_lessons | length' "$POLICY_STATE_FILE" 2>/dev/null || echo "0")
+        active_candidates=$(jq -r '.active_policy_candidates | length' "$POLICY_STATE_FILE" 2>/dev/null || echo "0")
+        quality_floor=$(jq -r '.execution_quality.min_quality_score // "unknown"' "$POLICY_STATE_FILE" 2>/dev/null || echo "unknown")
+        print_status "OK" "Policy state present (lessons=$active_lessons, candidates=$active_candidates, quality_floor=$quality_floor)"
+    else
+        print_status "OK" "Policy state file present at $POLICY_STATE_FILE"
+    fi
+else
+    print_status "WARN" "Policy state file missing at $POLICY_STATE_FILE"
+    ISSUES+=("Policy state file missing")
+fi
 
 # SUMMARY
 print_header "SYSTEM SUMMARY"

@@ -8,6 +8,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 import learn_from_system  # noqa: E402
+from simp.memory.policy_state import POLICY_STATE_PATH, REFLECTION_STATUS_PATH  # noqa: E402
 from simp.memory.system_reflection import SystemLearningEngine  # noqa: E402
 
 
@@ -83,6 +84,8 @@ def test_system_learning_detects_cross_system_policies(tmp_path: Path) -> None:
 
 def test_system_learning_script_persists(tmp_path: Path, monkeypatch) -> None:
     db_path = tmp_path / "system_memory.sqlite3"
+    policy_path = tmp_path / "active_system_policies.json"
+    status_path = tmp_path / "reflection_status.json"
 
     class _FakeReport:
         def to_dict(self):
@@ -101,8 +104,8 @@ def test_system_learning_script_persists(tmp_path: Path, monkeypatch) -> None:
                 },
                 "security_summary": {"total_events": 1},
                 "registry_summary": {"total_events": 1, "churn_ratio": 0.0},
-                "lessons": [],
-                "policy_candidates": [],
+                "lessons": [{"title": "L1", "summary": "s", "lesson_type": "x", "confidence": 0.9, "evidence": {}}],
+                "policy_candidates": [{"title": "P1", "rationale": "r", "priority": "high", "payload": {}}],
             }
 
     class _FakeEngine:
@@ -110,9 +113,14 @@ def test_system_learning_script_persists(tmp_path: Path, monkeypatch) -> None:
             return _FakeReport()
 
     monkeypatch.setattr(learn_from_system, "SystemLearningEngine", lambda: _FakeEngine())
+    monkeypatch.setattr("simp.memory.policy_state.POLICY_STATE_PATH", policy_path)
+    monkeypatch.setattr("simp.memory.policy_state.REFLECTION_STATUS_PATH", status_path)
 
     report = learn_from_system.build_report(db_path=str(db_path), persist=True)
 
     assert report["stored_counts"]["episodes"] == 0
     assert report["trade_learning"]["successful_live_trades"] == 1
+    assert report["policy_state"]["active_lessons"][0]["title"] == "L1"
+    assert policy_path.exists()
+    assert status_path.exists()
     assert "# System Learning Report" in learn_from_system.render_markdown(report)

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import quantum_signal_bridge as bridge
 
 
@@ -58,3 +60,39 @@ def test_apply_funding_constraints_scales_buys_to_quote_budget(monkeypatch) -> N
     assert adjusted["metadata"]["quote_budget_usd"] == 4.5
     assert adjusted["assets"]["BTC-USD"]["position_usd"] == 2.7
     assert adjusted["assets"]["ETH-USD"]["position_usd"] == 1.8
+
+
+def test_parse_qip_response_respects_policy_quality_floor(monkeypatch) -> None:
+    qip_payload = {
+        "success": True,
+        "result": "BTC 60% ETH 40%",
+        "metadata": {"quality_score": 0.6, "trace_id": "trace-1"},
+    }
+    policy_state = {"execution_quality": {"min_quality_score": 0.7}}
+
+    signal = bridge.parse_qip_response(qip_payload, policy_state=policy_state, cycle_id="cycle-1")
+
+    assert signal is None
+
+
+def test_parse_qip_response_adds_lineage_and_policy_version(monkeypatch) -> None:
+    monkeypatch.setattr(bridge, "_coinbase_client", lambda: None)
+    qip_payload = {
+        "success": True,
+        "result": "BTC 60% ETH 40%",
+        "metadata": {"quality_score": 0.9, "trace_id": "trace-1", "plan_id": "plan-7"},
+        "responding_to": "req-1",
+    }
+    policy_state = {
+        "generated_at": "2026-04-22T00:00:00+00:00",
+        "execution_quality": {"min_quality_score": 0.5},
+    }
+
+    signal = bridge.parse_qip_response(qip_payload, policy_state=policy_state, cycle_id="cycle-1")
+
+    assert signal is not None
+    lineage = signal["metadata"]["lineage"]
+    assert lineage["bridge_cycle_id"] == "cycle-1"
+    assert lineage["qip_trace_id"] == "trace-1"
+    assert lineage["plan_id"] == "plan-7"
+    assert signal["metadata"]["policy_state_version"] == "2026-04-22T00:00:00+00:00"

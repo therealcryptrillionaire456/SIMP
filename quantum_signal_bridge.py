@@ -39,11 +39,14 @@ except ImportError:
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from simp.memory import Episode, SystemMemoryStore, load_active_system_policies
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [quantum_signal_bridge] %(levelname)s %(message)s"
 )
 logger = logging.getLogger("quantum_signal_bridge")
+SYSTEM_MEMORY_STORE = SystemMemoryStore()
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -74,6 +77,30 @@ QUOTE_CURRENCIES = ("USD", "USDC")
 # Minimum QIP quality score to generate a live signal (0.0-1.0).
 # Below this threshold, the cycle is skipped — no blind trades.
 MIN_QUALITY_SCORE = float(os.environ.get("SIMP_MIN_QIP_QUALITY", "0.5"))
+
+
+def _record_bridge_episode(
+    episode_type: str,
+    summary: str,
+    payload: Dict[str, Any],
+    *,
+    entity: Optional[str] = None,
+    tags: Optional[list[str]] = None,
+) -> None:
+    try:
+        SYSTEM_MEMORY_STORE.add_episode(
+            Episode(
+                episode_type=episode_type,
+                source="quantum_signal_bridge",
+                entity=entity or str(payload.get("signal_id") or payload.get("request_id") or "bridge"),
+                summary=summary,
+                occurred_at=str(payload.get("generated_at") or datetime.now(timezone.utc).isoformat()),
+                payload=payload,
+                tags=tags or ["bridge", episode_type],
+            )
+        )
+    except Exception:
+        logger.debug("failed to persist bridge episode", exc_info=True)
 
 
 # ─── Broker helpers ───────────────────────────────────────────────────────────
@@ -389,7 +416,20 @@ def _apply_funding_constraints(signal: Dict[str, Any]) -> Dict[str, Any]:
 
 # ─── Signal generation ────────────────────────────────────────────────────────
 
-def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
+def _policy_quality_threshold(policy_state: Dict[str, Any]) -> float:
+    execution_quality = policy_state.get("execution_quality") or {}
+    try:
+        return float(execution_quality.get("min_quality_score", MIN_QUALITY_SCORE))
+    except (TypeError, ValueError):
+        return MIN_QUALITY_SCORE
+
+
+def parse_qip_response(
+    qip_payload: dict,
+    *,
+    policy_state: Optional[Dict[str, Any]] = None,
+    cycle_id: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
     """
     Extract trade signal from QIP response payload.
     Returns a signal dict ready for gate4_real's inbox.
@@ -404,13 +444,15 @@ def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
 
     result = qip_payload.get("result", "")
     metadata = qip_payload.get("metadata", {})
+    policy_state = policy_state or load_active_system_policies()
+    quality_threshold = _policy_quality_threshold(policy_state)
 
     # Require minimum quality score — low-confidence responses don't trade
     quality = float(metadata.get("quality_score", 0.0))
-    if quality < MIN_QUALITY_SCORE:
+    if quality < quality_threshold:
         logger.warning(
             "QIP quality_score %.2f < threshold %.2f — skipping signal",
-            quality, MIN_QUALITY_SCORE,
+            quality, quality_threshold,
         )
         return None
 
@@ -427,7 +469,20 @@ def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
             "execution_mode": metadata.get("execution_mode", "simulator"),
             "qip_trace_id": metadata.get("trace_id"),
             "verification_score": metadata.get("verification_score", 0.0),
+            "policy_state_version": policy_state.get("generated_at"),
+            "bridge_cycle_id": cycle_id,
+            "quality_threshold": quality_threshold,
         }
+    }
+    signal["metadata"]["lineage"] = {
+        "source": "quantum_intelligence_prime",
+        "signal_id": signal["signal_id"],
+        "bridge_agent_id": BRIDGE_AGENT_ID,
+        "bridge_cycle_id": cycle_id,
+        "qip_trace_id": metadata.get("trace_id"),
+        "policy_state_version": policy_state.get("generated_at"),
+        "responding_to": qip_payload.get("responding_to"),
+        "plan_id": metadata.get("plan_id"),
     }
 
     # Parse allocation from result string (QIP outputs recommendations in text)
@@ -449,7 +504,15 @@ def parse_qip_response(qip_payload: dict) -> Optional[Dict[str, Any]]:
             "action": "buy" if weight > 0.2 else "hold",
         }
 
-    return _apply_funding_constraints(signal)
+    adjusted = _apply_funding_constraints(signal)
+    _record_bridge_episode(
+        "bridge_signal_generated",
+        "Quantum signal generated for downstream execution",
+        adjusted,
+        entity=adjusted.get("signal_id"),
+        tags=["bridge", "signal", adjusted.get("source", "unknown")],
+    )
+    return adjusted
 
 
 def _parse_allocations(result_text: str) -> Dict[str, float]:
@@ -532,6 +595,7 @@ def deliver_signal(signal: Dict[str, Any], broker: str) -> bool:
         try:
             fname.write_text(json.dumps(signal, indent=2))
             logger.info(f"Signal written to gate4_real inbox: {fname.name}")
+            signal.setdefault("metadata", {})["inbox_file"] = fname.name
             success = True
         except Exception as e:
             logger.error(f"File inbox write failed: {e}")
@@ -548,9 +612,24 @@ def deliver_signal(signal: Dict[str, Any], broker: str) -> bool:
     })
     if mesh_result and mesh_result.get("status") == "success":
         logger.info(f"Signal sent to gate4_real via mesh [{mesh_result.get('message_id','?')[:8]}]")
+        signal.setdefault("metadata", {})["mesh_message_id"] = mesh_result.get("message_id")
         success = True
     else:
         logger.warning(f"Mesh delivery to gate4_real: {mesh_result}")
+
+    _record_bridge_episode(
+        "bridge_signal_delivery",
+        f"Quantum signal delivery success={success}",
+        {
+            "signal_id": signal.get("signal_id"),
+            "generated_at": signal.get("generated_at"),
+            "metadata": signal.get("metadata", {}),
+            "delivery_success": success,
+            "delivery_assets": signal.get("assets", {}),
+        },
+        entity=signal.get("signal_id"),
+        tags=["bridge", "delivery", "success" if success else "failure"],
+    )
 
     return success
 
@@ -586,6 +665,8 @@ class QuantumSignalBridge:
 
             if now - last_query >= self.poll_interval:
                 logger.info("Querying QIP for portfolio optimization...")
+                policy_state = load_active_system_policies()
+                cycle_id = str(uuid.uuid4())
 
                 problem = (
                     f"optimize portfolio allocation across {', '.join(TARGET_ASSETS)} "
@@ -597,7 +678,11 @@ class QuantumSignalBridge:
                 qip_response = query_qip(self.broker, problem)
 
                 if qip_response is not None:
-                    signal = parse_qip_response(qip_response)
+                    signal = parse_qip_response(
+                        qip_response,
+                        policy_state=policy_state,
+                        cycle_id=cycle_id,
+                    )
                 else:
                     logger.warning("No QIP response — skipping this cycle (timeout_fallback suppressed)")
                     signal = None
@@ -645,9 +730,20 @@ def main():
         register_and_subscribe(args.broker)
         problem = f"optimize {TARGET_ASSETS} portfolio for live Coinbase trading"
         qip = query_qip(args.broker, problem)
-        signal = parse_qip_response(qip) if qip else _apply_funding_constraints(_equal_weight_signal("once_fallback"))
-        deliver_signal(signal, args.broker)
-        print(json.dumps(signal, indent=2))
+        signal = (
+            parse_qip_response(
+                qip,
+                policy_state=load_active_system_policies(),
+                cycle_id=str(uuid.uuid4()),
+            )
+            if qip else _apply_funding_constraints(_equal_weight_signal("once_fallback"))
+        )
+        if signal:
+            deliver_signal(signal, args.broker)
+            print(json.dumps(signal, indent=2))
+        else:
+            logger.warning("no signal generated for --once execution")
+            print("{}")
         return
 
     bridge = QuantumSignalBridge(broker=args.broker, poll_interval=args.interval)

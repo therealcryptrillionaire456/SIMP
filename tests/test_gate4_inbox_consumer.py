@@ -78,3 +78,23 @@ def test_reset_cooldown_if_expired_clears_consecutive_losses() -> None:
     assert state["consecutive_losses"] == 0
     assert state["cooldown_until"] is None
     assert state["last_error_classification"] is None
+
+
+def test_pre_fanout_budget_blocks_underfunded_lower_priority_buys(monkeypatch) -> None:
+    cfg = {
+        "position_sizing": {"min_notional": 1.0, "max_notional": 10.0},
+    }
+    assets = {
+        "BTC-USD": {"action": "buy", "position_usd": 3.0, "weight": 0.6},
+        "ETH-USD": {"action": "buy", "position_usd": 2.0, "weight": 0.4},
+        "SOL-USD": {"action": "hold", "position_usd": 0.0, "weight": 0.0},
+    }
+    policies = {"capital_budgeting": {"enabled": True, "min_quote_reserve_usd": 0.0}}
+
+    monkeypatch.setattr(consumer, "_quote_balance_usd", lambda client: 3.0)
+
+    plan = consumer._apply_pre_fanout_budget(assets, cfg, client=object(), policy_state=policies)
+
+    assert plan["decision"] == "capital_budget_applied"
+    assert plan["allowed"]["BTC-USD"] == 3.0
+    assert plan["blocked"]["ETH-USD"] == "insufficient_quote_budget"

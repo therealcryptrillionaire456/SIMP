@@ -53,6 +53,7 @@ except ImportError:
     sys.exit(2)
 
 from simp.exchange import CoinbaseOperationError, ResilientCoinbaseClient
+from simp.memory import Episode, SystemMemoryStore, load_active_system_policies
 from simp.policies.trading_policy import check_trade_allowed, PolicyViolation
 
 # --- paths ------------------------------------------------------------------
@@ -69,6 +70,7 @@ CONFIG_PATH = REPO / "config" / "live_production_config.json"
 BROKER_URL = os.environ.get("SIMP_BROKER_URL", "http://127.0.0.1:5555").rstrip("/")
 TRADE_RESULT_CHANNEL = "trade_updates"
 TRADE_RESULT_RECIPIENTS = ("projectx_quantum_advisor", "projectx_native")
+SYSTEM_MEMORY_STORE = SystemMemoryStore()
 
 # --- logging ----------------------------------------------------------------
 logging.basicConfig(
@@ -299,6 +301,32 @@ def _append_jsonl(path: Path, payload: dict[str, Any]) -> None:
         handle.write(json.dumps(_json_safe(payload)) + "\n")
 
 
+def _record_trade_episode(payload: dict[str, Any]) -> None:
+    try:
+        SYSTEM_MEMORY_STORE.add_episode(
+            Episode(
+                episode_type="gate4_trade_result",
+                source="gate4_inbox_consumer",
+                entity=str(payload.get("client_order_id") or payload.get("signal_id") or "unknown"),
+                summary=(
+                    f"{payload.get('symbol', 'unknown')} "
+                    f"{payload.get('side', 'unknown')} "
+                    f"result={payload.get('result', 'unknown')}"
+                ),
+                occurred_at=str(payload.get("ts") or ""),
+                payload=payload,
+                tags=[
+                    "trade",
+                    str(payload.get("symbol") or "unknown"),
+                    str(payload.get("side") or "unknown").lower(),
+                    str(payload.get("result") or "unknown"),
+                ],
+            )
+        )
+    except Exception:
+        log.debug("failed to record structured trade episode", exc_info=True)
+
+
 def _extract_order_id(payload: dict[str, Any]) -> str | None:
     response = payload.get("response") or {}
     if not isinstance(response, dict):
@@ -411,6 +439,9 @@ def _emit_trade_ack(payload: dict[str, Any]) -> None:
         "error": payload.get("error"),
         "error_classification": payload.get("error_classification"),
         "timestamp": payload.get("ts"),
+        "policy_decision": payload.get("policy_decision"),
+        "policy_state_version": payload.get("policy_state_version"),
+        "lineage": payload.get("lineage"),
     }
     body = {
         "sender_id": "gate4_real",
@@ -438,6 +469,7 @@ def record_trade(payload: dict) -> None:
     _append_jsonl(TRADE_LOG, safe_payload)
     if safe_payload.get("result") == "ok":
         append_pnl_entry(safe_payload)
+    _record_trade_episode(safe_payload)
     _emit_trade_ack(safe_payload)
 
 
@@ -445,6 +477,110 @@ def record_trade(payload: dict) -> None:
 def clamp_notional(usd: float, cfg: dict) -> float:
     p = cfg["position_sizing"]
     return max(p["min_notional"], min(p["max_notional"], round(usd, 2)))
+
+
+def _extract_lineage(signal: dict[str, Any], policy_state: dict[str, Any]) -> dict[str, Any]:
+    metadata = signal.get("metadata") or {}
+    lineage = dict(metadata.get("lineage") or {})
+    lineage.setdefault("source", signal.get("source"))
+    lineage.setdefault("signal_id", signal.get("signal_id"))
+    if metadata.get("qip_trace_id"):
+        lineage.setdefault("qip_trace_id", metadata.get("qip_trace_id"))
+    if metadata.get("bridge_cycle_id"):
+        lineage.setdefault("bridge_cycle_id", metadata.get("bridge_cycle_id"))
+    if metadata.get("plan_id"):
+        lineage.setdefault("plan_id", metadata.get("plan_id"))
+    if policy_state.get("generated_at"):
+        lineage.setdefault("policy_state_version", policy_state.get("generated_at"))
+    return lineage
+
+
+def _quote_balance_usd(client: ResilientCoinbaseClient) -> float:
+    balances = [_balance_snapshot(client, "USD"), _balance_snapshot(client, "USDC")]
+    return round(sum(balance["available"] for balance in balances), 2)
+
+
+def _apply_pre_fanout_budget(
+    assets: dict[str, Any],
+    cfg: dict,
+    client: ResilientCoinbaseClient,
+    policy_state: dict[str, Any],
+) -> dict[str, Any]:
+    capital_policy = policy_state.get("capital_budgeting") or {}
+    if not capital_policy.get("enabled", False):
+        return {
+            "decision": "capital_budget_disabled",
+            "allowed": {},
+            "blocked": {},
+            "available_quote_usd": None,
+        }
+
+    buy_legs: list[tuple[str, float, float]] = []
+    for symbol, leg in assets.items():
+        action = str(leg.get("action") or "").lower()
+        if action != "buy":
+            continue
+        requested = float(leg.get("position_usd", 0.0) or 0.0)
+        if requested <= 0:
+            continue
+        weight = float(leg.get("weight", requested) or requested)
+        buy_legs.append((symbol, clamp_notional(requested, cfg), weight))
+
+    if len(buy_legs) <= 1:
+        return {
+            "decision": "capital_budget_not_required",
+            "allowed": {symbol: requested for symbol, requested, _ in buy_legs},
+            "blocked": {},
+            "available_quote_usd": None,
+        }
+
+    try:
+        available_quote = max(
+            0.0,
+            round(
+                _quote_balance_usd(client) - float(capital_policy.get("min_quote_reserve_usd", 0.0) or 0.0),
+                2,
+            ),
+        )
+    except CoinbaseOperationError as exc:
+        return {
+            "decision": "capital_budget_lookup_failed",
+            "allowed": {symbol: requested for symbol, requested, _ in buy_legs},
+            "blocked": {},
+            "available_quote_usd": None,
+            "error": exc.last_error,
+            "error_classification": exc.classification,
+        }
+
+    remaining = available_quote
+    min_notional = float(cfg["position_sizing"]["min_notional"])
+    allowed: dict[str, float] = {}
+    blocked: dict[str, str] = {}
+
+    for symbol, requested, weight in sorted(buy_legs, key=lambda item: (-item[2], -item[1], item[0])):
+        if remaining < min_notional:
+            blocked[symbol] = "insufficient_quote_budget"
+            continue
+        allocation = min(requested, remaining)
+        if allocation < min_notional:
+            blocked[symbol] = "insufficient_quote_budget"
+            continue
+        allowed[symbol] = round(allocation, 2)
+        remaining = round(remaining - allocation, 2)
+
+    total_requested = round(sum(requested for _, requested, _ in buy_legs), 2)
+    total_allocated = round(sum(allowed.values()), 2)
+    decision = "capital_budget_clear"
+    if blocked or total_allocated < total_requested:
+        decision = "capital_budget_applied"
+
+    return {
+        "decision": decision,
+        "allowed": allowed,
+        "blocked": blocked,
+        "available_quote_usd": available_quote,
+        "remaining_quote_usd": remaining,
+    }
 
 
 def process_signal(
@@ -474,6 +610,17 @@ def process_signal(
         return False
 
     any_success = False
+    policy_state = load_active_system_policies()
+    lineage = _extract_lineage(sig, policy_state)
+    budget_plan = {
+        "decision": "capital_budget_unchecked",
+        "allowed": {},
+        "blocked": {},
+        "available_quote_usd": None,
+    }
+    if not dry_run:
+        budget_plan = _apply_pre_fanout_budget(assets, cfg, client, policy_state)
+
     for symbol, leg in assets.items():
         if symbol not in allowed_symbols:
             log.info("signal %s: %s not in allowed symbols, skipping leg", sig_id, symbol)
@@ -510,7 +657,23 @@ def process_signal(
             "executed_usd": notional,
             "client_order_id": client_order_id,
             "dry_run": dry_run,
+            "policy_state_version": policy_state.get("generated_at"),
+            "policy_decision": budget_plan.get("decision"),
+            "lineage": lineage,
         }
+
+        if budget_plan.get("available_quote_usd") is not None:
+            trade_record["available_quote_usd"] = budget_plan.get("available_quote_usd")
+
+        if action == "buy" and symbol in (budget_plan.get("blocked") or {}):
+            trade_record["result"] = "policy_blocked:capital_budget"
+            trade_record["error"] = budget_plan["blocked"][symbol]
+            record_trade(trade_record)
+            continue
+
+        if action == "buy" and symbol in (budget_plan.get("allowed") or {}):
+            notional = float(budget_plan["allowed"][symbol])
+            trade_record["executed_usd"] = notional
 
         if dry_run:
             log.info(
@@ -528,6 +691,7 @@ def process_signal(
         except PolicyViolation as pv:
             log.error("POLICY BLOCKED %s %s $%.2f: %s", action.upper(), symbol, notional, pv.reason)
             trade_record["result"] = f"policy_blocked: {pv.reason}"
+            trade_record["policy_decision"] = "policy_guard_blocked"
             record_trade(trade_record)
             continue
 

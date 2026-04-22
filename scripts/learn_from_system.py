@@ -10,7 +10,13 @@ import json
 from pathlib import Path
 from typing import Any, Dict
 
-from simp.memory import SystemLearningEngine, SystemMemoryStore
+from simp.memory import (
+    SystemLearningEngine,
+    SystemMemoryStore,
+    build_active_policy_state,
+    write_policy_state,
+    write_reflection_status,
+)
 
 
 def build_report(
@@ -23,6 +29,10 @@ def build_report(
     payload = report.to_dict()
     payload["memory_db"] = str(Path(db_path))
     if persist:
+        policy_state = build_active_policy_state(payload)
+        write_policy_state(policy_state)
+        write_reflection_status(payload, policy_state)
+        payload["policy_state"] = policy_state
         payload["stored_counts"] = {
             "episodes": len(store.list_episodes(limit=5000)),
             "lessons": len(store.list_lessons(limit=5000)),
@@ -59,6 +69,18 @@ def render_markdown(report: Dict[str, Any]) -> str:
         "",
         f"- Memory DB: {report['memory_db']}",
     ]
+
+    policy_state = report.get("policy_state") or {}
+    if policy_state:
+        lines.extend(
+            [
+                "",
+                "## Active Policy State",
+                f"- Generated at: {policy_state.get('generated_at', 'unknown')}",
+                f"- Active lessons: {len(policy_state.get('active_lessons') or [])}",
+                f"- Active policy candidates: {len(policy_state.get('active_policy_candidates') or [])}",
+            ]
+        )
 
     if "stored_counts" in report:
         lines.extend(

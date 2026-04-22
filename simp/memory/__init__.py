@@ -19,6 +19,14 @@ from simp.memory.hooks import MemoryHooks
 from simp.memory.system_memory import SystemMemoryStore, Episode, Lesson, PolicyCandidate
 from simp.memory.trade_learning import TradeLearningEngine, TradeLearningReport
 from simp.memory.system_reflection import SystemLearningEngine, SystemLearningReport
+from simp.memory.policy_state import (
+    POLICY_STATE_PATH,
+    REFLECTION_STATUS_PATH,
+    build_active_policy_state,
+    write_policy_state,
+    write_reflection_status,
+    load_active_system_policies,
+)
 
 __all__ = [
     "ConversationArchive",
@@ -34,4 +42,10 @@ __all__ = [
     "TradeLearningReport",
     "SystemLearningEngine",
     "SystemLearningReport",
+    "POLICY_STATE_PATH",
+    "REFLECTION_STATUS_PATH",
+    "build_active_policy_state",
+    "write_policy_state",
+    "write_reflection_status",
+    "load_active_system_policies",
 ]
