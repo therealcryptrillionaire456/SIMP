@@ -410,6 +410,28 @@ else
     fi
 fi
 
+projectx_phase_summary=$(check_endpoint "$BROKER_URL" "/projectx/phases/summary" "ProjectX phase summary")
+if [ "$projectx_phase_summary" = "UNREACHABLE" ]; then
+    print_status "WARN" "ProjectX phase summary endpoint unreachable"
+    ISSUES+=("ProjectX phase summary endpoint unreachable")
+else
+    if $USE_JQ; then
+        phase_source=$(echo "$projectx_phase_summary" | jq -r '.source // "unknown"' 2>/dev/null || echo "unknown")
+        phase_count=$(echo "$projectx_phase_summary" | jq -r '.phase_count // 0' 2>/dev/null || echo "0")
+        ok_count=$(echo "$projectx_phase_summary" | jq -r '.ok_count // 0' 2>/dev/null || echo "0")
+        non_ok_count=$(echo "$projectx_phase_summary" | jq -r '.non_ok_count // 0' 2>/dev/null || echo "0")
+        if [ "${non_ok_count:-0}" -gt 0 ]; then
+            phase_names=$(echo "$projectx_phase_summary" | jq -r '(.non_ok_phases // {}) | keys | join(",")' 2>/dev/null || echo "unknown")
+            print_status "WARN" "ProjectX phases degraded ($non_ok_count/$phase_count non-ok, source=$phase_source): $phase_names"
+            ISSUES+=("ProjectX phases degraded: $phase_names")
+        else
+            print_status "OK" "ProjectX phases healthy ($ok_count/$phase_count ok, source=$phase_source)"
+        fi
+    else
+        print_status "OK" "ProjectX phase summary endpoint responding"
+    fi
+fi
+
 projectx_swarm_topology=$(check_endpoint "$PROJECTX_SWARM_URL" "/swarm/topology" "ProjectX swarm topology")
 if [ "$projectx_swarm_topology" = "UNREACHABLE" ]; then
     print_status "WARN" "ProjectX swarm topology endpoint unreachable"

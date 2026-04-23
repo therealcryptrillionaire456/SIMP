@@ -10,8 +10,10 @@ from simp.compat.projectx_contracts import (
 )
 from simp.compat.projectx_phase_status import (
     append_phase_status,
+    build_phase_alerts,
     normalize_phase_status,
     read_latest_phase_status,
+    summarize_phase_status,
 )
 
 
@@ -92,3 +94,22 @@ def test_phase_status_append_and_read(tmp_path) -> None:
 def test_normalize_phase_status_rejects_non_mapping_phases() -> None:
     with pytest.raises(ValueError):
         normalize_phase_status({"phases": ["bad"]})
+
+
+def test_phase_status_summary_and_alerts() -> None:
+    payload = {
+        "phase_range": "8-20",
+        "phases": {
+            "8_world_model": {"status": "ok"},
+            "11_self_repair": {"status": "warning", "detail": "drift detected"},
+        },
+    }
+
+    summary = summarize_phase_status(payload)
+    alerts = build_phase_alerts(payload)
+
+    assert summary["phase_count"] == 2
+    assert summary["ok_count"] == 1
+    assert summary["non_ok_count"] == 1
+    assert summary["non_ok_phases"]["11_self_repair"]["status"] == "warning"
+    assert alerts[0]["title"] == "ProjectX 11_self_repair"

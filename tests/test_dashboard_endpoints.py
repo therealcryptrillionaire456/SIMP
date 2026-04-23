@@ -540,6 +540,64 @@ class TestProjectXEndpoints:
         assert data["source"] == "live"
         assert data["phases"]["20_constitution"]["status"] == "ok"
 
+    def test_projectx_phase_summary_endpoint(self, client, monkeypatch):
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/phases/summary"
+            return {
+                "status": "ok",
+                "source": "cache",
+                "phase_range": "8-20",
+                "phase_count": 13,
+                "ok_count": 12,
+                "non_ok_count": 1,
+                "non_ok_phases": {"18_experimentation": {"status": "warning"}},
+                "healthy": False,
+                "alerts": [{"id": "alert-1", "title": "ProjectX 18_experimentation"}],
+            }
+
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get("/api/projectx/phases/summary")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["source"] == "cache"
+        assert data["non_ok_count"] == 1
+        assert data["alerts"][0]["title"] == "ProjectX 18_experimentation"
+
+    def test_activity_includes_projectx_phase_alerts(self, client, monkeypatch):
+        async def fake_broker_snapshot():
+            return {"dashboard": {"broker": {"agent_queues": {}, "status": "running", "routed": 0, "failed": 0}}}
+
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/activity"
+            return {"status": "ok", "count": 0, "events": []}
+
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/phases/summary"
+            return {
+                "status": "ok",
+                "alerts": [
+                    {
+                        "id": "projectx-phase:18",
+                        "timestamp": "2026-04-23T12:00:00+00:00",
+                        "title": "ProjectX 18_experimentation",
+                        "status": "warning",
+                        "source": "projectx_native",
+                        "agent_id": "projectx_native",
+                    }
+                ],
+            }
+
+        monkeypatch.setattr(ds, "_broker_snapshot", fake_broker_snapshot)
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get("/api/activity")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["sources"]["projectx_phase"] == 1
+        assert data["events"][0]["type"] == "projectx_phase"
+
     def test_projectx_contract_ingest_endpoint(self, client, monkeypatch):
         async def fake_broker_post(path: str, payload: dict):
             assert path == "/projectx/contracts"

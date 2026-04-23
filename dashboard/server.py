@@ -972,6 +972,31 @@ def _recent_intent_events(dashboard_data: dict | None) -> list[dict]:
     return _dashboard_recent_intents(dashboard_data, limit=25, newest_first=False)
 
 
+def _normalise_projectx_phase_events(payload: dict | None, *, limit: int = 5) -> list[dict[str, Any]]:
+    if not payload or not isinstance(payload, dict):
+        return []
+    alerts = payload.get("alerts")
+    if not isinstance(alerts, list):
+        return []
+    events: list[dict[str, Any]] = []
+    for alert in alerts[: max(1, limit)]:
+        if not isinstance(alert, dict):
+            continue
+        events.append(
+            {
+                "id": str(alert.get("id") or f"projectx-phase:{len(events)}"),
+                "timestamp": str(alert.get("timestamp") or datetime.now(timezone.utc).isoformat()),
+                "type": "projectx_phase",
+                "source": str(alert.get("source") or "projectx_native"),
+                "agent_id": str(alert.get("agent_id") or "projectx_native"),
+                "status": str(alert.get("status") or "unknown"),
+                "title": str(alert.get("title") or "ProjectX phase"),
+                "detail": alert.get("detail"),
+            }
+        )
+    return events
+
+
 async def _broker_intent_detail(intent_id: str) -> tuple[dict | None, str]:
     path = f"/intents/{intent_id}"
     cached = _broker_cache.get(path)
@@ -1530,7 +1555,9 @@ async def api_activity():
     broker_events = _recent_intent_events(snapshot["dashboard"])
     projectx_activity = await _projectx_get("/swarm/activity")
     projectx_events = _normalise_projectx_swarm_events(projectx_activity, limit=10)
-    events = [*projectx_events, *broker_events]
+    projectx_phase_summary = await _broker_get("/projectx/phases/summary")
+    projectx_phase_events = _normalise_projectx_phase_events(projectx_phase_summary, limit=5)
+    events = [*projectx_phase_events, *projectx_events, *broker_events]
     if events:
         return {
             "status": "success",
@@ -1539,6 +1566,7 @@ async def api_activity():
             "sources": {
                 "broker": len(broker_events),
                 "projectx_swarm": len(projectx_events),
+                "projectx_phase": len(projectx_phase_events),
             },
         }
     fallback_events = list(activity_buffer)
@@ -1549,6 +1577,7 @@ async def api_activity():
         "sources": {
             "broker": 0,
             "projectx_swarm": 0,
+            "projectx_phase": 0,
         },
     }
 
@@ -1820,6 +1849,22 @@ async def api_computer_use():
     if snapshot["dashboard"] is None:
         return {"status": "unreachable", "projectx_available": False}
     projectx_info = snapshot["dashboard"].get("projectx", {})
+    phase_summary = await _broker_get("/projectx/phases/summary")
+    phase_card = {
+        "healthy": False,
+        "phase_count": 0,
+        "ok_count": 0,
+        "non_ok_count": 0,
+        "source": "none",
+    }
+    if isinstance(phase_summary, dict):
+        phase_card = {
+            "healthy": bool(phase_summary.get("healthy", False)),
+            "phase_count": int(phase_summary.get("phase_count", 0) or 0),
+            "ok_count": int(phase_summary.get("ok_count", 0) or 0),
+            "non_ok_count": int(phase_summary.get("non_ok_count", 0) or 0),
+            "source": str(phase_summary.get("source") or "unknown"),
+        }
 
     return {
         "status": "success",
@@ -1832,6 +1877,7 @@ async def api_computer_use():
         }),
         "action_count": projectx_info.get("action_count", 0),
         "log_path": projectx_info.get("log_path", ""),
+        "phase_card": phase_card,
     }
 
 
@@ -2150,6 +2196,24 @@ async def api_projectx_phase_status():
             "source": "none",
             "phase_range": "8-20",
             "phases": {},
+        }
+    return _redact(data)
+
+
+@app.get("/api/projectx/phases/summary")
+async def api_projectx_phase_summary():
+    data = await _broker_get("/projectx/phases/summary")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "source": "none",
+            "phase_range": "8-20",
+            "phase_count": 0,
+            "ok_count": 0,
+            "non_ok_count": 0,
+            "non_ok_phases": {},
+            "healthy": False,
+            "alerts": [],
         }
     return _redact(data)
 

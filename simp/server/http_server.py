@@ -87,7 +87,9 @@ from simp.compat.projectx_contracts import (
 )
 from simp.compat.projectx_phase_status import (
     append_phase_status,
+    build_phase_alerts,
     read_latest_phase_status,
+    summarize_phase_status,
 )
 from simp.compat.rollback import ROLLBACK_MANAGER
 from simp.compat.gate_manager import GATE_MANAGER
@@ -112,6 +114,26 @@ def _fetch_projectx_phase_status(timeout: float = 3.0) -> Optional[Dict[str, Any
             return payload if isinstance(payload, dict) else None
     except (urllib_error.URLError, TimeoutError, OSError, json.JSONDecodeError):
         return None
+
+
+def _resolve_projectx_phase_status() -> Dict[str, Any]:
+    live = _fetch_projectx_phase_status()
+    if isinstance(live, dict):
+        record = append_phase_status(live)
+        record["source"] = "live"
+        return record
+    cached = read_latest_phase_status()
+    if isinstance(cached, dict):
+        cached = dict(cached)
+        cached["source"] = "cache"
+        cached["status"] = str(cached.get("status") or "cached")
+        return cached
+    return {
+        "status": "unreachable",
+        "source": "none",
+        "phase_range": "8-20",
+        "phases": {},
+    }
 
 
 def require_api_key(f):
@@ -662,23 +684,7 @@ class SimpHttpServer:
         def get_projectx_phase_status():
             """Return live ProjectX phase status when reachable, else latest cached snapshot."""
             try:
-                live = _fetch_projectx_phase_status()
-                if isinstance(live, dict):
-                    record = append_phase_status(live)
-                    record["source"] = "live"
-                    return jsonify(record), 200
-                cached = read_latest_phase_status()
-                if isinstance(cached, dict):
-                    cached = dict(cached)
-                    cached["source"] = "cache"
-                    cached["status"] = str(cached.get("status") or "cached")
-                    return jsonify(cached), 200
-                return jsonify({
-                    "status": "unreachable",
-                    "source": "none",
-                    "phase_range": "8-20",
-                    "phases": {},
-                }), 200
+                return jsonify(_resolve_projectx_phase_status()), 200
             except ValueError as exc:
                 return jsonify({"status": "error", "error": str(exc)}), 400
             except Exception as exc:
@@ -701,6 +707,23 @@ class SimpHttpServer:
                     },
                 )
                 return jsonify({"status": "success", "phase_status": record}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
+
+        @self.app.route("/projectx/phases/summary", methods=["GET"])
+        @require_api_key
+        def get_projectx_phase_summary():
+            """Return compact ProjectX phase health summary and derived alerts."""
+            try:
+                record = _resolve_projectx_phase_status()
+                summary = summarize_phase_status(record)
+                return jsonify({
+                    **summary,
+                    "source": record.get("source"),
+                    "alerts": build_phase_alerts(record),
+                }), 200
             except ValueError as exc:
                 return jsonify({"status": "error", "error": str(exc)}), 400
             except Exception as exc:

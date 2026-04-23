@@ -77,3 +77,53 @@ def read_latest_phase_status(*, log_path: Path = DEFAULT_PHASE_STATUS_LOG) -> Op
         if isinstance(payload, dict):
             return payload
     return None
+
+
+def summarize_phase_status(payload: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    record = normalize_phase_status(payload or {})
+    phases = record.get("phases") or {}
+    ok_count = 0
+    non_ok: Dict[str, Dict[str, Any]] = {}
+    for phase_name, phase_payload in phases.items():
+        if not isinstance(phase_payload, dict):
+            non_ok[str(phase_name)] = {"status": "invalid"}
+            continue
+        status = str(phase_payload.get("status") or "unknown")
+        if status == "ok":
+            ok_count += 1
+        else:
+            non_ok[str(phase_name)] = {
+                "status": status,
+                "source": phase_payload.get("source"),
+                "detail": phase_payload.get("detail"),
+            }
+    return {
+        "status": str(record.get("status") or "ok"),
+        "generated_at": str(record.get("generated_at") or utc_now_iso()),
+        "source_agent": str(record.get("source_agent") or "projectx_native"),
+        "phase_range": str(record.get("phase_range") or "8-20"),
+        "phase_count": len(phases),
+        "ok_count": ok_count,
+        "non_ok_count": len(non_ok),
+        "non_ok_phases": non_ok,
+        "healthy": len(phases) > 0 and len(non_ok) == 0,
+    }
+
+
+def build_phase_alerts(payload: Optional[Dict[str, Any]]) -> list[Dict[str, Any]]:
+    summary = summarize_phase_status(payload)
+    alerts: list[Dict[str, Any]] = []
+    for phase_name, phase_payload in summary["non_ok_phases"].items():
+        alerts.append(
+            {
+                "id": f"projectx-phase:{phase_name}:{summary['generated_at']}",
+                "timestamp": summary["generated_at"],
+                "type": "projectx_phase",
+                "source": "projectx_native",
+                "agent_id": "projectx_native",
+                "title": f"ProjectX {phase_name}",
+                "status": phase_payload.get("status") or "unknown",
+                "detail": phase_payload.get("detail"),
+            }
+        )
+    return alerts
