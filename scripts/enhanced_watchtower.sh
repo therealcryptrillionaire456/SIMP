@@ -376,6 +376,26 @@ else
     fi
 fi
 
+projectx_swarm_lifecycle=$(check_endpoint "$PROJECTX_SWARM_URL" "/swarm/lifecycle" "ProjectX swarm lifecycle")
+if [ "$projectx_swarm_lifecycle" = "UNREACHABLE" ]; then
+    print_status "WARN" "ProjectX swarm lifecycle endpoint unreachable"
+    ISSUES+=("ProjectX swarm lifecycle endpoint unreachable")
+else
+    if $USE_JQ; then
+        lifecycle_status=$(echo "$projectx_swarm_lifecycle" | jq -r '.status // "unknown"' 2>/dev/null || echo "unknown")
+        lifecycle_events=$(echo "$projectx_swarm_lifecycle" | jq -r '.summary.recent_event_count // 0' 2>/dev/null || echo "0")
+        lifecycle_actions=$(echo "$projectx_swarm_lifecycle" | jq -r '(.operator_actions // []) | length' 2>/dev/null || echo "0")
+        if [ "$lifecycle_status" = "ok" ] || [ "$lifecycle_status" = "mesh_attention" ]; then
+            print_status "OK" "ProjectX swarm lifecycle: $lifecycle_status ($lifecycle_events event(s), $lifecycle_actions action(s))"
+        else
+            print_status "WARN" "ProjectX swarm lifecycle status: $lifecycle_status"
+            ISSUES+=("ProjectX swarm lifecycle status: $lifecycle_status")
+        fi
+    else
+        print_status "OK" "ProjectX swarm lifecycle responding"
+    fi
+fi
+
 projectx_swarm_topology=$(check_endpoint "$PROJECTX_SWARM_URL" "/swarm/topology" "ProjectX swarm topology")
 if [ "$projectx_swarm_topology" = "UNREACHABLE" ]; then
     print_status "WARN" "ProjectX swarm topology endpoint unreachable"

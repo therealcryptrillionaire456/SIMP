@@ -574,6 +574,36 @@ def _tail_operator_events(limit: int = 25) -> list[dict]:
     return rows[::-1]
 
 
+def _normalise_projectx_swarm_events(payload: dict | None, *, limit: int = 10) -> list[dict[str, Any]]:
+    if not isinstance(payload, dict) or limit <= 0:
+        return []
+    raw_events = payload.get("events")
+    if not isinstance(raw_events, list):
+        return []
+    rows: list[dict[str, Any]] = []
+    for event in raw_events[:limit]:
+        if not isinstance(event, dict):
+            continue
+        event_type = str(event.get("event_type") or event.get("action_type") or "projectx_swarm_event")
+        rows.append(
+            _redact(
+                {
+                    "id": f"projectx:{event.get('mission_id') or event.get('timestamp') or event_type}",
+                    "timestamp": event.get("timestamp"),
+                    "type": "projectx_swarm",
+                    "source": "projectx_native",
+                    "agent_id": "projectx_native",
+                    "event_type": event_type,
+                    "status": event.get("status") or "info",
+                    "message": event.get("summary") or event_type,
+                    "mission_id": event.get("mission_id"),
+                    "details": event.get("details") if isinstance(event.get("details"), dict) else {},
+                }
+            )
+        )
+    return rows
+
+
 def _projectx_allowed_jobs() -> dict[str, dict[str, Any]]:
     return {
         "native_agent_health_check": {"intent_type": "native_agent_health_check", "params": {"quick": True}},
@@ -1495,19 +1525,31 @@ async def api_agents():
 
 @app.get("/api/activity")
 async def api_activity():
-    """Recent activity feed from the broker ledger, with local fallback."""
+    """Recent activity feed from broker intents plus ProjectX swarm lifecycle."""
     snapshot = await _broker_snapshot()
-    events = _recent_intent_events(snapshot["dashboard"])
+    broker_events = _recent_intent_events(snapshot["dashboard"])
+    projectx_activity = await _projectx_get("/swarm/activity")
+    projectx_events = _normalise_projectx_swarm_events(projectx_activity, limit=10)
+    events = [*projectx_events, *broker_events]
     if events:
         return {
             "status": "success",
             "count": len(events),
             "events": events,
+            "sources": {
+                "broker": len(broker_events),
+                "projectx_swarm": len(projectx_events),
+            },
         }
+    fallback_events = list(activity_buffer)
     return {
         "status": "success",
-        "count": len(activity_buffer),
-        "events": list(activity_buffer),
+        "count": len(fallback_events),
+        "events": fallback_events,
+        "sources": {
+            "broker": 0,
+            "projectx_swarm": 0,
+        },
     }
 
 
@@ -2047,6 +2089,20 @@ async def api_projectx_swarm_activity():
     data = await _projectx_get("/swarm/activity")
     if data is None:
         return {"status": "unreachable", "events": [], "count": 0}
+    return _redact(data)
+
+
+@app.get("/api/projectx/swarm/lifecycle")
+async def api_projectx_swarm_lifecycle():
+    data = await _projectx_get("/swarm/lifecycle")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "summary": {"active_mission_count": 0, "recent_event_count": 0},
+            "events": [],
+            "missions": [],
+            "operator_actions": [],
+        }
     return _redact(data)
 
 

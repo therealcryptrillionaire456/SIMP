@@ -231,6 +231,35 @@ class TestDashboardCoreEndpoints:
         assert "status" in data
         assert "events" in data
         assert isinstance(data["events"], list)
+
+    def test_activity_endpoint_fuses_projectx_swarm_events(self, client, monkeypatch):
+        async def fake_broker_snapshot():
+            return {"dashboard": {"recent_intents": []}, "health": {}}
+
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/activity"
+            return {
+                "status": "ok",
+                "events": [
+                    {
+                        "timestamp": "2026-04-23T12:00:00+00:00",
+                        "event_type": "mission_planned",
+                        "status": "info",
+                        "summary": "ProjectX planned mission",
+                        "mission_id": "mission-feed-1",
+                    }
+                ],
+            }
+
+        monkeypatch.setattr(ds, "_broker_snapshot", fake_broker_snapshot)
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/activity")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["sources"]["projectx_swarm"] == 1
+        assert data["events"][0]["type"] == "projectx_swarm"
+        assert data["events"][0]["mission_id"] == "mission-feed-1"
     
     def test_intents_recent_endpoint(self, client):
         """Test /api/intents/recent endpoint."""
@@ -437,6 +466,23 @@ class TestProjectXEndpoints:
         data = response.json()
         assert data["count"] == 1
         assert data["events"][0]["event_type"] == "swarm.mission_planned"
+
+    def test_projectx_swarm_lifecycle_endpoint(self, client, monkeypatch):
+        async def fake_projectx_get(path: str):
+            assert path == "/swarm/lifecycle"
+            return {
+                "status": "ok",
+                "summary": {"active_mission_count": 1, "recent_event_count": 2},
+                "operator_actions": [{"id": "bootstrap_native_kernel"}],
+            }
+
+        monkeypatch.setattr(ds, "_projectx_get", fake_projectx_get)
+
+        response = client.get("/api/projectx/swarm/lifecycle")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["summary"]["active_mission_count"] == 1
+        assert data["operator_actions"][0]["id"] == "bootstrap_native_kernel"
 
     def test_projectx_swarm_mesh_endpoint(self, client, monkeypatch):
         async def fake_projectx_get(path: str):
