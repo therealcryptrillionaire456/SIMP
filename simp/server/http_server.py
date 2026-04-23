@@ -53,6 +53,11 @@ from simp.compat.projectx_card import (
     build_projectx_a2a_card,
     validate_projectx_task,
 )
+from simp.compat.brp_card import (
+    build_brp_a2a_card,
+    validate_brp_task,
+)
+from simp.compat.brp_diagnostics import build_brp_health_report
 from simp.compat.event_stream import build_a2a_event, build_a2a_events_list, EVENT_BUFFER
 from simp.compat.a2a_security import (
     build_a2a_security_schemes_block,
@@ -1138,6 +1143,31 @@ class SimpHttpServer:
         def projectx_health():
             try:
                 report = build_projectx_health_report(self.broker)
+                return jsonify(report), 200
+            except Exception:
+                return jsonify({"status": "error", "message": "diagnostic unavailable"}), 200
+
+        @self.app.route("/a2a/agents/brp/agent.json", methods=["GET"])
+        def brp_card():
+            base = request.url_root.rstrip("/")
+            return jsonify(build_brp_a2a_card(base)), 200
+
+        @self.app.route("/a2a/agents/brp/tasks", methods=["POST"])
+        @_require_api_key
+        def brp_task():
+            data = request.get_json(silent=True) or {}
+            ok, msg_or_skill, intent_type = validate_brp_task(data)
+            if not ok:
+                return jsonify({"status": "error", "error": msg_or_skill}), 400
+
+            task_id = data.get("task_id", str(uuid.uuid4()))
+            status = build_a2a_task_status(task_id, "pending", intent_type=intent_type)
+            return jsonify(status), 200
+
+        @self.app.route("/a2a/agents/brp/health", methods=["GET"])
+        def brp_health():
+            try:
+                report = build_brp_health_report(data_dir=str(self.broker.brp_bridge.data_dir))
                 return jsonify(report), 200
             except Exception:
                 return jsonify({"status": "error", "message": "diagnostic unavailable"}), 200

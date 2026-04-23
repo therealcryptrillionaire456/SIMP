@@ -88,6 +88,7 @@ class TestBridgeScoring:
         resp = bridge.evaluate_event(event)
         assert resp.threat_score < 0.2
         assert resp.severity == BRPSeverity.INFO.value
+        assert "quantum_defense_assessment" in resp.metadata
 
     def test_high_value_elevated_threat(self, bridge):
         event = BRPEvent(action="trade_buy", params={"quantity": 200_000})
@@ -369,6 +370,7 @@ class TestOperatorReadHelpers:
         assert status["counts"]["responses"] == 2
         assert status["counts"]["observations"] == 1
         assert status["recent"]["decision_counts"]
+        assert "quantum_defense" in status
         assert evaluations[0]["record_type"] in {"event", "plan"}
         assert any(item["event_id"] == event.event_id for item in evaluations)
         assert isinstance(rules, list)
@@ -575,3 +577,4 @@ class TestOperatorReadHelpers:
         assert report["playbooks"]
         assert "runtime_context" in report
         assert "runtime_cache" in report["runtime_context"]
+        assert "quantum_defense" in report["runtime_context"]

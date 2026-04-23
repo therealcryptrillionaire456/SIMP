@@ -38,6 +38,7 @@ from simp.security.brp.deterministic_recurrent_controller import (
 )
 from simp.security.brp.multimodal_analysis import MultiModalSafetyAnalyzer
 from simp.security.brp.predictive_safety import PredictiveSafetyIntelligence
+from simp.security.brp.quantum_defense import QuantumDefenseAdvisor
 
 logger = logging.getLogger("SIMP.BRP")
 
@@ -105,6 +106,7 @@ class BRPBridge:
 
         self._predictive = PredictiveSafetyIntelligence()
         self._multimodal = MultiModalSafetyAnalyzer()
+        self._quantum = QuantumDefenseAdvisor()
         self._controller = DeterministicRecurrentController()
         self._recent_events = deque(maxlen=256)
         self._recent_observations = deque(maxlen=256)
@@ -146,6 +148,20 @@ class BRPBridge:
         )
         threat_score = min(1.0, threat_score + multimodal["score_boost"])
         threat_tags = self._merge_tags(threat_tags, multimodal["threat_tags"])
+        quantum = self._quantum.assess(
+            {
+                **event.to_dict(),
+                "action": event.action,
+                "params": event.params,
+                "context": event.context,
+                "tags": event.tags,
+            },
+            threat_score=threat_score,
+            threat_tags=threat_tags,
+        )
+        threat_score = min(1.0, threat_score + float(quantum.get("score_boost") or 0.0))
+        if float(quantum.get("score_boost") or 0.0) > 0:
+            threat_tags = self._merge_tags(threat_tags, ["quantum_defense_signal"])
         controller = self._run_controller_for_record(
             surface="event",
             event_id=event.event_id,
@@ -173,6 +189,7 @@ class BRPBridge:
             metadata={
                 "predictive_assessment": predictive,
                 "multimodal_assessment": multimodal,
+                "quantum_defense_assessment": quantum,
                 "controller_assessment": controller,
             },
         )
@@ -239,6 +256,22 @@ class BRPBridge:
             predictive_details.append({"action": action, **predictive})
             multimodal_details.append({"action": action, **multimodal})
 
+        quantum = self._quantum.assess(
+            {
+                "source_agent": plan.source_agent,
+                "event_type": BRPEventType.PLAN_REVIEW.value,
+                "action": "plan_review",
+                "params": {"steps": plan.steps},
+                "context": plan.context,
+                "tags": plan.tags,
+            },
+            threat_score=max_threat,
+            threat_tags=all_tags,
+        )
+        max_threat = min(1.0, max_threat + float(quantum.get("score_boost") or 0.0))
+        if float(quantum.get("score_boost") or 0.0) > 0:
+            all_tags.append("quantum_defense_signal")
+
         controller = self._run_controller_for_record(
             surface="plan",
             event_id=plan.plan_id,
@@ -275,6 +308,7 @@ class BRPBridge:
             metadata={
                 "predictive_steps": predictive_details,
                 "multimodal_steps": multimodal_details,
+                "quantum_defense_assessment": quantum,
                 "controller_assessment": controller,
             },
         )
@@ -395,6 +429,7 @@ class BRPBridge:
                     for tag, count in sorted(tag_counts.items(), key=lambda item: (-item[1], item[0]))[:10]
                 ],
             },
+            "quantum_defense": QuantumDefenseAdvisor().build_posture_summary(),
         }
 
     @classmethod
@@ -1004,6 +1039,7 @@ class BRPBridge:
             ),
             "adaptive_rules": adaptive_rules,
             "runtime_cache": cache.namespace_summary(),
+            "quantum_defense": QuantumDefenseAdvisor().build_posture_summary(),
         }
 
     # ------------------------------------------------------------------
