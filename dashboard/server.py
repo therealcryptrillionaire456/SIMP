@@ -2141,6 +2141,31 @@ async def api_projectx_contract_ingest(request: Request):
     return _redact(data)
 
 
+@app.get("/api/projectx/phases/status")
+async def api_projectx_phase_status():
+    data = await _broker_get("/projectx/phases/status")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "source": "none",
+            "phase_range": "8-20",
+            "phases": {},
+        }
+    return _redact(data)
+
+
+@app.post("/api/projectx/phases/status")
+async def api_projectx_phase_status_ingest(request: Request):
+    payload = await request.json()
+    data = await _broker_post("/projectx/phases/status", payload)
+    if data is None:
+        return {
+            "status": "unreachable",
+            "phase_status": {},
+        }
+    return _redact(data)
+
+
 @app.get("/api/projectx/swarm/mesh")
 async def api_projectx_swarm_mesh():
     data = await _projectx_get("/swarm/mesh")

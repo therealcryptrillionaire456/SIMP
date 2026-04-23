@@ -16,6 +16,8 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional
+from urllib import request as urllib_request
+from urllib import error as urllib_error
 from flask import Flask, request, jsonify
 from threading import Thread
 import time
@@ -83,17 +85,33 @@ from simp.compat.projectx_contracts import (
     contract_summary,
     read_contracts,
 )
+from simp.compat.projectx_phase_status import (
+    append_phase_status,
+    read_latest_phase_status,
+)
 from simp.compat.rollback import ROLLBACK_MANAGER
 from simp.compat.gate_manager import GATE_MANAGER
 from simp.compat.budget_monitor import BUDGET_MONITOR
 
 # Max payload for A2A task submissions (64 KB)
 _A2A_MAX_PAYLOAD = 64 * 1024
+_DEFAULT_PROJECTX_GUARD_URL = os.environ.get("PROJECTX_GUARD_URL", "http://127.0.0.1:8771").rstrip("/")
 
 
 def _utcnow_iso_http() -> str:
     """Return current UTC time as ISO 8601 string."""
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _fetch_projectx_phase_status(timeout: float = 3.0) -> Optional[Dict[str, Any]]:
+    target = f"{_DEFAULT_PROJECTX_GUARD_URL}/phase/status"
+    req = urllib_request.Request(target, headers={"Accept": "application/json"}, method="GET")
+    try:
+        with urllib_request.urlopen(req, timeout=timeout) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+            return payload if isinstance(payload, dict) else None
+    except (urllib_error.URLError, TimeoutError, OSError, json.JSONDecodeError):
+        return None
 
 
 def require_api_key(f):
@@ -636,6 +654,55 @@ class SimpHttpServer:
             """Return ProjectX contract coverage summary."""
             try:
                 return jsonify(contract_summary()), 200
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
+
+        @self.app.route("/projectx/phases/status", methods=["GET"])
+        @require_api_key
+        def get_projectx_phase_status():
+            """Return live ProjectX phase status when reachable, else latest cached snapshot."""
+            try:
+                live = _fetch_projectx_phase_status()
+                if isinstance(live, dict):
+                    record = append_phase_status(live)
+                    record["source"] = "live"
+                    return jsonify(record), 200
+                cached = read_latest_phase_status()
+                if isinstance(cached, dict):
+                    cached = dict(cached)
+                    cached["source"] = "cache"
+                    cached["status"] = str(cached.get("status") or "cached")
+                    return jsonify(cached), 200
+                return jsonify({
+                    "status": "unreachable",
+                    "source": "none",
+                    "phase_range": "8-20",
+                    "phases": {},
+                }), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
+
+        @self.app.route("/projectx/phases/status", methods=["POST"])
+        @require_api_key
+        def post_projectx_phase_status():
+            """Persist a pushed ProjectX phase status snapshot."""
+            data = request.get_json(force=False, silent=True) or {}
+            try:
+                record = append_phase_status(data)
+                self.broker._log_event(
+                    "projectx_phase_status_ingested",
+                    "ProjectX phase status snapshot ingested",
+                    agent_id=str(record.get("source_agent") or "projectx_native"),
+                    extra={
+                        "phase_range": record.get("phase_range"),
+                        "phase_count": len(record.get("phases") or {}),
+                    },
+                )
+                return jsonify({"status": "success", "phase_status": record}), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
             except Exception as exc:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 

@@ -519,6 +519,27 @@ class TestProjectXEndpoints:
         data = response.json()
         assert data["contracts"][0]["contract_type"] == "validation_evidence"
 
+    def test_projectx_phase_status_endpoint(self, client, monkeypatch):
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/phases/status"
+            return {
+                "status": "ok",
+                "source": "live",
+                "phase_range": "8-20",
+                "phases": {
+                    "8_world_model": {"status": "ok"},
+                    "20_constitution": {"status": "ok"},
+                },
+            }
+
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get("/api/projectx/phases/status")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["source"] == "live"
+        assert data["phases"]["20_constitution"]["status"] == "ok"
+
     def test_projectx_contract_ingest_endpoint(self, client, monkeypatch):
         async def fake_broker_post(path: str, payload: dict):
             assert path == "/projectx/contracts"
