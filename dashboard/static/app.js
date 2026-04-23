@@ -100,6 +100,12 @@
     activityFeed:    $("#activity-feed"),
     projectxProcessesTbody: $("#projectx-processes-tbody"),
     projectxActionsFeed: $("#projectx-actions-feed"),
+    valProjectxPhaseSource: $("#val-projectx-phase-source"),
+    valProjectxPhaseCount: $("#val-projectx-phase-count"),
+    valProjectxPhaseOkCount: $("#val-projectx-phase-ok-count"),
+    valProjectxPhaseNonOkCount: $("#val-projectx-phase-non-ok-count"),
+    projectxPhaseSummary: $("#projectx-phase-summary"),
+    projectxPhaseAlertsFeed: $("#projectx-phase-alerts-feed"),
     stackStartCommand: $("#stack-start-command"),
     stackRestartCommand: $("#stack-restart-command"),
     valProjectxProtocolVersion: $("#val-projectx-protocol-version"),
@@ -1269,7 +1275,64 @@
     }
     const tiers = data.action_tiers || {};
     const total = Object.values(tiers).reduce((sum, arr) => sum + arr.length, 0);
-    el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${escapeHtml(total)} actions available</span>`;
+    const phaseCard = data.phase_card || {};
+    const phaseBadge = phaseCard.healthy ? "online" : (phaseCard.phase_count ? "degraded" : "offline");
+    el.innerHTML = `<span class="status-badge online">Active</span> <span class="mono">${escapeHtml(total)} actions available</span> <span class="status-badge ${phaseBadge}">Phases ${escapeHtml(String(phaseCard.ok_count || 0))}/${escapeHtml(String(phaseCard.phase_count || 0))}</span>`;
+  }
+
+  function renderProjectXPhases(summary, alerts) {
+    summary = summary || {};
+    alerts = alerts || {};
+    const source = summary.source || "none";
+    const phaseCount = summary.phase_count ?? 0;
+    const okCount = summary.ok_count ?? 0;
+    const nonOkCount = summary.non_ok_count ?? 0;
+    if (dom.valProjectxPhaseSource) dom.valProjectxPhaseSource.textContent = source;
+    if (dom.valProjectxPhaseCount) dom.valProjectxPhaseCount.textContent = String(phaseCount);
+    if (dom.valProjectxPhaseOkCount) dom.valProjectxPhaseOkCount.textContent = String(okCount);
+    if (dom.valProjectxPhaseNonOkCount) {
+      dom.valProjectxPhaseNonOkCount.textContent = String(nonOkCount);
+      dom.valProjectxPhaseNonOkCount.className = "card-value mono" + (nonOkCount > 0 ? " status-error" : "");
+    }
+
+    if (dom.projectxPhaseSummary) {
+      const nonOkNames = Object.keys(summary.non_ok_phases || {});
+      let html = "";
+      html += '<div class="protocol-summary-row"><span class="card-label">Healthy</span><span>' + escHtml(summary.healthy ? "yes" : "no") + '</span></div>';
+      html += '<div class="protocol-summary-row"><span class="card-label">Source</span><span class="mono">' + escHtml(source) + '</span></div>';
+      html += '<div class="protocol-summary-row"><span class="card-label">Phase Range</span><span class="mono">' + escHtml(summary.phase_range || "8-20") + '</span></div>';
+      html += '<div class="protocol-summary-row"><span class="card-label">Degraded Phases</span><span class="mono">' + escHtml(nonOkNames.join(", ") || "none") + '</span></div>';
+      dom.projectxPhaseSummary.innerHTML = html;
+    }
+
+    if (dom.projectxPhaseAlertsFeed) {
+      const rows = (alerts.alerts || []);
+      if (!rows.length) {
+        dom.projectxPhaseAlertsFeed.innerHTML = '<div class="empty-state">No ProjectX phase alerts.</div>';
+      } else {
+        dom.projectxPhaseAlertsFeed.innerHTML = rows.map(function(alert) {
+          return '<div class="activity-item">'
+            + '<span class="activity-ts">' + formatDate(alert.timestamp) + "</span>"
+            + '<span class="activity-type">' + escHtml(alert.title || "ProjectX phase") + "</span>"
+            + '<span class="activity-status ' + deliveryStatusClass(alert.status || "") + '">' + escHtml(alert.status || "--") + "</span>"
+            + '<span class="activity-result">' + escHtml(alert.detail || "phase attention required") + "</span>"
+            + '</div>';
+        }).join("");
+      }
+    }
+
+    if (dom.valProjectXStatus) {
+      if (!phaseCount) {
+        dom.valProjectXStatus.textContent = "Unknown";
+        dom.valProjectXStatus.className = "card-value status-degraded";
+      } else if (nonOkCount > 0) {
+        dom.valProjectXStatus.textContent = "Degraded";
+        dom.valProjectXStatus.className = "card-value status-degraded";
+      } else {
+        dom.valProjectXStatus.textContent = "Healthy";
+        dom.valProjectXStatus.className = "card-value status-healthy";
+      }
+    }
   }
 
   function renderProjectXSystem(data) {
@@ -2187,7 +2250,7 @@
 
     // Fetch all endpoints in parallel
     var brpQuery = buildBrpEvaluationQuery();
-    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, brpStatus, brpIncidents, brpAlerts, brpPlaybooks, brpRemediations, brpEvaluations, brpRules, brpInsights] = await Promise.all([
+    const [health, stats, agents, activity, failedIntents, capabilities, tasks, routing, smokeData, flowData, memTasks, memConvos, logsData, topologyData, taskQueueData, orchestrationData, computerUseData, projectxSystem, projectxProcesses, projectxActions, projectxProtocolFacts, projectxPhaseSummary, projectxPhaseAlerts, brpStatus, brpIncidents, brpAlerts, brpPlaybooks, brpRemediations, brpEvaluations, brpRules, brpInsights] = await Promise.all([
       apiFetch("/api/health"),
       apiFetch("/api/stats"),
       apiFetch("/api/agents"),
@@ -2209,6 +2272,8 @@
       apiFetch("/api/projectx/processes"),
       apiFetch("/api/projectx/actions"),
       apiFetch("/api/projectx/protocol-facts"),
+      apiFetch("/api/projectx/phases/summary"),
+      apiFetch("/api/projectx/phases/alerts"),
       apiFetch("/api/brp/status"),
       apiFetch("/api/brp/incidents?limit=12"),
       apiFetch("/api/brp/alerts?limit=8"),
@@ -2244,6 +2309,7 @@
     renderProjectXProcesses(projectxProcesses);
     renderProjectXActions(projectxActions);
     renderProjectXProtocolFacts(projectxProtocolFacts);
+    renderProjectXPhases(projectxPhaseSummary, projectxPhaseAlerts);
     renderBrpStatus(brpStatus);
     renderBrpIncidents(brpIncidents);
     renderBrpAlerts(brpAlerts);

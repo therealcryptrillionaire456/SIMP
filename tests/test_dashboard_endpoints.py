@@ -213,6 +213,40 @@ class TestDashboardCoreEndpoints:
         data = response.json()
         assert "dashboard_started_at" in data
         assert "broker" in data or "status" in data
+
+    def test_stats_endpoint_includes_projectx_phase_summary(self, client, monkeypatch):
+        async def fake_broker_snapshot():
+            return {
+                "dashboard": {
+                    "broker": {
+                        "status": "running",
+                        "agent_queues": {},
+                        "agents_online": 3,
+                        "total_intents": 10,
+                        "routed": 9,
+                        "failed": 1,
+                    }
+                }
+            }
+
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/phases/summary"
+            return {
+                "healthy": False,
+                "source": "cache",
+                "phase_count": 13,
+                "ok_count": 12,
+                "non_ok_count": 1,
+            }
+
+        monkeypatch.setattr(ds, "_broker_snapshot", fake_broker_snapshot)
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get("/api/stats")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["projectx_phase"]["source"] == "cache"
+        assert data["projectx_phase"]["non_ok_count"] == 1
     
     def test_agents_endpoint(self, client):
         """Test /api/agents endpoint."""
@@ -563,6 +597,44 @@ class TestProjectXEndpoints:
         assert data["source"] == "cache"
         assert data["non_ok_count"] == 1
         assert data["alerts"][0]["title"] == "ProjectX 18_experimentation"
+
+    def test_projectx_phase_alerts_endpoint(self, client, monkeypatch):
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/phases/summary"
+            return {
+                "status": "ok",
+                "source": "live",
+                "alerts": [{"id": "alert-1", "title": "ProjectX 11_self_repair", "status": "warning"}],
+            }
+
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get("/api/projectx/phases/alerts")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 1
+        assert data["alerts"][0]["title"] == "ProjectX 11_self_repair"
+
+    def test_projectx_phase_non_ok_endpoint(self, client, monkeypatch):
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/phases/summary"
+            return {
+                "status": "ok",
+                "source": "live",
+                "non_ok_count": 2,
+                "non_ok_phases": {
+                    "18_experimentation": {"status": "warning"},
+                    "20_constitution": {"status": "hold"},
+                },
+            }
+
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get("/api/projectx/phases/non-ok")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["non_ok_count"] == 2
+        assert data["non_ok_phases"]["20_constitution"]["status"] == "hold"
 
     def test_activity_includes_projectx_phase_alerts(self, client, monkeypatch):
         async def fake_broker_snapshot():

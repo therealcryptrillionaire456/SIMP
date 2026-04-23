@@ -966,6 +966,24 @@ def _dashboard_stats_payload(dashboard_data: dict | None) -> dict | None:
     }
 
 
+def _projectx_phase_stats_payload(phase_summary: dict | None) -> dict:
+    if not phase_summary or not isinstance(phase_summary, dict):
+        return {
+            "healthy": False,
+            "source": "none",
+            "phase_count": 0,
+            "ok_count": 0,
+            "non_ok_count": 0,
+        }
+    return {
+        "healthy": bool(phase_summary.get("healthy", False)),
+        "source": str(phase_summary.get("source") or "unknown"),
+        "phase_count": int(phase_summary.get("phase_count", 0) or 0),
+        "ok_count": int(phase_summary.get("ok_count", 0) or 0),
+        "non_ok_count": int(phase_summary.get("non_ok_count", 0) or 0),
+    }
+
+
 def _recent_intent_events(dashboard_data: dict | None) -> list[dict]:
     if not dashboard_data:
         return []
@@ -1524,12 +1542,15 @@ async def api_stats():
     """Broker statistics."""
     snapshot = await _broker_snapshot()
     data = _dashboard_stats_payload(snapshot["dashboard"])
+    phase_summary = await _broker_get("/projectx/phases/summary")
     if data is None:
         return {
             "status": "unreachable",
             "broker_url_reachable": False,
             "dashboard_started_at": _started_at,
+            "projectx_phase": _projectx_phase_stats_payload(None),
         }
+    data["projectx_phase"] = _projectx_phase_stats_payload(phase_summary)
     return _redact(data)
 
 
@@ -2216,6 +2237,33 @@ async def api_projectx_phase_summary():
             "alerts": [],
         }
     return _redact(data)
+
+
+@app.get("/api/projectx/phases/alerts")
+async def api_projectx_phase_alerts():
+    data = await _broker_get("/projectx/phases/summary")
+    if data is None:
+        return {"status": "unreachable", "alerts": [], "count": 0}
+    alerts = data.get("alerts") if isinstance(data.get("alerts"), list) else []
+    return _redact({
+        "status": data.get("status", "ok"),
+        "source": data.get("source"),
+        "count": len(alerts),
+        "alerts": alerts,
+    })
+
+
+@app.get("/api/projectx/phases/non-ok")
+async def api_projectx_phase_non_ok():
+    data = await _broker_get("/projectx/phases/summary")
+    if data is None:
+        return {"status": "unreachable", "non_ok_count": 0, "non_ok_phases": {}}
+    return _redact({
+        "status": data.get("status", "ok"),
+        "source": data.get("source"),
+        "non_ok_count": data.get("non_ok_count", 0),
+        "non_ok_phases": data.get("non_ok_phases", {}),
+    })
 
 
 @app.post("/api/projectx/phases/status")
