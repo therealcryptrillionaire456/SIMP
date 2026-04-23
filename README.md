@@ -496,6 +496,7 @@ python3 -m pytest tests/security/brp/ -v
 ```
 
 See [docs/brp/README.md](docs/brp/README.md) for full documentation.
+For the higher-level Bridge framing behind SIMP, see [simp/docs/bridge_manifest.md](simp/docs/bridge_manifest.md).
 
 ## License
 

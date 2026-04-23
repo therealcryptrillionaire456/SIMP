@@ -3,6 +3,8 @@
 This repository contains a complete Bill Russell Protocol (BRP) implementation
 and integration plan for SIMP.
 
+For the broader conceptual framing of the Bridge and SIMP as a recursive messaging layer, see **simp/docs/bridge_manifest.md**.
+
 ## Key Planning Documents:
 - **BRP_GIT_COMMIT_PLAN.md** — High-level 12-phase integration strategy
 - **BRP_COMMIT_SUMMARY_REPORT.md** — File catalog, risk assessment, and readiness report
