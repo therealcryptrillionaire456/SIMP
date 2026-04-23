@@ -396,6 +396,20 @@ else
     fi
 fi
 
+projectx_contract_summary=$(check_endpoint "$BROKER_URL" "/projectx/contracts/summary" "ProjectX contract summary")
+if [ "$projectx_contract_summary" = "UNREACHABLE" ]; then
+    print_status "WARN" "ProjectX contract summary endpoint unreachable"
+    ISSUES+=("ProjectX contract summary endpoint unreachable")
+else
+    if $USE_JQ; then
+        contract_total=$(echo "$projectx_contract_summary" | jq -r '.total_recent // 0' 2>/dev/null || echo "0")
+        contract_missing=$(echo "$projectx_contract_summary" | jq -r '(.missing_contract_types // []) | length' 2>/dev/null || echo "0")
+        print_status "OK" "ProjectX contract store responding ($contract_total recent, $contract_missing missing type(s))"
+    else
+        print_status "OK" "ProjectX contract store responding"
+    fi
+fi
+
 projectx_swarm_topology=$(check_endpoint "$PROJECTX_SWARM_URL" "/swarm/topology" "ProjectX swarm topology")
 if [ "$projectx_swarm_topology" = "UNREACHABLE" ]; then
     print_status "WARN" "ProjectX swarm topology endpoint unreachable"

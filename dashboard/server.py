@@ -2106,6 +2106,41 @@ async def api_projectx_swarm_lifecycle():
     return _redact(data)
 
 
+@app.get("/api/projectx/contracts")
+async def api_projectx_contracts(limit: int = 50, contract_type: str | None = None, mission_id: str | None = None):
+    params = [f"limit={max(1, min(limit, 500))}"]
+    if contract_type:
+        params.append(f"contract_type={contract_type}")
+    if mission_id:
+        params.append(f"mission_id={mission_id}")
+    data = await _broker_get(f"/projectx/contracts?{'&'.join(params)}")
+    if data is None:
+        return {"status": "unreachable", "contracts": [], "count": 0}
+    return _redact(data)
+
+
+@app.get("/api/projectx/contracts/summary")
+async def api_projectx_contract_summary():
+    data = await _broker_get("/projectx/contracts/summary")
+    if data is None:
+        return {
+            "status": "unreachable",
+            "total_recent": 0,
+            "counts": {},
+            "missing_contract_types": [],
+        }
+    return _redact(data)
+
+
+@app.post("/api/projectx/contracts")
+async def api_projectx_contract_ingest(request: Request):
+    payload = await request.json()
+    data = await _broker_post("/projectx/contracts", payload)
+    if data is None:
+        return {"status": "unreachable", "contracts": [], "count": 0}
+    return _redact(data)
+
+
 @app.get("/api/projectx/swarm/mesh")
 async def api_projectx_swarm_mesh():
     data = await _projectx_get("/swarm/mesh")

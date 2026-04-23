@@ -14,6 +14,7 @@ import os
 import threading
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Dict, Any, Optional
 from flask import Flask, request, jsonify
 from threading import Thread
@@ -76,6 +77,12 @@ from simp.compat.approval_queue import (
 from simp.compat.live_ledger import LIVE_LEDGER
 from simp.compat.reconciliation import run_reconciliation
 from simp.compat.projectx_diagnostics import build_projectx_health_report
+from simp.compat.projectx_contracts import (
+    append_contract,
+    append_many_contracts,
+    contract_summary,
+    read_contracts,
+)
 from simp.compat.rollback import ROLLBACK_MANAGER
 from simp.compat.gate_manager import GATE_MANAGER
 from simp.compat.budget_monitor import BUDGET_MONITOR
@@ -572,6 +579,65 @@ class SimpHttpServer:
                     "status": "error",
                     "error": f"Intent '{intent_id}' not found"
                 }), 404
+
+        @self.app.route("/projectx/contracts", methods=["GET"])
+        @require_api_key
+        def get_projectx_contracts():
+            """Return ProjectX contract records ingested by SIMP."""
+            try:
+                limit = max(1, min(int(request.args.get("limit", 50)), 500))
+                contract_type = request.args.get("contract_type") or None
+                mission_id = request.args.get("mission_id") or None
+                records = read_contracts(limit=limit, contract_type=contract_type, mission_id=mission_id)
+                return jsonify({
+                    "status": "success",
+                    "count": len(records),
+                    "contracts": records,
+                }), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
+
+        @self.app.route("/projectx/contracts", methods=["POST"])
+        @require_api_key
+        def post_projectx_contract():
+            """Ingest one or more ProjectX contract records."""
+            data = request.get_json(force=False, silent=True) or {}
+            try:
+                if isinstance(data.get("contracts"), list):
+                    records = append_many_contracts(data["contracts"])
+                else:
+                    records = [append_contract(data)]
+                for record in records[:20]:
+                    self.broker._log_event(
+                        "projectx_contract_ingested",
+                        f"ProjectX contract ingested: {record.get('contract_type')}",
+                        agent_id=str(record.get("source_agent") or "projectx_native"),
+                        extra={
+                            "contract_type": record.get("contract_type"),
+                            "record_id": record.get("record_id"),
+                            "mission_id": record.get("mission_id"),
+                        },
+                    )
+                return jsonify({
+                    "status": "success",
+                    "count": len(records),
+                    "contracts": records,
+                }), 200
+            except ValueError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 400
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
+
+        @self.app.route("/projectx/contracts/summary", methods=["GET"])
+        @require_api_key
+        def get_projectx_contract_summary():
+            """Return ProjectX contract coverage summary."""
+            try:
+                return jsonify(contract_summary()), 200
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/intents/<intent_id>/response", methods=["POST"])
         @require_api_key

@@ -484,6 +484,61 @@ class TestProjectXEndpoints:
         assert data["summary"]["active_mission_count"] == 1
         assert data["operator_actions"][0]["id"] == "bootstrap_native_kernel"
 
+    def test_projectx_contract_summary_endpoint(self, client, monkeypatch):
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/contracts/summary"
+            return {
+                "status": "ok",
+                "total_recent": 2,
+                "counts": {"mission_lifecycle_event": 1, "validation_evidence": 1},
+            }
+
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get("/api/projectx/contracts/summary")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_recent"] == 2
+        assert data["counts"]["mission_lifecycle_event"] == 1
+
+    def test_projectx_contracts_endpoint_filters(self, client, monkeypatch):
+        async def fake_broker_get(path: str):
+            assert path == "/projectx/contracts?limit=25&contract_type=validation_evidence&mission_id=mission-1"
+            return {
+                "status": "success",
+                "count": 1,
+                "contracts": [{"contract_type": "validation_evidence", "mission_id": "mission-1"}],
+            }
+
+        monkeypatch.setattr(ds, "_broker_get", fake_broker_get)
+
+        response = client.get(
+            "/api/projectx/contracts?limit=25&contract_type=validation_evidence&mission_id=mission-1"
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["contracts"][0]["contract_type"] == "validation_evidence"
+
+    def test_projectx_contract_ingest_endpoint(self, client, monkeypatch):
+        async def fake_broker_post(path: str, payload: dict):
+            assert path == "/projectx/contracts"
+            assert payload["contract_type"] == "mission_lifecycle_event"
+            return {
+                "status": "success",
+                "count": 1,
+                "contracts": [{"record_id": "pxc-1"}],
+            }
+
+        monkeypatch.setattr(ds, "_broker_post", fake_broker_post)
+
+        response = client.post(
+            "/api/projectx/contracts",
+            json={"contract_type": "mission_lifecycle_event", "mission_id": "mission-1"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["contracts"][0]["record_id"] == "pxc-1"
+
     def test_projectx_swarm_mesh_endpoint(self, client, monkeypatch):
         async def fake_projectx_get(path: str):
             assert path == "/swarm/mesh"
