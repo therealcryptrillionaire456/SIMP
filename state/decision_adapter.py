@@ -12,10 +12,16 @@ A3 owns the decision_id namespace; this uses "legacy:<signal_id>" as the tag.
 Usage:
     # Watch the trade log and mirror to decision journal
     python3 state/decision_adapter.py
-
     # One-shot backfill of existing trades
     python3 state/decision_adapter.py --backfill
 """
+
+SCHEMA_REQUIRED_FIELDS = [
+    "decision_id", "created_at", "source_signal_ids", "thesis",
+    "confidence", "risk_budget_usd", "venue", "instrument",
+    "side", "size", "expected_edge", "policy_result",
+    "mode", "fill_status", "executed_at", "lineage",
+]
 
 import json
 import os
