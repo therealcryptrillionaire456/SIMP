@@ -98,3 +98,5 @@ var/
 venv/
 venv_gate4/
 wheels/
+# Kalshi/operator keys (never commit)
+~/.simp/

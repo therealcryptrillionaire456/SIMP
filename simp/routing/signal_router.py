@@ -362,9 +362,21 @@ class KalshiLiveOrgan:
     def __init__(self, dry_run: bool = False):
         self.dry_run    = dry_run
         self._key_id    = _env_or_file("KALSHI_API_KEY_ID")
-        self._priv_key  = _env_or_file(
+        raw_key         = _env_or_file(
             "KALSHI_PRIVATE_KEY", "KALSHI_PRODUCTION_PRIVATE_KEY"
         )
+        # Support file-path keys (path to PEM file) vs inline PEM
+        if raw_key and not raw_key.startswith("-----"):
+            key_path = os.path.expanduser(raw_key)
+            if os.path.isfile(key_path):
+                with open(key_path) as _kf:
+                    self._priv_key = _kf.read().strip()
+                log.info("KalshiLiveOrgan: loaded key from %s", key_path)
+            else:
+                self._priv_key = raw_key
+                log.warning("KalshiLiveOrgan: key path %s not found", key_path)
+        else:
+            self._priv_key = raw_key
         self._available = bool(self._key_id and self._priv_key)
         if self._available:
             log.info("KalshiLiveOrgan: ready (dry_run=%s)", self.dry_run)
