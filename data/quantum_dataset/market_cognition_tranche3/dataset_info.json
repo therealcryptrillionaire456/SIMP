@@ -1,0 +1,44 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "prompt": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "chosen": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "rejected": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "regime_type": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "volatility_score": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "trend_direction": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "liquidity_state": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "timestamp": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "symbol": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}

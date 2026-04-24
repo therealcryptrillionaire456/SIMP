@@ -1,1281 +1,425 @@
-INFO:SIMP.AgentRegistry:Loaded 2 agents from /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/agent_registry.jsonl
-/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/gate4_http_agent.py:43: DeprecationWarning: 
-        on_event is deprecated, use lifespan event handlers instead.
-
-        Read more about it in the
-        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-        
-  @app.on_event("startup")
-INFO:__main__:Starting Gate 4 HTTP Agent on port 8772
-INFO:     Started server process [76021]
-INFO:     Waiting for application startup.
-INFO:__main__:Initializing Gate 4 HTTP agent...
-INFO:__main__:Gate 4 HTTP agent initialized
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://127.0.0.1:8772 (Press CTRL+C to quit)
-INFO:__main__:Auto-registered gate4_http with broker at port 8772
-INFO:__main__:Auto-registered gate4_live with broker at port 8772
-INFO:     127.0.0.1:52040 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52041 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52082 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52083 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52156 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52157 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52196 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52197 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52262 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52263 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52306 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52307 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52376 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52377 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52422 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52423 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52486 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52487 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52519 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52520 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52578 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52579 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52617 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52618 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52685 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52686 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52728 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52729 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52795 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52796 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52837 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52838 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52909 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52910 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52949 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52950 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53016 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53017 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53061 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53062 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53149 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53150 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53212 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53213 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53280 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53281 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53321 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53322 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53388 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53389 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53428 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53429 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53494 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53495 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53535 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53536 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53605 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53606 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53654 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53655 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53726 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53727 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53768 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53769 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53838 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53839 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53884 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53885 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53952 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53953 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53991 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53992 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54063 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54064 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54103 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54104 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54174 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54175 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54236 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54237 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54319 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54320 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54374 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54375 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54442 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54443 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54484 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54485 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54558 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54559 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54599 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54600 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54669 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54670 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54712 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54713 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54779 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54780 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54827 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54828 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54904 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54905 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54967 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54968 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55014 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55015 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55079 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55080 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55123 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55124 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55188 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55189 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55229 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55230 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55297 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55298 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55337 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55338 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55411 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55412 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55462 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55463 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55532 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55533 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55581 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55582 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55656 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55657 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55699 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55700 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55767 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55768 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55808 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55809 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55875 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55876 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55914 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55915 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55985 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55986 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56033 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56034 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56100 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56101 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56153 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56154 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56225 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56226 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56269 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56270 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56334 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56335 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56376 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56377 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56441 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56442 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56486 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56487 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56557 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56558 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56605 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56606 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56672 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56673 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56714 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56715 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56783 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56784 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56829 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56830 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56894 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56895 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56938 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56939 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57004 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57005 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57049 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57050 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57125 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57126 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57173 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57174 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57241 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57242 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57283 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57284 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57351 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57352 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57396 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57397 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57462 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57463 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57504 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57505 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57573 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57574 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57618 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57619 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57690 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57691 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57741 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57742 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57807 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57808 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57852 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57853 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57923 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57924 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57966 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57967 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58033 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58034 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58076 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58077 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58147 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58148 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58188 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58189 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58275 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58276 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58330 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58331 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59173 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59174 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62466 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62467 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62534 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62535 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62575 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62576 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62649 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62650 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50343 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50344 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54462 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54463 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58549 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58550 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58622 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58623 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58668 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58669 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62771 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62772 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50470 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50471 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50536 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50537 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54626 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54627 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58740 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58741 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58783 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58784 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62885 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62886 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50584 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50585 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50655 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50656 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50712 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50713 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54827 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54828 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54868 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54869 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54937 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54938 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54988 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54989 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63178 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63179 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63220 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63221 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63287 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63288 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63328 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63329 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63400 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63401 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63448 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63449 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63519 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63520 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63562 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63563 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63630 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63631 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63676 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63677 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63747 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63748 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63794 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63795 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63868 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63869 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63911 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63912 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64003 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64004 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64213 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64214 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64425 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64426 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64860 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64861 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64939 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64940 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65043 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65044 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65116 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65117 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65234 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65235 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65357 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65358 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65513 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65514 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49256 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49257 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49392 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49393 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49451 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49452 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49567 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49568 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49637 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49638 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49797 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49798 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49861 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49862 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49994 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49995 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50054 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50055 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50169 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50170 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50243 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50244 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50366 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50367 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50424 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50425 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50556 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50557 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50635 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50636 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50755 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50756 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50818 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50819 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50930 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50931 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51003 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51004 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51119 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51120 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51190 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51191 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51298 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51299 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51365 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51366 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51486 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51487 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51550 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51551 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51677 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51678 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51820 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51821 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51955 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51956 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52052 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52053 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52163 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52164 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52236 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52237 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52339 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52340 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52402 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52403 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52503 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52504 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52559 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52560 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52662 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52663 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52720 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52721 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52823 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52824 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52882 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52883 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52979 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52980 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53043 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53044 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53151 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53152 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53209 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53210 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53314 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53315 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53373 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53374 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53475 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53476 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53528 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53529 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53628 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53629 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53688 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53689 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53788 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53789 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53865 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53866 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53975 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53976 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54033 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54034 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54125 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54126 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54185 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54186 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58320 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58321 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58379 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58380 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58485 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58486 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58545 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58546 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58646 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58647 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58710 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58711 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58815 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58816 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58877 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58878 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58984 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58985 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59042 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59043 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59147 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59148 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59208 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59209 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59308 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59309 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59372 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59373 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59466 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59467 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59558 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59559 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59664 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59665 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59727 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59728 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59835 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59836 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59891 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59892 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59997 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59998 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60067 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60068 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60180 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60181 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60236 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60237 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60340 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60341 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60407 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60408 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60491 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60492 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60553 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60554 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64663 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64664 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64723 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64724 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64823 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64824 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64885 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64886 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64972 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64973 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65032 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65033 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65115 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65116 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65182 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65183 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65260 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65261 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65328 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65329 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65406 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65407 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65470 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65471 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49168 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49169 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49228 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49229 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49302 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49303 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49361 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49362 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49445 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49446 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49518 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49519 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49604 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49605 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49662 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49663 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49744 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49745 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49799 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49800 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49877 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49878 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49932 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49933 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50018 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50019 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50079 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50080 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50158 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50159 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50232 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50233 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50306 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50307 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50364 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50365 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50441 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50442 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50505 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50506 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50593 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50594 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50647 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50648 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50728 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50729 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50792 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50793 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50886 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50887 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51005 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51006 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51101 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51102 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51159 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51160 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51243 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51244 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51308 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51309 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51394 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51395 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51447 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51448 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51527 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51528 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51591 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51592 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51675 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51676 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51745 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51746 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51830 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51831 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51886 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51887 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51980 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51981 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52097 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52098 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52282 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52283 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52448 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52449 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52644 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52645 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52815 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52816 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53013 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53014 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53179 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53180 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53367 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53368 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53539 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53540 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53764 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53765 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53933 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:53934 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54122 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54123 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54293 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54294 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54483 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54484 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54663 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54664 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54791 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54792 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54858 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54859 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54940 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54941 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54999 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55000 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55081 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55082 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55142 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55143 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55223 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55224 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55283 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55284 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55367 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55368 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55419 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55420 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55507 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55508 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55570 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55571 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55650 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55651 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55713 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55714 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55792 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55793 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55847 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55848 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55930 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55931 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55992 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55993 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56075 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56076 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56140 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56141 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56232 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56233 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56303 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56304 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56396 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56397 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56453 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56454 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56536 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56537 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56594 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56595 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56680 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56681 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56737 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56738 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56817 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56818 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56882 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56883 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56982 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56983 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57049 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57050 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57132 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57133 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57205 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57206 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57291 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57292 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57350 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57351 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57432 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57433 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57492 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57493 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57576 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57577 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57631 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57632 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57715 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57716 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57798 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57799 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57888 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57889 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57947 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57948 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58023 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58024 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58082 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58083 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58159 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58160 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58215 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58216 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58327 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58328 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58379 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58380 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58464 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58465 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58517 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58518 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58604 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58605 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58658 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58659 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58735 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58736 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58796 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58797 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58880 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58881 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58947 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58948 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59034 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59035 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59110 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59111 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59190 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59191 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59256 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59257 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59338 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59339 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59392 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59393 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59470 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59471 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59530 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59531 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59606 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59607 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59663 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59664 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59744 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59745 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59801 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59802 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59888 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59889 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59946 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59947 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60018 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60019 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60075 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60076 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60149 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60150 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60210 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60211 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60285 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60286 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60348 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60349 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60424 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60425 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60492 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60493 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60567 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60568 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60638 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60639 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60711 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60712 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60771 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60772 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60843 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60844 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60907 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60908 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60981 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60982 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61046 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61047 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61119 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61120 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61181 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61182 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61266 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61267 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61358 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61359 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61435 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61436 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61498 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61499 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61574 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61575 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61631 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61632 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61710 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61711 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61763 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61764 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61851 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61852 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61927 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61928 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62020 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62021 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62093 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62094 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62168 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62169 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62227 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62228 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62310 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62311 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62362 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62363 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62437 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62438 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62499 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62500 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62576 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62577 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62641 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62642 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62730 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62731 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62792 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62793 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62877 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62878 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62930 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62931 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50661 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50662 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50718 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50719 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50798 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50799 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50854 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50855 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50926 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50927 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50981 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50982 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51057 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51058 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51120 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51121 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51192 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51193 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51258 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51259 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51337 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51338 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51394 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51395 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51471 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51472 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51528 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51529 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51619 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51620 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51690 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51691 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51764 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51765 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55852 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55853 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55926 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55927 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55987 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:55988 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56059 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56060 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56114 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56115 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56190 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56191 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56251 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56252 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56326 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56327 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56386 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56387 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56466 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56467 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56526 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56527 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56601 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56602 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56659 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56660 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56729 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56730 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56791 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56792 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56867 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56868 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56918 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56919 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:56999 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57000 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57048 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57049 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57126 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57127 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57182 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57183 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57256 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57257 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57312 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57313 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57391 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57392 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57448 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57449 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57524 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57525 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57579 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57580 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57650 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57651 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57707 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57708 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57785 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57786 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57854 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57855 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57945 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57946 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57989 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:57990 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58026 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58027 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58145 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58146 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58221 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58222 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58268 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58269 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58336 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58337 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58385 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58386 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58460 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58461 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58505 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58506 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58575 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58576 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58621 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58622 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58710 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58711 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58757 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58758 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58828 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58829 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58875 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58876 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58942 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58943 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58986 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:58987 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59054 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59055 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59101 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59102 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59168 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59169 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59216 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59217 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59292 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59293 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59338 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59339 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59405 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59406 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59449 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59450 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59517 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59518 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59561 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59562 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59634 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59635 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59672 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59673 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59737 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59738 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59789 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59790 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59871 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59872 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59926 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59927 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60001 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60002 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60055 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60056 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60116 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60117 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60158 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60159 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60221 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60222 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60260 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60261 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60323 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60324 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60381 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60382 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60449 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60450 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60490 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60491 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60551 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60552 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60590 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60591 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60651 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60652 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60695 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60696 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60756 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60757 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60796 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60797 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60856 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60857 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60901 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:60902 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61018 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61019 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61076 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61077 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61136 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61137 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61174 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61175 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61235 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61236 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61276 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61277 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61338 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61339 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61378 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61379 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61447 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61448 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61490 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61491 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61555 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61556 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61596 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61597 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61658 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61659 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61699 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61700 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61761 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61762 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61799 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61800 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61864 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61865 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61903 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61904 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61964 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:61965 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62008 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62009 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62078 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62079 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62122 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62123 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62184 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62185 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62230 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62231 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62301 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62302 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62355 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62356 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62417 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62418 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62459 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62460 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62534 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62535 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62586 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62587 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62652 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62653 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62698 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62699 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62759 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62760 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62798 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62799 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62860 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62861 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62900 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62901 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62960 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62961 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62999 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63000 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63061 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63062 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63106 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63107 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63172 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63173 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63213 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63214 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63275 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63276 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63343 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63344 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63432 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63433 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63518 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63519 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63582 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63583 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63620 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63621 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63685 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63686 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63732 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63733 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63799 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63800 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63840 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63841 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63903 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63904 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63944 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63945 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64005 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64006 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64043 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64044 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64105 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64106 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64146 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64147 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64207 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64208 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64249 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64250 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64326 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64327 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64370 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64371 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64432 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64433 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64472 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64473 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64533 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64534 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64571 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64572 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64632 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64633 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64673 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64674 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64753 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64754 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64801 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64802 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64864 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64865 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64905 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64906 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64965 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64966 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65005 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65006 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65061 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65062 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65100 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65101 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65156 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65157 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65195 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65196 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65250 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65251 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65293 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65294 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65396 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65397 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65438 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65439 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65499 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65500 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49154 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49155 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49210 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49211 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49249 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49250 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49304 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49305 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49348 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49349 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49406 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49407 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49451 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49452 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49516 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49517 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49559 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49560 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49616 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49617 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49655 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49656 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49713 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49714 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49751 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49752 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49810 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49811 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49849 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49850 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49906 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49907 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49951 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49952 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50017 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50018 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50061 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50062 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50118 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50119 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50156 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50157 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50215 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50216 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50254 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50255 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50313 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50314 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50353 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50354 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50411 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50412 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50481 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50482 - "GET /health HTTP/1.1" 200 OK
+2026-04-24 12:31:57,920 [gate4] INFO === gate4 inbox consumer starting (LIVE) ===
+2026-04-24 12:31:57,920 [gate4] INFO inbox:       /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/inboxes/gate4_real
+2026-04-24 12:31:57,920 [gate4] INFO processed:   /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/inboxes/gate4_real/_processed
+2026-04-24 12:31:57,920 [gate4] INFO failed:      /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/inboxes/gate4_real/_failed
+2026-04-24 12:31:57,920 [gate4] INFO trade log:   /Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/logs/gate4_trades.jsonl
+2026-04-24 12:31:57,920 [gate4] INFO symbols:     ['BTC-USD', 'ETH-USD', 'SOL-USD']
+2026-04-24 12:31:57,920 [gate4] INFO notional:    $1.00 - $10.00
+2026-04-24 12:31:57,920 [gate4] INFO breakers:    30/hr, 100/day, 4 consec losses -> 15m cooldown
+2026-04-24 12:32:07,979 [gate4] INFO processing quantum_signal_1777048323_b0a64fe7f21e.json
+2026-04-24 12:32:07,980 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:32:08,868 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:32:08,893 [gate4] INFO processing quantum_signal_1777048326_43e6b3f6f070.json
+2026-04-24 12:32:08,893 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:32:09,245 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:32:09,261 [gate4] INFO processed 2 signal(s) this pass
+2026-04-24 12:32:14,282 [gate4] INFO processing quantum_signal_1777048329_eaf26112defc.json
+2026-04-24 12:32:14,283 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:32:14,610 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:32:14,624 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:34:10,103 [gate4] INFO processing quantum_signal_1777048445_d66559f452ab.json
+2026-04-24 12:34:10,106 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:34:10,447 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:34:10,473 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:36:21,110 [gate4] INFO processing quantum_signal_1777048580_f946f075af9a.json
+2026-04-24 12:36:21,112 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:36:21,427 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:36:21,444 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:38:37,099 [gate4] INFO processing quantum_signal_1777048716_0c2dcac3d93f.json
+2026-04-24 12:38:37,100 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:38:37,389 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:38:37,417 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:40:53,071 [gate4] INFO processing quantum_signal_1777048851_6d510e280799.json
+2026-04-24 12:40:53,073 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:40:53,385 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:40:53,442 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:43:09,033 [gate4] INFO processing quantum_signal_1777048986_40d1a4e72014.json
+2026-04-24 12:43:09,035 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:43:09,378 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:43:09,399 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:45:25,045 [gate4] INFO processing quantum_signal_1777049121_65bdee812f3d.json
+2026-04-24 12:45:25,050 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:45:25,367 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:45:25,404 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:47:40,983 [gate4] INFO processing quantum_signal_1777049256_67d0428d2c41.json
+2026-04-24 12:47:40,984 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:47:41,275 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:47:41,289 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:49:51,852 [gate4] INFO processing quantum_signal_1777049391_7b0ac80add7b.json
+2026-04-24 12:49:51,853 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:49:52,147 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:49:52,162 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:52:07,791 [gate4] INFO processing quantum_signal_1777049526_7bf52ec0b199.json
+2026-04-24 12:52:07,792 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:52:08,067 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:52:08,094 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:54:23,807 [gate4] INFO processing quantum_signal_1777049661_35397b9c15a1.json
+2026-04-24 12:54:23,809 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:54:24,126 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:54:24,144 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:56:39,759 [gate4] INFO processing quantum_signal_1777049796_74a45ad4b53c.json
+2026-04-24 12:56:39,760 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:56:40,075 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:56:40,100 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 12:58:55,724 [gate4] INFO processing quantum_signal_1777049931_10079e750c01.json
+2026-04-24 12:58:55,726 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 12:58:56,025 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 12:58:56,038 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:01:11,635 [gate4] INFO processing quantum_signal_1777050066_af61fec80967.json
+2026-04-24 13:01:11,635 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:01:11,949 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:01:11,965 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:03:22,499 [gate4] INFO processing quantum_signal_1777050201_69b0d6e9af40.json
+2026-04-24 13:03:22,500 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:03:22,798 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:03:22,814 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:05:38,418 [gate4] INFO processing quantum_signal_1777050336_072e34eb56d5.json
+2026-04-24 13:05:38,420 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:05:38,775 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:05:38,809 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:07:54,380 [gate4] INFO processing quantum_signal_1777050471_dba2527b77d4.json
+2026-04-24 13:07:54,381 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:07:54,677 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:07:54,685 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:10:10,264 [gate4] INFO processing quantum_signal_1777050607_6ca2ddb95459.json
+2026-04-24 13:10:10,265 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:10:10,570 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:10:10,588 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:12:26,126 [gate4] INFO processing quantum_signal_1777050742_74d99c6bb4f7.json
+2026-04-24 13:12:26,127 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:12:26,447 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:12:26,461 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:14:42,053 [gate4] INFO processing quantum_signal_1777050877_5488e32e9222.json
+2026-04-24 13:14:42,068 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:14:42,348 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:14:42,364 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:16:52,916 [gate4] INFO processing quantum_signal_1777051012_19ed7323118c.json
+2026-04-24 13:16:52,917 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:16:53,407 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:16:53,424 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:19:08,999 [gate4] INFO processing quantum_signal_1777051147_4de1e42f5794.json
+2026-04-24 13:19:09,000 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:19:09,323 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:19:09,337 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:21:24,945 [gate4] INFO processing quantum_signal_1777051282_7e5840df8744.json
+2026-04-24 13:21:24,946 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:21:25,493 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:21:25,508 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:23:41,102 [gate4] INFO processing quantum_signal_1777051417_1b1c0d9d38ea.json
+2026-04-24 13:23:41,103 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:23:41,487 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:23:41,503 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:25:57,110 [gate4] INFO processing quantum_signal_1777051552_b31db1ff1b6d.json
+2026-04-24 13:25:57,111 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:25:57,462 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:25:57,479 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:28:08,027 [gate4] INFO processing quantum_signal_1777051687_ead1fec84200.json
+2026-04-24 13:28:08,029 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:28:08,371 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:28:08,391 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:30:23,976 [gate4] INFO processing quantum_signal_1777051822_45bbcb4acfad.json
+2026-04-24 13:30:23,977 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:30:24,283 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:30:24,300 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:32:39,823 [gate4] INFO processing quantum_signal_1777051957_c99cd14e9660.json
+2026-04-24 13:32:39,825 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:32:40,136 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:32:40,152 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:34:55,697 [gate4] INFO processing quantum_signal_1777052092_ea91676b79b0.json
+2026-04-24 13:34:55,698 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:34:56,008 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:34:56,020 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:37:11,589 [gate4] INFO processing quantum_signal_1777052227_93d5c93b04bd.json
+2026-04-24 13:37:11,590 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:37:11,909 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:37:11,977 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:39:27,607 [gate4] INFO processing quantum_signal_1777052363_cd0236ca065a.json
+2026-04-24 13:39:27,608 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:39:27,967 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:39:27,980 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:41:38,598 [gate4] INFO processing quantum_signal_1777052498_c3923f649a8f.json
+2026-04-24 13:41:38,599 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:41:38,913 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:41:38,926 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:43:54,568 [gate4] INFO processing quantum_signal_1777052633_4ef1bab8bc8c.json
+2026-04-24 13:43:54,569 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:43:54,885 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:43:54,908 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:46:10,487 [gate4] INFO processing quantum_signal_1777052768_e0ec44ea508d.json
+2026-04-24 13:46:10,487 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:46:10,767 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:46:10,783 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:48:26,376 [gate4] INFO processing quantum_signal_1777052903_42576137c27d.json
+2026-04-24 13:48:26,385 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:48:26,657 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:48:26,664 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:50:42,290 [gate4] INFO processing quantum_signal_1777053038_ec84c2700283.json
+2026-04-24 13:50:42,291 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:50:42,632 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:50:42,646 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:52:58,262 [gate4] INFO processing quantum_signal_1777053173_d6071671d382.json
+2026-04-24 13:52:58,263 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:52:58,551 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:52:58,567 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:55:09,160 [gate4] INFO processing quantum_signal_1777053308_6a91d6ea58da.json
+2026-04-24 13:55:09,163 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:55:09,471 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:55:09,493 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:57:25,086 [gate4] INFO processing quantum_signal_1777053443_728b71bc42ef.json
+2026-04-24 13:57:25,087 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:57:25,420 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:57:25,450 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 13:59:41,153 [gate4] INFO processing quantum_signal_1777053578_20a1cb8b5933.json
+2026-04-24 13:59:41,153 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 13:59:41,437 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 13:59:41,459 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:01:57,075 [gate4] INFO processing quantum_signal_1777053713_46d52d982983.json
+2026-04-24 14:01:57,076 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:01:57,544 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:01:57,569 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:04:13,147 [gate4] INFO processing quantum_signal_1777053849_b4539caa1851.json
+2026-04-24 14:04:13,148 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:04:13,452 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:04:13,494 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:06:29,100 [gate4] INFO processing quantum_signal_1777053984_650eb7e16d36.json
+2026-04-24 14:06:29,100 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:06:29,405 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:06:29,426 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:08:40,021 [gate4] INFO processing quantum_signal_1777054119_579d67d3e22e.json
+2026-04-24 14:08:40,021 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:08:40,347 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:08:40,355 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:10:55,963 [gate4] INFO processing quantum_signal_1777054254_c4a8b28fd8f6.json
+2026-04-24 14:10:55,964 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:10:56,259 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:10:56,273 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:13:11,910 [gate4] INFO processing quantum_signal_1777054389_a7e992a53ab0.json
+2026-04-24 14:13:12,015 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:13:12,422 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:13:12,520 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:15:28,086 [gate4] INFO processing quantum_signal_1777054524_cd17c4118e0b.json
+2026-04-24 14:15:28,088 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:15:28,412 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:15:28,448 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:17:44,010 [gate4] INFO processing quantum_signal_1777054659_199bcd93da64.json
+2026-04-24 14:17:44,010 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:17:44,289 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:17:44,311 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:19:54,872 [gate4] INFO processing quantum_signal_1777054794_69d18b6909b0.json
+2026-04-24 14:19:54,873 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:19:55,155 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:19:55,169 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:22:10,729 [gate4] INFO processing quantum_signal_1777054929_0eb2cfdd090b.json
+2026-04-24 14:22:10,731 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:22:11,066 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:22:11,082 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:24:26,629 [gate4] INFO processing quantum_signal_1777055064_6f8880821193.json
+2026-04-24 14:24:26,630 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:24:26,976 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:24:26,995 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:26:42,589 [gate4] INFO processing quantum_signal_1777055199_7e97eda6142f.json
+2026-04-24 14:26:42,590 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:26:42,903 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:26:42,924 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:28:58,499 [gate4] INFO processing quantum_signal_1777055334_241110f01ff6.json
+2026-04-24 14:28:58,500 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:28:58,791 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:28:58,810 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:31:14,404 [gate4] INFO processing quantum_signal_1777055470_5992c3626640.json
+2026-04-24 14:31:14,405 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:31:14,694 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:31:14,708 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:33:25,251 [gate4] INFO processing quantum_signal_1777055605_bc6e3a879aa3.json
+2026-04-24 14:33:25,261 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:33:25,582 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:33:25,601 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:35:41,188 [gate4] INFO processing quantum_signal_1777055740_4e18c81b3d0e.json
+2026-04-24 14:35:41,190 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:35:41,511 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:35:41,530 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:37:57,103 [gate4] INFO processing quantum_signal_1777055875_33370a492b23.json
+2026-04-24 14:37:57,104 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:37:57,382 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:37:57,398 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:40:12,962 [gate4] INFO processing quantum_signal_1777056010_cd9b37804261.json
+2026-04-24 14:40:12,964 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:40:13,254 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:40:13,272 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:42:28,841 [gate4] INFO processing quantum_signal_1777056145_dcfbc97f9c3d.json
+2026-04-24 14:42:28,842 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:42:29,140 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:42:29,152 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:44:44,778 [gate4] INFO processing quantum_signal_1777056280_10f38a9d7d4e.json
+2026-04-24 14:44:44,780 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:44:45,098 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:44:45,116 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:46:55,682 [gate4] INFO processing quantum_signal_1777056415_04f6680aa228.json
+2026-04-24 14:46:55,683 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:46:56,021 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:46:56,031 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:49:11,622 [gate4] INFO processing quantum_signal_1777056550_fb5f806b255a.json
+2026-04-24 14:49:11,623 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:49:11,938 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:49:12,516 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:51:28,074 [gate4] INFO processing quantum_signal_1777056685_fc30e2884acb.json
+2026-04-24 14:51:28,076 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:51:28,397 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:51:28,416 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:53:43,959 [gate4] INFO processing quantum_signal_1777056820_e8f7721e5ecd.json
+2026-04-24 14:53:43,962 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:53:44,295 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:53:44,338 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:55:59,852 [gate4] INFO processing quantum_signal_1777056955_909001124474.json
+2026-04-24 14:55:59,853 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:56:00,157 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:56:00,173 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 14:58:15,782 [gate4] INFO processing quantum_signal_1777057090_4aaea7d5925d.json
+2026-04-24 14:58:15,789 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 14:58:16,213 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 14:58:16,254 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:00:26,812 [gate4] INFO processing quantum_signal_1777057225_ac0a1a119915.json
+2026-04-24 15:00:26,819 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:00:27,283 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:00:27,319 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:02:42,887 [gate4] INFO processing quantum_signal_1777057361_b57afcaa4ac1.json
+2026-04-24 15:02:42,888 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:02:43,567 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:02:43,582 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:04:59,133 [gate4] INFO processing quantum_signal_1777057496_3647fbb2c5fe.json
+2026-04-24 15:04:59,134 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:04:59,858 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:04:59,871 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:07:15,449 [gate4] INFO processing quantum_signal_1777057631_75e8f9f72633.json
+2026-04-24 15:07:15,450 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:07:16,011 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:07:16,027 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:09:26,631 [gate4] INFO processing quantum_signal_1777057766_ceba0d9622f7.json
+2026-04-24 15:09:26,632 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:09:27,005 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:09:27,300 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:11:42,897 [gate4] INFO processing quantum_signal_1777057901_9acfda669ae6.json
+2026-04-24 15:11:42,900 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:11:43,669 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:11:43,688 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:13:59,212 [gate4] INFO processing quantum_signal_1777058036_311f9c9e3621.json
+2026-04-24 15:13:59,213 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:13:59,910 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:13:59,928 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:16:15,467 [gate4] INFO processing quantum_signal_1777058171_771b11347892.json
+2026-04-24 15:16:15,468 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:16:16,095 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:16:16,104 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:18:26,627 [gate4] INFO processing quantum_signal_1777058306_a036bbd4196a.json
+2026-04-24 15:18:26,628 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:18:27,495 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:18:27,516 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:20:43,128 [gate4] INFO processing quantum_signal_1777058441_9c3014411d34.json
+2026-04-24 15:20:43,149 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:20:43,707 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:20:43,736 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:22:59,373 [gate4] INFO processing quantum_signal_1777058576_89b870ad119f.json
+2026-04-24 15:22:59,374 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:23:00,090 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:23:00,133 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:25:15,701 [gate4] INFO processing quantum_signal_1777058711_fd45a46bbe46.json
+2026-04-24 15:25:15,703 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:25:16,199 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:25:16,218 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:27:31,808 [gate4] INFO processing quantum_signal_1777058846_496b3bca85bc.json
+2026-04-24 15:27:31,809 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:27:32,295 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:27:32,308 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:29:42,881 [gate4] INFO processing quantum_signal_1777058981_daa774f7bc37.json
+2026-04-24 15:29:42,882 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:29:43,599 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:29:43,617 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:31:59,218 [gate4] INFO processing quantum_signal_1777059117_1984610b8958.json
+2026-04-24 15:31:59,219 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:31:59,794 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:31:59,810 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:34:15,365 [gate4] INFO processing quantum_signal_1777059252_cc23b4db872a.json
+2026-04-24 15:34:15,368 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:34:15,893 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:34:15,917 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:36:31,432 [gate4] INFO processing quantum_signal_1777059387_0a8e0727ff52.json
+2026-04-24 15:36:31,434 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:36:32,140 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:36:32,160 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:38:42,715 [gate4] INFO processing quantum_signal_1777059522_c2f90c02332a.json
+2026-04-24 15:38:42,717 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:38:43,036 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:38:43,056 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:40:58,622 [gate4] INFO processing quantum_signal_1777059657_5686f6c99e4d.json
+2026-04-24 15:40:58,623 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:40:58,983 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:40:59,005 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:43:14,695 [gate4] INFO processing quantum_signal_1777059792_921fb611912c.json
+2026-04-24 15:43:14,696 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:43:15,071 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:43:15,090 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:45:30,699 [gate4] INFO processing quantum_signal_1777059927_b59ff696a51c.json
+2026-04-24 15:45:30,705 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:45:31,014 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:45:31,029 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:47:46,648 [gate4] INFO processing quantum_signal_1777060062_7bed02fb85b6.json
+2026-04-24 15:47:46,649 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:47:46,957 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:47:46,993 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:50:02,588 [gate4] INFO processing quantum_signal_1777060197_64a8231334ff.json
+2026-04-24 15:50:02,591 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:50:02,966 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:50:02,982 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:52:13,541 [gate4] INFO processing quantum_signal_1777060332_69dae47d6bd6.json
+2026-04-24 15:52:13,542 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:52:13,954 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:52:13,968 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:54:29,628 [gate4] INFO processing quantum_signal_1777060467_f2430bd8fabd.json
+2026-04-24 15:54:29,628 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:54:30,104 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:54:30,116 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:56:45,730 [gate4] INFO processing quantum_signal_1777060602_b1ed1e80282d.json
+2026-04-24 15:56:45,730 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:56:46,503 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:56:46,516 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 15:59:02,219 [gate4] INFO processing quantum_signal_1777060738_11ed37605287.json
+2026-04-24 15:59:02,220 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 15:59:03,316 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 15:59:03,334 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:01:13,834 [gate4] INFO processing quantum_signal_1777060873_deb5aef7e7a7.json
+2026-04-24 16:01:13,836 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:01:43,839 [gate4] WARNING coinbase get_product attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Read timed out. (read timeout=30)
+2026-04-24 16:01:45,466 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:01:45,493 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:03:30,932 [gate4] INFO processing quantum_signal_1777061008_7b9679273585.json
+2026-04-24 16:03:30,933 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:03:31,647 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:03:31,663 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:05:47,170 [gate4] INFO processing quantum_signal_1777061143_8535784b429b.json
+2026-04-24 16:05:47,172 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:05:50,800 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:05:50,813 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:08:01,348 [gate4] INFO processing quantum_signal_1777061278_8e27813faa7e.json
+2026-04-24 16:08:01,349 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:08:31,351 [gate4] WARNING coinbase get_product attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Read timed out. (read timeout=30)
+2026-04-24 16:08:32,393 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:08:32,407 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:10:17,855 [gate4] INFO processing quantum_signal_1777061413_a90a241f4f14.json
+2026-04-24 16:10:17,855 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:10:18,631 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:10:18,637 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:12:29,202 [gate4] INFO processing quantum_signal_1777061548_8790ef7545a6.json
+2026-04-24 16:12:29,203 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:12:30,757 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:12:30,770 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:14:46,458 [gate4] INFO processing quantum_signal_1777061683_333e9266310a.json
+2026-04-24 16:14:46,459 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:14:47,338 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:14:47,350 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:17:02,938 [gate4] INFO processing quantum_signal_1777061818_ecdbbc0e8f02.json
+2026-04-24 16:17:02,941 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:17:04,136 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:17:04,152 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:19:14,731 [gate4] INFO processing quantum_signal_1777061953_53639423d711.json
+2026-04-24 16:19:14,732 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:19:15,345 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:19:15,358 [gate4] INFO processed 1 signal(s) this pass

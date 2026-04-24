@@ -220,3 +220,42 @@ After deployment, integrate with ProjectX:
 **Model not saving:**
 - Ensure `HF_TOKEN` has write permissions
 - Check `hub_model_id` is correct format
+
+## Market Cognition Training Data (Tranche 3 - Phase 13)
+
+Generate preference pairs for market cognition DPO training from trade and PNL data.
+
+### Usage
+
+```bash
+python3.10 scripts/training/market_data_prep.py
+```
+
+### Input Files
+- `logs/gate4_trades.jsonl` - Gate4 trade executions
+- `data/phase4_pnl_ledger.jsonl` - PNL ledger entries
+
+### Output
+- `data/quantum_dataset/market_cognition_tranche3/` - HuggingFace dataset
+- `data/quantum_dataset/market_cognition_tranche3/preference_pairs.jsonl` - JSONL for inspection
+
+### Dataset Format
+```python
+{
+    "prompt": "Market context description",
+    "chosen": "Optimal strategy recommendation",
+    "rejected": "Suboptimal or risky recommendation",
+    "regime_type": "trending|ranging|high_volatility|low_volatility",
+    "volatility_score": 0.0-1.0,
+    "trend_direction": "bullish|bearish|neutral",
+    "liquidity_state": "high|medium|low",
+    "timestamp": "ISO timestamp",
+    "symbol": "BTC-USD|ETH-USD|SOL-USD|PORTFOLIO"
+}
+```
+
+### Pair Types
+- `single_symbol` - Per-symbol strategy recommendations
+- `cross_asset` - Multi-asset portfolio allocation
+- `regime_comparison` - Compare regimes across symbols
+- `signal_based` - Signal-level execution analysis

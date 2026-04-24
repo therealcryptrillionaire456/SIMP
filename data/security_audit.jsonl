@@ -133,3 +133,12 @@
 {"timestamp": "2026-04-24T05:44:30.786658Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "goose_orchestrator", "agent_type": "orchestrator"}}
 {"timestamp": "2026-04-24T06:11:30.078017Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "goose_orchestrator", "agent_type": "orchestrator"}}
 {"timestamp": "2026-04-24T13:07:11.730216Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "goose_orchestrator", "agent_type": "orchestrator"}}
+{"timestamp": "2026-04-24T17:31:12.398046Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "t:001", "agent_type": "test"}}
+{"timestamp": "2026-04-24T17:34:00.997352Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "sse-test-agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T17:34:11.181969Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T17:34:11.198414Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T17:34:12.167414Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T17:34:14.032114Z", "event_type": "validation_error", "severity": "low", "details": {"reason": "invalid_content_type", "content_type": "text/plain", "path": "/agents/register", "method": "POST"}}
+{"timestamp": "2026-04-24T17:34:14.158142Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test:001", "agent_type": "test"}}
+{"timestamp": "2026-04-24T17:34:15.891568Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test:001", "agent_type": "test"}}
+{"timestamp": "2026-04-24T20:06:43.035783Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "t:001", "agent_type": "test"}}

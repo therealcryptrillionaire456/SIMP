@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-24T15:06:57.112871+00:00",
+  "timestamp": "2026-04-24T16:25:57.896743+00:00",
   "all_ok": true,
   "checks": {
     "broker": {
@@ -9,18 +9,18 @@
     },
     "gate4_freshness": {
       "ok": true,
-      "detail": "gate4 trade age=40s (target <120s)",
-      "age_s": 39.7
+      "detail": "gate4 trade age=51s (target <120s)",
+      "age_s": 51.2
     },
     "decision_freshness": {
       "ok": true,
-      "detail": "decision journal age=40s (target <120s)",
-      "age_s": 39.7
+      "detail": "decision journal age=8s (target <120s)",
+      "age_s": 7.9
     },
     "signal_freshness": {
       "ok": true,
-      "detail": "signal age=40s (target <60s)",
-      "age_s": 39.7
+      "detail": "signal age=8s (target <60s)",
+      "age_s": 7.9
     }
   }
 }

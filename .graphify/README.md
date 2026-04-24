@@ -1,10 +1,10 @@
-# SIMP Architecture Graph - 20260424_110819
+# SIMP Architecture Graph - 20260424_155504
 
 ## Statistics
 - **Nodes**: 4556
 - **Edges**: 11727
 - **Files Processed**: 300
-- **Total Python Files**: 26184
+- **Total Python Files**: 26738
 
 ## Top 5 Central Modules
 1. **base_command** (centrality: 0.080)
