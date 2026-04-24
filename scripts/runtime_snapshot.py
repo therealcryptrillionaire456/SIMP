@@ -1,244 +1,294 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3
 """
-Render a compact hot-runtime snapshot for operators.
-"""
+runtime_snapshot.py — one canonical snapshot writer, owned by A6.
 
+Collects:
+  - process health (broker, http_server, orchestration_loop, gate4_inbox_consumer, signal bridge)
+  - freshness ages from decision_journal
+  - verifier status (by invoking harness/verify_revenue_path.py --json)
+  - mode + kill switch
+  - policy: budget remaining, block rate 1h, limits from contracts/live_limits.json
+
+Writes: state/status_board.json via harness/status_board.py, and appends one line
+to state/metrics/snapshots.ndjson.
+
+Safe to run every 30s during burn-in.
+"""
 from __future__ import annotations
 
-import argparse
 import json
+import os
+import re
 import subprocess
 import sys
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+import time
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
-from urllib.error import URLError, HTTPError
-from urllib.request import urlopen
+from typing import Any, Dict, List, Optional, Tuple
 
-REPO = Path(__file__).resolve().parents[1]
-if str(REPO) not in sys.path:
-    sys.path.insert(0, str(REPO))
+HERE = Path(__file__).resolve().parent
+REPO_ROOT = HERE.parent if HERE.name in {"scripts", "harness"} else HERE
+sys.path.insert(0, str(REPO_ROOT))
 
-from simp.exchange import coinbase_dns_status
+try:
+    from harness import status_board
+    from harness import verify_revenue_path as verifier
+except ImportError:
+    sys.path.insert(0, str(HERE))
+    import status_board  # type: ignore
+    import verify_revenue_path as verifier  # type: ignore
 
-LOG_DIR = REPO / "logs"
-RUNTIME_LOG_DIR = LOG_DIR / "runtime"
-TRADE_LOG = LOG_DIR / "gate4_trades.jsonl"
-BRIDGE_LOG = LOG_DIR / "quantum" / "signal_bridge.log"
-STATE_FILE = REPO / "data" / "gate4_consumer_state.json"
-
-
-@dataclass
-class EndpointStatus:
-    url: str
-    ok: bool
-    body: dict[str, Any] | None
-    error: str | None = None
+STATE_DIR = Path(os.environ.get("SIMP_STATE_DIR", REPO_ROOT / "state"))
+METRICS_DIR = STATE_DIR / "metrics"
+METRICS_DIR.mkdir(parents=True, exist_ok=True)
+DECISION_JOURNAL = STATE_DIR / "decision_journal.ndjson"
+LIMITS_PATH = Path(os.environ.get("SIMP_LIMITS_PATH", REPO_ROOT / "contracts" / "live_limits.json"))
+MODE_PATH = Path(os.environ.get("SIMP_MODE_PATH", STATE_DIR / "mode.json"))
+KILL_PATH = Path(os.environ.get("SIMP_KILL_PATH", STATE_DIR / "KILL"))
 
 
-def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+PROCESSES = {
+    "broker":               r"bin/start_server|simp[./]server[./]broker",
+    "http_server":          r"bin/start_server|simp[./]server[./]http_server|uvicorn.*http_server",
+    "orchestration_loop":   r"orchestration_loop|closed_loop_scheduler",
+    "gate4_inbox_consumer": r"gate4_inbox_consumer",
+    "signal_bridge":        r"quantum_signal_bridge",
+    "dashboard":            r"dashboard[./]server|uvicorn.*dashboard",
+}
 
 
-def fetch_json(url: str, timeout: int = 3) -> EndpointStatus:
+def _utcnow() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _pid_for(pattern: str) -> Optional[int]:
     try:
-        with urlopen(url, timeout=timeout) as response:  # noqa: S310 - localhost/operator use
-            payload = json.loads(response.read().decode("utf-8"))
-            return EndpointStatus(url=url, ok=True, body=payload)
-    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
-        return EndpointStatus(url=url, ok=False, body=None, error=str(exc))
-
-
-def latest_startall_markers(max_age_minutes: int = 20) -> dict[str, bool]:
-    logs = sorted(RUNTIME_LOG_DIR.glob("startall_*.log"), key=lambda path: path.stat().st_mtime)
-    if not logs:
-        return {}
-    latest = logs[-1]
-    modified = datetime.fromtimestamp(latest.stat().st_mtime, tz=timezone.utc)
-    if datetime.now(timezone.utc) - modified > timedelta(minutes=max_age_minutes):
-        return {}
-
-    text = latest.read_text(encoding="utf-8", errors="ignore")
-    return {
-        "broker": "SIMP Broker is healthy" in text or "SIMP Broker already healthy" in text,
-        "dashboard": "Dashboard is healthy" in text or "Dashboard already healthy" in text,
-        "projectx": "ProjectX is healthy" in text or "ProjectX already healthy" in text,
-        "gate4_consumer": "Gate4 Live Consumer is running" in text or "Gate4 Live Consumer already running" in text,
-        "quantum_signal_bridge": "quantum_signal_bridge.py" in text,
-        "quantum_mesh_consumer": "quantum_mesh_consumer.py" in text,
-        "quantum_advisory_broadcaster": "quantum_advisory_broadcaster.py" in text,
-    }
-
-
-def tail_jsonl(path: Path) -> dict[str, Any] | None:
-    if not path.exists():
-        return None
-    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-    if not lines:
-        return None
-    return json.loads(lines[-1])
-
-
-def latest_bridge_line(path: Path) -> str | None:
-    if not path.exists():
-        return None
-    for line in reversed(path.read_text(encoding="utf-8").splitlines()):
-        if "Signal #" in line or "Signal written" in line or "QIP intent sent" in line:
-            return line.strip()
-    return None
-
-
-def process_count(pattern: str) -> int:
-    try:
-        result = subprocess.run(  # noqa: S603
-            ["pgrep", "-f", pattern],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
+        out = subprocess.check_output(["pgrep", "-f", pattern], text=True, timeout=3).strip()
+        if not out:
+            return None
+        # take first
+        return int(out.splitlines()[0])
     except Exception:
-        return 0
-    if result.returncode != 0:
-        try:
-            ps_result = subprocess.run(  # noqa: S603
-                ["ps", "aux"],
-                check=False,
-                capture_output=True,
-                text=True,
-            )
-        except Exception:
-            return 0
-        if ps_result.returncode != 0:
-            return 0
-        return sum(1 for line in ps_result.stdout.splitlines() if pattern in line and "grep" not in line)
-    return len([line for line in result.stdout.splitlines() if line.strip()])
-
-
-def load_gate4_state() -> dict[str, Any] | None:
-    if not STATE_FILE.exists():
         return None
-    return json.loads(STATE_FILE.read_text(encoding="utf-8"))
 
 
-def build_snapshot() -> dict[str, Any]:
-    broker = fetch_json("http://127.0.0.1:5555/health")
-    dashboard = fetch_json("http://127.0.0.1:8050/health")
-    projectx = fetch_json("http://127.0.0.1:8771/health")
-    runtime_markers = latest_startall_markers()
-
-    if not broker.ok and runtime_markers.get("broker"):
-        broker = EndpointStatus(
-            url=broker.url,
-            ok=True,
-            body={"status": "healthy", "source": "startall_log_fallback"},
-            error=broker.error,
-        )
-    if not dashboard.ok and runtime_markers.get("dashboard"):
-        dashboard = EndpointStatus(
-            url=dashboard.url,
-            ok=True,
-            body={"status": "healthy", "source": "startall_log_fallback"},
-            error=dashboard.error,
-        )
-    if not projectx.ok and runtime_markers.get("projectx"):
-        projectx = EndpointStatus(
-            url=projectx.url,
-            ok=True,
-            body={"status": "healthy", "registered": True, "source": "startall_log_fallback"},
-            error=projectx.error,
-        )
-
-    processes = {
-        "projectx_supervisor": process_count("projectx_supervisor.sh"),
-        "projectx_guard": process_count("projectx_guard_server.py"),
-        "gate4_consumer": process_count("gate4_inbox_consumer.py"),
-        "quantum_signal_bridge": process_count("quantum_signal_bridge.py"),
-        "quantum_mesh_consumer": process_count("quantum_mesh_consumer.py"),
-        "quantum_advisory_broadcaster": process_count("quantum_advisory_broadcaster.py"),
-    }
-    for key in ("gate4_consumer", "quantum_signal_bridge", "quantum_mesh_consumer", "quantum_advisory_broadcaster"):
-        if processes[key] == 0 and runtime_markers.get(key):
-            processes[key] = 1
-
-    snapshot = {
-        "timestamp": utc_now_iso(),
-        "coinbase_dns": coinbase_dns_status(),
-        "runtime_markers": runtime_markers,
-        "services": {
-            "broker": broker.__dict__,
-            "dashboard": dashboard.__dict__,
-            "projectx": projectx.__dict__,
-        },
-        "processes": processes,
-        "gate4": {
-            "state": load_gate4_state(),
-            "latest_trade": tail_jsonl(TRADE_LOG),
-            "latest_successful_trade": latest_successful_trade(TRADE_LOG),
-        },
-        "bridge": {
-            "latest_log_line": latest_bridge_line(BRIDGE_LOG),
-        },
-    }
-    return snapshot
+def _age_seconds(iso_ts: str) -> float:
+    try:
+        ts = datetime.fromisoformat(iso_ts.replace("Z", "+00:00"))
+    except Exception:
+        return float("inf")
+    return max(0.0, (datetime.now(timezone.utc) - ts).total_seconds())
 
 
-def latest_successful_trade(path: Path) -> dict[str, Any] | None:
+def _tail(path: Path, n: int = 500) -> List[Dict[str, Any]]:
     if not path.exists():
-        return None
-    for line in reversed(path.read_text(encoding="utf-8").splitlines()):
-        if not line.strip():
+        return []
+    try:
+        with path.open("rb") as f:
+            f.seek(0, os.SEEK_END)
+            size = f.tell()
+            block = min(size, 2_000_000)
+            f.seek(size - block)
+            lines = f.read().decode("utf-8", errors="replace").splitlines()
+        out = []
+        for line in reversed(lines):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                out.append(json.loads(line))
+            except Exception:
+                continue
+            if len(out) >= n:
+                break
+        out.reverse()
+        return out
+    except Exception:
+        return []
+
+
+def compute_freshness(entries: List[Dict[str, Any]]) -> Dict[str, Any]:
+    last_signal_age: Optional[float] = None
+    last_fill_age: Optional[float] = None
+    for e in reversed(entries):
+        if last_signal_age is None and "decision_id" in e and "created_at" in e:
+            last_signal_age = _age_seconds(e["created_at"])
+        if last_fill_age is None and e.get("fill_status") == "executed" and e.get("executed_at"):
+            last_fill_age = _age_seconds(e["executed_at"])
+        if last_signal_age is not None and last_fill_age is not None:
+            break
+    return {
+        "last_signal_age_s": last_signal_age if last_signal_age is not None else 9_999_999,
+        "last_fill_age_s": last_fill_age,
+        "bridge_rtt_ms_p95": None,
+        "consumer_backlog": 0,
+    }
+
+
+def compute_policy(entries: List[Dict[str, Any]], limits: Dict[str, Any]) -> Dict[str, Any]:
+    one_hour_ago = 3600.0
+    fills_1h = [e for e in entries
+                if e.get("fill_status") and _age_seconds(e.get("executed_at", _utcnow())) <= one_hour_ago]
+    blocks = [e for e in fills_1h if e.get("fill_status") == "policy_blocked"]
+    total = len(fills_1h)
+    block_rate = (len(blocks) / total) if total else 0.0
+
+    # Budget: sum notional of executed fills today vs daily cap
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    spent = 0.0
+    for e in entries:
+        if e.get("fill_status") != "executed":
             continue
-        record = json.loads(line)
-        if record.get("result") == "ok":
-            return record
-    return None
+        ts = e.get("executed_at", "")
+        if not ts.startswith(today):
+            continue
+        spent += abs(float(e.get("fill_price", 0)) * float(e.get("fill_size", 0)))
+    cap = float(limits.get("daily_cap_usd", 0.0))
+    remaining = max(0.0, cap - spent)
+
+    return {
+        "live_mode": _load_mode(),
+        "block_rate_1h": round(block_rate, 4),
+        "budget_remaining_usd": round(remaining, 2),
+        "max_position_usd": float(limits.get("max_position_usd", 0.0)),
+        "daily_cap_usd": cap,
+    }
 
 
-def render_markdown(snapshot: dict[str, Any]) -> str:
-    latest_trade = snapshot["gate4"]["latest_trade"] or {}
-    latest_success = snapshot["gate4"]["latest_successful_trade"] or {}
-    trade_result = latest_trade.get("result", "none")
-    trade_symbol = latest_trade.get("symbol", "n/a")
-    trade_side = latest_trade.get("side", "n/a")
-    success_order_id = (
-        ((latest_success.get("response") or {}).get("success_response") or {}).get("order_id")
-        or "n/a"
-    )
-    bridge_line = snapshot["bridge"]["latest_log_line"] or "No recent bridge activity"
-    projectx = snapshot["services"]["projectx"]
-    projectx_status = "up" if projectx["ok"] else f"down ({projectx['error']})"
-    lines = [
-        f"# SIMP Hot Runtime Snapshot",
-        f"",
-        f"- Timestamp: {snapshot['timestamp']}",
-        f"- Broker: {'up' if snapshot['services']['broker']['ok'] else 'down'}",
-        f"- Dashboard: {'up' if snapshot['services']['dashboard']['ok'] else 'down'}",
-        f"- ProjectX: {projectx_status}",
-        f"- Coinbase DNS: {'ok' if snapshot['coinbase_dns']['ok'] else 'down'}",
-        f"- Gate4 latest trade: {trade_symbol} {trade_side} -> {trade_result}",
-        f"- Gate4 latest successful trade: {latest_success.get('symbol', 'n/a')} {latest_success.get('side', 'n/a')} order={success_order_id}",
-        f"- Bridge: {bridge_line}",
-        f"",
-        f"## Process Counts",
-    ]
-    for name, count in snapshot["processes"].items():
-        lines.append(f"- {name}: {count}")
-    return "\n".join(lines)
+def _load_mode() -> str:
+    if not MODE_PATH.exists():
+        return "fully_live"
+    try:
+        with MODE_PATH.open() as f:
+            return json.load(f).get("mode", "fully_live")
+    except Exception:
+        return "fully_live"
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Render a SIMP hot runtime snapshot")
-    parser.add_argument("--format", choices=["json", "markdown"], default="json")
-    args = parser.parse_args()
+def _load_limits() -> Dict[str, Any]:
+    if not LIMITS_PATH.exists():
+        return {}
+    with LIMITS_PATH.open() as f:
+        return json.load(f)
 
-    snapshot = build_snapshot()
-    if args.format == "markdown":
-        print(render_markdown(snapshot))
-    else:
-        print(json.dumps(snapshot, indent=2))
-    return 0
+
+def collect_processes() -> Dict[str, Dict[str, Any]]:
+    out: Dict[str, Dict[str, Any]] = {}
+    for name, pat in PROCESSES.items():
+        pid = _pid_for(pat)
+        out[name] = {
+            "pid": pid,
+            "state": "up" if pid else "down",
+            "last_restart": None,
+        }
+    return out
+
+
+def snapshot_once() -> Dict[str, Any]:
+    limits = _load_limits()
+    entries = _tail(DECISION_JOURNAL, n=1000)
+    freshness = compute_freshness(entries)
+    policy = compute_policy(entries, limits)
+    processes = collect_processes()
+
+    # Run verifier (in-process)
+    v_report = verifier.run()
+    v_status = "green" if v_report.green else "red"
+    v_failing = next((s.name for s in v_report.stages if not s.ok and not s.terminal_ok), None)
+
+    # Write full board
+    board = {
+        "updated_at": _utcnow(),
+        "mode": _load_mode(),
+        "kill_switch": {
+            "set": KILL_PATH.exists(),
+            "path": str(KILL_PATH),
+            "last_checked": _utcnow(),
+        },
+        "verifier": {
+            "status": v_status,
+            "last_run": _utcnow(),
+            "failing_stage": v_failing,
+            "pass_rate_6h": _pass_rate_6h(),
+        },
+        "freshness": freshness,
+        "processes": processes,
+        "policy": policy,
+        "lanes": status_board.load().get("lanes", {}),  # preserve lanes
+        "slo": limits.get("slo", {}),
+        "incidents_open": status_board.load().get("incidents_open", []),
+    }
+    status_board.write_full(board)
+
+    # Append metrics line
+    metrics_line = {
+        "ts": board["updated_at"],
+        "verifier": v_status,
+        "failing_stage": v_failing,
+        "last_signal_age_s": freshness["last_signal_age_s"],
+        "last_fill_age_s": freshness["last_fill_age_s"],
+        "block_rate_1h": policy["block_rate_1h"],
+        "budget_remaining_usd": policy["budget_remaining_usd"],
+        "procs_down": [name for name, st in processes.items() if st["state"] != "up"],
+    }
+    with (METRICS_DIR / "snapshots.ndjson").open("a") as f:
+        f.write(json.dumps(metrics_line) + "\n")
+    return board
+
+
+def _pass_rate_6h() -> float:
+    path = METRICS_DIR / "snapshots.ndjson"
+    if not path.exists():
+        return 0.0
+    cutoff = 6 * 3600
+    total = 0
+    green = 0
+    try:
+        with path.open() as f:
+            for line in f:
+                try:
+                    r = json.loads(line)
+                except Exception:
+                    continue
+                if _age_seconds(r.get("ts", "")) > cutoff:
+                    continue
+                total += 1
+                if r.get("verifier") == "green":
+                    green += 1
+    except Exception:
+        return 0.0
+    return round(green / total, 4) if total else 0.0
+
+
+def main(argv: List[str]) -> int:
+    loop = "--loop" in argv
+    interval = 30
+    for i, a in enumerate(argv):
+        if a == "--interval" and i + 1 < len(argv):
+            try:
+                interval = int(argv[i + 1])
+            except ValueError:
+                pass
+
+    if not loop:
+        board = snapshot_once()
+        print(json.dumps({
+            "verifier": board["verifier"]["status"],
+            "freshness": board["freshness"],
+            "policy": board["policy"],
+            "mode": board["mode"],
+            "kill": board["kill_switch"]["set"],
+            "procs_down": [n for n, s in board["processes"].items() if s["state"] != "up"],
+        }, indent=2))
+        return 0
+
+    while True:
+        try:
+            snapshot_once()
+        except Exception as e:
+            print(f"[snapshot] error: {e}", file=sys.stderr)
+        time.sleep(interval)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main(sys.argv[1:]))
