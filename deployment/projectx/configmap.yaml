@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: projectx-runtime-config
+data:
+  PROJECTX_HOST: "0.0.0.0"
+  PROJECTX_PORT: "5555"
+  PYTHONUNBUFFERED: "1"

@@ -1154,6 +1154,30 @@ class EnhancedMeshBus:
                 "offline_pending":  self.offline_store.pending_count(agent_id),
             }
 
+    def get_registered_agents(self) -> List[str]:
+        """Return the currently registered agents in stable order."""
+        with self._lock:
+            return sorted(self._registered_agents)
+
+    def get_agent_channels(self, agent_id: str) -> List[str]:
+        """Return the channels an agent is currently subscribed to."""
+        with self._lock:
+            if agent_id not in self._registered_agents:
+                return []
+            return sorted(
+                channel
+                for channel, subscribers in self._channel_subscribers.items()
+                if agent_id in subscribers
+            )
+
+    def get_all_subscriptions(self) -> Dict[str, List[str]]:
+        """Return channel -> subscriber mapping for observability surfaces."""
+        with self._lock:
+            return {
+                channel: sorted(subscribers)
+                for channel, subscribers in self._channel_subscribers.items()
+            }
+
     # ── Channel management (original API, unchanged) ─────────────────────────
 
     def subscribe(self, agent_id: str, channel: str) -> bool:
@@ -1185,6 +1209,39 @@ class EnhancedMeshBus:
     def get_channel_subscribers(self, channel: str) -> List[str]:
         with self._lock:
             return list(self._channel_subscribers.get(channel, set()))
+
+    def get_all_subscriptions(self) -> Dict[str, List[str]]:
+        """
+        Return channel → [agent_id, ...] mapping for all subscriptions.
+
+        Mirror of the original MeshBus.get_all_subscriptions() for API compatibility.
+        """
+        with self._lock:
+            return {
+                ch: sorted(subs)
+                for ch, subs in self._channel_subscribers.items()
+            }
+
+    def get_agent_channels(self, agent_id: str) -> List[str]:
+        """
+        Return list of channels an agent is subscribed to.
+
+        Mirror of the original MeshBus.get_agent_channels().
+        """
+        with self._lock:
+            return [
+                ch for ch, subs in self._channel_subscribers.items()
+                if agent_id in subs
+            ]
+
+    def get_registered_agents(self) -> List[str]:
+        """
+        Return list of all currently registered agents.
+
+        Mirror of the original MeshBus.get_registered_agents().
+        """
+        with self._lock:
+            return sorted(self._registered_agents)
 
     # ── Message sending ───────────────────────────────────────────────────────
 
@@ -1622,6 +1679,11 @@ class EnhancedMeshBus:
 
     def get_statistics(self) -> Dict[str, Any]:
         with self._lock:
+            active_channels = {
+                channel: sorted(subscribers)
+                for channel, subscribers in self._channel_subscribers.items()
+                if subscribers
+            }
             stats = self._stats.copy()
             stats.update(
                 {
@@ -1631,6 +1693,7 @@ class EnhancedMeshBus:
                     "pending_offline_messages": self.offline_store.pending_count(),
                     "offline_store":            self.offline_store.stats(),
                     "channel_stats":            self._channel_stats.copy(),
+                    "channels":                 active_channels,
                     "queue_sizes": {
                         aid: len(q)
                         for aid, q in self._agent_queues.items()

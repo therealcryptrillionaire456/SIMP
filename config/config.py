@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 def _default_db() -> str:
     return str(Path(__file__).parent.parent / "data" / "simp.db")
@@ -64,9 +65,11 @@ class SimpConfig(BaseSettings):
     MESH_DB_PATH: str = Field(default_factory=_default_mesh_db)
     MESH_LOG_DIR: str = Field(default_factory=_default_log_dir)
     
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 # Create singleton instance
 config = SimpConfig()

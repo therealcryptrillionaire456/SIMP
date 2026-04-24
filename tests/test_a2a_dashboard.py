@@ -23,6 +23,8 @@ class TestDashboardA2AStatus:
             },
         }
         mock_broker.intent_records = {}
+        # Provide list_agents for the endpoint to call
+        mock_broker.list_agents.return_value = list(mock_broker.agents.values())
         set_broker(mock_broker)
         return TestClient(app)
 

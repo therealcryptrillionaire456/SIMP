@@ -1,0 +1,79 @@
+{
+  "started_at": "2026-04-24T15:31:04.197764+00:00",
+  "green": true,
+  "fatal_stage": null,
+  "stages": [
+    {
+      "name": "kill_switch",
+      "ok": true,
+      "detail": "",
+      "terminal_ok": true
+    },
+    {
+      "name": "mode",
+      "ok": true,
+      "detail": "mode=fully_live",
+      "terminal_ok": false
+    },
+    {
+      "name": "processes",
+      "ok": true,
+      "detail": "",
+      "terminal_ok": true
+    },
+    {
+      "name": "signal_freshness",
+      "ok": true,
+      "detail": "age_s=1.3 target=60",
+      "terminal_ok": true
+    },
+    {
+      "name": "bridge_reachable",
+      "ok": true,
+      "detail": "probe url not configured (skipped)",
+      "terminal_ok": true
+    },
+    {
+      "name": "decision_present",
+      "ok": true,
+      "detail": "decision_id=dec_3a9d5fbda9ece4d5",
+      "terminal_ok": true
+    },
+    {
+      "name": "policy_evaluated",
+      "ok": true,
+      "detail": "policy=allow",
+      "terminal_ok": true
+    },
+    {
+      "name": "execution_terminal",
+      "ok": false,
+      "detail": "fill_status=stale",
+      "terminal_ok": true
+    },
+    {
+      "name": "fill_freshness",
+      "ok": true,
+      "detail": "mode=fully_live live_trading=False; not enforced",
+      "terminal_ok": true
+    },
+    {
+      "name": "lineage",
+      "ok": true,
+      "detail": "checked=20",
+      "terminal_ok": true
+    },
+    {
+      "name": "policy_bypass_check",
+      "ok": true,
+      "detail": "",
+      "terminal_ok": true
+    },
+    {
+      "name": "shadow_integrity",
+      "ok": true,
+      "detail": "mode=fully_live",
+      "terminal_ok": true
+    }
+  ]
+}

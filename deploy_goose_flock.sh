@@ -65,8 +65,8 @@ prime_window "infra_hardener" "Goose 3 — Infra Hardener" "Focus on consensus, 
 prime_window "analytics" "Goose 4 — Analytics" "Focus on advisory broadcast, prediction enhancement, and reputation systems."
 prime_window "tester" "Goose 5 — Tester" "Focus on targeted pytest and runtime validation."
 
-tmux send-keys -t "${SESSION_NAME}:control" "python3.10 load_context.py --brief" C-m
-tmux send-keys -t "${SESSION_NAME}:control" "python3.10 kloutbot_bridge.py --execute" C-m
+tmux send-keys -t "${SESSION_NAME}:control" "python3.10 scripts/kloutbot/load_context.py --brief" C-m
+tmux send-keys -t "${SESSION_NAME}:control" "python3.10 scripts/kloutbot/kloutbot_bridge.py --execute" C-m
 tmux send-keys -t "${SESSION_NAME}:control" "curl -s ${BROKER_URL}/health | python3.10 -m json.tool" C-m
 
 if [[ "${AUTORUN}" -eq 1 ]]; then

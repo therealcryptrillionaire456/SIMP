@@ -1,0 +1,58 @@
+{
+  "profile_name": "simp_quantum",
+  "version": "1.0.0",
+  "description": "Stray Goose quantum-powered SIMP trading mesh integration",
+  "broker_url": "http://127.0.0.1:5555",
+  "agent_id": "goose_orchestrator",
+  "system_context": "\n## SIMP Quantum Mesh \u2014 Goose Integration\n\nYou are operating within the SIMP multi-agent trading mesh. You have quantum\ncomputing capability via quantum_intelligence_prime (QIP).\n\n### When to use quantum acceleration:\n- Portfolio allocation / position sizing across BTC, ETH, SOL\n- Pattern detection in market data (quantum search speedup)\n- Risk estimation (quantum Monte Carlo)\n- Strategy optimization (QAOA)\n- Arbitrage detection (quantum amplitude estimation)\n\n### How to invoke quantum tools:\n```python\nfrom goose_quantum_orchestrator import GooseQuantumOrchestrator\nqo = GooseQuantumOrchestrator()\n\n# Optimize portfolio\nresult = qo.optimize_portfolio(assets=[\"BTC-USD\", \"ETH-USD\", \"SOL-USD\"])\n\n# Solve quantum problem\nresult = qo.solve(\"problem description here\")\n\n# Dispatch any intent\nresult = qo.dispatch(\"evolve_quantum_skills\", {\"skill\": \"arbitrage_detection\"})\n\n# Get QIP status\nstatus = qo.qip_status()\n```\n\n### Broker endpoints (all live at http://127.0.0.1:5555):\n- GET  /health          \u2014 broker health\n- GET  /agents          \u2014 all 12 registered agents\n- GET  /mesh/routing/agents \u2014 4 active mesh agents\n- POST /mesh/send       \u2014 send intent via mesh\n- GET  /mesh/poll       \u2014 receive responses\n- GET  /mesh/routing/status \u2014 mesh mode (currently: preferred)\n\n### Active mesh agents with capabilities:\n- quantum_intelligence_prime: solve_quantum_problem, optimize_portfolio, evolve_quantum_skills\n- quantumarb_primary: arbitrage detection, market analysis\n- projectx_native: repo_scan, code_maintenance, security_audit\n- ktc_agent: receipt_processing, crypto_investment, wallet_management\n\n### Revenue pipeline:\ngate4_real (Coinbase, $1-$10 live) \u2190 quantum_signal_bridge \u2190 QIP\nquantumarb_real (file-based) \u2190 quantum circuit signals \u2190 QIP\nbullbear_predictor (:5559) \u2190 quantum ML signals \u2190 QIP\n",
+  "tools": [
+    {
+      "name": "quantum_solve",
+      "description": "Solve any problem using quantum computing via QIP",
+      "command": "python3.10 goose_quantum_orchestrator.py --solve",
+      "usage": "quantum_solve <problem description>"
+    },
+    {
+      "name": "quantum_optimize_portfolio",
+      "description": "Get quantum-optimal portfolio allocation for BTC/ETH/SOL",
+      "command": "python3.10 goose_quantum_orchestrator.py --task optimize_portfolio",
+      "usage": "quantum_optimize_portfolio [--assets BTC ETH SOL] [--capital 10.0]"
+    },
+    {
+      "name": "quantum_market_analysis",
+      "description": "Quantum market analysis for trading signals",
+      "command": "python3.10 goose_quantum_orchestrator.py --task market_analysis",
+      "usage": "quantum_market_analysis <market description>"
+    },
+    {
+      "name": "qip_status",
+      "description": "Check quantum_intelligence_prime status and capabilities",
+      "command": "python3.10 goose_quantum_orchestrator.py --status",
+      "usage": "qip_status"
+    },
+    {
+      "name": "dispatch_intent",
+      "description": "Dispatch a named intent to any mesh agent",
+      "command": "python3.10 goose_quantum_orchestrator.py --dispatch-intent",
+      "usage": "dispatch_intent <intent_name> <agent_id> <problem>"
+    },
+    {
+      "name": "broker_status",
+      "description": "Get full SIMP broker and mesh status",
+      "command": "python3.10 goose_quantum_orchestrator.py --broker-status",
+      "usage": "broker_status"
+    }
+  ],
+  "startup_sequence": [
+    "python3.10 bin/start_server.py &",
+    "sleep 3",
+    "python3.10 quantum_mesh_consumer.py &",
+    "python3.10 quantum_signal_bridge.py &",
+    "python3.10 goose_quantum_orchestrator.py --status"
+  ],
+  "revenue_pipeline": {
+    "gate4_real": "Coinbase live trading $1-$10, fed by quantum_signal_bridge",
+    "quantumarb_primary": "Mesh-routed arbitrage signals from QIP",
+    "bullbear_predictor": "Quantum ML predictions for BTC direction"
+  }
+}

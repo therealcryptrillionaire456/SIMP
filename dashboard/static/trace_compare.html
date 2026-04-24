@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trace Comparison — SIMP Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --orange: #d4760a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+  h1 { font-size: 22px; margin-bottom: 16px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  h1 small { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+  .toolbar button, .toolbar select { background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .toolbar button:hover { background: #1c2129; }
+  .toolbar button.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .toolbar button.primary:hover { opacity: 0.9; }
+  .toolbar label { font-size: 13px; color: var(--text-muted); }
+  .trace-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .trace-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .trace-panel h3 { padding: 10px 14px; background: #1c2129; font-size: 13px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+  .trace-panel h3 .meta { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+  .trace-panel textarea { width: 100%; height: 220px; background: #0d1117; color: var(--text); border: none; padding: 10px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; resize: vertical; outline: none; }
+  .trace-panel textarea::placeholder { color: var(--text-muted); }
+  .timeline { padding: 12px; }
+  .timeline-bar { display: flex; height: 28px; border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+  .timeline-segment { display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; min-width: 4px; transition: flex 0.2s; cursor: pointer; position: relative; }
+  .timeline-segment:hover { opacity: 0.85; }
+  .timeline-segment:hover .tooltip { display: block; }
+  .tooltip { display: none; position: absolute; top: -38px; left: 50%; transform: translateX(-50%); background: #1c2129; border: 1px solid var(--border); padding: 6px 10px; border-radius: 4px; font-size: 11px; white-space: nowrap; z-index: 10; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0 12px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-color { width: 12px; height: 12px; border-radius: 2px; }
+  .diff-view { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-top: 16px; }
+  .diff-view h3 { font-size: 14px; margin-bottom: 10px; color: var(--text); }
+  .diff-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .diff-table th { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
+  .diff-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .diff-table tr:hover td { background: #1c2129; }
+  .diff-added { color: var(--green); }
+  .diff-removed { color: var(--red); }
+  .diff-changed { color: var(--yellow); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-success { background: #1b3a2d; color: var(--green); }
+  .badge-fail { background: #3a1b1b; color: var(--red); }
+  .badge-warn { background: #3a3520; color: var(--yellow); }
+  .badge-info { background: #1b2a3a; color: var(--blue); }
+  .empty-state { padding: 30px; text-align: center; color: var(--text-muted); font-size: 14px; }
+  .loading-dots::after { content: ''; animation: dots 1.5s steps(4, end) infinite; }
+  @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+  .stats-row { display: flex; gap: 24px; margin: 10px 0; flex-wrap: wrap; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; min-width: 100px; }
+  .stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .stat-card .value { font-size: 20px; font-weight: 600; }
+  @media (max-width: 800px) { .trace-panels { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>🧬 Trace Comparison <small>side-by-side trace diff for debugging agent regressions</small></h1>
+
+<div class="toolbar">
+  <button class="primary" id="btn-load-api">📥 Load from API</button>
+  <button id="btn-load-sample">📋 Load Sample Data</button>
+  <button id="btn-compare">🔍 Compare</button>
+  <button id="btn-clear">🗑 Clear</button>
+  <label>GZIP: <input type="checkbox" id="chk-gzip" checked></label>
+  <span id="status" style="color:var(--text-muted);font-size:12px;"></span>
+</div>
+
+<div class="trace-panels">
+  <div class="trace-panel" id="panel-left">
+    <h3>Trace A <span class="meta" id="meta-left">no data</span></h3>
+    <textarea id="trace-input-left" placeholder="Paste JSONL trace data for Trace A here...&#10;Or click 'Load from API' to fetch recent traces."></textarea>
+    <div class="timeline" id="timeline-left"></div>
+  </div>
+  <div class="trace-panel" id="panel-right">
+    <h3>Trace B <span class="meta" id="meta-right">no data</span></h3>
+    <textarea id="trace-input-right" placeholder="Paste JSONL trace data for Trace B here...&#10;Or click 'Load from API' to fetch recent traces."></textarea>
+    <div class="timeline" id="timeline-right"></div>
+  </div>
+</div>
+
+<div class="stats-row" id="stats-row" style="display:none;">
+  <div class="stat-card"><div class="label">Total Events (A)</div><div class="value" id="stat-a-total">0</div></div>
+  <div class="stat-card"><div class="label">Total Events (B)</div><div class="value" id="stat-b-total">0</div></div>
+  <div class="stat-card"><div class="label">Duration (A)</div><div class="value" id="stat-a-dur">0s</div></div>
+  <div class="stat-card"><div class="label">Duration (B)</div><div class="value" id="stat-b-dur">0s</div></div>
+  <div class="stat-card"><div class="label">Errors (A)</div><div class="value" id="stat-a-err" style="color:var(--red)">0</div></div>
+  <div class="stat-card"><div class="label">Errors (B)</div><div class="value" id="stat-b-err" style="color:var(--red)">0</div></div>
+</div>
+
+<div class="diff-view" id="diff-view" style="display:none;">
+  <h3>📊 Trace Differences</h3>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-color" style="background:var(--green)"></span> Added (in B, not A)</span>
+    <span class="legend-item"><span class="legend-color" style="background:var(--red)"></span> Removed (in A, not B)</span>
+    <span class="legend-item"><span class="legend-color" style="background:var(--yellow)"></span> Changed (different status/latency)</span>
+  </div>
+  <table class="diff-table">
+    <thead><tr><th>Phase</th><th>Action</th><th>Trace A</th><th>Trace B</th><th>Diff</th></tr></thead>
+    <tbody id="diff-body"></tbody>
+  </table>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  const PHASE_COLORS = {
+    'inventory': '#58a6ff',
+    'planning': '#d29922',
+    'prompting': '#bc8cff',
+    'execution': '#3fb950',
+    'evaluation': '#d4760a',
+    'promotion': '#f85149',
+    'controller': '#79c0ff',
+    'integration': '#56d36e',
+  };
+
+  // ── DOM refs ──
+  const leftInput = document.getElementById('trace-input-left');
+  const rightInput = document.getElementById('trace-input-right');
+  const leftTimeline = document.getElementById('timeline-left');
+  const rightTimeline = document.getElementById('timeline-right');
+  const metaLeft = document.getElementById('meta-left');
+  const metaRight = document.getElementById('meta-right');
+  const diffBody = document.getElementById('diff-body');
+  const diffView = document.getElementById('diff-view');
+  const statsRow = document.getElementById('stats-row');
+  const status = document.getElementById('status');
+  const chkGzip = document.getElementById('chk-gzip');
+
+  // ── Parse JSONL ──
+  function parseJsonl(text) {
+    if (!text || !text.trim()) return [];
+    return text.trim().split('\n')
+      .map(function(line) {
+        line = line.trim();
+        if (!line) return null;
+        try { return JSON.parse(line); } catch(e) { return null; }
+      })
+      .filter(Boolean);
+  }
+
+  // ── Render timeline ──
+  function renderTimeline(events, container, metaEl) {
+    container.innerHTML = '';
+    if (!events || events.length === 0) {
+      metaEl.textContent = 'no data';
+      return;
+    }
+
+    var totalTime = 0;
+    events.forEach(function(e) { totalTime += (e.latency_ms || 10); });
+    if (totalTime === 0) totalTime = events.length * 10;
+
+    metaEl.textContent = events.length + ' events, ' + (totalTime / 1000).toFixed(1) + 's';
+
+    var phases = {};
+    events.forEach(function(e) {
+      var phase = e.phase || 'unknown';
+      if (!phases[phase]) phases[phase] = 0;
+      phases[phase]++;
+    });
+
+    // Phase distribution bar
+    var phaseBar = document.createElement('div');
+    phaseBar.className = 'timeline-bar';
+    phaseBar.style.marginBottom = '12px';
+    phaseBar.title = 'Phase distribution';
+    Object.keys(phases).forEach(function(phase) {
+      var seg = document.createElement('div');
+      seg.className = 'timeline-segment';
+      var pct = (phases[phase] / events.length * 100);
+      seg.style.flex = pct.toFixed(1);
+      seg.style.background = PHASE_COLORS[phase] || '#8b949e';
+      if (pct > 10) seg.textContent = phase.substring(0, 3);
+      seg.title = phase + ': ' + phases[phase] + ' events (' + pct.toFixed(0) + '%)';
+      phaseBar.appendChild(seg);
+    });
+    container.appendChild(phaseBar);
+
+    // Legend
+    var legend = document.createElement('div');
+    legend.className = 'legend';
+    Object.keys(phases).forEach(function(phase) {
+      var item = document.createElement('span');
+      item.className = 'legend-item';
+      item.innerHTML = '<span class="legend-color" style="background:' + (PHASE_COLORS[phase] || '#8b949e') + '"></span> ' + phase;
+      legend.appendChild(item);
+    });
+    container.appendChild(legend);
+
+    // Event timeline (show up to 100 events)
+    var displayEvents = events.slice(0, 100);
+    var eventBar = document.createElement('div');
+    eventBar.className = 'timeline-bar';
+    eventBar.style.height = '36px';
+
+    displayEvents.forEach(function(e) {
+      var seg = document.createElement('div');
+      seg.className = 'timeline-segment';
+      var pct = (e.latency_ms || 10) / totalTime * 100;
+      seg.style.flex = Math.max(pct, 0.5).toFixed(1);
+      seg.style.background = e.status === 'failed' || e.status === 'error' ? '#f85149'
+        : e.status === 'warning' ? '#d29922'
+        : PHASE_COLORS[e.phase] || '#8b949e';
+
+      var tooltip = document.createElement('div');
+      tooltip.className = 'tooltip';
+      tooltip.textContent = (e.phase || '?') + ' — ' + (e.action || '?') + ' [' + (e.latency_ms || 0) + 'ms] ' + (e.status || '');
+      seg.appendChild(tooltip);
+
+      eventBar.appendChild(seg);
+    });
+    if (events.length > 100) {
+      var more = document.createElement('div');
+      more.style.cssText = 'font-size:10px;color:var(--text-muted);padding:2px 0;text-align:center;';
+      more.textContent = '+' + (events.length - 100) + ' more events';
+      container.appendChild(more);
+    }
+    container.appendChild(eventBar);
+  }
+
+  // ── Compute diff ──
+  function computeDiff(eventsA, eventsB) {
+    var diffs = [];
+    var maxLen = Math.max(eventsA.length, eventsB.length);
+
+    for (var i = 0; i < maxLen; i++) {
+      var a = eventsA[i];
+      var b = eventsB[i];
+
+      if (a && !b) {
+        diffs.push({ type: 'removed', phase: a.phase, action: a.action, aStatus: a.status, aMs: a.latency_ms, bStatus: '—', bMs: '—', detail: 'Removed in B' });
+      } else if (!a && b) {
+        diffs.push({ type: 'added', phase: b.phase, action: b.action, aStatus: '—', aMs: '—', bStatus: b.status, bMs: b.latency_ms, detail: 'Added in B' });
+      } else if (a && b) {
+        var changed = false;
+        var detail = [];
+        if (a.status !== b.status) { changed = true; detail.push('status: ' + a.status + ' → ' + b.status); }
+        if (Math.abs((a.latency_ms || 0) - (b.latency_ms || 0)) > 100) { changed = true; detail.push('latency: ' + (a.latency_ms||0) + 'ms → ' + (b.latency_ms||0) + 'ms'); }
+        if (a.phase !== b.phase) { changed = true; detail.push('phase: ' + a.phase + ' → ' + b.phase); }
+        if (a.error_code !== b.error_code) { changed = true; detail.push('error: ' + (a.error_code||'none') + ' → ' + (b.error_code||'none')); }
+        if (changed) {
+          diffs.push({ type: 'changed', phase: a.phase, action: a.action, aStatus: a.status, aMs: a.latency_ms, bStatus: b.status, bMs: b.latency_ms, detail: detail.join('; ') });
+        }
+      }
+    }
+    return diffs;
+  }
+
+  // ── Render diff table ──
+  function renderDiff(diffs) {
+    diffBody.innerHTML = '';
+    if (diffs.length === 0) {
+      diffBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--green);padding:20px;">✅ Traces are identical (no differences found)</td></tr>';
+      diffView.style.display = 'block';
+      return;
+    }
+    diffView.style.display = 'block';
+    diffs.forEach(function(d) {
+      var tr = document.createElement('tr');
+      var cls = d.type === 'added' ? 'diff-added' : d.type === 'removed' ? 'diff-removed' : 'diff-changed';
+      tr.innerHTML = '<td>' + escapeHtml(d.phase || '') + '</td>'
+        + '<td>' + escapeHtml(d.action || '') + '</td>'
+        + '<td><span class="badge badge-' + (d.aStatus === 'failed' || d.aStatus === 'error' ? 'fail' : d.aStatus === 'warning' ? 'warn' : 'info') + '">' + escapeHtml(d.aStatus || '—') + '</span> ' + escapeHtml(d.aMs != null ? d.aMs + 'ms' : '—') + '</td>'
+        + '<td><span class="badge badge-' + (d.bStatus === 'failed' || d.bStatus === 'error' ? 'fail' : d.bStatus === 'warning' ? 'warn' : 'info') + '">' + escapeHtml(d.bStatus || '—') + '</span> ' + escapeHtml(d.bMs != null ? d.bMs + 'ms' : '—') + '</td>'
+        + '<td class="' + cls + '">' + escapeHtml(d.detail) + '</td>';
+      diffBody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ── Compute stats ──
+  function updateStats(eventsA, eventsB) {
+    if (!eventsA.length && !eventsB.length) { statsRow.style.display = 'none'; return; }
+    statsRow.style.display = 'flex';
+
+    var durA = eventsA.reduce(function(s, e) { return s + (e.latency_ms || 0); }, 0);
+    var durB = eventsB.reduce(function(s, e) { return s + (e.latency_ms || 0); }, 0);
+    var errA = eventsA.filter(function(e) { return e.status === 'failed' || e.status === 'error' || e.error_code; }).length;
+    var errB = eventsB.filter(function(e) { return e.status === 'failed' || e.status === 'error' || e.error_code; }).length;
+
+    document.getElementById('stat-a-total').textContent = eventsA.length;
+    document.getElementById('stat-b-total').textContent = eventsB.length;
+    document.getElementById('stat-a-dur').textContent = (durA / 1000).toFixed(1) + 's';
+    document.getElementById('stat-b-dur').textContent = (durB / 1000).toFixed(1) + 's';
+    document.getElementById('stat-a-err').textContent = errA;
+    document.getElementById('stat-b-err').textContent = errB;
+  }
+
+  // ── Compare ──
+  function compare() {
+    var eventsA = parseJsonl(leftInput.value);
+    var eventsB = parseJsonl(rightInput.value);
+
+    renderTimeline(eventsA, leftTimeline, metaLeft);
+    renderTimeline(eventsB, rightTimeline, metaRight);
+    updateStats(eventsA, eventsB);
+
+    if (eventsA.length && eventsB.length) {
+      var diffs = computeDiff(eventsA, eventsB);
+      renderDiff(diffs);
+    } else {
+      diffView.style.display = 'none';
+    }
+
+    setStatus('Compared ' + eventsA.length + ' vs ' + eventsB.length + ' events');
+  }
+
+  function setStatus(msg) { status.textContent = msg; }
+
+  // ── Load sample data ──
+  function loadSample() {
+    var now = new Date().toISOString();
+    var sampleA = [];
+    var sampleB = [];
+    var phases = ['inventory', 'planning', 'prompting', 'execution', 'evaluation', 'promotion'];
+    var actions = ['scan', 'analyze', 'generate', 'validate', 'approve', 'deploy'];
+
+    for (var i = 0; i < 20; i++) {
+      var phase = phases[i % phases.length];
+      var action = actions[i % actions.length];
+      var latency = 50 + Math.floor(Math.random() * 950);
+      var status = i === 7 ? 'failed' : i === 12 ? 'warning' : 'completed';
+      sampleA.push({
+        trace_id: 'trace-a-' + i,
+        session_id: 'sample-session-A',
+        phase: phase,
+        action: action,
+        status: status,
+        timestamp: now,
+        latency_ms: latency,
+        cycle_number: Math.floor(i / 4) + 1,
+        error_code: status === 'failed' ? 'ERR_TIMEOUT' : null,
+        error_message: status === 'failed' ? 'Request timed out after 30s' : null,
+      });
+      // Sample B is slightly different — one event missing, one added, some slower
+      if (i === 7) {
+        // Fix the failure in B
+        sampleB.push({
+          trace_id: 'trace-b-' + i,
+          session_id: 'sample-session-B',
+          phase: phase,
+          action: action,
+          status: 'completed',
+          timestamp: now,
+          latency_ms: 320,
+          cycle_number: Math.floor(i / 4) + 1,
+        });
+      } else if (i === 12) {
+        // Skip this event in B (removed)
+        // Event 13 shifts
+        sampleB.push({
+          trace_id: 'trace-b-' + (i + 1),
+          session_id: 'sample-session-B',
+          phase: phases[(i + 1) % phases.length],
+          action: actions[(i + 1) % actions.length],
+          status: 'completed',
+          timestamp: now,
+          latency_ms: 80 + Math.floor(Math.random() * 400),
+          cycle_number: Math.floor((i + 1) / 4) + 1,
+        });
+      } else if (i === 15) {
+        // Slower in B
+        sampleB.push({
+          trace_id: 'trace-b-' + i,
+          session_id: 'sample-session-B',
+          phase: phase,
+          action: action,
+          status: status,
+          timestamp: now,
+          latency_ms: 2800,
+          cycle_number: Math.floor(i / 4) + 1,
+        });
+      } else {
+        sampleB.push({
+          trace_id: 'trace-b-' + i,
+          session_id: 'sample-session-B',
+          phase: phase,
+          action: action,
+          status: status,
+          timestamp: now,
+          latency_ms: latency + Math.floor(Math.random() * 60),
+          cycle_number: Math.floor(i / 4) + 1,
+        });
+      }
+    }
+
+    leftInput.value = sampleA.map(function(e) { return JSON.stringify(e); }).join('\n');
+    rightInput.value = sampleB.map(function(e) { return JSON.stringify(e); }).join('\n');
+    compare();
+    setStatus('Loaded sample data (20 events each)');
+  }
+
+  // ── Load from API ──
+  function loadFromAPI() {
+    setStatus('Loading traces from API...');
+    var url = '/api/traces/recent?limit=20';
+
+    fetch(url)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var traces = data.traces || data || [];
+        if (traces.length === 0) {
+          setStatus('No traces found via API — try loading sample data');
+          return;
+        }
+        var half = Math.ceil(traces.length / 2);
+        var leftData = traces.slice(0, half);
+        var rightData = traces.slice(half);
+
+        leftInput.value = leftData.map(function(e) { return JSON.stringify(e); }).join('\n');
+        rightInput.value = rightData.map(function(e) { return JSON.stringify(e); }).join('\n');
+        compare();
+        setStatus('Loaded ' + traces.length + ' traces from API');
+      })
+      .catch(function(err) {
+        setStatus('API error: ' + err.message + ' — try loading sample data');
+      });
+  }
+
+  // ── Clear ──
+  function clearAll() {
+    leftInput.value = '';
+    rightInput.value = '';
+    leftTimeline.innerHTML = '';
+    rightTimeline.innerHTML = '';
+    metaLeft.textContent = 'no data';
+    metaRight.textContent = 'no data';
+    diffView.style.display = 'none';
+    statsRow.style.display = 'none';
+    diffBody.innerHTML = '';
+    setStatus('Cleared');
+  }
+
+  // ── Init ──
+  document.getElementById('btn-load-api').addEventListener('click', loadFromAPI);
+  document.getElementById('btn-load-sample').addEventListener('click', loadSample);
+  document.getElementById('btn-compare').addEventListener('click', compare);
+  document.getElementById('btn-clear').addEventListener('click', clearAll);
+
+  // Auto-compare on textarea change (debounced)
+  var debounceTimer;
+  function onInput() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(compare, 800);
+  }
+  leftInput.addEventListener('input', onInput);
+  rightInput.addEventListener('input', onInput);
+
+  // Load sample data on page load
+  loadSample();
+})();
+</script>
+</body>
+</html>

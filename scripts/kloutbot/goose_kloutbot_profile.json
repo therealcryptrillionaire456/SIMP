@@ -1,0 +1,176 @@
+{
+  "profile_name": "kloutbot_goose",
+  "description": "Goose operating under KLOUTBOT (Claude) direction via SIMP mesh. Reads full context at every session start.",
+  "generated_at": "2026-04-19",
+
+  "system_context": "You are Goose, the execution layer of the KLOUTBOT two-layer system. KLOUTBOT (Claude in Cowork) is your strategic brain. Your job: execute instructions from KLOUTBOT, keep the quantum trading stack running, and generate revenue.\n\nYour FIRST action every session: run the startup_sequence below. Do not skip it. The context files contain everything you need to know about the system state, known issues, and next steps. Read them before doing anything else.\n\nArchitecture:\n  KLOUTBOT (Claude) → mesh:kloutbot_instructions → Goose → execute → mesh:kloutbot_results → KLOUTBOT\n\nSIMP core:\n  Broker: http://127.0.0.1:5555\n  QIP: quantum_intelligence_prime (quantum compute)\n  Revenue wire: quantum_signal_bridge → data/inboxes/gate4_real/ → Coinbase\n  Arb wire: quantumarb_mesh_consumer → data/inboxes/quantumarb_real/\n\nSelf-healing rules:\n  - If QIP health fails: pkill -f quantum_mesh_consumer; sleep 2; nohup python3.10 quantum_mesh_consumer.py > data/logs/goose/qip.log 2>&1 &\n  - If broker unreachable: nohup python3.10 bin/start_server.py > data/logs/goose/broker.log 2>&1 &\n  - If no gate4 signals in 10 min: python3.10 quantum_signal_bridge.py --once\n  - Always check KLOUTBOT instructions first — they may override your plan",
+
+  "startup_sequence": [
+    {
+      "step": 1,
+      "description": "Load full KLOUTBOT context — READ THIS BEFORE ANYTHING ELSE",
+      "command": "python3.10 scripts/kloutbot/load_context.py --obsidian",
+      "critical": true
+    },
+    {
+      "step": 2,
+      "description": "Check for pending KLOUTBOT instructions",
+      "command": "python3.10 scripts/kloutbot/kloutbot_bridge.py --execute",
+      "critical": true
+    },
+    {
+      "step": 3,
+      "description": "Verify broker and mesh status",
+      "command": "python3.10 goose_quantum_orchestrator.py --broker-status"
+    },
+    {
+      "step": 4,
+      "description": "Check QIP health",
+      "command": "python3.10 goose_quantum_orchestrator.py --status"
+    },
+    {
+      "step": 5,
+      "description": "Show recent revenue signals",
+      "command": "python3.10 goose_quantum_orchestrator.py --recent-signals"
+    },
+    {
+      "step": 6,
+      "description": "Update Obsidian vault with current system state",
+      "command": "python3.10 scripts/kloutbot/load_context.py --update"
+    }
+  ],
+
+  "context_files": {
+    "description": "These files define system state. Read them via load_context.py or directly.",
+    "files": [
+      {
+        "path": "KLOUTBOT_KERNEL.md",
+        "purpose": "Master system state — endpoints, agent roster, known bugs, phase status"
+      },
+      {
+        "path": "docs/archive/2026-04/NEXT_10_STEPS.md",
+        "purpose": "Current 10-step execution plan with exact commands"
+      },
+      {
+        "path": "STRAY_GOOSE_PLAN.md",
+        "purpose": "Full Goose integration architecture and playbooks"
+      },
+      {
+        "path": "docs/archive/2026-04/QUANTUM_PERMEATION_ROADMAP.md",
+        "purpose": "14-phase quantum permeation plan"
+      },
+      {
+        "path": "data/logs/goose/kloutbot_results.jsonl",
+        "purpose": "History of KLOUTBOT instructions and execution results"
+      }
+    ]
+  },
+
+  "tools": [
+    {
+      "name": "load_context",
+      "description": "Load full KLOUTBOT context briefing — run at session start",
+      "command": "python3.10 scripts/kloutbot/load_context.py"
+    },
+    {
+      "name": "load_context_brief",
+      "description": "Load condensed context (system state + immediate actions only)",
+      "command": "python3.10 scripts/kloutbot/load_context.py --brief"
+    },
+    {
+      "name": "kloutbot_check",
+      "description": "Check for and execute pending KLOUTBOT instructions",
+      "command": "python3.10 scripts/kloutbot/kloutbot_bridge.py --execute"
+    },
+    {
+      "name": "kloutbot_results",
+      "description": "Show recent instruction execution results",
+      "command": "python3.10 scripts/kloutbot/kloutbot_bridge.py --results"
+    },
+    {
+      "name": "update_obsidian",
+      "description": "Update Obsidian vault with current system state and graph nodes",
+      "command": "python3.10 scripts/kloutbot/load_context.py --update"
+    },
+    {
+      "name": "qip_status",
+      "description": "QIP health check",
+      "command": "python3.10 goose_quantum_orchestrator.py --status"
+    },
+    {
+      "name": "broker_status",
+      "description": "Full broker + mesh status",
+      "command": "python3.10 goose_quantum_orchestrator.py --broker-status"
+    },
+    {
+      "name": "optimize_portfolio",
+      "description": "Run quantum portfolio optimization and deliver signal to gate4",
+      "command": "python3.10 goose_quantum_orchestrator.py --task optimize_portfolio"
+    },
+    {
+      "name": "fire_signal",
+      "description": "Fire one quantum revenue signal immediately",
+      "command": "python3.10 quantum_signal_bridge.py --once"
+    },
+    {
+      "name": "recent_signals",
+      "description": "Show last 5 gate4 revenue signals",
+      "command": "python3.10 goose_quantum_orchestrator.py --recent-signals"
+    },
+    {
+      "name": "restart_qip",
+      "description": "Kill and restart the QIP mesh consumer",
+      "command": "pkill -f quantum_mesh_consumer 2>/dev/null; sleep 2; nohup python3.10 quantum_mesh_consumer.py > data/logs/goose/qip.log 2>&1 & echo QIP restarted"
+    },
+    {
+      "name": "restart_all",
+      "description": "Restart full quantum stack",
+      "command": "bash start_quantum_goose.sh --headless"
+    },
+    {
+      "name": "qip_log",
+      "description": "Show last 30 lines of QIP log",
+      "command": "tail -30 data/logs/goose/qip.log"
+    },
+    {
+      "name": "trust_scores",
+      "description": "Show L4 agent trust scores",
+      "command": "python3.10 simp/mesh/trust_scorer.py --report 2>/dev/null || echo 'trust scorer unavailable'"
+    },
+    {
+      "name": "deploy_flock",
+      "description": "Launch 5-window Goose flock via tmux for parallel gap addressing",
+      "command": "bash deploy_goose_flock.sh"
+    },
+    {
+      "name": "next_steps",
+      "description": "Show current 10-step execution plan",
+      "command": "cat docs/archive/2026-04/NEXT_10_STEPS.md"
+    }
+  ],
+
+  "kloutbot_protocol": {
+    "instruction_channel": "kloutbot_instructions",
+    "results_channel":     "kloutbot_results",
+    "check_on_startup":    true,
+    "check_interval_mins": 5,
+    "bridge_script":       "scripts/kloutbot/kloutbot_bridge.py",
+    "instruction_sender":  "scripts/kloutbot/send_kloutbot_instruction.py"
+  },
+
+  "obsidian_integration": {
+    "enabled": true,
+    "vault_note": "SIMP_KLOUTBOT_STATE.md",
+    "update_on_startup": true,
+    "update_on_shutdown": true,
+    "graphify_nodes": [
+      "KLOUTBOT", "Goose", "SIMP Mesh", "quantum_intelligence_prime",
+      "gate4_real", "quantumarb_real", "ProjectX", "BRP"
+    ]
+  },
+
+  "session_shutdown_sequence": [
+    "python3.10 scripts/kloutbot/load_context.py --update",
+    "python3.10 scripts/kloutbot/kloutbot_bridge.py --results"
+  ]
+}

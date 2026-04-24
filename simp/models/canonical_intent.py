@@ -70,7 +70,22 @@ INTENT_TYPE_REGISTRY = {
 REQUIRED_FIELDS = ["intent_id", "source_agent", "intent_type", "params"]
 
 # Optional fields
-OPTIONAL_FIELDS = ["target_agent", "simp_version", "timestamp", "signature", "priority"]
+OPTIONAL_FIELDS = [
+    "target_agent",
+    "simp_version",
+    "timestamp",
+    "signature",
+    "priority",
+    "ttl_seconds",
+    "trace_id",
+    "correlation_id",
+    "metadata",
+    "invocation_mode",
+    "_sig_nonce",
+    "_sig_exp",
+    "_sig_iat",
+    "_sig_kid",
+]
 
 
 @dataclass
@@ -89,6 +104,15 @@ class CanonicalIntent:
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     signature: str = ""
     priority: str = "medium"  # critical, high, medium, low
+    ttl_seconds: int = 300
+    trace_id: str = ""
+    correlation_id: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+    invocation_mode: str = "native"
+    _sig_nonce: str = ""
+    _sig_exp: Optional[float] = None
+    _sig_iat: Optional[float] = None
+    _sig_kid: str = ""
 
     def validate(self) -> List[str]:
         """Validate this intent against the canonical schema. Returns list of errors."""
@@ -101,8 +125,12 @@ class CanonicalIntent:
             errors.append(f"Unknown intent_type: '{self.intent_type}'. Known types: {sorted(INTENT_TYPE_REGISTRY.keys())}")
         if not isinstance(self.params, dict):
             errors.append("params must be a dict")
+        if not isinstance(self.metadata, dict):
+            errors.append("metadata must be a dict")
         if self.priority not in ("critical", "high", "medium", "low"):
             errors.append(f"Invalid priority: '{self.priority}'")
+        if self.ttl_seconds < 0:
+            errors.append("ttl_seconds must be non-negative")
         return errors
 
     def to_dict(self) -> Dict[str, Any]:
@@ -117,6 +145,15 @@ class CanonicalIntent:
             "timestamp": self.timestamp,
             "signature": self.signature,
             "priority": self.priority,
+            "ttl_seconds": self.ttl_seconds,
+            "trace_id": self.trace_id,
+            "correlation_id": self.correlation_id,
+            "metadata": self.metadata,
+            "invocation_mode": self.invocation_mode,
+            "_sig_nonce": self._sig_nonce,
+            "_sig_exp": self._sig_exp,
+            "_sig_iat": self._sig_iat,
+            "_sig_kid": self._sig_kid,
         }
 
     @classmethod
@@ -148,6 +185,15 @@ class CanonicalIntent:
             timestamp=data.get("timestamp", datetime.now(timezone.utc).isoformat()),
             signature=data.get("signature", ""),
             priority=data.get("priority", "medium"),
+            ttl_seconds=int(data.get("ttl_seconds", 300) or 0),
+            trace_id=data.get("trace_id", ""),
+            correlation_id=data.get("correlation_id", ""),
+            metadata=data.get("metadata", {}) or {},
+            invocation_mode=data.get("invocation_mode", "native"),
+            _sig_nonce=data.get("_sig_nonce", ""),
+            _sig_exp=data.get("_sig_exp"),
+            _sig_iat=data.get("_sig_iat"),
+            _sig_kid=data.get("_sig_kid", ""),
         )
 
     def get_task_type(self) -> str:

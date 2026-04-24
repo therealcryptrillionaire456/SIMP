@@ -17,12 +17,14 @@ var/
 wheels/
 venv/
 .venv
+venv_gate4/
 env/
 .env
 .vscode/
 .idea/
 .DS_Store
 *.db
+*.sqlite3
 .pytest_cache/
 *.egg-info/
 
@@ -51,3 +53,56 @@ logs/brp/
 .claude/
 .mcp.json
 CLAUDE.md
+
+# Repo hygiene: local env variants and backup snapshots
+.env.backup*
+.env.master
+.env.minimal
+.env.multi_exchange
+.env.proper
+.env.solana_seeker
+.env.universal
+*.bak
+*.bak.*
+*.bak_*
+*.backup
+*.backup.*
+*.manual_backup
+*.backup_fix
+
+# Repo hygiene: runtime and generated artifacts
+*.log
+.playwright-cli/
+graphify-out/
+output/
+projectx_logs/
+logs/
+dashboard/operator_events.jsonl
+dashboard/config.json
+dashboard/server.py.backup
+memory/active_system_policies.json
+memory/reflection_status.json
+memory/system_memory.sqlite3
+
+# Repo hygiene: broker/runtime state generated during operation
+data/agent_registry.jsonl
+data/orchestration_plans.jsonl
+data/security_audit.jsonl
+data/router_journal.jsonl
+data/trade_journal.jsonl
+data/cost_ledger.jsonl
+data/eval_results.jsonl
+data/intent_telemetry.jsonl
+data/gate4_consumer_state.json
+data/gate4_consumer_state.json.bak.*
+data/brp_audit_logs/
+data/coordination/
+data/eval_datasets/
+data/logs/
+data/processed/
+data/processed_logs/
+data/signals/
+
+# Repo hygiene: local graph snapshots
+.graphify/snapshots/
+backups/repo_hygiene/

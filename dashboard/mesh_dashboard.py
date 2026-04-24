@@ -11,6 +11,11 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 import logging
 
+try:
+    import requests
+except ImportError:  # pragma: no cover - requests is expected in normal runtime
+    requests = None
+
 logger = logging.getLogger("MeshDashboard")
 
 
@@ -23,90 +28,178 @@ class MeshDashboard:
         self.channel_data = {}
         self.agent_status = {}
         self.last_update = None
-        
+        self._last_success: Optional[str] = None
+        self._last_error: Optional[str] = None
+
+    def broker_is_reachable(self) -> bool:
+        """Return whether the broker health endpoint can be reached."""
+        if requests is None:
+            self._last_error = "requests is not installed"
+            return False
+
+        try:
+            response = requests.get(f"{self.broker_url}/health", timeout=3)
+            if response.status_code == 200:
+                self._last_error = None
+                return True
+            self._last_error = f"broker health returned {response.status_code}"
+        except Exception as exc:
+            self._last_error = str(exc)
+        return False
+
+    def _mark_success(self) -> str:
+        """Track the last successful broker refresh timestamp."""
+        self._last_success = datetime.now(timezone.utc).isoformat()
+        self._last_error = None
+        self.last_update = self._last_success
+        return self._last_success
+
+    def _wrap_result(
+        self,
+        *,
+        data: Any,
+        broker_reachable: bool,
+        error: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return a stable truthfulness envelope for dashboard fetches."""
+        return {
+            "broker_reachable": broker_reachable,
+            "data_freshness": self._last_success,
+            "source": "broker" if broker_reachable else "fallback",
+            "error": error,
+            "data": data,
+        }
+
     def fetch_mesh_stats(self) -> Dict[str, Any]:
         """Fetch mesh statistics from broker"""
+        if requests is None:
+            error = "requests is not installed"
+            self._last_error = error
+            return self._wrap_result(data=self.mesh_stats, broker_reachable=False, error=error)
+
         try:
-            import requests
-            
             response = requests.get(f"{self.broker_url}/mesh/stats", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("status") == "success":
                     self.mesh_stats = data.get("statistics", {})
-                    self.last_update = datetime.now(timezone.utc).isoformat()
-                    return self.mesh_stats
+                    self._mark_success()
+                    return self._wrap_result(data=self.mesh_stats, broker_reachable=True)
+                error = "mesh stats response did not report success"
             else:
+                error = f"mesh stats returned {response.status_code}"
                 logger.error(f"Failed to fetch mesh stats: {response.status_code}")
-                
+
         except Exception as e:
+            error = str(e)
             logger.error(f"Error fetching mesh stats: {e}")
-        
-        return {}
-    
+
+        self._last_error = error
+        return self._wrap_result(data=self.mesh_stats, broker_reachable=False, error=error)
+
     def fetch_channel_data(self) -> Dict[str, Any]:
         """Fetch channel data from broker"""
+        if requests is None:
+            error = "requests is not installed"
+            self._last_error = error
+            return self._wrap_result(data=self.channel_data, broker_reachable=False, error=error)
+
         try:
-            import requests
-            
             response = requests.get(f"{self.broker_url}/mesh/channels", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("status") == "success":
                     self.channel_data = data.get("channels", {})
-                    return self.channel_data
+                    self._mark_success()
+                    return self._wrap_result(data=self.channel_data, broker_reachable=True)
+                error = "channel data response did not report success"
             else:
+                error = f"channel data returned {response.status_code}"
                 logger.error(f"Failed to fetch channel data: {response.status_code}")
-                
+
         except Exception as e:
+            error = str(e)
             logger.error(f"Error fetching channel data: {e}")
-        
-        return {}
-    
+
+        self._last_error = error
+        return self._wrap_result(data=self.channel_data, broker_reachable=False, error=error)
+
     def fetch_agent_status(self, agent_id: str) -> Dict[str, Any]:
         """Fetch agent mesh status"""
+        if requests is None:
+            error = "requests is not installed"
+            self._last_error = error
+            return self._wrap_result(
+                data=self.agent_status.get(agent_id, {}),
+                broker_reachable=False,
+                error=error,
+            )
+
         try:
-            import requests
-            
             response = requests.get(f"{self.broker_url}/mesh/agent/{agent_id}/status", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("status") == "success":
                     self.agent_status[agent_id] = data.get("agent_status", {})
-                    return self.agent_status[agent_id]
+                    self._mark_success()
+                    return self._wrap_result(
+                        data=self.agent_status[agent_id],
+                        broker_reachable=True,
+                    )
+                error = f"agent status response did not report success for {agent_id}"
             else:
+                error = f"agent status returned {response.status_code} for {agent_id}"
                 logger.error(f"Failed to fetch agent status for {agent_id}: {response.status_code}")
-                
+
         except Exception as e:
+            error = str(e)
             logger.error(f"Error fetching agent status for {agent_id}: {e}")
-        
-        return {}
-    
-    def fetch_recent_events(self, limit: int = 50) -> List[Dict[str, Any]]:
+
+        self._last_error = error
+        return self._wrap_result(
+            data=self.agent_status.get(agent_id, {}),
+            broker_reachable=False,
+            error=error,
+        )
+
+    def fetch_recent_events(self, limit: int = 50) -> Dict[str, Any]:
         """Fetch recent mesh events"""
+        recent_events: List[Dict[str, Any]] = []
+        if requests is None:
+            error = "requests is not installed"
+            self._last_error = error
+            return self._wrap_result(data=recent_events, broker_reachable=False, error=error)
+
         try:
-            import requests
-            
             response = requests.get(f"{self.broker_url}/mesh/events?limit={limit}", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("status") == "success":
-                    return data.get("events", [])
+                    recent_events = data.get("events", [])
+                    self._mark_success()
+                    return self._wrap_result(data=recent_events, broker_reachable=True)
+                error = "recent events response did not report success"
             else:
+                error = f"recent events returned {response.status_code}"
                 logger.error(f"Failed to fetch recent events: {response.status_code}")
-                
+
         except Exception as e:
+            error = str(e)
             logger.error(f"Error fetching recent events: {e}")
-        
-        return []
-    
+
+        self._last_error = error
+        return self._wrap_result(data=recent_events, broker_reachable=False, error=error)
+
     def get_dashboard_data(self) -> Dict[str, Any]:
         """Get all dashboard data for mesh visualization"""
         # Fetch latest data
-        stats = self.fetch_mesh_stats()
-        channels = self.fetch_channel_data()
-        recent_events = self.fetch_recent_events(limit=20)
-        
+        stats_result = self.fetch_mesh_stats()
+        channels_result = self.fetch_channel_data()
+        recent_events_result = self.fetch_recent_events(limit=20)
+        stats = stats_result.get("data", {})
+        channels = channels_result.get("data", {})
+        recent_events = recent_events_result.get("data", [])
+
         # Process channel data for visualization
         channel_list = []
         for channel_name, subscriber_count in channels.items():
@@ -119,7 +212,8 @@ class MeshDashboard:
         # Process agent data
         agents = []
         for agent_id, queue_size in stats.get("agent_queue_sizes", {}).items():
-            agent_status = self.fetch_agent_status(agent_id)
+            agent_status_result = self.fetch_agent_status(agent_id)
+            agent_status = agent_status_result.get("data", {})
             agents.append({
                 "id": agent_id,
                 "queue_size": queue_size,
@@ -141,6 +235,10 @@ class MeshDashboard:
             })
         
         return {
+            "broker_reachable": stats_result.get("broker_reachable", False),
+            "data_freshness": self._last_success,
+            "source": "broker" if stats_result.get("broker_reachable") else "fallback",
+            "error": stats_result.get("error"),
             "stats": {
                 "total_agents": stats.get("registered_agents", 0),
                 "total_channels": len(channels),

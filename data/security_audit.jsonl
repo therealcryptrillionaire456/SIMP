@@ -94,3 +94,42 @@
 {"timestamp": "2026-04-18T23:02:28.691498Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantum_intelligence_prime", "agent_type": "quantum_intelligence"}}
 {"timestamp": "2026-04-19T00:09:31.684975Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantum_intelligence_prime", "agent_type": "quantum"}}
 {"timestamp": "2026-04-19T00:16:27.073489Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "kloutbot", "agent_type": "orchestrator"}}
+{"timestamp": "2026-04-24T03:51:03.792071Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T03:51:04.287538Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T03:54:41.727089Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T03:54:41.740807Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T03:54:42.270144Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T03:56:51.596105Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T03:56:51.609626Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T03:56:52.164464Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T03:57:34.815006Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T03:57:34.828321Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T03:57:35.387234Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T03:59:57.709010Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T03:59:57.721667Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T03:59:58.334832Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T04:00:18.303192Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T04:00:18.316771Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T04:00:18.889265Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T04:02:43.477236Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T04:02:43.489883Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T04:02:44.124758Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T04:03:55.134540Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T04:03:55.147894Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T04:03:55.818496Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T04:11:30.648463Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T04:11:30.661363Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T04:11:31.237185Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T04:19:45.931242Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T04:19:45.945038Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T04:19:46.619294Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T04:27:56.814818Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "smoke_test_agent", "agent_type": "test"}}
+{"timestamp": "2026-04-24T04:27:56.827780Z", "event_type": "agent_deregistered", "severity": "low", "details": {"agent_id": "smoke_test_agent"}}
+{"timestamp": "2026-04-24T04:27:57.481201Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "test_file_agent", "agent_type": "file_agent"}}
+{"timestamp": "2026-04-24T05:34:29.877046Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "ktc_agent", "agent_type": "ktc"}}
+{"timestamp": "2026-04-24T05:34:56.774202Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "quantum_signal_bridge", "agent_type": "signal_bridge"}}
+{"timestamp": "2026-04-24T05:34:58.820703Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "projectx_quantum_advisor", "agent_type": "quantum_advisor"}}
+{"timestamp": "2026-04-24T05:35:01.016872Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "goose_orchestrator", "agent_type": "orchestrator"}}
+{"timestamp": "2026-04-24T05:44:30.786658Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "goose_orchestrator", "agent_type": "orchestrator"}}
+{"timestamp": "2026-04-24T06:11:30.078017Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "goose_orchestrator", "agent_type": "orchestrator"}}
+{"timestamp": "2026-04-24T13:07:11.730216Z", "event_type": "agent_registered", "severity": "low", "details": {"agent_id": "goose_orchestrator", "agent_type": "orchestrator"}}

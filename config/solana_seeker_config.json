@@ -1,0 +1,150 @@
+{
+  "solana_seeker": {
+    "name": "Solana Seeker Phone Integration",
+    "version": "1.0.0",
+    "enabled": true,
+    "phone_integration": {
+      "device_type": "solana_seeker",
+      "connection_protocol": "websocket",
+      "api_endpoint": "https://api.solana-seeker.com/v1",
+      "push_notifications": true,
+      "real_time_updates": true
+    },
+    "trading_pairs": {
+      "SOL/USD": {
+        "symbol": "SOL/USD",
+        "exchange": "solana_seeker",
+        "contract_type": "spot",
+        "tick_size": 0.01,
+        "min_notional": 0.01,
+        "max_notional": 1000.00
+      },
+      "SOL/USDC": {
+        "symbol": "SOL/USDC",
+        "exchange": "solana_seeker",
+        "contract_type": "spot",
+        "tick_size": 0.0001,
+        "min_notional": 0.01,
+        "max_notional": 1000.00
+      },
+      "RAY/USD": {
+        "symbol": "RAY/USD",
+        "exchange": "solana_seeker",
+        "contract_type": "spot",
+        "tick_size": 0.01,
+        "min_notional": 0.01,
+        "max_notional": 500.00
+      },
+      "SRM/USD": {
+        "symbol": "SRM/USD",
+        "exchange": "solana_seeker",
+        "contract_type": "spot",
+        "tick_size": 0.01,
+        "min_notional": 0.01,
+        "max_notional": 500.00
+      },
+      "PYTH/USD": {
+        "symbol": "PYTH/USD",
+        "exchange": "solana_seeker",
+        "contract_type": "spot",
+        "tick_size": 0.01,
+        "min_notional": 0.01,
+        "max_notional": 500.00
+      }
+    },
+    "position_sizing": {
+      "microscopic": {"min_usd": 0.01, "max_usd": 10.00, "default_usd": 5.00},
+      "small": {"min_usd": 10.00, "max_usd": 100.00, "default_usd": 50.00},
+      "medium": {"min_usd": 100.00, "max_usd": 1000.00, "default_usd": 500.00},
+      "large": {"min_usd": 1000.00, "max_usd": 10000.00, "default_usd": 5000.00}
+    },
+    "risk_management": {
+      "circuit_breakers": {
+        "max_hourly_trades": 100,
+        "max_daily_trades": 500,
+        "max_consecutive_losses": 3,
+        "cool_down_minutes": 10,
+        "max_daily_loss_usd": 1000.00,
+        "max_position_exposure_pct": 15.0
+      },
+      "solana_specific": {
+        "max_sol_exposure": 100.00,
+        "max_token_exposure": 50.00,
+        "min_liquidity_score": 0.2,
+        "max_spread_bps": 200,
+        "enable_arbitrage": true,
+        "enable_meme_pump": false,
+        "enable_whale_detection": true
+      }
+    },
+    "prediction_models": {
+      "technical_analysis": {
+        "enabled": true,
+        "indicators": ["RSI", "MACD", "BB", "EMA", "VWAP"],
+        "timeframes": ["1m", "5m", "15m", "1h", "4h", "1d"],
+        "signal_threshold": 0.75
+      },
+      "on_chain_analysis": {
+        "enabled": true,
+        "metrics": ["network_volume", "exchange_flow", "holder_distribution", "transaction_count"],
+        "time_windows": ["1h", "6h", "24h", "7d"],
+        "correlation_threshold": 0.6
+      },
+      "sentiment_analysis": {
+        "enabled": true,
+        "sources": ["twitter", "discord", "telegram", "reddit", "news"],
+        "sentiment_threshold": 0.7,
+        "volume_weight": true
+      },
+      "arbitrage_detection": {
+        "enabled": true,
+        "exchanges": ["coinbase", "kraken", "binance", "solana_seeker"],
+        "min_spread_bps": 50,
+        "max_latency_ms": 100
+      }
+    },
+    "execution": {
+      "dry_run": false,
+      "test_mode": false,
+      "enable_arbitrage": true,
+      "enable_hedging": true,
+      "enable_momentum": true,
+      "enable_rebalance": true,
+      "execution_timeout_ms": 5000,
+      "retry_attempts": 3,
+      "retry_delay_ms": 1000
+    },
+    "monitoring": {
+      "enable_real_time": true,
+      "enable_alerts": true,
+      "log_level": "INFO",
+      "retention_days": 30,
+      "performance_tracking": true,
+      "profit_loss_tracking": true,
+      "risk_metrics_tracking": true
+    },
+    "web3_integration": {
+      "nft_trading": {
+        "enabled": true,
+        "marketplaces": ["magic_eden", "tensor", "alpha"],
+        "floor_price_threshold": 0.5,
+        "volume_threshold": 1000,
+        "rarity_weight": 0.3
+      },
+      "defi_yield_farming": {
+        "enabled": true,
+        "protocols": ["orca", "raydium", "serum", "jupiter"],
+        "min_apy": 0.05,
+        "max_impermanent_loss": 0.1,
+        "rebalance_frequency": "daily"
+      },
+      "token_launches": {
+        "enabled": true,
+        "launch_pads": ["raydium", "pump_fun", "jupiter"],
+        "min_market_cap": 10000,
+        "max_volatility": 0.3,
+        "enable_early_entry": true
+      }
+    }
+  }
+}

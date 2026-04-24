@@ -23,7 +23,7 @@ class TestLedgerConfig(unittest.TestCase):
 
     def test_defaults(self):
         cfg = LedgerConfig()
-        assert cfg.path == "data/task_ledger.jsonl"
+        assert cfg.path.endswith("data/task_ledger.jsonl")
         assert cfg.max_size_mb == 100.0
         assert cfg.expire_after_hours == 168.0
 

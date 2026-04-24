@@ -1,0 +1,92 @@
+{
+  "exchange_config": {
+    "kalshi": {
+      "name": "Kalshi",
+      "type": "kalshi",
+      "environments": {
+        "production": {
+          "api_key": "${KALSHI_PRODUCTION_API_KEY}",
+          "api_secret": "${KALSHI_PRODUCTION_API_SECRET}",
+          "base_url": "https://api.kalshi.com",
+          "enabled": true
+        }
+      }
+    }
+  },
+  "symbol_config": {
+    "kalshi_futures": {
+      "BTC-USD": {
+        "symbol": "BTC-USD",
+        "exchange": "kalshi",
+        "contract_type": "futures",
+        "trading_mode": "continuous",
+        "tick_size": 0.01,
+        "min_notional": 1.00,
+        "max_notional": 100.00
+      },
+      "ELECTION-2024-D": {
+        "symbol": "ELECTION-2024-D",
+        "exchange": "kalshi",
+        "contract_type": "binary",
+        "trading_mode": "event",
+        "tick_size": 0.01,
+        "min_notional": 1.00,
+        "max_notional": 100.00
+      },
+      "CL-2024-DEC": {
+        "symbol": "CL-2024-DEC",
+        "exchange": "kalshi",
+        "contract_type": "futures",
+        "trading_mode": "monthly",
+        "tick_size": 0.01,
+        "min_notional": 1.00,
+        "max_notional": 100.00
+      }
+    }
+  },
+  "position_sizing": {
+    "kalshi": {
+      "microscopic": {"min_usd": 1.00, "max_usd": 10.00, "default_usd": 5.00},
+      "small": {"min_usd": 10.00, "max_usd": 100.00, "default_usd": 50.00},
+      "medium": {"min_usd": 100.00, "max_usd": 1000.00, "default_usd": 500.00},
+      "large": {"min_usd": 1000.00, "max_usd": 10000.00, "default_usd": 5000.00}
+    }
+  },
+  "risk_management": {
+    "circuit_breakers": {
+      "max_hourly_trades": 50,
+      "max_daily_trades": 200,
+      "max_consecutive_losses": 4,
+      "cool_down_minutes": 15,
+      "max_daily_loss_usd": 1000.00,
+      "max_position_exposure_pct": 10.0
+    },
+    "kalshi_specific": {
+      "max_binary_exposure": 0.10,
+      "max_futures_notional": 5000.00,
+      "min_liquidity_score": 0.3,
+      "max_spread_bps": 100
+    }
+  },
+  "trading_hours": {
+    "kalshi": {
+      "days_active": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "start_time_utc": "08:00",
+      "end_time_utc": "22:00",
+      "extended_hours": false
+    }
+  },
+  "execution": {
+    "dry_run": false,
+    "test_mode": false,
+    "enable_arbitrage": true,
+    "enable_hedging": true,
+    "enable_momentum": true
+  },
+  "monitoring": {
+    "enable_real_time": true,
+    "enable_alerts": true,
+    "log_level": "INFO",
+    "retention_days": 30
+  }
+}

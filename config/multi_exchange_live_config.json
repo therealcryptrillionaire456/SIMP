@@ -1,0 +1,253 @@
+{
+  "system_version": "1.0.0",
+  "last_updated": "2026-04-19",
+  "description": "Multi-Exchange Live Trading Configuration for SIMP",
+  
+  "exchanges": {
+    "coinbase": {
+      "name": "Coinbase",
+      "type": "cdp",
+      "environments": {
+        "sandbox": {
+          "api_key": "${COINBASE_SANDBOX_API_KEY}",
+          "api_secret": "${COINBASE_SANDBOX_API_SECRET}",
+          "passphrase": "${COINBASE_SANDBOX_PASSPHRASE}",
+          "base_url": "https://api-public.sandbox.pro.coinbase.com",
+          "timeout_seconds": 30,
+          "retry_attempts": 3,
+          "enabled": true
+        },
+        "production": {
+          "api_key": "${COINBASE_PRODUCTION_API_KEY}",
+          "api_secret": "${COINBASE_PRODUCTION_API_SECRET}",
+          "passphrase": "${COINBASE_PRODUCTION_PASSPHRASE}",
+          "base_url": "https://api.pro.coinbase.com",
+          "timeout_seconds": 30,
+          "retry_attempts": 3,
+          "enabled": false
+        }
+      }
+    },
+    
+    "kraken": {
+      "name": "Kraken",
+      "type": "rest",
+      "environments": {
+        "sandbox": {
+          "api_key": "${KRAKEN_SANDBOX_API_KEY}",
+          "api_secret": "${KRAKEN_SANDBOX_API_SECRET}",
+          "base_url": "https://api-test.kraken.com",
+          "timeout_seconds": 30,
+          "retry_attempts": 3,
+          "enabled": false
+        },
+        "production": {
+          "api_key": "${KRAKEN_PRODUCTION_API_KEY}",
+          "api_secret": "${KRAKEN_PRODUCTION_API_SECRET}",
+          "base_url": "https://api.kraken.com",
+          "timeout_seconds": 30,
+          "retry_attempts": 3,
+          "enabled": false
+        }
+      }
+    },
+    
+    "binance": {
+      "name": "Binance",
+      "type": "rest",
+      "environments": {
+        "sandbox": {
+          "api_key": "${BINANCE_SANDBOX_API_KEY}",
+          "api_secret": "${BINANCE_SANDBOX_API_SECRET}",
+          "base_url": "https://testnet.binance.vision",
+          "timeout_seconds": 30,
+          "retry_attempts": 3,
+          "enabled": false
+        },
+        "production": {
+          "api_key": "${BINANCE_PRODUCTION_API_KEY}",
+          "api_secret": "${BINANCE_PRODUCTION_API_SECRET}",
+          "base_url": "https://api.binance.com",
+          "timeout_seconds": 30,
+          "retry_attempts": 3,
+          "enabled": false
+        }
+      }
+    }
+  },
+  
+  "trading_pairs": {
+    "primary": {
+      "BTC-USD": {
+        "exchanges": ["coinbase", "kraken"],
+        "min_spread_pct": 0.01,
+        "liquidity": "high"
+      },
+      "ETH-USD": {
+        "exchanges": ["coinbase", "kraken", "binance"],
+        "min_spread_pct": 0.02,
+        "liquidity": "high"
+      },
+      "SOL-USD": {
+        "exchanges": ["coinbase", "binance"],
+        "min_spread_pct": 0.03,
+        "liquidity": "medium"
+      }
+    },
+    "secondary": {
+      "LTC-USD": {
+        "exchanges": ["coinbase", "kraken"],
+        "min_spread_pct": 0.03,
+        "liquidity": "medium"
+      },
+      "BCH-USD": {
+        "exchanges": ["coinbase", "kraken"],
+        "min_spread_pct": 0.04,
+        "liquidity": "low"
+      }
+    }
+  },
+  
+  "position_sizing": {
+    "microscopic": {
+      "min_notional_usd": 0.01,
+      "max_notional_usd": 0.10,
+      "default_notional_usd": 0.05
+    },
+    "small": {
+      "min_notional_usd": 1.00,
+      "max_notional_usd": 10.00,
+      "default_notional_usd": 5.00
+    },
+    "medium": {
+      "min_notional_usd": 25.00,
+      "max_notional_usd": 100.00,
+      "default_notional_usd": 50.00
+    }
+  },
+  
+  "risk_management": {
+    "circuit_breakers": {
+      "max_hourly_trades": 30,
+      "max_daily_trades": 100,
+      "max_consecutive_losses": 4,
+      "cooldown_minutes": 15,
+      "max_daily_loss_usd": 100.00,
+      "max_position_exposure_pct": 5.0
+    },
+    
+    "arbitrage_protection": {
+      "min_profit_threshold_pct": 0.1,
+      "max_slippage_pct": 0.05,
+      "max_execution_time_seconds": 30,
+      "min_liquidity_score": 0.7
+    },
+    
+    "cross_exchange_limits": {
+      "max_simultaneous_arbitrage": 3,
+      "min_exchange_balance_usd": 10.00,
+      "reserve_balance_pct": 10.0
+    }
+  },
+  
+  "execution_engine": {
+    "primary_exchange": "coinbase",
+    "arbitrage_mode": true,
+    "market_data_delay_seconds": 1,
+    "order_timeout_seconds": 30,
+    "retry_policy": {
+      "max_retries": 3,
+      "retry_delay_seconds": 1,
+      "exponential_backoff": true
+    }
+  },
+  
+  "monitoring": {
+    "enabled": true,
+    "metrics_collection": {
+      "trade_execution": true,
+      "market_data": true,
+      "risk_metrics": true,
+      "performance": true
+    },
+    
+    "alert_channels": {
+      "log": true,
+      "dashboard": true,
+      "webhook": false,
+      "email": false
+    },
+    
+    "alert_thresholds": {
+      "slippage_pct": 0.10,
+      "latency_seconds": 5.0,
+      "error_rate_pct": 1.0,
+      "balance_alert_pct": 10.0
+    }
+  },
+  
+  "environment_variables": {
+    "required": [
+      "COINBASE_SANDBOX_API_KEY",
+      "COINBASE_SANDBOX_API_SECRET",
+      "COINBASE_SANDBOX_PASSPHRASE"
+    ],
+    "optional": [
+      "COINBASE_PRODUCTION_API_KEY",
+      "COINBASE_PRODUCTION_API_SECRET",
+      "COINBASE_PRODUCTION_PASSPHRASE",
+      "KRAKEN_SANDBOX_API_KEY",
+      "KRAKEN_SANDBOX_API_SECRET",
+      "KRAKEN_PRODUCTION_API_KEY",
+      "KRAKEN_PRODUCTION_API_SECRET",
+      "BINANCE_SANDBOX_API_KEY",
+      "BINANCE_SANDBOX_API_SECRET",
+      "BINANCE_PRODUCTION_API_KEY",
+      "BINANCE_PRODUCTION_API_SECRET",
+      "TRADING_ENVIRONMENT",
+      "EMERGENCY_STOP"
+    ]
+  },
+  
+  "operational_modes": {
+    "sandbox": {
+      "description": "Testing with simulated funds",
+      "exchanges": ["coinbase"],
+      "position_sizing": "microscopic",
+      "risk_level": "low",
+      "enabled": true
+    },
+    
+    "microscopic": {
+      "description": "Live trading with minimal risk ($0.01-$0.10)",
+      "exchanges": ["coinbase"],
+      "position_sizing": "microscopic",
+      "risk_level": "low",
+      "enabled": false
+    },
+    
+    "small_scale": {
+      "description": "Consistent live trading ($1-$10)",
+      "exchanges": ["coinbase"],
+      "position_sizing": "small",
+      "risk_level": "medium",
+      "enabled": false
+    },
+    
+    "multi_exchange": {
+      "description": "Cross-exchange arbitrage and trading",
+      "exchanges": ["coinbase", "kraken", "binance"],
+      "position_sizing": "small",
+      "risk_level": "medium",
+      "enabled": false
+    },
+    
+    "full_production": {
+      "description": "Maximum trading capacity",
+      "exchanges": ["coinbase", "kraken", "binance"],
+      "position_sizing": "medium",
+      "risk_level": "high",
+      "enabled": false
+    }
+  }
+}

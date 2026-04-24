@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-04-24T15:06:57.112871+00:00",
+  "all_ok": true,
+  "checks": {
+    "broker": {
+      "ok": true,
+      "detail": "broker healthy, 14 agents online",
+      "agents": 14
+    },
+    "gate4_freshness": {
+      "ok": true,
+      "detail": "gate4 trade age=40s (target <120s)",
+      "age_s": 39.7
+    },
+    "decision_freshness": {
+      "ok": true,
+      "detail": "decision journal age=40s (target <120s)",
+      "age_s": 39.7
+    },
+    "signal_freshness": {
+      "ok": true,
+      "detail": "signal age=40s (target <60s)",
+      "age_s": 39.7
+    }
+  }
+}

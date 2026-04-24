@@ -46,6 +46,16 @@ try:
 except ImportError:
     MESH_DASHBOARD_AVAILABLE = False
     logger.warning("MeshDashboard not available. Mesh visualization will be limited.")
+
+# Try to import path telemetry for operator visibility
+try:
+    from simp.telemetry.path_telemetry import make_telemetry_block
+    PATH_TELEMETRY_AVAILABLE = True
+    logger.info("Path telemetry available for /api/stats")
+except ImportError:
+    make_telemetry_block = None  # type: ignore[assignment]
+    PATH_TELEMETRY_AVAILABLE = False
+    logger.warning("Path telemetry not available. /api/stats will omit telemetry section.")
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # ---------------------------------------------------------------------------
@@ -74,6 +84,18 @@ CORS_ORIGINS: list[str] = [
     for o in os.environ.get("DASHBOARD_CORS_ORIGINS", "*").split(",")
     if o.strip()
 ]
+
+# Mock broker injection point for tests
+_mock_broker = None
+def set_broker(broker):
+    """Inject a mock broker for tests (simpler than async mocking)."""
+    global _mock_broker
+    _mock_broker = broker
+
+def _get_broker_inject():
+    """Return the injected mock broker, if any."""
+    global _mock_broker
+    return _mock_broker
 
 # Fields that must never appear in public responses
 SENSITIVE_KEYS = frozenset({
@@ -483,8 +505,9 @@ async def _broker_snapshot(*, force_refresh: bool = False) -> dict[str, dict | N
     return {"dashboard": dashboard_data, "health": health_data}
 
 
-async def _broker_get(path: str) -> dict | None:
-    return await _broker_cached_get(path)
+async def _broker_get(path: str, default: dict | None = None, timeout: float = 3.0) -> dict | None:
+    result = await _broker_cached_get(path)
+    return result if result is not None else default
 
 
 async def _broker_post(path: str, payload: dict[str, Any]) -> dict | None:
@@ -1551,6 +1574,27 @@ async def api_stats():
             "projectx_phase": _projectx_phase_stats_payload(None),
         }
     data["projectx_phase"] = _projectx_phase_stats_payload(phase_summary)
+    # Attach path telemetry (gracefully degrade if unavailable)
+    try:
+        if PATH_TELEMETRY_AVAILABLE:
+            data["path_telemetry"] = make_telemetry_block()
+        else:
+            data["path_telemetry"] = {
+                "native_count": 0,
+                "bridged_count": 0,
+                "aggregate_latency_ms": 0.0,
+                "count_by_agent": {},
+                "count_by_mode": {},
+            }
+    except Exception:
+        logger.exception("Failed to build path_telemetry block")
+        data["path_telemetry"] = {
+            "native_count": 0,
+            "bridged_count": 0,
+            "aggregate_latency_ms": 0.0,
+            "count_by_agent": {},
+            "count_by_mode": {},
+        }
     return _redact(data)
 
 
@@ -2496,7 +2540,14 @@ async def api_mesh_stats():
     try:
         dashboard = MeshDashboard()
         stats = dashboard.fetch_mesh_stats()
-        return {"status": "success", "data": stats}
+        return {
+            "status": "success",
+            "broker_reachable": stats.get("broker_reachable"),
+            "data_freshness": stats.get("data_freshness"),
+            "source": stats.get("source"),
+            "error": stats.get("error"),
+            "data": stats.get("data", {}),
+        }
     except Exception as e:
         logger.error(f"Error fetching mesh stats: {e}")
         return {"error": str(e), "status": "error"}
@@ -2514,8 +2565,12 @@ async def api_mesh_channels():
         core_channels = dashboard._get_core_channels_info()
         return {
             "status": "success",
+            "broker_reachable": channels.get("broker_reachable"),
+            "data_freshness": channels.get("data_freshness"),
+            "source": channels.get("source"),
+            "error": channels.get("error"),
             "data": {
-                "channels": channels,
+                "channels": channels.get("data", {}),
                 "core_channels": core_channels
             }
         }
@@ -2533,7 +2588,14 @@ async def api_mesh_events(limit: int = 50):
     try:
         dashboard = MeshDashboard()
         events = dashboard.fetch_recent_events(limit=limit)
-        return {"status": "success", "events": events}
+        return {
+            "status": "success",
+            "broker_reachable": events.get("broker_reachable"),
+            "data_freshness": events.get("data_freshness"),
+            "source": events.get("source"),
+            "error": events.get("error"),
+            "events": events.get("data", []),
+        }
     except Exception as e:
         logger.error(f"Error fetching mesh events: {e}")
         return {"error": str(e), "status": "error"}
@@ -2548,7 +2610,19 @@ async def api_mesh_dashboard():
     try:
         dashboard = MeshDashboard()
         data = dashboard.get_dashboard_data()
-        return {"status": "success", "data": data}
+        dashboard_data = {
+            key: value
+            for key, value in data.items()
+            if key not in {"broker_reachable", "data_freshness", "source", "error"}
+        }
+        return {
+            "status": "success",
+            "broker_reachable": data.get("broker_reachable"),
+            "data_freshness": data.get("data_freshness"),
+            "source": data.get("source"),
+            "error": data.get("error"),
+            "data": dashboard_data,
+        }
     except Exception as e:
         logger.error(f"Error fetching mesh dashboard data: {e}")
         return {"error": str(e), "status": "error"}
@@ -2618,19 +2692,28 @@ async def api_mesh_export():
     
     try:
         dashboard = MeshDashboard()
-        
+
         # Get all data
         stats = dashboard.fetch_mesh_stats()
         channels = dashboard.fetch_channel_data()
         events = dashboard.fetch_recent_events(limit=1000)
         dashboard_data = dashboard.get_dashboard_data()
-        
+        dashboard_data_payload = {
+            key: value
+            for key, value in dashboard_data.items()
+            if key not in {"broker_reachable", "data_freshness", "source", "error"}
+        }
+
         export_data = {
             "export_timestamp": datetime.now(timezone.utc).isoformat(),
-            "stats": stats,
-            "channels": channels,
-            "events": events,
-            "dashboard_data": dashboard_data,
+            "broker_reachable": stats.get("broker_reachable"),
+            "data_freshness": stats.get("data_freshness"),
+            "source": stats.get("source"),
+            "error": stats.get("error"),
+            "stats": stats.get("data", {}),
+            "channels": channels.get("data", {}),
+            "events": events.get("data", []),
+            "dashboard_data": dashboard_data_payload,
             "export_format": "simp_mesh_v1"
         }
         
@@ -2684,10 +2767,14 @@ def _broker_get_sync(path: str, default=None, timeout: float = 3.0):
 @app.get("/dashboard/a2a/status")
 async def dashboard_a2a_status():
     """A2A compatibility status for the dashboard."""
-    agents_data = await _broker_get("/agents")
-    if agents_data is None:
-        agents_data = {"agents": []}
-    agents_list = agents_data.get("agents", []) if isinstance(agents_data, dict) else []
+    broker = _get_broker_inject()
+    if broker is not None:
+        agents_list = list(broker.list_agents())
+    else:
+        agents_data = await _broker_get("/agents")
+        if agents_data is None:
+            agents_data = {"agents": []}
+        agents_list = agents_data.get("agents", []) if isinstance(agents_data, dict) else []
 
     return {
         "a2a_capable_agents": agents_list,

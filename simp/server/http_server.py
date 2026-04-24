@@ -15,6 +15,7 @@ import threading
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+import queue
 from typing import Dict, Any, Optional
 from urllib import request as urllib_request
 from urllib import error as urllib_error
@@ -22,6 +23,8 @@ from flask import Flask, request, jsonify
 from threading import Thread
 import time
 
+from simp.agentic_https import build_contract_description
+from simp.native_tools import NATIVE_TOOL_REGISTRIES, NativeToolRegistry
 from simp.server.broker import SimpBroker, BrokerConfig, BrokerState
 from simp.server.security_audit import SecurityAuditLog, get_audit_log
 from simp.server.request_guards import (
@@ -273,12 +276,44 @@ class SimpHttpServer:
             broker=self.broker,
         )
 
+        # SSE subscriber registry for task streaming
+        self._sse_subscribers: dict[str, list[queue.Queue]] = {}
+        self._sse_lock = threading.Lock()
+
         self._setup_security_hooks()
         self._setup_routes()
         self._setup_a2a_routes()
         self._setup_mesh_routes()
         self._setup_sprint51_55_routes()
         self.logger.info("SIMP HTTP Server initialized")
+
+    # ------------------------------------------------------------------
+    # SSE streaming (Sprint 41)
+    # ------------------------------------------------------------------
+    def register_sse_with_runtime(self, runtime):
+        """Register the SSE subscriber layer with the given runtime.
+        
+        This is a no-op stub for Sprint 41 compatibility — real runtime
+        integration would wire the runtime's event bus to sse_publish().
+        """
+        self.logger.info("SSE subscriber layer registered (stub)")
+        pass
+
+    def sse_publish(self, task_id: str, event_data: dict) -> None:
+        """Publish an SSE event to all subscribers of a given task.
+        
+        Args:
+            task_id: The task identifier subscribers are listening on.
+            event_data: JSON-serializable dict to deliver.
+        """
+        data_str = json.dumps(event_data)
+        with self._sse_lock:
+            queues = self._sse_subscribers.get(task_id, [])
+            for q in queues:
+                try:
+                    q.put_nowait(f"data: {data_str}\n\n")
+                except Exception:
+                    pass
 
     def _setup_security_hooks(self):
         """Setup Sprint 70 security hooks (before/after request)."""
@@ -323,12 +358,221 @@ class SimpHttpServer:
             response.headers.pop("X-Powered-By", None)
             return response
 
+    def _submit_async(self, coro, timeout: float = 30.0):
+        """Run a broker coroutine on the shared async loop and return its result."""
+        future = asyncio.run_coroutine_threadsafe(coro, self._async_loop)
+        return future.result(timeout=timeout)
+
     def _setup_routes(self):
         """Setup Flask routes"""
 
         @self.app.route("/health", methods=["GET"])
         def health():
             return jsonify(self.broker.health_check()), 200
+
+        @self.app.route("/agentic/contract", methods=["GET"])
+        def agentic_contract():
+            return jsonify(build_contract_description()), 200
+
+        @self.app.route("/agentic/intents/route", methods=["POST"])
+        def route_agentic_intent():
+            payload = request.get_json(force=False, silent=True) or {}
+            response = self._submit_async(self.broker.route_agentic_request(payload))
+            status_code = 200
+            if not response.get("success", False):
+                status_code = 400 if response.get("error_code") == "INVALID_SIGNATURE" else 500
+            return jsonify(response), status_code
+
+        @self.app.route("/skills", methods=["GET"])
+        def list_skills():
+            """List available skills from DeerFlow runtime."""
+            try:
+                from simp.orchestration.orchestration_loop import _get_deerflow_runtime
+                runtime = _get_deerflow_runtime()
+                if runtime is None or not hasattr(runtime, "skill_loader"):
+                    return jsonify({
+                        "status": "success",
+                        "count": 0,
+                        "skills": [],
+                        "message": "DeerFlow runtime not active",
+                    }), 200
+                registry = runtime.skill_loader.registry
+                skills = registry.list_all() if hasattr(registry, "list_all") else []
+                skill_list = [
+                    {
+                        "name": getattr(s, "name", str(s)),
+                        "description": getattr(s, "description", ""),
+                        "tools": getattr(s, "tools", []),
+                        "intent_types": getattr(s, "intent_types", []),
+                    }
+                    for s in skills
+                ]
+                return jsonify({
+                    "status": "success",
+                    "count": len(skill_list),
+                    "skills": skill_list,
+                }), 200
+            except ImportError:
+                return jsonify({
+                    "status": "success",
+                    "count": 0,
+                    "skills": [],
+                    "message": "DeerFlow runtime not available",
+                }), 200
+
+        @self.app.route("/tasks/<task_id>/stream", methods=["GET"])
+        def task_sse_stream(task_id):
+            """SSE stream for a task's progress."""
+            from flask import Response, stream_with_context
+
+            def generate():
+                q = queue.Queue()
+                with self._sse_lock:
+                    if task_id not in self._sse_subscribers:
+                        self._sse_subscribers[task_id] = []
+                    self._sse_subscribers[task_id].append(q)
+                try:
+                    yield ": connected\n\n"
+                    while True:
+                        try:
+                            data = q.get(timeout=30)
+                            yield data
+                        except queue.Empty:
+                            yield ": heartbeat\n\n"
+                except GeneratorExit:
+                    pass
+                finally:
+                    with self._sse_lock:
+                        queues = self._sse_subscribers.get(task_id, [])
+                        if q in queues:
+                            queues.remove(q)
+                        if not self._sse_subscribers.get(task_id):
+                            self._sse_subscribers.pop(task_id, None)
+
+            return Response(
+                stream_with_context(generate()),
+                mimetype="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                    "X-Accel-Buffering": "no",
+                },
+            )
+
+        @self.app.route("/native/tools/list", methods=["GET"])
+        def list_native_tools():
+            registries = NativeToolRegistry.all_registries()
+            return jsonify(
+                {
+                    "status": "success",
+                    "source": "native",
+                    "agent_count": len(registries),
+                    "agents": sorted(registries),
+                    "tool_names": sorted(
+                        {
+                            tool.name
+                            for registry in registries.values()
+                            for tool in registry.list_tools()
+                        }
+                    ),
+                }
+            ), 200
+
+        @self.app.route("/native/tools/<agent_id>/list", methods=["GET"])
+        def list_agent_native_tools(agent_id):
+            registry = NativeToolRegistry.get_registry(agent_id)
+            if registry is None:
+                return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
+            return jsonify(
+                {
+                    "status": "success",
+                    "source": "native",
+                    "agent_id": agent_id,
+                    "tool_names": sorted(registry.tool_names()),
+                    "tools": registry.list_native_items(),
+                }
+            ), 200
+
+        @self.app.route("/native/tools/<agent_id>/<tool_name>/invoke", methods=["POST"])
+        def invoke_native_tool(agent_id, tool_name):
+            registry = NativeToolRegistry.get_registry(agent_id)
+            if registry is None:
+                return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
+            body = request.get_json(force=False, silent=True) or {}
+            arguments = body.get("arguments") or {}
+            try:
+                result = registry.invoke(tool_name, arguments=arguments)
+            except KeyError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 404
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
+            return jsonify(
+                {
+                    "status": "success",
+                    "source": "native",
+                    "agent_id": agent_id,
+                    "tool_name": tool_name,
+                    "invocation_mode": "native",
+                    "result": result,
+                }
+            ), 200
+
+        @self.app.route("/mcp/tools/list", methods=["GET"])
+        def list_compat_tools():
+            registries = dict(NATIVE_TOOL_REGISTRIES)
+            return jsonify(
+                {
+                    "status": "success",
+                    "source": "native_via_mcp_compat",
+                    "agent_count": len(registries),
+                    "agents": sorted(registries),
+                    "tools": [
+                        {
+                            "agent_id": agent_id,
+                            "tools": registry.list_mcp_items(),
+                        }
+                        for agent_id, registry in sorted(registries.items())
+                    ],
+                }
+            ), 200
+
+        @self.app.route("/mcp/tools/<agent_id>/list", methods=["GET"])
+        def list_agent_compat_tools(agent_id):
+            registry = NativeToolRegistry.get_registry(agent_id)
+            if registry is None:
+                return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
+            return jsonify(
+                {
+                    "status": "success",
+                    "source": "native_via_mcp_compat",
+                    "agent_id": agent_id,
+                    "tools": registry.list_mcp_items(),
+                }
+            ), 200
+
+        @self.app.route("/mcp/tools/<agent_id>/<tool_name>/call", methods=["POST"])
+        def call_compat_tool(agent_id, tool_name):
+            registry = NativeToolRegistry.get_registry(agent_id)
+            if registry is None:
+                return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
+            body = request.get_json(force=False, silent=True) or {}
+            arguments = body.get("arguments") or {}
+            try:
+                result = registry.invoke(tool_name, arguments=arguments)
+            except KeyError as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 404
+            except Exception as exc:
+                return jsonify({"status": "error", "error": str(exc)}), 500
+            return jsonify(
+                {
+                    "status": "success",
+                    "source": "native_via_mcp_compat",
+                    "agent_id": agent_id,
+                    "tool_name": tool_name,
+                    "invocation_mode": "mcp_bridge",
+                    "result": result,
+                }
+            ), 200
 
         # ── TimesFM observability endpoints ────────────────────────────
         @self.app.route("/timesfm/health", methods=["GET"])
@@ -437,11 +681,16 @@ class SimpHttpServer:
 
         @self.app.route("/agents", methods=["GET"])
         def list_agents():
-            agents = self.broker.list_agents()
+            agents_list = self.broker.list_agents()
+            # Build a dict keyed by agent_id for backward-compatible consumer code
+            agents_dict: Dict[str, Dict[str, Any]] = {}
+            for a in agents_list:
+                aid = a.get("agent_id", "")
+                agents_dict[aid] = a
             return jsonify({
                 "status": "success",
-                "count": len(agents),
-                "agents": agents
+                "count": len(agents_list),
+                "agents": agents_dict
             }), 200
 
         @self.app.route("/agents/heartbeat", methods=["POST"])

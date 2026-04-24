@@ -1,0 +1,346 @@
+{
+  "system_version": "2.0.0",
+  "last_updated": "2026-04-19",
+  "description": "Universal Exchange Configuration - All Asset Classes & Markets",
+  
+  "market_categories": {
+    "crypto": {
+      "exchanges": ["coinbase", "kraken", "binance", "gemini", "kucoin", "okx"],
+      "assets": ["BTC-USD", "ETH-USD", "SOL-USD", "LTC-USD", "XRP-USD", "ADA-USD"],
+      "trading_modes": ["spot", "futures", "options", "perpetual"]
+    },
+    "stocks": {
+      "exchanges": ["robinhood", "alpaca", "interactive_brokers", "schwab", "etrade"],
+      "assets": ["AAPL", "GOOGL", "MSFT", "TSLA", "AMZN", "META"],
+      "trading_modes": ["equity", "options", "warrants", "convertibles"]
+    },
+    "futures": {
+      "exchanges": ["cme", "ice", "cboe", "gemini", "kalshi"],
+      "assets": ["ES", "NQ", "CL", "GC", "SI", "BTC", "ETH"],
+      "trading_modes": ["futures", "forwards", "swaps"]
+    },
+    "options": {
+      "exchanges": ["cboe", "nyse", "nasdaq", "robinhood", "alpaca"],
+      "assets": ["AAPL_CALL", "AAPL_PUT", "SPX_CALL", "SPX_PUT"],
+      "trading_modes": ["vanilla", "exotic", "barrier", "digital"]
+    },
+    "commodities": {
+      "exchanges": ["cme", "ice", "lme", "comex", "kalshi"],
+      "assets": ["GC", "SI", "CL", "NG", "W", "C"],
+      "trading_modes": ["spot", "futures", "options", "physical"]
+    },
+    "forex": {
+      "exchanges": ["fxcm", "oanda", "interactive_brokers", "td_ameritrade"],
+      "assets": ["EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF"],
+      "trading_modes": ["spot", "forwards", "options", "cfds"]
+    },
+    "digital_revenue": {
+      "exchanges": ["nft_marketplaces", "defi_protocols", "gaming_platforms", "content_platforms"],
+      "assets": ["NFT_COLLECTIONS", "DE_TOKENS", "Gaming_NFTs", "Content_Tokens"],
+      "trading_modes": ["secondary", "primary", "fractional", "royalties"]
+    }
+  },
+  
+  "exchanges": {
+    "crypto": {
+      "coinbase": {
+        "name": "Coinbase",
+        "type": "cdp",
+        "categories": ["crypto"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${COINBASE_SANDBOX_API_KEY}",
+            "api_secret": "${COINBASE_SANDBOX_API_SECRET}",
+            "passphrase": "${COINBASE_SANDBOX_PASSPHRASE}",
+            "base_url": "https://api-public.sandbox.pro.coinbase.com",
+            "enabled": true
+          },
+          "production": {
+            "api_key": "${COINBASE_PRODUCTION_API_KEY}",
+            "api_secret": "${COINBASE_PRODUCTION_API_SECRET}",
+            "passphrase": "${COINBASE_PRODUCTION_PASSPHRASE}",
+            "base_url": "https://api.pro.coinbase.com",
+            "enabled": false
+          }
+        }
+      },
+      "gemini": {
+        "name": "Gemini",
+        "type": "rest",
+        "categories": ["crypto"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${GEMINI_SANDBOX_API_KEY}",
+            "api_secret": "${GEMINI_SANDBOX_API_SECRET}",
+            "base_url": "https://api.sandbox.gemini.com",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${GEMINI_PRODUCTION_API_KEY}",
+            "api_secret": "${GEMINI_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.gemini.com",
+            "enabled": false
+          }
+        }
+      },
+      "kalshi": {
+        "name": "Kalshi",
+        "type": "rest",
+        "categories": ["futures", "options"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${KALSHI_SANDBOX_API_KEY}",
+            "api_secret": "${KALSHI_SANDBOX_API_SECRET}",
+            "base_url": "https://api-sandbox.kalshi.com",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${KALSHI_PRODUCTION_API_KEY}",
+            "api_secret": "${KALSHI_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.kalshi.com",
+            "enabled": true
+          }
+        }
+      },
+      "kraken": {
+        "name": "Kraken",
+        "type": "rest",
+        "categories": ["crypto"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${KRAKEN_SANDBOX_API_KEY}",
+            "api_secret": "${KRAKEN_SANDBOX_API_SECRET}",
+            "base_url": "https://api-test.kraken.com",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${KRAKEN_PRODUCTION_API_KEY}",
+            "api_secret": "${KRAKEN_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.kraken.com",
+            "enabled": false
+          }
+        }
+      },
+      "binance": {
+        "name": "Binance",
+        "type": "rest",
+        "categories": ["crypto"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${BINANCE_SANDBOX_API_KEY}",
+            "api_secret": "${BINANCE_SANDBOX_API_SECRET}",
+            "base_url": "https://testnet.binance.vision",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${BINANCE_PRODUCTION_API_KEY}",
+            "api_secret": "${BINANCE_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.binance.com",
+            "enabled": false
+          }
+        }
+      }
+    },
+    "stocks": {
+      "robinhood": {
+        "name": "Robinhood",
+        "type": "rest",
+        "categories": ["stocks", "options"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${ROBINHOOD_SANDBOX_API_KEY}",
+            "api_secret": "${ROBINHOOD_SANDBOX_API_SECRET}",
+            "base_url": "https://api.robinhood.com",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${ROBINHOOD_PRODUCTION_API_KEY}",
+            "api_secret": "${ROBINHOOD_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.robinhood.com",
+            "enabled": false
+          }
+        }
+      },
+      "alpaca": {
+        "name": "Alpaca",
+        "type": "rest",
+        "categories": ["stocks", "options"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${ALPACA_SANDBOX_API_KEY}",
+            "api_secret": "${ALPACA_SANDBOX_API_SECRET}",
+            "base_url": "https://paper-api.alpaca.markets",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${ALPACA_PRODUCTION_API_KEY}",
+            "api_secret": "${ALPACA_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.alpaca.markets",
+            "enabled": false
+          }
+        }
+      }
+    },
+    "futures": {
+      "cme": {
+        "name": "Chicago Mercantile Exchange",
+        "type": "fix",
+        "categories": ["futures", "options"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${CME_SANDBOX_API_KEY}",
+            "api_secret": "${CME_SANDBOX_API_SECRET}",
+            "base_url": "https://api-sandbox.cmegroup.com",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${CME_PRODUCTION_API_KEY}",
+            "api_secret": "${CME_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.cmegroup.com",
+            "enabled": false
+          }
+        }
+      },
+      "ice": {
+        "name": "Intercontinental Exchange",
+        "type": "fix",
+        "categories": ["futures", "options"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${ICE_SANDBOX_API_KEY}",
+            "api_secret": "${ICE_SANDBOX_API_SECRET}",
+            "base_url": "https://api-sandbox.theice.com",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${ICE_PRODUCTION_API_KEY}",
+            "api_secret": "${ICE_PRODUCTION_API_SECRET}",
+            "base_url": "https://api.theice.com",
+            "enabled": false
+          }
+        }
+      }
+    },
+    "digital_revenue": {
+      "opensea": {
+        "name": "OpenSea",
+        "type": "rest",
+        "categories": ["digital_revenue"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${OPENSEA_SANDBOX_API_KEY}",
+            "base_url": "https://api-sandbox.opensea.io",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${OPENSEA_PRODUCTION_API_KEY}",
+            "base_url": "https://api.opensea.io",
+            "enabled": false
+          }
+        }
+      },
+      "rarible": {
+        "name": "Rarible",
+        "type": "rest",
+        "categories": ["digital_revenue"],
+        "environments": {
+          "sandbox": {
+            "api_key": "${RARIBLE_SANDBOX_API_KEY}",
+            "base_url": "https://api-sandbox.rarible.com",
+            "enabled": false
+          },
+          "production": {
+            "api_key": "${RARIBLE_PRODUCTION_API_KEY}",
+            "base_url": "https://api.rarible.com",
+            "enabled": false
+          }
+        }
+      }
+    }
+  },
+  
+  "position_sizing": {
+    "crypto": {
+      "microscopic": {"min_usd": 0.01, "max_usd": 0.10, "default_usd": 0.05},
+      "small": {"min_usd": 1.00, "max_usd": 10.00, "default_usd": 5.00},
+      "medium": {"min_usd": 25.00, "max_usd": 100.00, "default_usd": 50.00},
+      "large": {"min_usd": 1000.00, "max_usd": 10000.00, "default_usd": 5000.00}
+    },
+    "stocks": {
+      "microscopic": {"min_usd": 1.00, "max_usd": 10.00, "default_usd": 5.00},
+      "small": {"min_usd": 100.00, "max_usd": 1000.00, "default_usd": 500.00},
+      "medium": {"min_usd": 1000.00, "max_usd": 10000.00, "default_usd": 5000.00},
+      "large": {"min_usd": 10000.00, "max_usd": 100000.00, "default_usd": 50000.00}
+    },
+    "futures": {
+      "microscopic": {"min_usd": 10.00, "max_usd": 100.00, "default_usd": 50.00},
+      "small": {"min_usd": 100.00, "max_usd": 1000.00, "default_usd": 500.00},
+      "medium": {"min_usd": 1000.00, "max_usd": 10000.00, "default_usd": 5000.00},
+      "large": {"min_usd": 10000.00, "max_usd": 100000.00, "default_usd": 50000.00}
+    },
+    "digital_revenue": {
+      "microscopic": {"min_usd": 0.10, "max_usd": 1.00, "default_usd": 0.50},
+      "small": {"min_usd": 1.00, "max_usd": 10.00, "default_usd": 5.00},
+      "medium": {"min_usd": 10.00, "max_usd": 100.00, "default_usd": 50.00},
+      "large": {"min_usd": 100.00, "max_usd": 1000.00, "default_usd": 500.00}
+    }
+  },
+  
+  "risk_management": {
+    "universal_circuit_breakers": {
+      "max_hourly_trades": 100,
+      "max_daily_trades": 500,
+      "max_consecutive_losses": 6,
+      "cooldown_minutes": 30,
+      "max_daily_loss_usd": 10000.00,
+      "max_position_exposure_pct": 15.0,
+      "max_correlation_exposure_pct": 25.0
+    },
+    
+    "market_specific_limits": {
+      "crypto": {
+        "max_volatility_exposure": 0.20,
+        "max_leverage": 3.0,
+        "min_liquidity_score": 0.5
+      },
+      "stocks": {
+        "max_beta_exposure": 2.0,
+        "max_short_interest": 0.10,
+        "min_market_cap": 1000000.00
+      },
+      "futures": {
+        "max_margin_usage": 0.80,
+        "max_notional_exposure": 1000000.00,
+        "min_liquidity_score": 0.7
+      },
+      "digital_revenue": {
+        "max_floor_price_usd": 100.00,
+        "min_volume_24h": 10.00,
+        "max_rarity_score": 0.95
+      }
+    }
+  },
+  
+  "prediction_models": {
+    "crypto": {
+      "technical_analysis": ["RSI", "MACD", "Bollinger_Bands", "Moving_Averages"],
+      "on_chain_metrics": ["Network_Volume", "Exchange_Flow", "Holder_Distribution"],
+      "sentiment_analysis": ["Social_Media", "News_Sentiment", "Fear_Greed_Index"]
+    },
+    "stocks": {
+      "fundamental_analysis": ["P/E_Ratio", "EPS_Growth", "Revenue_Growth", "ROE"],
+      "technical_analysis": ["RSI", "MACD", "Volume_Profile", "Support_Resistance"],
+      "market_regime": ["Bull_Bear", "Volatility_Regime", "Seasonal_Trends"]
+    },
+    "futures": {
+      "carry_trade": ["Contango_Backwardation", "Roll_Yield", "Term_Structure"],
+      "momentum": ["Trend_Strength", "Breakout_Patterns", "Volume_Spike"],
+      "arbitrage": ["Inter_Exchange_Spread", "Calendar_Spread", "Cross_Market"]
+    },
+    "digital_revenue": {
+      "rarity_scoring": ["Trait_Rarity", "Collection_Score", "Historical_Performance"],
+      "utility_scoring": ["Utility_Function", "Integration_Score", "Protocol_Adoption"],
+      "market_momentum": ["Floor_Price", "Volume_Trends", "Holder_Activity"]
+    }
+  }
+}

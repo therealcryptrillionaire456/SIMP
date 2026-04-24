@@ -21,6 +21,7 @@ import threading
 import time
 
 from config.config import SimpConfig
+from simp.agentic_https import AgenticIntentRequest, AgenticIntentResponse
 from simp.crypto import SimpCrypto
 from simp.task_ledger import TaskLedger
 from simp.models.canonical_intent import CanonicalIntent, INTENT_TYPE_REGISTRY
@@ -154,6 +155,7 @@ class SimpBroker:
             "[BRP] Bill Russell Protocol active — mode=%s, data_dir=%s",
             self.brp_bridge.default_mode, self.brp_bridge.data_dir,
         )
+        self._seen_signature_nonces: set[str] = set()
 
         # Sprint 64 — restart resilience
         self._startup_at: datetime = datetime.now(timezone.utc)
@@ -384,8 +386,8 @@ class SimpBroker:
             # NOTE: agent_registry is disk-persisted but mesh_bus is in-memory only.
             # After a broker restart, an agent may still be in the registry but
             # absent from the mesh bus. Reconcile mesh_bus on re-registration
-            # instead of returning False (which left agents permanently stuck
-            # outside mesh routing — see MORNING_BRIEF_KASEY.md).
+            # instead of returning False, which can leave agents permanently
+            # outside mesh routing after broker restarts.
             if self.agent_registry.exists(agent_id):
                 self.logger.info(
                     f"♻️  Agent '{agent_id}' already in registry — reconciling mesh bus"
@@ -493,7 +495,19 @@ class SimpBroker:
     def list_agents(self) -> list[Dict[str, Any]]:
         """Return the current broker-visible agent list."""
         with self.agent_lock:
-            return list(self.agent_registry.get_all().values())
+            agents = list(self.agent_registry.get_all().values())
+            # Enrich with heartbeat_count and file_based from broker's own tracking
+            for agent in agents:
+                aid = agent.get("agent_id", "")
+                broker_data = self.agents.get(aid, {})
+                if isinstance(broker_data, dict):
+                    if "heartbeat_count" in broker_data:
+                        agent["heartbeat_count"] = broker_data["heartbeat_count"]
+                    if "file_based" in broker_data:
+                        agent["file_based"] = broker_data["file_based"]
+                    if "last_heartbeat" in broker_data:
+                        agent["last_heartbeat"] = broker_data["last_heartbeat"]
+            return agents
 
     def get_agent(self, agent_id: Optional[str]) -> Optional[Dict[str, Any]]:
         """Return one agent record by id."""
@@ -573,17 +587,26 @@ class SimpBroker:
         """Return non-file-based agents whose heartbeat is older than the threshold."""
         now = datetime.now(timezone.utc)
         stale: list[str] = []
+        grace_seconds = 60.0
         with self.agent_lock:
+            # Grace period: skip agents registered within the last 60 seconds
             for agent_id, agent in self.agent_registry.get_all().items():
                 if agent.get("file_based"):
                     continue
-                last_heartbeat = agent.get("last_heartbeat")
+                # Use broker's heartbeat if present, otherwise registry's
+                broker_agent = self.agents.get(agent_id, {})
+                last_heartbeat = broker_agent.get("last_heartbeat") if isinstance(broker_agent, dict) else agent.get("last_heartbeat")
                 if not last_heartbeat:
                     continue
                 try:
                     heartbeat_dt = datetime.fromisoformat(str(last_heartbeat).replace("Z", "+00:00"))
                 except ValueError:
                     continue
+                # Grace period: skip if heartbeat time is within grace window of startup
+                startup_dt = getattr(self, "_startup_at", None)
+                if startup_dt is not None and isinstance(startup_dt, datetime):
+                    if (heartbeat_dt - startup_dt).total_seconds() < grace_seconds:
+                        continue
                 if (now - heartbeat_dt).total_seconds() > stale_after_seconds:
                     stale.append(agent_id)
                     self.agent_registry.update(agent_id, {"stale": True, "status": "stale"})
@@ -636,11 +659,43 @@ class SimpBroker:
                 except Exception as exc:
                     self.logger.warning(f"Signature verification failed: {exc}")
                     return {"status": "error", "error": f"Signature verification error: {exc}"}
+        elif intent_data.get("signature") and intent_data.get("_sig_nonce"):
+            source_id = intent_data.get("source_agent", "")
+            source_info = self.agents.get(source_id, {})
+            public_key_pem = source_info.get("public_key") or (
+                intent_data.get("metadata", {}) or {}
+            ).get("public_key")
+            if public_key_pem:
+                try:
+                    pub_key = SimpCrypto.load_public_key(
+                        public_key_pem.encode() if isinstance(public_key_pem, str) else public_key_pem
+                    )
+                    valid, reason = SimpCrypto.verify_signature_strict(
+                        intent_data, pub_key, self._seen_signature_nonces
+                    )
+                    if not valid:
+                        return {
+                            "status": "error",
+                            "error_code": "INVALID_SIGNATURE",
+                            "error_message": reason,
+                            "error": "Invalid signature",
+                        }
+                except Exception as exc:
+                    self.logger.warning(f"Strict signature verification failed: {exc}")
+                    return {
+                        "status": "error",
+                        "error_code": "INVALID_SIGNATURE",
+                        "error_message": str(exc),
+                        "error": "Invalid signature",
+                    }
 
         intent_id = intent_data.get("intent_id", str(uuid.uuid4()))
         source_agent = intent_data.get("source_agent", "client")
         target_agent = intent_data.get("target_agent")
         intent_type = intent_data.get("intent_type", "unknown")
+        trace_id = intent_data.get("trace_id", "")
+        correlation_id = intent_data.get("correlation_id", "")
+        invocation_mode = intent_data.get("invocation_mode", "native")
         brp_mode = intent_data.get("brp_mode", self.brp_bridge.default_mode)
         delivery_start = time.monotonic()
 
@@ -978,6 +1033,9 @@ class SimpBroker:
                                 "intent_id": intent_id,
                                 "target_agent": target_agent,
                                 "task_id": task_id,
+                                "invocation_mode": invocation_mode,
+                                "trace_id": trace_id,
+                                "correlation_id": correlation_id,
                                 "delivery_status": "delivered",
                                 "delivery_method": "mesh",
                                 "mesh_intent_id": mesh_routing_result.get("mesh_intent_id"),
@@ -1034,6 +1092,9 @@ class SimpBroker:
                             "intent_id": intent_id,
                             "target_agent": target_agent,
                             "task_id": task_id,
+                            "invocation_mode": invocation_mode,
+                            "trace_id": trace_id,
+                            "correlation_id": correlation_id,
                             "delivery_status": "blocked",
                             "mesh_routing": {
                                 "enabled": True,
@@ -1145,6 +1206,9 @@ class SimpBroker:
             "intent_id": intent_id,
             "target_agent": target_agent,
             "task_id": task_id,
+            "invocation_mode": invocation_mode,
+            "trace_id": trace_id,
+            "correlation_id": correlation_id,
             "mesh_routing": {
                 "enabled": self.mesh_routing is not None,
                 "mode": self.mesh_routing.config.mode.value if self.mesh_routing else "disabled",
@@ -1190,6 +1254,51 @@ class SimpBroker:
                 self.logger.debug("Memory hook on_intent_routed failed", exc_info=True)
 
         return route_result
+
+    async def route_agentic_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Route an agentic-HTTPS request and return a uniform response envelope."""
+        request = AgenticIntentRequest.from_dict(request_data)
+        payload = request.to_broker_payload()
+
+        if request.identity and request.identity.public_key and payload.get("signature"):
+            try:
+                public_key = SimpCrypto.load_public_key(request.identity.public_key.encode())
+                valid, reason = SimpCrypto.verify_signature_strict(
+                    payload, public_key, self._seen_signature_nonces
+                )
+                if not valid:
+                    return AgenticIntentResponse(
+                        status="error",
+                        success=False,
+                        error_code="INVALID_SIGNATURE",
+                        error_message=reason,
+                        invocation_mode=request.invocation_mode,
+                        trace_id=request.trace_id,
+                        correlation_id=request.correlation_id,
+                    ).to_dict()
+            except Exception as exc:
+                return AgenticIntentResponse(
+                    status="error",
+                    success=False,
+                    error_code="INVALID_SIGNATURE",
+                    error_message=str(exc),
+                    invocation_mode=request.invocation_mode,
+                    trace_id=request.trace_id,
+                    correlation_id=request.correlation_id,
+                ).to_dict()
+
+        result = await self.route_intent(payload)
+        stream_endpoint = ""
+        task_id = str(result.get("task_id") or "")
+        if request.expect_stream and task_id:
+            stream_endpoint = f"/tasks/{task_id}/stream"
+        return AgenticIntentResponse.from_route_result(
+            result,
+            invocation_mode=request.invocation_mode,
+            trace_id=request.trace_id,
+            correlation_id=request.correlation_id,
+            stream_endpoint=stream_endpoint,
+        ).to_dict()
 
     def _serialize_brp_evaluation(self, brp_event: BRPEvent, brp_response: Any) -> Dict[str, Any]:
         """Return an additive, runtime-safe BRP evaluation snapshot."""

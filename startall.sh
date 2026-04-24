@@ -38,6 +38,7 @@ QUANTUMARB_PHASE4_CONFIG="${QUANTUMARB_PHASE4_CONFIG:-config/phase4_microscopic.
 QUANTUMARB_HOT_CONFIG="${QUANTUMARB_HOT_CONFIG:-config/live_phase2_sol_microscopic.json}"
 SOLANA_SEEKER_CONFIG="${SOLANA_SEEKER_CONFIG:-config/solana_seeker_config.json}"
 CLOSED_LOOP_INTERVAL="${CLOSED_LOOP_INTERVAL:-900}"
+POLICY_LIVE_EXCHANGES="${SIMP_LIVE_EXCHANGES:-}"
 
 BOOT_SIMP_BROKER_URL="${SIMP_BROKER_URL}"
 BOOT_PROJECTX_GUARD_URL="${PROJECTX_GUARD_URL}"
@@ -51,8 +52,11 @@ START_QUANTUM=1
 START_EXTERNAL=1
 START_GATE4=0
 START_SOLANA=0
+START_SECOND_BRAIN=1
 HOT_MODE=0
 RESET_GATE4_STATE=0
+SIMP_STARTING_CAPITAL_USD="${SIMP_STARTING_CAPITAL_USD:-10000}"
+export SIMP_STARTING_CAPITAL_USD
 
 usage() {
     cat <<EOF
@@ -65,6 +69,8 @@ Options:
   --no-ktc         Skip KTC startup
   --no-quantum     Skip the quantum stack bootstrap
   --no-external    Skip ProjectX, BullBear, and Gemma external services
+  --no-second-brain
+                   Skip the Obsidian/Graphify state watcher
   --reset-gate4-state
                    Archive Gate4 breaker state before startup
   --help           Show this help
@@ -92,6 +98,9 @@ for arg in "$@"; do
             ;;
         --no-external)
             START_EXTERNAL=0
+            ;;
+        --no-second-brain)
+            START_SECOND_BRAIN=0
             ;;
         --reset-gate4-state)
             RESET_GATE4_STATE=1
@@ -465,6 +474,8 @@ bootstrap_quantum_stack() {
         env \
             SIMP_BROKER_URL="${SIMP_BROKER_URL}" \
             PROJECTX_GUARD_URL="${PROJECTX_GUARD_URL}" \
+            SIMP_LIVE_TRADING_ENABLED="${SIMP_LIVE_TRADING_ENABLED:-}" \
+            SIMP_LIVE_EXCHANGES="${SIMP_LIVE_EXCHANGES:-}" \
             bash "${ROOT_DIR}/start_quantum_goose.sh" --headless
     ) >> "${log_file}" 2>&1
 
@@ -478,6 +489,11 @@ bootstrap_quantum_stack() {
 }
 
 show_summary() {
+    local cmd_python="./venv_gate4/bin/python"
+    if [ ! -x "${ROOT_DIR}/venv_gate4/bin/python" ]; then
+        cmd_python="${PYTHON_BIN}"
+    fi
+
     log ""
     log "Bring-up summary"
     log "  Broker:    ${SIMP_BROKER_URL}"
@@ -549,10 +565,18 @@ show_summary() {
         done
     fi
 
-    log "  Snapshot:  ${PYTHON_BIN} scripts/runtime_snapshot.py --format markdown"
+    if [ "${START_SECOND_BRAIN}" -eq 1 ]; then
+        if process_running "scripts/obsidian_state_watch.py"; then
+            log "  Docs:      scripts/obsidian_state_watch.py"
+        else
+            warn "Second-brain watcher requested but not running"
+        fi
+    fi
+
+    log "  Snapshot:  ${cmd_python} scripts/runtime_snapshot.py --format markdown"
     if [ "${HOT_MODE}" -eq 1 ]; then
-        log "  Verify:    ${PYTHON_BIN} scripts/verify_revenue_path.py"
-        log "  Inject:    ${PYTHON_BIN} scripts/inject_quantum_signal.py --asset BTC-USD --side sell --usd 1.00"
+        log "  Verify:    ${cmd_python} scripts/verify_revenue_path.py"
+        log "  Inject:    ${cmd_python} scripts/inject_quantum_signal.py --asset BTC-USD --side sell --usd 1.00"
     fi
 }
 
@@ -564,6 +588,7 @@ log "Broker URL: ${SIMP_BROKER_URL}"
 if [ "${HOT_MODE}" -eq 1 ]; then
     load_env_file "${ROOT_DIR}/.env.multi_exchange" "multi-exchange"
     load_env_file "${ROOT_DIR}/.env.solana_seeker" "solana"
+    load_env_file "${ROOT_DIR}/.env" "main-env"
 
     export SIMP_BROKER_URL="${BOOT_SIMP_BROKER_URL}"
     export PROJECTX_GUARD_URL="${BOOT_PROJECTX_GUARD_URL}"
@@ -580,6 +605,7 @@ if [ "${HOT_MODE}" -eq 1 ]; then
 
     if gate4_env_ready; then
         log "Hot mode: Gate4 live Coinbase credentials detected"
+        POLICY_LIVE_EXCHANGES="coinbase"
     else
         warn "Hot mode: Gate4 Coinbase credentials not detected"
     fi
@@ -603,9 +629,22 @@ if [ "${HOT_MODE}" -eq 1 ]; then
     elif [ "${START_SOLANA}" -eq 1 ]; then
         if [ "${SOLANA_SEEKER_LIVE:-false}" = "true" ]; then
             log "Hot mode: Solana Seeker live mode armed"
+            if [ -n "${POLICY_LIVE_EXCHANGES}" ]; then
+                POLICY_LIVE_EXCHANGES="${POLICY_LIVE_EXCHANGES},solana"
+            else
+                POLICY_LIVE_EXCHANGES="solana"
+            fi
         else
             warn "Hot mode: Solana Seeker will start in dry-run mode unless SOLANA_SEEKER_LIVE=true"
         fi
+    fi
+
+    export SIMP_STARTING_CAPITAL_USD="${SIMP_STARTING_CAPITAL_USD}"
+
+    if [ -n "${POLICY_LIVE_EXCHANGES}" ]; then
+        export SIMP_LIVE_TRADING_ENABLED="true"
+        export SIMP_LIVE_EXCHANGES="${POLICY_LIVE_EXCHANGES}"
+        log "Hot mode: trading policy live allowlist set to ${SIMP_LIVE_EXCHANGES}"
     fi
 
     if [ -f "${ROOT_DIR}/data/gate4_consumer_state.json" ] && [ "${RESET_GATE4_STATE}" -ne 1 ]; then
@@ -663,6 +702,8 @@ start_background_service \
     env \
         PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
         SIMP_BROKER_URL="${SIMP_BROKER_URL}" \
+        SIMP_LIVE_TRADING_ENABLED="${SIMP_LIVE_TRADING_ENABLED:-}" \
+        SIMP_LIVE_EXCHANGES="${SIMP_LIVE_EXCHANGES:-}" \
         QUANTUMARB_ALLOW_LIVE_TRADING="${QUANTUMARB_ALLOW_LIVE_TRADING:-false}" \
         "${PYTHON_BIN}" simp/agents/quantumarb_agent_phase4.py \
         --config "${QUANTUMARB_PHASE4_CONFIG}"
@@ -675,6 +716,8 @@ if [ "${START_GATE4}" -eq 1 ]; then
         "${ROOT_DIR}" \
         env \
             PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+            SIMP_LIVE_TRADING_ENABLED="${SIMP_LIVE_TRADING_ENABLED:-}" \
+            SIMP_LIVE_EXCHANGES="${SIMP_LIVE_EXCHANGES:-}" \
             "${PYTHON_BIN}" gate4_inbox_consumer.py
 fi
 
@@ -714,6 +757,8 @@ if [ "${START_SOLANA}" -eq 1 ]; then
         "${ROOT_DIR}" \
         env \
             PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+            SIMP_LIVE_TRADING_ENABLED="${SIMP_LIVE_TRADING_ENABLED:-}" \
+            SIMP_LIVE_EXCHANGES="${SIMP_LIVE_EXCHANGES:-}" \
             "${PYTHON_BIN}" scripts/solana_seeker_integration.py --daemon "${solana_mode_arg}" --config "${SOLANA_SEEKER_CONFIG}"
 fi
 
@@ -728,6 +773,17 @@ start_background_service \
 
 if [ "${START_QUANTUM}" -eq 1 ]; then
     bootstrap_quantum_stack
+fi
+
+if [ "${START_SECOND_BRAIN}" -eq 1 ]; then
+    start_background_service \
+        "obsidian_state_watch" \
+        "Obsidian State Watcher" \
+        "scripts/obsidian_state_watch.py" \
+        "${ROOT_DIR}" \
+        env \
+            PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}" \
+            "${ROOT_DIR}/scripts/bootstrap/launch_second_brain.sh"
 fi
 
 show_summary

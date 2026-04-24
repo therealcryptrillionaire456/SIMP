@@ -1,7 +1,5 @@
 """
-SIMP Agent Registry — Session 2
-
-Persistent registry for agent state with disk persistence.
+SIMP Agent Registry — Persistent registry for agent state with disk persistence.
 Loads agent state on startup, saves on registration/deregistration.
 """
 
@@ -11,8 +9,61 @@ import os
 import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger("SIMP.AgentRegistry")
+
+
+# ---------------------------------------------------------------------------
+# Enums and Data Classes
+# ---------------------------------------------------------------------------
+
+class AgentState(Enum):
+    """Operator-grade agent lifecycle states."""
+    ONLINE = "online"
+    STALE = "stale"
+    UNREACHABLE = "unreachable"
+    DEREGISTERED = "deregistered"
+
+
+@dataclass
+class AgentInfo:
+    """Structured view of a registered agent."""
+    agent_id: str
+    state: AgentState
+    last_seen: str  # ISO8601 UTC
+    capabilities: List[str] = field(default_factory=list)
+    endpoint: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        d = {
+            "agent_id": self.agent_id,
+            "state": self.state.value,
+            "last_seen": self.last_seen,
+            "capabilities": self.capabilities,
+            "endpoint": self.endpoint,
+        }
+        if self.metadata:
+            d["metadata"] = self.metadata
+        return d
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "AgentInfo":
+        return cls(
+            agent_id=data["agent_id"],
+            state=AgentState(data.get("state", "stale")),
+            last_seen=data.get("last_seen", ""),
+            capabilities=data.get("capabilities", []),
+            endpoint=data.get("endpoint", ""),
+            metadata=data.get("metadata", {}),
+        )
+
+
+AgentRecord = AgentInfo
+"""Alias for backward compatibility."""
 
 logger = logging.getLogger("SIMP.AgentRegistry")
 
@@ -28,7 +79,19 @@ _REPO_ROOT = str(Path(__file__).resolve().parent.parent.parent)
 class AgentRegistryConfig:
     """Tuning knobs for the agent registry."""
     path: str = os.path.join(_REPO_ROOT, "data", "agent_registry.jsonl")
-    max_size_mb: float = 10.0  # Smaller than intent ledger since fewer records
+    persist_path: Optional[str] = None
+    max_size_mb: float = 10.0
+    stale_after_seconds: int = 120
+    unreachable_after_seconds: int = 300
+    prune_after_seconds: int = 86400
+
+    def __post_init__(self) -> None:
+        if self.persist_path:
+            self.path = self.persist_path
+
+
+RegistryConfig = AgentRegistryConfig
+"""Alias for backward compatibility — test imports RegistryConfig."""
 
 
 # ---------------------------------------------------------------------------
@@ -138,6 +201,7 @@ class AgentRegistry:
         
         # Add metadata
         enriched_data = dict(agent_data)
+        enriched_data.setdefault("state", "online")
         enriched_data["agent_id"] = agent_id
         enriched_data["registered_at"] = datetime.now(timezone.utc).isoformat()
         enriched_data["last_updated"] = enriched_data["registered_at"]
@@ -260,6 +324,44 @@ class AgentRegistry:
         """Check if agent exists."""
         return agent_id in self._agents
     
+    def get_agent(self, agent_id: str) -> AgentInfo:
+        """
+        Return an AgentInfo view of an agent.
+
+        Raises KeyError if agent not found.
+        """
+        raw = self._agents[agent_id]  # let KeyError propagate
+        # Infer state from the raw dict's "state" or "status" field
+        state_val = raw.get("state") or raw.get("status", "stale")
+        if isinstance(state_val, AgentState):
+            state = state_val
+        else:
+            try:
+                state = AgentState(state_val.lower())
+            except ValueError:
+                state = AgentState.STALE  # safe fallback
+
+        return AgentInfo(
+            agent_id=agent_id,
+            state=state,
+            last_seen=raw.get("last_seen") or raw.get("last_updated", ""),
+            capabilities=raw.get("capabilities", []),
+            endpoint=raw.get("endpoint", ""),
+            metadata=raw.get("metadata", {}),
+        )
+
+    def get_agents_by_state(self, target: AgentState) -> List[str]:
+        """Return agent IDs whose state matches *target*."""
+        result: List[str] = []
+        for aid in self._agents:
+            try:
+                info = self.get_agent(aid)
+                if info.state == target:
+                    result.append(aid)
+            except KeyError:
+                continue
+        return result
+
     # ------------------------------------------------------------------
     # stats and maintenance
     # ------------------------------------------------------------------
