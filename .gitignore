@@ -1,60 +1,36 @@
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-venv/
-.venv
-venv_gate4/
-env/
-.env
-.vscode/
-.idea/
-.DS_Store
-*.db
-*.sqlite3
-.pytest_cache/
-*.egg-info/
 
-# Dashboard runtime artifacts
-dashboard/activity_log.jsonl
-
-# Task ledger data
-data/task_ledger.jsonl
-
-# Agent inboxes (keep the directory structure via .gitkeep)
-data/inboxes/*
 !data/inboxes/.gitkeep
-
-# Memory context packs (generated, not tracked)
-memory/context_packs/*.json
 !memory/context_packs/.gitkeep
-
+# Agent inboxes (keep the directory structure via .gitkeep)
 # BRP data directories
-data/brp/
-data/security_datasets/
-data/outboxes/
-logs/brp/
-*.pid
-
 # Claude/MCP local config
-.claude/
-.mcp.json
-CLAUDE.md
-
+# Dashboard runtime artifacts
+# Memory context packs (generated, not tracked)
+# Repo hygiene: broker/runtime state generated during operation
 # Repo hygiene: local env variants and backup snapshots
+# Repo hygiene: local graph snapshots
+# Repo hygiene: runtime and generated artifacts
+# Task ledger data
+*$py.class
+*.backup
+*.backup.*
+*.backup_fix
+*.bak
+*.bak.*
+*.bak_*
+*.db
+*.egg-info/
+*.log
+*.manual_backup
+*.pid
+*.py[cod]
+*.so
+*.sqlite3
+.DS_Store
+.Python
+.claude/
+.eggs/
+.env
 .env.backup*
 .env.master
 .env.minimal
@@ -62,47 +38,63 @@ CLAUDE.md
 .env.proper
 .env.solana_seeker
 .env.universal
-*.bak
-*.bak.*
-*.bak_*
-*.backup
-*.backup.*
-*.manual_backup
-*.backup_fix
-
-# Repo hygiene: runtime and generated artifacts
-*.log
+.graphify/snapshots/
+.idea/
+.mcp.json
 .playwright-cli/
-graphify-out/
-output/
-projectx_logs/
-logs/
-dashboard/operator_events.jsonl
+.pytest_cache/
+.venv
+.vscode/
+CLAUDE.md
+__pycache__/
+backups/repo_hygiene/
+build/
+dashboard/activity_log.jsonl
 dashboard/config.json
+dashboard/operator_events.jsonl
 dashboard/server.py.backup
-memory/active_system_policies.json
-memory/reflection_status.json
-memory/system_memory.sqlite3
-
-# Repo hygiene: broker/runtime state generated during operation
 data/agent_registry.jsonl
-data/orchestration_plans.jsonl
-data/security_audit.jsonl
-data/router_journal.jsonl
-data/trade_journal.jsonl
-data/cost_ledger.jsonl
-data/eval_results.jsonl
-data/intent_telemetry.jsonl
-data/gate4_consumer_state.json
-data/gate4_consumer_state.json.bak.*
+data/brp/
 data/brp_audit_logs/
 data/coordination/
+data/cost_ledger.jsonl
 data/eval_datasets/
+data/eval_results.jsonl
+data/gate4_consumer_state.json
+data/gate4_consumer_state.json.bak.*
+data/inboxes/*
+data/intent_telemetry.jsonl
 data/logs/
+data/orchestration_plans.jsonl
+data/outboxes/
 data/processed/
 data/processed_logs/
+data/router_journal.jsonl
+data/security_audit.jsonl
+data/security_datasets/
 data/signals/
-
-# Repo hygiene: local graph snapshots
-.graphify/snapshots/
-backups/repo_hygiene/
+data/task_ledger.jsonl
+data/trade_journal.jsonl
+develop-eggs/
+dist/
+downloads/
+eggs/
+env/
+graphify-out/
+keys,secrets,
+lib/
+lib64/
+logs/
+logs/brp/
+memory/active_system_policies.json
+memory/context_packs/*.json
+memory/reflection_status.json
+memory/system_memory.sqlite3
+output/
+parts/
+projectx_logs/
+sdist/
+var/
+venv/
+venv_gate4/
+wheels/

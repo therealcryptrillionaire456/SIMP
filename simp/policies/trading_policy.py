@@ -425,7 +425,7 @@ class TradingPolicy:
 # Module-level singleton + convenience function
 # ---------------------------------------------------------------------------
 
-_DEFAULT_POLICY = TradingPolicy()  # fetches real balances at import time
+_DEFAULT_POLICY = TradingPolicy(skip_balance_fetch=True)  # reads SIMP_STARTING_CAPITAL_USD env var
 
 
 def check_trade_allowed(
