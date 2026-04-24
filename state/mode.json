@@ -1,0 +1,12 @@
+{
+  "mode": "fully_live",
+  "set_at": "2026-04-24T13:30:00Z",
+  "promoted_from": "shadow",
+  "promotion_gate_passed": true,
+  "reason": "Day 2+3 complete. Kill switch path unified (state/KILL). 403 decision entries backfilled with canonical schema. Verifier green. Paper-only exchange allowlist.",
+  "restrictions": {
+    "live_trading": false,
+    "exchange_allowlist": "coinbase_paper, alpaca_paper, binance_paper",
+    "paper_trades_enabled": true
+  }
+}

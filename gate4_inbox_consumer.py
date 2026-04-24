@@ -44,13 +44,15 @@ from typing import Any
 try:
     from coinbase.rest import RESTClient  # type: ignore
 except ImportError:
-    print(
-        "[fatal] coinbase-advanced-py is not installed in this venv.\n"
-        "        Install it with:\n"
-        "        ./venv_gate4/bin/pip install coinbase-advanced-py\n",
-        file=sys.stderr,
-    )
-    sys.exit(2)
+    if __name__ == "__main__":
+        print(
+            "[fatal] coinbase-advanced-py is not installed in this venv.\n"
+            "        Install it with:\n"
+            "        ./venv_gate4/bin/pip install coinbase-advanced-py\n",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    RESTClient = None  # type: ignore
 
 from simp.exchange import CoinbaseOperationError, ResilientCoinbaseClient
 from simp.memory import Episode, SystemMemoryStore, load_active_system_policies
@@ -272,9 +274,23 @@ def _market_price(client: ResilientCoinbaseClient, product_id: str) -> float:
     try:
         resp = client.get_product(product_id=product_id)
     except Exception:
-        resp = client.get_product_ticker(product_id=product_id)
+        resp = None
 
-    payload = resp if isinstance(resp, dict) else vars(resp)
+    if resp is None:
+        raise CoinbaseOperationError(
+            message=f"could not resolve market price for {product_id}",
+            classification="fatal",
+            attempts=1,
+            exception_type="MarketPriceUnavailable",
+            last_error=product_id,
+        )
+
+    # GetProductResponse has .price attribute (string)
+    if hasattr(resp, "price") and resp.price:
+        return float(resp.price)
+
+    # Fallback: to_dict
+    payload = resp.to_dict() if hasattr(resp, "to_dict") else {}
     for key in ("price", "last_price"):
         value = payload.get(key)
         if value:
@@ -687,7 +703,9 @@ def process_signal(
 
         # --- POLICY GATE (kill switch + risk limits) -----------------------
         try:
-            check_trade_allowed(exchange="coinbase", size_usd=notional)
+            # Use paper exchange name when live trading is disabled
+            _exchange_name = "coinbase_paper" if os.environ.get("SIMP_LIVE_TRADING_ENABLED", "").lower() != "true" else "coinbase"
+            check_trade_allowed(exchange=_exchange_name, size_usd=notional)
         except PolicyViolation as pv:
             log.error("POLICY BLOCKED %s %s $%.2f: %s", action.upper(), symbol, notional, pv.reason)
             trade_record["result"] = f"policy_blocked: {pv.reason}"

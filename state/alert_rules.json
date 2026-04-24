@@ -1,0 +1,95 @@
+{
+  "$schema": "../contracts/status_board_schema.json",
+  "rules": [
+    {
+      "id": "proc_broker_down",
+      "severity": 1,
+      "condition": "processes.broker.state == 'down'",
+      "description": "SIMP Broker process is down — critical path blocked"
+    },
+    {
+      "id": "proc_http_down",
+      "severity": 1,
+      "condition": "processes.http_server.state == 'down'",
+      "description": "HTTP server is down — all routes unavailable"
+    },
+    {
+      "id": "proc_orch_down",
+      "severity": 2,
+      "condition": "processes.orchestration_loop.state == 'down'",
+      "description": "Orchestration loop is down"
+    },
+    {
+      "id": "proc_signal_bridge_down",
+      "severity": 2,
+      "condition": "processes.signal_bridge.state == 'down'",
+      "description": "Signal bridge is down — no new signals"
+    },
+    {
+      "id": "mode_halt",
+      "severity": 1,
+      "condition": "mode == 'halt'",
+      "description": "System in HALT mode — all execution stopped"
+    },
+    {
+      "id": "mode_shadow",
+      "severity": 3,
+      "condition": "mode == 'shadow'",
+      "description": "System in shadow mode — paper trades only"
+    },
+    {
+      "id": "kill_switch_set",
+      "severity": 1,
+      "condition": "kill_switch.set == true",
+      "description": "Kill switch is set — all mutation halted"
+    },
+    {
+      "id": "verifier_red",
+      "severity": 1,
+      "condition": "verifier.status == 'red'",
+      "description": "Verifier is red — revenue loop broken"
+    },
+    {
+      "id": "verifier_yellow",
+      "severity": 2,
+      "condition": "verifier.status == 'yellow'",
+      "description": "Verifier is yellow — non-critical stage failing"
+    },
+    {
+      "id": "signal_stale",
+      "severity": 2,
+      "condition": "freshness.last_signal_age_s > 300",
+      "description": "Signal freshness exceeds 5 minutes"
+    },
+    {
+      "id": "fill_stale",
+      "severity": 2,
+      "condition": "freshness.last_fill_age_s > 600",
+      "description": "No fills in 10+ minutes with active signals"
+    },
+    {
+      "id": "budget_critical",
+      "severity": 1,
+      "condition": "policy.budget_remaining_usd < 25.0",
+      "description": "Budget critically low — shadow mode triggered"
+    },
+    {
+      "id": "budget_warning",
+      "severity": 2,
+      "condition": "policy.budget_remaining_usd < 50.0",
+      "description": "Budget below 50 USD — approaching critical"
+    },
+    {
+      "id": "policy_block_high",
+      "severity": 2,
+      "condition": "policy.block_rate_1h > 0.05",
+      "description": "Policy block rate exceeds 5% ceiling"
+    },
+    {
+      "id": "sev1_open",
+      "severity": 1,
+      "condition": "incidents_open > 0 and any(i.sev == 1 for i in incidents_open)",
+      "description": "Open Sev1 incident — preempts all lanes"
+    }
+  ]
+}

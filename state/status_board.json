@@ -1,0 +1,120 @@
+{
+  "freshness": {
+    "bridge_rtt_ms_p95": null,
+    "consumer_backlog": 0,
+    "last_fill_age_s": 253606.302475,
+    "last_signal_age_s": 22.358603
+  },
+  "incidents_open": [],
+  "kill_switch": {
+    "last_checked": "2026-04-24T15:03:39Z",
+    "path": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/state/KILL",
+    "set": false
+  },
+  "lanes": {
+    "A0": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A1": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A2": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A3": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A4": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A5": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A6": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A7": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A8": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    },
+    "A9": {
+      "last_cycle_at": "",
+      "last_status": "ok",
+      "sev_open": 0
+    }
+  },
+  "mode": "fully_live",
+  "policy": {
+    "block_rate_1h": 0.1468,
+    "budget_remaining_usd": 250.0,
+    "daily_cap_usd": 250.0,
+    "live_mode": "fully_live",
+    "max_position_usd": 50.0
+  },
+  "processes": {
+    "broker": {
+      "last_restart": null,
+      "pid": 79805,
+      "state": "up"
+    },
+    "dashboard": {
+      "last_restart": null,
+      "pid": 84401,
+      "state": "up"
+    },
+    "gate4_inbox_consumer": {
+      "last_restart": null,
+      "pid": 39418,
+      "state": "up"
+    },
+    "http_server": {
+      "last_restart": null,
+      "pid": 79805,
+      "state": "up"
+    },
+    "orchestration_loop": {
+      "last_restart": null,
+      "pid": 84584,
+      "state": "up"
+    },
+    "signal_bridge": {
+      "last_restart": null,
+      "pid": 84616,
+      "state": "up"
+    }
+  },
+  "slo": {
+    "bridge_rtt_ms_p95": 3000,
+    "fill_fresh_target_s": 300,
+    "policy_block_ceiling": 0.05,
+    "signal_fresh_target_s": 60,
+    "verifier_green_target": 0.95
+  },
+  "updated_at": "2026-04-24T15:03:39Z",
+  "verifier": {
+    "failing_stage": "processes",
+    "last_run": "2026-04-24T15:03:39Z",
+    "pass_rate_6h": 0.0303,
+    "status": "red"
+  }
+}

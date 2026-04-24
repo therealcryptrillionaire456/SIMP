@@ -1,0 +1,240 @@
+{
+  "task_id": "simp_hot_wire_up_2026_04_21",
+  "title": "SIMP/KLOUTBOT full-system wire-up and revenue-path hardening",
+  "priority": "critical",
+  "time_budget_minutes": 90,
+  "mode": "autonomous",
+  "branch": "hot/wire-up-revenue-path",
+
+  "context": {
+    "repo_root": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp",
+    "venv_python": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/venv_gate4/bin/python",
+    "broker_url": "http://127.0.0.1:5555",
+    "dashboard_url": "http://127.0.0.1:8050",
+    "projectx_url": "http://127.0.0.1:8771",
+    "ktc_url": "http://127.0.0.1:8765",
+    "bullbear_url": "http://127.0.0.1:5559",
+    "gemma_url": "http://127.0.0.1:8780",
+    "active_config_file": "config/live_production_config.json",
+    "gate4_state_file": "data/gate4_consumer_state.json",
+    "gate4_consumer_entry": "gate4_inbox_consumer.py",
+    "gate4_trade_log": "logs/gate4_trades.jsonl",
+    "pnl_ledger": "data/phase4_pnl_ledger.jsonl",
+    "inbox": "data/inboxes/gate4_real/",
+    "trading_symbols": ["BTC-USD", "ETH-USD", "SOL-USD"],
+    "notional_band_usd": {"min": 1.0, "max": 10.0},
+    "mode": "HOT",
+    "exchange": "coinbase_advanced_trade"
+  },
+
+  "ground_truth_at_2026_04_21T14_45Z": {
+    "processes_running": [
+      "simp_broker",
+      "dashboard",
+      "ktc_agent",
+      "projectx_supervisor",
+      "projectx_guard",
+      "bullbear_agent",
+      "kashclaw_gemma",
+      "gate4_inbox_consumer",
+      "quantum_signal_bridge",
+      "quantum_mesh_consumer",
+      "quantum_advisory_broadcaster",
+      "quantumarb_phase4"
+    ],
+    "registered_agents_count": 14,
+    "registered_agents": [
+      "brp_audit_consumer", "goose_bridge", "goose_kloutbot_bridge",
+      "goose_kloutbot_bridge_test", "goose_kloutbot_bridge_test2",
+      "goose_orchestrator", "kloutbot", "ktc_agent", "projectx_native",
+      "projectx_quantum_advisor", "quantum_advisory_broadcaster",
+      "quantum_intelligence_prime", "quantum_signal_bridge", "test_goose_bridge"
+    ],
+    "latest_gate4_trade": {
+      "ts": "2026-04-21T11:57:00.793053+00:00",
+      "age_seconds": 10032,
+      "symbol": "BTC-USD",
+      "side": "BUY",
+      "executed_usd": 1.0,
+      "result": "exception:ConnectionError",
+      "error_excerpt": "Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"
+    },
+    "verify_revenue_path_ok": false,
+    "breaker_state_notes": "consecutive_losses was at threshold (4); stale signal backlog already quarantined; fresh signals should drain once DNS + connection path is healthy"
+  },
+
+  "observed_failures": [
+    {
+      "id": "F1",
+      "surface": "coinbase_rest_client",
+      "symptom": "NameResolutionError for api.coinbase.com on recent live BUY",
+      "root_cause_hypothesis": "macOS resolver / VPN / network interface lost DNS; no retry-with-backoff in consumer; no fallback DNS or /etc/hosts pin"
+    },
+    {
+      "id": "F2",
+      "surface": "gate4_inbox_consumer.py",
+      "symptom": "SELL orders are silently skipped (code comment: 'SELL not yet supported; needs balance lookup')",
+      "root_cause_hypothesis": "market_order_sell path not wired to account balance fetch"
+    },
+    {
+      "id": "F3",
+      "surface": "gate4_consumer_state.json",
+      "symptom": "consecutive_losses counter persists across cooldowns and only resets on a successful buy",
+      "root_cause_hypothesis": "no reset-on-cooldown-expiry logic; breaker re-trips on first failed trade after cooldown"
+    },
+    {
+      "id": "F4",
+      "surface": "quantum_signal_bridge",
+      "symptom": "QIP intents sent but no confirmation signals landing in logs recently",
+      "root_cause_hypothesis": "bridge emits signals but downstream consumer ACK path may not be wired; need to verify end-to-end"
+    },
+    {
+      "id": "F5",
+      "surface": "verify_revenue_path.py",
+      "symptom": "latest_trade_fresh=false (2.8h stale) and latest_trade_successful=false",
+      "root_cause_hypothesis": "aggregate symptom of F1+F2+F3; no liveness beacon trade"
+    }
+  ],
+
+  "objectives_ordered_by_priority": [
+    "O1. Restore a confirmed end-to-end live path: Coinbase API reachable, one successful $1 BTC-USD test BUY recorded in gate4_trades.jsonl with order_id.",
+    "O2. Harden Gate4 consumer against transient network/DNS errors (retry with exponential backoff, classify transient vs fatal, do NOT count transient ConnectionError as a 'loss' for breaker purposes).",
+    "O3. Add proper breaker reset-on-cooldown-expiry semantics so the counter cannot stay latched at threshold.",
+    "O4. Wire SELL orders: fetch account balance per product, size the sell in base units, place market_order_sell with base_size. Gate with a safety check that base_size > 0 and <= held_balance.",
+    "O5. Audit the mesh: for every registered agent, verify it is (a) subscribed to intended channels, (b) heartbeating within the last 120s, (c) either emitting or consuming something observable in the last 10 minutes. Deregister zombies.",
+    "O6. Verify quantum signal pipeline end-to-end: quantum_signal_bridge emits → mesh channel → gate4_inbox_consumer picks up → trade executed → result mirrored to projectx_quantum_advisor. Add missing ACK edges.",
+    "O7. Ensure P&L ledger (data/phase4_pnl_ledger.jsonl) is being appended on every successful fill with (entry_px, exec_ts, notional_usd, fees, client_order_id). Backfill from gate4_trades.jsonl if the ledger is behind.",
+    "O8. Produce a wire-up report (docs/WIRE_UP_REPORT.md) that lists every edge in the system as {producer -> consumer -> channel -> status}."
+  ],
+
+  "acceptance_criteria": [
+    "AC1: `python3.10 scripts/verify_revenue_path.py` returns ok=true on a fresh run.",
+    "AC2: `logs/gate4_trades.jsonl` contains at least one new entry with result='ok' and a non-null order_id, dated after the start of this task.",
+    "AC3: A transient ConnectionError during a trade retries at least 3 times with backoff BEFORE being recorded as a loss, and logs a classifier decision ('transient' vs 'fatal').",
+    "AC4: `consecutive_losses` in gate4_consumer_state.json is reset to 0 when cooldown_until passes, automatically, on consumer tick (not only on successful trade).",
+    "AC5: A dry-run SELL signal injected via scripts/inject_quantum_signal.py with --side sell results in a recorded trade record with either a real fill OR a clearly-logged 'insufficient_balance' skip — never the current silent 'sell_unsupported' skip.",
+    "AC6: `docs/WIRE_UP_REPORT.md` enumerates all registered agents and the specific channels each subscribes to; any agent with no edges is flagged.",
+    "AC7: `scripts/enhanced_watchtower.sh` reports zero warnings in sections 1, 4, 5, 6, 7 (test_agent:8888 is permitted to remain absent as it is a harness)."
+  ],
+
+  "in_scope": [
+    "Edits to: gate4_inbox_consumer.py, simp/server/broker.py, simp/server/agent_registry.py, simp/mesh/bus.py, simp/server/http_server.py, simp/agents/quantumarb_agent_phase4.py, quantum_signal_bridge.py, projectx_quantum_advisor.py, scripts/verify_revenue_path.py, scripts/enhanced_watchtower.sh.",
+    "New files under: scripts/, docs/, simp/server/, simp/mesh/.",
+    "Adjustments to: config/live_production_config.json (conservative caps only — see safety_rails).",
+    "Restart of local processes when necessary (kill + relaunch from run_all_canonical.sh or equivalent)."
+  ],
+
+  "out_of_scope": [
+    "Raising notional band above $10 per trade.",
+    "Raising daily trade count above 100.",
+    "Adding new exchanges or new API keys.",
+    "Executing trades beyond the single $1 test BUY required for AC2 unless signals arrive organically from quantum_signal_bridge.",
+    "Modifying the Coinbase private key or any credential file.",
+    "Any code path that initiates a transfer/withdrawal from the exchange."
+  ],
+
+  "safety_rails": [
+    "HARD CAP: max_notional stays at 10.0 USD. Any PR that raises it must fail CI.",
+    "HARD CAP: max_daily_trades stays at 100.",
+    "HARD CAP: max_consecutive_losses stays at 4 or lower.",
+    "NEVER commit or log .env files, .pem keys, COINBASE_API_PRIVATE_KEY values, or any secret. Redact before logging.",
+    "NEVER place a trade larger than $1.00 during this task unless a real signal arrives from quantum_signal_bridge AND is clamped by existing clamp_notional().",
+    "NEVER disable circuit breakers. Only make them more forgiving in ways that keep the existing caps intact.",
+    "NEVER submit withdrawal, transfer, or convert calls to Coinbase.",
+    "If `api.coinbase.com` cannot be resolved after diagnostic fixes, STOP and write a clear report to docs/WIRE_UP_REPORT.md — do NOT attempt workarounds that hard-code IPs for TLS-verified endpoints."
+  ],
+
+  "workflow": [
+    {
+      "step": 1,
+      "name": "Inventory and diagnose",
+      "actions": [
+        "Run `./scripts/enhanced_watchtower.sh` and capture output.",
+        "Run `python3.10 scripts/runtime_snapshot.py --format markdown > /tmp/snapshot_start.md`.",
+        "Run `python3.10 scripts/verify_revenue_path.py > /tmp/verify_start.json`.",
+        "Run `dscacheutil -q host -a name api.coinbase.com` and `nslookup api.coinbase.com 8.8.8.8` to determine whether the resolver itself is broken or just the system default.",
+        "grep recent errors: `tail -500 logs/gate4_consumer.log | grep -iE 'error|fail|except' > /tmp/gate4_errors.txt`."
+      ]
+    },
+    {
+      "step": 2,
+      "name": "Fix the network/DNS blocker (F1)",
+      "actions": [
+        "If nslookup via 8.8.8.8 resolves but system default does not, add a CoinbaseClient wrapper in simp/exchange/coinbase_client.py that uses a requests.Session with a custom resolver (dnspython) falling back to 1.1.1.1 / 8.8.8.8.",
+        "Wrap every coinbase REST call in a retry_with_backoff decorator: 3 attempts, base=0.5s, cap=5s, retries only on ConnectionError/Timeout/DNS/5xx.",
+        "Ensure retries increment a `transient_errors` counter in gate4_consumer_state.json WITHOUT incrementing consecutive_losses."
+      ]
+    },
+    {
+      "step": 3,
+      "name": "Harden Gate4 consumer (F2, F3)",
+      "actions": [
+        "Add reset-on-cooldown-expiry: on every consumer tick, if `cooldown_until` is in the past, clear it AND reset `consecutive_losses` to 0, log the reset.",
+        "Implement market_order_sell path: fetch `client.get_account` for the base asset, compute base_size = min(requested_base, held_balance * 0.99), place market_order_sell with client_order_id and base_size, record as normal.",
+        "Replace the 'sell_unsupported' skip with either a real sell or an 'insufficient_balance' record.",
+        "Classify errors: retryable (ConnectionError/Timeout/5xx/429) vs fatal (auth, validation, 4xx). Only fatal counts toward consecutive_losses."
+      ]
+    },
+    {
+      "step": 4,
+      "name": "Mesh audit (O5, O6)",
+      "actions": [
+        "Call GET /agents and for each agent fetch /agents/<id>/heartbeat. Stale (>120s) agents get deregistered.",
+        "Enumerate channel subscriptions via the mesh bus; any agent subscribed to zero channels gets auto-subscribed to its expected default (see docs/agent_channel_map.md — create if missing).",
+        "Inject one BTC-USD sell $1 test signal via `scripts/inject_quantum_signal.py --asset BTC-USD --side sell --usd 1.00` and verify the trade appears in gate4_trades.jsonl within 90 seconds.",
+        "Inject one BTC-USD BUY $1 signal likewise and require a real order_id on the resulting log line."
+      ]
+    },
+    {
+      "step": 5,
+      "name": "P&L ledger continuity (O7)",
+      "actions": [
+        "Diff gate4_trades.jsonl against data/phase4_pnl_ledger.jsonl by client_order_id. For every successful trade not in the ledger, append a ledger entry with {ts, signal_id, symbol, side, exec_usd, fees_usd (if Coinbase returned it else null), client_order_id}.",
+        "Add a post-trade hook in gate4_inbox_consumer.py so future successful trades always append to the ledger atomically."
+      ]
+    },
+    {
+      "step": 6,
+      "name": "Produce wire-up report and restart",
+      "actions": [
+        "Write docs/WIRE_UP_REPORT.md with: (a) pre/post snapshot diff, (b) list of every producer→channel→consumer edge, (c) unresolved issues if any, (d) verification outputs.",
+        "Run `./scripts/enhanced_watchtower.sh` and `python3.10 scripts/verify_revenue_path.py` again; paste outputs at the bottom of the report.",
+        "If all acceptance criteria pass, open PR on branch hot/wire-up-revenue-path with title 'Wire up revenue path + DNS hardening' and include the report body as the PR description."
+      ]
+    }
+  ],
+
+  "commands_for_verification": {
+    "snapshot": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/venv_gate4/bin/python scripts/runtime_snapshot.py --format markdown",
+    "verify": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/venv_gate4/bin/python scripts/verify_revenue_path.py",
+    "inject_buy_test": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/venv_gate4/bin/python scripts/inject_quantum_signal.py --asset BTC-USD --side buy --usd 1.00",
+    "inject_sell_test": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/venv_gate4/bin/python scripts/inject_quantum_signal.py --asset BTC-USD --side sell --usd 1.00",
+    "watchtower": "./scripts/enhanced_watchtower.sh",
+    "tail_trades": "tail -f logs/gate4_trades.jsonl",
+    "tail_pnl": "tail -f data/phase4_pnl_ledger.jsonl"
+  },
+
+  "deliverables": [
+    "PR on branch hot/wire-up-revenue-path against main.",
+    "docs/WIRE_UP_REPORT.md (checked in).",
+    "New module simp/exchange/coinbase_client.py (retry + DNS fallback wrapper).",
+    "Updated gate4_inbox_consumer.py (SELL path, breaker reset, error classification).",
+    "Updated scripts/verify_revenue_path.py to include DNS resolution check and retry-counter visibility.",
+    "Green result from verify_revenue_path.py on final run."
+  ],
+
+  "stop_conditions": [
+    "STOP and report if api.coinbase.com is unreachable after diagnostic + fallback DNS fixes — the blocker is outside the code.",
+    "STOP and report if any acceptance criterion requires violating a safety rail.",
+    "STOP and report if the broker or mesh bus requires a schema migration beyond this scope.",
+    "STOP and report if an existing test suite breaks and you cannot fix it within the 90-minute budget."
+  ],
+
+  "reminders": [
+    "This system is in HOT mode with live Coinbase credentials. Every code path you touch can move real money.",
+    "All notional amounts stay within the $1–$10 band.",
+    "No new credentials, no new exchanges, no transfers, no withdrawals.",
+    "Commit frequently with clear messages; the user may need to roll back quickly.",
+    "Time is strict: if at minute 75 you are not on the final verification step, stop new scope and write the report."
+  ]
+}

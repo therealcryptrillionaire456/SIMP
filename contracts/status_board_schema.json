@@ -1,0 +1,100 @@
+{
+  "$id": "simp/status_board.v1",
+  "type": "object",
+  "required": ["updated_at", "mode", "kill_switch", "verifier", "freshness", "processes", "policy", "lanes", "slo"],
+  "properties": {
+    "updated_at": { "type": "string", "format": "date-time" },
+    "mode": { "type": "string", "enum": ["fully_live", "shadow", "halt"] },
+    "kill_switch": {
+      "type": "object",
+      "required": ["set", "path", "last_checked"],
+      "properties": {
+        "set": { "type": "boolean" },
+        "path": { "type": "string" },
+        "last_checked": { "type": "string", "format": "date-time" },
+        "reason": { "type": "string" }
+      }
+    },
+    "verifier": {
+      "type": "object",
+      "required": ["status", "last_run", "failing_stage"],
+      "properties": {
+        "status": { "type": "string", "enum": ["green", "yellow", "red", "unknown"] },
+        "last_run": { "type": "string", "format": "date-time" },
+        "failing_stage": { "type": ["string", "null"] },
+        "pass_rate_6h": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "required": ["last_signal_age_s", "last_fill_age_s", "bridge_rtt_ms_p95"],
+      "properties": {
+        "last_signal_age_s": { "type": "number", "minimum": 0 },
+        "last_fill_age_s":   { "type": ["number", "null"], "minimum": 0 },
+        "bridge_rtt_ms_p95": { "type": ["number", "null"], "minimum": 0 },
+        "consumer_backlog":  { "type": "integer", "minimum": 0 }
+      }
+    },
+    "processes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["pid", "state"],
+        "properties": {
+          "pid":   { "type": ["integer", "null"] },
+          "state": { "type": "string", "enum": ["up", "down", "flapping", "unknown"] },
+          "last_restart": { "type": ["string", "null"], "format": "date-time" }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": ["live_mode", "block_rate_1h", "budget_remaining_usd"],
+      "properties": {
+        "live_mode":            { "type": "string", "enum": ["fully_live", "shadow", "halt"] },
+        "block_rate_1h":        { "type": "number", "minimum": 0, "maximum": 1 },
+        "budget_remaining_usd": { "type": "number" },
+        "max_position_usd":     { "type": "number" },
+        "daily_cap_usd":        { "type": "number" }
+      }
+    },
+    "lanes": {
+      "type": "object",
+      "patternProperties": {
+        "^A[0-9]$": {
+          "type": "object",
+          "required": ["last_cycle_at", "last_status", "sev_open"],
+          "properties": {
+            "last_cycle_at": { "type": "string", "format": "date-time" },
+            "last_status":   { "type": "string", "enum": ["ok", "blocked", "rolled_back", "halted"] },
+            "sev_open":      { "type": "integer", "minimum": 0 },
+            "notes":         { "type": "string" }
+          }
+        }
+      }
+    },
+    "slo": {
+      "type": "object",
+      "properties": {
+        "signal_fresh_target_s": { "type": "number" },
+        "fill_fresh_target_s":   { "type": "number" },
+        "verifier_green_target": { "type": "number" },
+        "policy_block_ceiling":  { "type": "number" }
+      }
+    },
+    "incidents_open": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "sev", "lane", "opened_at", "summary"],
+        "properties": {
+          "id":        { "type": "string" },
+          "sev":       { "type": "integer", "minimum": 1, "maximum": 4 },
+          "lane":      { "type": "string" },
+          "opened_at": { "type": "string", "format": "date-time" },
+          "summary":   { "type": "string" }
+        }
+      }
+    }
+  }
+}

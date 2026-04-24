@@ -1,0 +1,22 @@
+{
+  "_comment": "Human-edited only. A5 reads. Swarm agents never write to this file. Values below are conservative defaults for the 7-day push.",
+  "mode_default": "fully_live",
+  "daily_cap_usd": 250.0,
+  "max_position_usd": 50.0,
+  "max_per_strategy_gross_usd": 100.0,
+  "max_orders_per_minute": 6,
+  "allowed_venues": ["paper", "coinbase", "kalshi", "alpaca"],
+  "shadow_only_venues": ["solana"],
+  "shadow_if_budget_remaining_lt_usd": 25.0,
+  "kill_switch_path": "state/KILL",
+  "mode_file_path": "state/mode.json",
+  "auto_tighten_at_pct": 0.80,
+  "auto_shadow_at_pct": 1.00,
+  "slo": {
+    "signal_fresh_target_s": 60,
+    "fill_fresh_target_s": 300,
+    "bridge_rtt_ms_p95": 3000,
+    "verifier_green_target": 0.95,
+    "policy_block_ceiling": 0.05
+  }
+}

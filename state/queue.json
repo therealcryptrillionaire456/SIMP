@@ -1,0 +1,12 @@
+{
+  "A0": [{"id": "d1_a0_01", "action": "publish daily brief and close-out checklist"}],
+  "A1": [{"id": "d1_a1_01", "action": "inventory every process startall.sh launches; map to canonical hot path; mark orphans"}],
+  "A2": [{"id": "d1_a2_01", "action": "run verify_revenue_path.py against real repo; enumerate every failing stage"}],
+  "A3": [{"id": "d1_a3_01", "action": "read simp/task_ledger.py and simp/routing/builder_pool.py; confirm where a decision could be emitted; propose minimal adapter"}],
+  "A4": [{"id": "d1_a4_01", "action": "inventory A2A routes in simp/server/http_server.py; mark each as live/dead/duplicate"}],
+  "A5": [{"id": "d1_a5_01", "action": "locate every file matching policy_guard*, kill_switch*, budget*, risk_caps*, live_mode*; produce single authority map"}],
+  "A6": [{"id": "d1_a6_01", "action": "run snapshot every 30s for 1h; post baseline status_board and first metrics summary"}],
+  "A7": [{"id": "d1_a7_01", "action": "classify top-level files: critical/operational/experimental/historical/generated"}],
+  "A8": [{"id": "d1_a8_01", "action": "read AGENTS.md and README.md; mark claims by tier (Implemented/Prototype/Aspirational)"}],
+  "A9": [{"id": "d1_a9_01", "action": "independently re-run each lane's Day 1 verification claim; post first truth report"}]
+}

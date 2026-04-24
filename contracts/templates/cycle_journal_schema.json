@@ -1,0 +1,20 @@
+{
+  "$id": "simp/cycle_journal_entry.v1",
+  "type": "object",
+  "required": ["ts", "lane", "cycle_id", "observed", "decided", "gate", "executed", "verified", "journal_note"],
+  "properties": {
+    "ts":            { "type": "string", "format": "date-time" },
+    "lane":          { "type": "string", "pattern": "^A[0-9]$" },
+    "cycle_id":      { "type": "string" },
+    "observed":      { "type": "string" },
+    "decided":       { "type": "string" },
+    "gate":          { "type": "string", "enum": ["pass", "halt", "owner_conflict", "needs_a5", "needs_a0"] },
+    "executed":      { "type": "array", "items": { "type": "string" } },
+    "verified":      { "type": "string", "enum": ["green", "yellow", "red", "na"] },
+    "revert_cmd":    { "type": "string" },
+    "journal_note":  { "type": "string" },
+    "next_candidates": { "type": "array", "items": { "type": "string" } },
+    "sev_opened":    { "type": "array", "items": { "type": "string" } },
+    "sev_closed":    { "type": "array", "items": { "type": "string" } }
+  }
+}

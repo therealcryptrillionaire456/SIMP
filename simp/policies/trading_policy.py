@@ -69,7 +69,7 @@ log = logging.getLogger("simp.policies.trading_policy")
 # ---------------------------------------------------------------------------
 
 _DEFAULT_KILL_SWITCH_PATH = Path(
-    os.environ.get("SIMP_KILL_SWITCH_PATH", "data/KILL_SWITCH")
+    os.environ.get("SIMP_KILL_SWITCH_PATH", "state/KILL")
 )
 
 # ---------------------------------------------------------------------------
