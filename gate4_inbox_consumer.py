@@ -192,20 +192,26 @@ def is_trading_hours(cfg: dict) -> bool:
 
 def build_client(cfg: dict) -> ResilientCoinbaseClient:
     ex = cfg["exchange_config"]
-    # coinbase-advanced-py accepts CDP keys directly.
-    # Use environment variable substitution for security
-    api_key_name = os.path.expandvars(ex["api_key_name"])
-    api_secret = os.path.expandvars(ex["api_secret"]).strip()
-    if api_secret.startswith(("'", '"')) and api_secret.endswith(("'", '"')):
-        api_secret = api_secret[1:-1]
-    if "\\n" in api_secret:
-        api_secret = api_secret.replace("\\n", "\n")
-
-    raw_client = RESTClient(
-        api_key=api_key_name,
-        api_secret=api_secret,
-        timeout=ex.get("timeout_seconds", 30),
-    )
+    # Check for CDP key file first (preferred path for coinbase-advanced-py)
+    cdp_key_file = os.path.expandvars(ex.get("key_file", ""))
+    if cdp_key_file and os.path.exists(cdp_key_file):
+        raw_client = RESTClient(
+            key_file=cdp_key_file,
+            timeout=ex.get("timeout_seconds", 30),
+        )
+    else:
+        # Fallback: legacy api_key/api_secret path
+        api_key_name = os.path.expandvars(ex["api_key_name"])
+        api_secret = os.path.expandvars(ex["api_secret"]).strip()
+        if api_secret.startswith(("'", '"')) and api_secret.endswith(("'", '"')):
+            api_secret = api_secret[1:-1]
+        if "\\n" in api_secret:
+            api_secret = api_secret.replace("\\n", "\n")
+        raw_client = RESTClient(
+            api_key=api_key_name,
+            api_secret=api_secret,
+            timeout=ex.get("timeout_seconds", 30),
+        )
     return ResilientCoinbaseClient(raw_client, logger=log)
 
 

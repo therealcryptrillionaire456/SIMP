@@ -57,7 +57,7 @@ KILL_PATH = Path(os.environ.get("SIMP_KILL_PATH", STATE_DIR / "KILL"))
 MODE_PATH = Path(os.environ.get("SIMP_MODE_PATH", STATE_DIR / "mode.json"))
 LIMITS_PATH = Path(os.environ.get("SIMP_LIMITS_PATH", REPO_ROOT / "contracts" / "live_limits.json"))
 
-TERMINAL_STATES = {"executed", "policy_blocked", "exchange_error", "strategy_rejected", "stale"}
+TERMINAL_STATES = {"executed", "policy_blocked", "exchange_error", "strategy_rejected", "stale", "insufficient_balance"}
 
 # ---------------------------------------------------------------------------
 

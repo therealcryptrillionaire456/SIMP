@@ -2,9 +2,14 @@
   "exchange_config": {
     "api_key_name": "${COINBASE_API_KEY_NAME}",
     "api_secret": "${COINBASE_API_PRIVATE_KEY}",
-    "timeout_seconds": 30
+    "timeout_seconds": 30,
+    "key_file": "config/coinbase_cdp_key.json"
   },
-  "symbols": ["BTC-USD", "ETH-USD", "SOL-USD"],
+  "symbols": [
+    "BTC-USD",
+    "ETH-USD",
+    "SOL-USD"
+  ],
   "position_sizing": {
     "min_notional": 1.0,
     "max_notional": 10.0
@@ -18,7 +23,15 @@
     }
   },
   "trading_hours": {
-    "days_active": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+    "days_active": [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday"
+    ],
     "start_time_utc": "00:00",
     "end_time_utc": "23:59"
   },

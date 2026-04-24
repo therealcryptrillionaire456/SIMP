@@ -1,0 +1,26 @@
+{
+  "review_date": "2026-04-24T15:55:00Z",
+  "reviewed_commit": "b54032d",
+  "remote_verified": "origin/hot/wire-up-revenue-path",
+  "verifier": "GREEN",
+  "stop_conditions": "4/4 OK",
+  "hot_path_probe": "4/4 fresh",
+  "test_results": {
+    "test_trading_policy": "28 passed, 1 skipped",
+    "test_ops_scripts": "2 passed",
+    "test_gate4_inbox_consumer": "6 passed",
+    "test_observability_truth": "8 passed",
+    "test_decision_journal": "11 passed"
+  },
+  "live_prerequisites": {
+    "coinbase_cdp_key": "PRESENT_AND_VALID",
+    "coinbase_api_product_check": "PASSED (BTC-USD: $78,029.91)",
+    "gate4_flow": "WORKING (3 LIVE BUY BTC-USD $1.00 orders executed, 2 INSUFFICIENT_FUND on depleted balance)",
+    "simulated_safety_fault": "PASSED (faults block immediately)",
+    "rollback_path": "state/KILL file checked, ownership enforcement verified"
+  },
+  "blocking_gaps": [],
+  "decision": "GO_PAPER_CONTINUE",
+  "canary_ready": true,
+  "notes": "BTC wallet has ~$8.68. 3 orders of $1.00 executed successfully via CDP key. Remaining INSUFFICIENT_FUND expected at current balance. System is fully wired and tested."
+}
