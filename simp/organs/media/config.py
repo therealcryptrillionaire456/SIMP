@@ -1,14 +1,12 @@
-"""
-Configuration for KashClaw Media Grid.
-"""
+"""Media Grid Configuration."""
+
 import os
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
+from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, List, Optional, Set
 
 
-class MediaEnvironment(str, Enum):
-    """Media grid environment types."""
+class MediaEnvironment(Enum):
     DEVELOPMENT = "development"
     STAGING = "staging"
     PRODUCTION = "production"
@@ -16,330 +14,160 @@ class MediaEnvironment(str, Enum):
 
 @dataclass
 class MediaGridConfig:
-    """Main configuration for KashClaw Media Grid."""
-    
+    """Configuration for the Media Grid subsystem.
+
+    All fields have defaults sourced from environment variables.
+    """
+
     # Environment
     environment: MediaEnvironment = MediaEnvironment.DEVELOPMENT
-    
-    # Data storage
-    data_dir: str = "data/media"
-    ledger_retention_days: int = 90
-    
-    # Agent configurations
-    agents_enabled: Dict[str, bool] = field(default_factory=lambda: {
-        "trend_harvester": True,
-        "script_agent": True,
-        "asset_agent": True,
-        "edit_packaging_agent": True,
-        "publisher_agent": True,
-        "analytics_agent": True,
-        "simp_news_agent": True,
-        "offer_intelligence_agent": True
-    })
-    
+    log_level: str = "DEBUG"  # DEBUG, INFO, WARNING, ERROR
+
+    # Agent enablement flags
+    enable_trend_harvester: bool = True
+    enable_script_agent: bool = True
+    enable_asset_agent: bool = True
+    enable_edit_packaging: bool = True
+    enable_publisher: bool = True
+    enable_analytics: bool = True
+    enable_landing_page: bool = True
+    enable_offer_intelligence: bool = True
+    enable_simp_news: bool = True
+
     # Content generation
     default_generation_tool: str = "higgsfield"
-    max_content_per_day: int = 10
-    content_quality: str = "balanced"  # "fast", "balanced", "quality"
-    
+    max_content_per_day: int = 20
+    quality_mode: str = "balanced"
+
     # Publishing
-    platforms_enabled: Dict[str, bool] = field(default_factory=lambda: {
-        "tiktok": True,
-        "youtube_shorts": True,
-        "instagram_reels": True,
-        "x": True,
-        "facebook": False,
-        "linkedin": False
-    })
-    
-    max_posts_per_day: int = 20
-    posting_schedule_enabled: bool = True
-    
+    enable_tiktok: bool = True
+    enable_youtube_shorts: bool = True
+    enable_instagram_reels: bool = True
+    enable_x: bool = False
+
     # Monetization
-    affiliate_networks: List[str] = field(default_factory=lambda: [
-        "clickbank",
-        "shareasale",
-        "cj",
-        "partnerstack",
-        "direct"
-    ])
-    
-    min_commission_rate: float = 20.0  # Percentage
-    min_payout: float = 25.0  # USD
-    
-    # Compliance
-    disclosure_required: bool = True
-    compliance_check_enabled: bool = True
-    human_approval_required: bool = False
-    
-    # Budget and costs
-    daily_budget: float = 50.0  # USD
-    max_cost_per_content: float = 15.0  # USD
-    roi_target: float = 100.0  # Percentage
-    
-    # Analytics
-    tracking_enabled: bool = True
-    analysis_interval_minutes: int = 60
-    performance_decay_days: int = 7
-    
-    # SIMP integration
+    min_affiliate_commission: float = 20.0
+    default_affiliate_network: str = "amazon"
+
+    # Budget
+    daily_budget: float = 50.0
+    max_cost_per_content: float = 5.0
+    budget_alert_threshold: float = 0.8
+
+    # Performance
+    rate_limit_calls_per_minute: int = 10
+
+    # SIMP Integration
     simp_broker_url: str = "http://127.0.0.1:5555"
     simp_api_key: str = ""
-    auto_register_agents: bool = True
-    
-    # n8n integration
-    n8n_webhook_url: str = "http://localhost:5678/webhook/media"
-    n8n_enabled: bool = False
-    
-    # AI tools configuration
-    ai_tools: Dict[str, Dict[str, Any]] = field(default_factory=lambda: {
-        "higgsfield": {
-            "enabled": True,
-            "api_key": "",
-            "max_cost_per_video": 10.0,
-            "quality_preset": "standard"
-        },
-        "minimax": {
-            "enabled": True,
-            "api_key": "",
-            "max_cost_per_video": 5.0,
-            "quality_preset": "fast"
-        },
-        "elevenlabs": {
-            "enabled": True,
-            "api_key": "",
-            "voice_id": "default",
-            "cost_per_character": 0.0003
-        },
-        "openai": {
-            "enabled": True,
-            "api_key": "",
-            "model": "gpt-4",
-            "max_tokens": 2000
-        }
-    })
-    
-    # Content templates
-    content_templates: Dict[str, Dict[str, Any]] = field(default_factory=lambda: {
-        "ai_tools_review": {
-            "name": "AI Tools Review",
-            "description": "Review and demonstration of AI tools",
-            "target_platforms": ["tiktok", "youtube_shorts", "instagram_reels"],
-            "duration_seconds": 60,
-            "formats": ["9:16"],
-            "monetization_method": "affiliate_links",
-            "compliance_notes": ["Disclose affiliate relationship", "Accurate capability claims"]
-        },
-        "productivity_tips": {
-            "name": "Productivity Tips",
-            "description": "Quick productivity tips and hacks",
-            "target_platforms": ["tiktok", "instagram_reels", "x"],
-            "duration_seconds": 45,
-            "formats": ["9:16", "1:1"],
-            "monetization_method": "lead_generation",
-            "compliance_notes": ["Educational content", "No medical/financial advice"]
-        },
-        "comparison_video": {
-            "name": "Tool Comparison",
-            "description": "Comparison of similar tools or methods",
-            "target_platforms": ["youtube_shorts", "instagram_reels"],
-            "duration_seconds": 90,
-            "formats": ["9:16", "16:9"],
-            "monetization_method": "affiliate_links",
-            "compliance_notes": ["Fair comparison", "Disclose testing methodology"]
-        }
-    })
-    
-    # Account portfolio
-    account_portfolio: List[Dict[str, Any]] = field(default_factory=lambda: [
-        {
-            "name": "KashClawLabs",
-            "type": "brand",
-            "platforms": ["tiktok", "youtube_shorts", "instagram"],
-            "niche": "ai_tools",
-            "voice": "professional",
-            "posting_frequency": "daily",
-            "monetization": ["affiliate_links", "sponsored_content"]
-        },
-        {
-            "name": "ClipCashFlow",
-            "type": "niche",
-            "platforms": ["tiktok", "instagram_reels"],
-            "niche": "productivity",
-            "voice": "casual",
-            "posting_frequency": "3x_weekly",
-            "monetization": ["affiliate_links", "digital_products"]
-        },
-        {
-            "name": "AgentSideHustles",
-            "type": "persona",
-            "platforms": ["x", "linkedin"],
-            "niche": "entrepreneurship",
-            "voice": "enthusiastic",
-            "posting_frequency": "daily",
-            "monetization": ["affiliate_links", "consulting"]
-        }
-    ])
-    
-    # Performance thresholds
-    performance_thresholds: Dict[str, float] = field(default_factory=lambda: {
-        "min_engagement_rate": 0.02,  # 2%
-        "min_ctr": 0.01,  # 1%
-        "min_conversion_rate": 0.001,  # 0.1%
-        "max_cost_per_conversion": 50.0,  # USD
-        "min_roi": 50.0,  # 50%
-        "content_decay_threshold": 0.1  # 10% of initial views after 7 days
-    })
-    
-    # Logging
-    log_level: str = "INFO"
-    log_file: str = "media_grid.log"
-    log_rotation: str = "daily"
-    
+
+    # Enabled agents (derived from flags)
+    enabled_agents: Set[str] = None
+
     def __post_init__(self):
-        """Post-initialization processing."""
-        # Ensure data directory exists
-        os.makedirs(self.data_dir, exist_ok=True)
-        
-        # Set SIMP API key from environment if not provided
-        if not self.simp_api_key:
-            self.simp_api_key = os.getenv("SIMP_API_KEY", "")
-        
-        # Set AI tool API keys from environment
-        for tool_name in self.ai_tools:
-            env_key = f"{tool_name.upper()}_API_KEY"
-            if env_key in os.environ and not self.ai_tools[tool_name].get("api_key"):
-                self.ai_tools[tool_name]["api_key"] = os.environ[env_key]
-    
-    @classmethod
-    def from_env(cls) -> "MediaGridConfig":
-        """Create configuration from environment variables."""
-        config = cls()
-        
-        # Environment
-        env_str = os.getenv("MEDIA_ENVIRONMENT", "development").upper()
-        if env_str in MediaEnvironment.__members__:
-            config.environment = MediaEnvironment[env_str]
-        
-        # Data directory
-        if "MEDIA_DATA_DIR" in os.environ:
-            config.data_dir = os.getenv("MEDIA_DATA_DIR")
-        
-        # SIMP integration
-        if "SIMP_BROKER_URL" in os.environ:
-            config.simp_broker_url = os.getenv("SIMP_BROKER_URL")
-        
-        # Budget
-        if "MEDIA_DAILY_BUDGET" in os.environ:
-            try:
-                config.daily_budget = float(os.getenv("MEDIA_DAILY_BUDGET"))
-            except (ValueError, TypeError):
-                pass
-        
-        # Logging
-        if "MEDIA_LOG_LEVEL" in os.environ:
-            config.log_level = os.getenv("MEDIA_LOG_LEVEL")
-        
-        return config
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert configuration to dictionary."""
-        import dataclasses
-        return dataclasses.asdict(self)
-    
+        if self.enabled_agents is None:
+            self.enabled_agents = self._compute_enabled_agents()
+
+    def _compute_enabled_agents(self) -> Set[str]:
+        agents = set()
+        if self.enable_trend_harvester:
+            agents.add("trend_harvester")
+        if self.enable_script_agent:
+            agents.add("script_agent")
+        if self.enable_asset_agent:
+            agents.add("asset_agent")
+        if self.enable_edit_packaging:
+            agents.add("edit_packaging")
+        if self.enable_publisher:
+            agents.add("publisher")
+        if self.enable_analytics:
+            agents.add("analytics")
+        if self.enable_landing_page:
+            agents.add("landing_page")
+        if self.enable_offer_intelligence:
+            agents.add("offer_intelligence")
+        if self.enable_simp_news:
+            agents.add("simp_news")
+        return agents
+
+    @property
+    def agents_enabled(self) -> Dict[str, bool]:
+        """Backward-compatible dict view for orchestrator compatibility."""
+        return {
+            "trend_harvester": self.enable_trend_harvester,
+            "script_agent": self.enable_script_agent,
+            "asset_agent": self.enable_asset_agent,
+            "edit_packaging": self.enable_edit_packaging,
+            "publisher": self.enable_publisher,
+            "analytics": self.enable_analytics,
+            "landing_page": self.enable_landing_page,
+            "offer_intelligence": self.enable_offer_intelligence,
+            "simp_news": self.enable_simp_news,
+        }
+
     def validate(self) -> List[str]:
-        """Validate configuration and return list of issues."""
-        issues = []
-        
-        # Check required fields
-        if not self.simp_broker_url:
-            issues.append("SIMP broker URL is required")
-        
-        if self.environment == MediaEnvironment.PRODUCTION and not self.simp_api_key:
-            issues.append("SIMP API key is required for production")
-        
-        # Check budget constraints
-        if self.daily_budget <= 0:
-            issues.append("Daily budget must be positive")
-        
-        if self.max_cost_per_content <= 0:
-            issues.append("Max cost per content must be positive")
-        
-        if self.max_cost_per_content > self.daily_budget:
-            issues.append("Max cost per content cannot exceed daily budget")
-        
-        # Check at least one platform is enabled
-        enabled_platforms = [p for p, enabled in self.platforms_enabled.items() if enabled]
-        if not enabled_platforms:
-            issues.append("At least one platform must be enabled")
-        
-        # Check at least one agent is enabled
-        enabled_agents = [a for a, enabled in self.agents_enabled.items() if enabled]
-        if not enabled_agents:
-            issues.append("At least one agent must be enabled")
-        
-        # Check AI tools configuration
-        for tool_name, tool_config in self.ai_tools.items():
-            if tool_config.get("enabled", False) and not tool_config.get("api_key"):
-                if self.environment == MediaEnvironment.PRODUCTION:
-                    issues.append(f"API key required for {tool_name} in production")
-        
-        return issues
+        """Validate config values. Returns list of error messages (empty = valid)."""
+        errors = []
+        if self.environment not in list(MediaEnvironment):
+            errors.append(f"Invalid environment: {self.environment}")
+        if self.max_content_per_day < 1:
+            errors.append("max_content_per_day must be >= 1")
+        if self.max_cost_per_content < 0:
+            errors.append("max_cost_per_content must be >= 0")
+        if self.daily_budget < 0:
+            errors.append("daily_budget must be >= 0")
+        if self.budget_alert_threshold < 0 or self.budget_alert_threshold > 1:
+            errors.append("budget_alert_threshold must be between 0 and 1")
+        if self.rate_limit_calls_per_minute < 1:
+            errors.append("rate_limit_calls_per_minute must be >= 1")
+        if self.min_affiliate_commission < 0 or self.min_affiliate_commission > 100:
+            errors.append("min_affiliate_commission must be between 0 and 100")
+        return errors
 
 
-# Default configuration instance
-default_config = MediaGridConfig()
+def load_config() -> MediaGridConfig:
+    """Load configuration from environment variables."""
+    env_str = os.environ.get("MEDIA_ENVIRONMENT", "development")
+    try:
+        env = MediaEnvironment(env_str)
+    except ValueError:
+        env = MediaEnvironment.DEVELOPMENT
 
-# Environment-specific configurations
-configs = {
-    MediaEnvironment.DEVELOPMENT: MediaGridConfig(
-        environment=MediaEnvironment.DEVELOPMENT,
-        log_level="DEBUG",
-        human_approval_required=True,
-        max_content_per_day=3,
-        max_posts_per_day=5,
-        daily_budget=25.0,
-        compliance_check_enabled=True
-    ),
-    MediaEnvironment.STAGING: MediaGridConfig(
-        environment=MediaEnvironment.STAGING,
-        log_level="INFO",
-        human_approval_required=False,
-        max_content_per_day=10,
-        max_posts_per_day=15,
-        daily_budget=100.0,
-        compliance_check_enabled=True
-    ),
-    MediaEnvironment.PRODUCTION: MediaGridConfig(
-        environment=MediaEnvironment.PRODUCTION,
-        log_level="WARNING",
-        human_approval_required=False,
-        max_content_per_day=50,
-        max_posts_per_day=100,
-        daily_budget=500.0,
-        compliance_check_enabled=True,
-        auto_register_agents=True
+    return MediaGridConfig(
+        environment=env,
+        enable_trend_harvester=_env_bool("MEDIA_ENABLE_TREND_HARVESTER", True),
+        enable_script_agent=_env_bool("MEDIA_ENABLE_SCRIPT_AGENT", True),
+        enable_asset_agent=_env_bool("MEDIA_ENABLE_ASSET_AGENT", True),
+        enable_edit_packaging=_env_bool("MEDIA_ENABLE_EDIT_PACKAGING", True),
+        enable_publisher=_env_bool("MEDIA_ENABLE_PUBLISHER", True),
+        enable_analytics=_env_bool("MEDIA_ENABLE_ANALYTICS", True),
+        enable_landing_page=_env_bool("MEDIA_ENABLE_LANDING_PAGE", True),
+        enable_offer_intelligence=_env_bool("MEDIA_ENABLE_OFFER_INTELLIGENCE", True),
+        enable_simp_news=_env_bool("MEDIA_ENABLE_SIMP_NEWS", True),
+        default_generation_tool=os.environ.get("MEDIA_DEFAULT_GENERATION_TOOL", "higgsfield"),
+        max_content_per_day=int(os.environ.get("MEDIA_MAX_CONTENT_PER_DAY", "20")),
+        quality_mode=os.environ.get("MEDIA_QUALITY_MODE", "balanced"),
+        enable_tiktok=_env_bool("MEDIA_ENABLE_TIKTOK", True),
+        enable_youtube_shorts=_env_bool("MEDIA_ENABLE_YOUTUBE_SHORTS", True),
+        enable_instagram_reels=_env_bool("MEDIA_ENABLE_INSTAGRAM_REELS", True),
+        enable_x=_env_bool("MEDIA_ENABLE_X", False),
+        min_affiliate_commission=float(os.environ.get("MEDIA_MIN_AFFILIATE_COMMISSION", "20.0")),
+        default_affiliate_network=os.environ.get("MEDIA_DEFAULT_AFFILIATE_NETWORK", "amazon"),
+        daily_budget=float(os.environ.get("MEDIA_DAILY_BUDGET", "50.0")),
+        max_cost_per_content=float(os.environ.get("MEDIA_MAX_COST_PER_CONTENT", "5.0")),
+        budget_alert_threshold=float(os.environ.get("MEDIA_BUDGET_ALERT_THRESHOLD", "0.8")),
+        rate_limit_calls_per_minute=int(os.environ.get("MEDIA_RATE_LIMIT_CALLS_PER_MINUTE", "10")),
+        simp_broker_url=os.environ.get("MEDIA_SIMP_BROKER_URL", "http://127.0.0.1:5555"),
+        simp_api_key=os.environ.get("MEDIA_SIMP_API_KEY", ""),
     )
-}
 
 
-def get_config(environment: Optional[MediaEnvironment] = None) -> MediaGridConfig:
-    """
-    Get configuration for specified environment.
-    
-    Args:
-        environment: Environment type, defaults to MEDIA_ENVIRONMENT env var or DEVELOPMENT
-    
-    Returns:
-        MediaGridConfig instance
-    """
-    if environment is None:
-        env_str = os.getenv("MEDIA_ENVIRONMENT", "development").upper()
-        if env_str in MediaEnvironment.__members__:
-            environment = MediaEnvironment[env_str]
-        else:
-            environment = MediaEnvironment.DEVELOPMENT
-    
-    # Return environment-specific config with environment variable overrides
-    config = configs.get(environment, default_config).from_env()
-    return config
+# Backward-compatible alias
+get_config = load_config
+
+
+def _env_bool(key: str, default: bool) -> bool:
+    val = os.environ.get(key)
+    if val is None:
+        return default
+    return val.lower() in ("true", "1", "yes")

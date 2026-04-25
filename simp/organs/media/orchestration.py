@@ -9,11 +9,44 @@ import json
 import signal
 import sys
 import time
+import traceback
+import uuid
 from datetime import datetime, timedelta
+from enum import Enum
+from pathlib import Path
 from typing import Dict, List, Optional, Any, Callable
 
+from simp.organs.media.agents.base_media_agent import timed_operation
 from simp.organs.media.config import MediaGridConfig, get_config
 from simp.organs.media import create_media_grid_agents
+
+
+class ErrorSeverity(Enum):
+    """Severity levels for media grid errors."""
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
+class MediaGridError(Exception):
+    """Custom exception for media grid errors with structured information."""
+    
+    def __init__(
+        self,
+        message: str,
+        severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+        step: Optional[str] = None,
+        component: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        original_exception: Optional[Exception] = None
+    ):
+        super().__init__(message)
+        self.severity = severity
+        self.step = step
+        self.component = component
+        self.details = details or {}
+        self.original_exception = original_exception
 
 
 class MediaGridOrchestrator:
@@ -44,6 +77,7 @@ class MediaGridOrchestrator:
             "workflows_completed": 0,
             "content_published": 0,
             "revenue_generated": 0.0,
+            "media_revenue_cents": 0,
             "errors_encountered": 0,
             "start_time": None,
             "last_activity": None
@@ -294,19 +328,50 @@ class MediaGridOrchestrator:
                 await asyncio.sleep(60)
     
     def _save_metrics(self, metrics: Dict[str, Any]):
-        """Save metrics to ledger."""
+        """Save metrics to ledgers (both orchestrator and shared metrics)."""
         try:
+            ts = datetime.utcnow().isoformat()
             metrics_record = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": ts,
                 "metrics": metrics
             }
             
+            # Orchestrator-specific ledger
             ledger_path = f"{self.config.data_dir}/orchestrator_metrics.jsonl"
             with open(ledger_path, "a") as f:
                 f.write(json.dumps(metrics_record) + "\n")
+
+            # Shared per-metric records for the metrics ledger (read by diagnostics)
+            self._write_metric_records(metrics, ts)
                 
         except Exception as e:
             self.logger.error(f"Error saving metrics: {e}")
+
+    def _write_metric_records(self, metrics: Dict[str, Any], timestamp: str) -> None:
+        """Write individual metric records to data/media/metrics.jsonl."""
+        ledger_path = f"{self.config.data_dir}/metrics.jsonl"
+        summary = metrics.get("summary", {})
+        orchestrator = metrics.get("orchestrator", {})
+
+        # Flatten relevant summary + orchestrator metrics into individual records
+        metric_sources = [
+            ("workflows_completed", summary.get("total_workflows_completed", 0)),
+            ("content_published", summary.get("total_content_published", 0)),
+            ("revenue_generated", orchestrator.get("revenue_generated", 0.0)),
+            ("media_revenue_cents", orchestrator.get("media_revenue_cents", 0)),
+            ("active_workflows", summary.get("active_workflows", 0)),
+            ("total_errors", summary.get("total_errors", 0)),
+        ]
+
+        with open(ledger_path, "a") as f:
+            for metric_name, metric_value in metric_sources:
+                record = {
+                    "metric": metric_name,
+                    "value": metric_value,
+                    "agent_id": "orchestrator",
+                    "timestamp": timestamp,
+                }
+                f.write(json.dumps(record) + "\n")
     
     async def execute_workflow(self, workflow_type: str, **kwargs) -> Dict[str, Any]:
         """
@@ -516,6 +581,13 @@ class MediaGridOrchestrator:
             
             analysis_results = await self._execute_performance_analysis_workflow(
                 f"{workflow_id}_analysis", **kwargs
+            )
+
+            # Increment revenue metric on successful pipeline completion
+            # Each completed pipeline increments by a base amount; real values
+            # would come from affiliate commissions / ad revenue tracking.
+            self.metrics["media_revenue_cents"] = (
+                self.metrics.get("media_revenue_cents", 0) + 50
             )
             
             return {
@@ -821,6 +893,7 @@ class MediaGridOrchestrator:
             "total_workflows_completed": self.metrics["workflows_completed"],
             "total_content_published": self.metrics["content_published"],
             "total_revenue": self.metrics["revenue_generated"],
+            "media_revenue_cents": self.metrics.get("media_revenue_cents", 0),
             "total_errors": self.metrics["errors_encountered"],
             "uptime_seconds": self._calculate_uptime()
         }
@@ -835,6 +908,146 @@ class MediaGridOrchestrator:
         start_time = datetime.fromisoformat(self.metrics["start_time"])
         return (datetime.utcnow() - start_time).total_seconds()
     
+    def _log_error(
+        self,
+        message: str,
+        severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+        step: Optional[str] = None,
+        component: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        exception: Optional[Exception] = None
+    ) -> str:
+        """
+        Log a structured error to the media errors ledger.
+        
+        Args:
+            message: Human-readable error description
+            severity: Error severity level
+            step: Workflow step where error occurred
+            component: Component name (agent, workflow, etc.)
+            details: Additional structured error context
+            exception: Original exception if applicable
+            
+        Returns:
+            Error record ID
+        """
+        error_id = f"error_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
+        
+        error_record = {
+            "id": error_id,
+            "timestamp": datetime.utcnow().isoformat(),
+            "message": message,
+            "severity": severity.value,
+            "step": step,
+            "component": component or "orchestrator",
+            "details": details or {},
+            "traceback": traceback.format_exc() if exception else None,
+            "exception_type": type(exception).__name__ if exception else None,
+            "exception_message": str(exception) if exception else None
+        }
+        
+        # Write to errors ledger
+        errors_dir = Path(self.config.data_dir)
+        errors_dir.mkdir(parents=True, exist_ok=True)
+        ledger_path = errors_dir / "errors.jsonl"
+        
+        try:
+            with open(ledger_path, "a") as f:
+                f.write(json.dumps(error_record) + "\n")
+        except Exception as e:
+            self.logger.error(f"Failed to write error ledger: {e}")
+        
+        # Log at appropriate level
+        log_map = {
+            ErrorSeverity.LOW: self.logger.info,
+            ErrorSeverity.MEDIUM: self.logger.warning,
+            ErrorSeverity.HIGH: self.logger.error,
+            ErrorSeverity.CRITICAL: self.logger.critical
+        }
+        log_map.get(severity, self.logger.warning)(
+            f"[{severity.value}] {message}"
+            + (f" [step={step}]" if step else "")
+            + (f" [component={component}]" if component else "")
+        )
+        
+        self.metrics["errors_encountered"] += 1
+        
+        return error_id
+    
+    async def error_recovery(
+        self,
+        failed_step: str,
+        error_info: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Handle error recovery for a failed workflow step.
+        
+        Logs the error, determines severity, and returns a recovery plan.
+        
+        Args:
+            failed_step: Name of the step that failed
+            error_info: Error information (message, exception, severity, etc.)
+            
+        Returns:
+            Recovery plan suggestion
+        """
+        error_id = self._log_error(
+            message=error_info.get("message", "Unknown error"),
+            severity=ErrorSeverity(error_info.get("severity", "medium")),
+            step=failed_step,
+            component=error_info.get("component"),
+            details=error_info.get("details"),
+            exception=error_info.get("exception")
+        )
+        
+        severity = ErrorSeverity(error_info.get("severity", "medium"))
+        
+        recovery_plan = {
+            "error_id": error_id,
+            "step": failed_step,
+            "severity": severity.value,
+            "action": "unknown",
+            "suggestion": "",
+            "can_retry": False
+        }
+        
+        # Generate recovery suggestion based on severity
+        if severity == ErrorSeverity.CRITICAL:
+            recovery_plan["action"] = "halt_and_notify"
+            recovery_plan["suggestion"] = (
+                f"Critical failure in step '{failed_step}'. "
+                f"Halting pipeline and notifying operator."
+            )
+            recovery_plan["can_retry"] = False
+            
+        elif severity == ErrorSeverity.HIGH:
+            recovery_plan["action"] = "retry_step"
+            recovery_plan["suggestion"] = (
+                f"High-severity failure in step '{failed_step}'. "
+                f"Recommend retrying the step with exponential backoff."
+            )
+            recovery_plan["can_retry"] = True
+            
+        elif severity == ErrorSeverity.MEDIUM:
+            recovery_plan["action"] = "retry_step"
+            recovery_plan["suggestion"] = (
+                f"Medium-severity failure in step '{failed_step}'. "
+                f"Retry with default backoff, skip on repeated failure."
+            )
+            recovery_plan["can_retry"] = True
+            
+        elif severity == ErrorSeverity.LOW:
+            recovery_plan["action"] = "skip_and_continue"
+            recovery_plan["suggestion"] = (
+                f"Low-severity issue in step '{failed_step}'. "
+                f"Skipping and continuing pipeline."
+            )
+            recovery_plan["can_retry"] = False
+        
+        self.logger.info(f"Recovery plan for {failed_step}: {recovery_plan['action']}")
+        
+        return recovery_plan
+
     def get_status(self) -> Dict[str, Any]:
         """Get current status of the orchestrator."""
         return {

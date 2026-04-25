@@ -99,6 +99,23 @@ class AffiliateOffer:
     created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
     updated_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
 
+    def validate(self) -> list:
+        """Validate AffiliateOffer fields. Returns list of error messages (empty = valid)."""
+        errors = []
+        if not self.affiliate_link and not self.landing_page_url:
+            errors.append("Either affiliate_link or landing_page_url must be set")
+        if self.affiliate_link:
+            if not self.affiliate_link.startswith("https://"):
+                errors.append("affiliate_link must start with https://")
+        if self.landing_page_url:
+            if not self.landing_page_url.startswith("https://"):
+                errors.append("landing_page_url must start with https://")
+        if self.commission_rate < 0:
+            errors.append("commission_rate must be >= 0")
+        if self.commission_rate > 100:
+            errors.append("commission_rate must be <= 100")
+        return errors
+
 
 @dataclass
 class ContentBrief:
@@ -135,6 +152,23 @@ class ContentBrief:
     
     metadata: Dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+
+    def validate(self) -> list:
+        """Validate ContentBrief fields. Returns list of error messages (empty = valid)."""
+        errors = []
+        if len(self.title) > 200:
+            errors.append("title must be <= 200 characters")
+        if len(self.description) > 2000:
+            errors.append("description must be <= 2000 characters")
+        # Check for HTML tags in title and description
+        for field_name, value in [("title", self.title), ("description", self.description)]:
+            if "<" in value and ">" in value:
+                # Simple check for HTML tag patterns
+                import re
+                if re.search(r"<\s*/?\s*\w+[^>]*>", value):
+                    errors.append(f"{field_name} must not contain HTML tags")
+                    break
+        return errors
 
 
 @dataclass

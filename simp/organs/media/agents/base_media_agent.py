@@ -2,21 +2,81 @@
 Base class for all KashClaw Media Grid agents.
 """
 import asyncio
+import functools
 import json
 import logging
 import os
 import time
 import uuid
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
+from enum import Enum, auto
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Callable
+
+
+def timed_operation(name=None):
+    """Decorator that logs execution time of agent methods.
+
+    Wraps a method call, measures elapsed wall-clock time, and logs
+    the duration (and any error) via the agent's _log_metric method.
+
+    Args:
+        name: Optional override for the operation name.  Defaults to
+              the wrapped function's __name__.
+
+    Usage::
+
+        class MyAgent(BaseMediaAgent):
+            @timed_operation("my_op")
+            async def do_stuff(self) -> str:
+                ...
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            op_name = name or func.__name__
+            start = time.time()
+            try:
+                result = func(self, *args, **kwargs)
+                elapsed = time.time() - start
+                self._log_metric(f"{op_name}_duration_seconds", elapsed)
+                return result
+            except Exception as e:
+                elapsed = time.time() - start
+                self._log_metric(f"{op_name}_error", 1)
+                self._log_metric(f"{op_name}_duration_seconds", elapsed)
+                raise
+        return wrapper
+    return decorator
 
 from simp.organs.media.models import (
     AffiliateOffer, ContentBrief, ScriptPackage, AssetJob,
     GeneratedAsset, ContentPackage, PublishedPost, PerformanceMetrics,
     LandingPage, ContentOpportunityScore
 )
+
+
+class CircuitBreakerState(Enum):
+    """State of the circuit breaker."""
+    CLOSED = auto()      # Normal operation, requests pass through
+    OPEN = auto()        # Circuit is tripped, requests fail fast
+    HALF_OPEN = auto()   # Testing if service has recovered
+
+
+class CircuitBreakerOpenError(Exception):
+    """Raised when a circuit breaker is OPEN and blocks a call."""
+    pass
+
+
+@dataclass
+class CircuitBreaker:
+    """Tracks failure count and determines whether calls should be blocked."""
+    failure_count: int = 0
+    max_failures: int = 5
+    half_open_timeout: float = 60.0
+    last_failure_time: Optional[float] = None
+    state: CircuitBreakerState = CircuitBreakerState.CLOSED
 
 
 class BaseMediaAgent:
@@ -27,7 +87,8 @@ class BaseMediaAgent:
         agent_id: str,
         agent_name: str,
         data_dir: Optional[str] = None,
-        log_level: str = "INFO"
+        log_level: str = "INFO",
+        circuit_breaker: Optional[CircuitBreaker] = None
     ):
         """
         Initialize base media agent.
@@ -37,6 +98,7 @@ class BaseMediaAgent:
             agent_name: Human-readable name for the agent
             data_dir: Directory for data storage (defaults to data/media/)
             log_level: Logging level
+            circuit_breaker: Optional CircuitBreaker instance (auto-created if None)
         """
         self.agent_id = agent_id
         self.agent_name = agent_name
@@ -57,6 +119,10 @@ class BaseMediaAgent:
         # SIMP broker configuration
         self.broker_url = os.getenv("SIMP_BROKER_URL", "http://127.0.0.1:5555")
         self.api_key = os.getenv("SIMP_API_KEY", "")
+        
+        # Circuit breaker
+        self._circuit_breaker = circuit_breaker or CircuitBreaker()
+        self.logger.info(f"Circuit breaker initialized: {self._circuit_breaker.state.name}")
         
         self.logger.info(f"Initialized {agent_name} ({agent_id})")
     
@@ -182,11 +248,22 @@ class BaseMediaAgent:
         return matches
     
     def _send_heartbeat(self) -> bool:
-        """Send heartbeat to SIMP broker."""
+        """Send heartbeat to SIMP broker and record to heartbeat ledger."""
         try:
             # This would be an HTTP POST to the broker
-            # For now, just update local timestamp
-            self.last_heartbeat = datetime.utcnow().isoformat()
+            # For now, just update local timestamp and write ledger
+            now = datetime.utcnow().isoformat()
+            self.last_heartbeat = now
+
+            # Record heartbeat to append-only ledger
+            heartbeat_record = {
+                "agent_id": self.agent_id,
+                "agent_name": self.agent_name,
+                "timestamp": now,
+                "is_running": self.is_running,
+            }
+            self._append_to_ledger("agent_heartbeats", heartbeat_record)
+
             self.logger.debug(f"Heartbeat sent at {self.last_heartbeat}")
             return True
         except Exception as e:
@@ -241,6 +318,21 @@ class BaseMediaAgent:
             self.logger.error(f"Failed to send intent {intent_type}: {e}")
             return None
     
+    def _log_metric(self, metric_name: str, value: float) -> None:
+        """Record a numeric metric to the metrics JSONL ledger.
+
+        Args:
+            metric_name: Dot-separated metric path (e.g. ``trend_research_duration_seconds``).
+            value: Numeric value (float or int).
+        """
+        record = {
+            "metric": metric_name,
+            "value": value,
+            "agent_id": self.agent_id,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+        self._append_to_ledger("metrics", record)
+
     def _log_operation(
         self,
         operation: str,
@@ -388,6 +480,78 @@ class BaseMediaAgent:
                 self.logger.error(f"Processing loop error: {e}")
                 await asyncio.sleep(5)
     
+    @property
+    def circuit_breaker_state(self) -> str:
+        """Return current circuit breaker state name."""
+        return self._circuit_breaker.state.name
+
+    def _call_with_circuit_breaker(
+        self,
+        func: Callable,
+        *args,
+        **kwargs
+    ) -> Any:
+        """
+        Execute a function with circuit breaker protection.
+        
+        Checks circuit state before calling the function. On success,
+        resets failure count. On exception, increments counter and
+        transitions state as needed.
+        
+        Args:
+            func: Callable to invoke
+            *args: Positional arguments for func
+            **kwargs: Keyword arguments for func
+            
+        Returns:
+            Result of the function call
+            
+        Raises:
+            CircuitBreakerOpenError: If circuit is OPEN
+            Exception: Any exception raised by the wrapped function
+        """
+        cb = self._circuit_breaker
+
+        if cb.state == CircuitBreakerState.OPEN:
+            now = time.time()
+            if cb.last_failure_time is not None and (now - cb.last_failure_time) >= cb.half_open_timeout:
+                self.logger.info(
+                    f"Circuit breaker half-open timeout elapsed ({cb.half_open_timeout}s), "
+                    f"transitioning to HALF_OPEN"
+                )
+                cb.state = CircuitBreakerState.HALF_OPEN
+            else:
+                elapsed = 0.0 if cb.last_failure_time is None else now - cb.last_failure_time
+                remaining = max(0.0, cb.half_open_timeout - elapsed)
+                raise CircuitBreakerOpenError(
+                    f"Circuit breaker is OPEN for agent '{self.agent_name}'. "
+                    f"Retry in {remaining:.1f}s after {cb.max_failures} consecutive failures."
+                )
+
+        try:
+            result = func(*args, **kwargs)
+            # Success: reset circuit
+            if cb.state != CircuitBreakerState.CLOSED:
+                self.logger.info("Circuit breaker reset to CLOSED after successful call")
+            cb.failure_count = 0
+            cb.state = CircuitBreakerState.CLOSED
+            cb.last_failure_time = None
+            return result
+        except CircuitBreakerOpenError:
+            raise
+        except Exception as e:
+            cb.failure_count += 1
+            cb.last_failure_time = time.time()
+            self.logger.warning(
+                f"Circuit breaker failure {cb.failure_count}/{cb.max_failures}: {e}"
+            )
+            if cb.failure_count >= cb.max_failures:
+                cb.state = CircuitBreakerState.OPEN
+                self.logger.error(
+                    f"Circuit breaker OPEN after {cb.failure_count} consecutive failures"
+                )
+            raise
+
     def health_check(self) -> Dict[str, Any]:
         """Return agent health status."""
         return {
@@ -396,6 +560,12 @@ class BaseMediaAgent:
             "status": "running" if self.is_running else "stopped",
             "last_heartbeat": self.last_heartbeat,
             "data_dir": str(self.data_dir),
+            "circuit_breaker": {
+                "state": self._circuit_breaker.state.name,
+                "failure_count": self._circuit_breaker.failure_count,
+                "max_failures": self._circuit_breaker.max_failures,
+                "last_failure_time": self._circuit_breaker.last_failure_time
+            },
             "ledgers": {
                 ledger.stem: ledger.stat().st_size if ledger.exists() else 0
                 for ledger in self.data_dir.glob("*.jsonl")

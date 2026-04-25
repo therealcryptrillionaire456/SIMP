@@ -7,18 +7,104 @@ Responsible for:
 - Managing posting schedules and rate limits
 - Tracking published posts with unique IDs
 - Implementing retry logic for failed posts
+- Security hardening: UTM sanitization, affiliate URL validation
 """
 import asyncio
+import functools
 import json
+import logging
 import random
+import re
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Callable
 
-from simp.organs.media.agents.base_media_agent import BaseMediaAgent
+# ── Security: UTM sanitisation ─────────────────────────────────────────────
+
+ALLOWED_UTM_KEYS = frozenset({
+    "utm_source", "utm_medium", "utm_campaign",
+    "utm_content", "utm_term",
+})
+
+_UTM_VALUE_PATTERN = re.compile(r"^[a-zA-Z0-9_\-]+$")
+
+_REJECT_PATTERNS = re.compile(r"[<>\"'`]|javascript:|data:|vbscript:", re.IGNORECASE)
+
+_sanitize_logger = logging.getLogger("media.security.utm")
+
+
+def sanitize_utm_params(params: dict) -> dict:
+    """Strip and validate UTM parameters.
+
+    Allowlist: ``utm_source``, ``utm_medium``, ``utm_campaign``,
+    ``utm_content``, ``utm_term``.
+
+    Rules for each value:
+        - max 100 chars
+        - alphanumeric, underscore, dash only
+        - must NOT contain ``<`` ``>`` ``"`` ``'`` ``javascript:`` ``data:``
+
+    Stripped/dropped keys and invalid values are logged.
+
+    Returns:
+        New dict with only valid, allowed UTM pairs.
+    """
+    clean: dict = {}
+    for key, value in params.items():
+        if key not in ALLOWED_UTM_KEYS:
+            _sanitize_logger.warning("UTM sanitization: dropped key %r", key)
+            continue
+        if not isinstance(value, str):
+            _sanitize_logger.warning("UTM sanitization: non-string value for %r", key)
+            continue
+        if len(value) > 100:
+            _sanitize_logger.warning(
+                "UTM sanitization: value too long (%d chars) for %r", len(value), key
+            )
+            continue
+        if _REJECT_PATTERNS.search(value):
+            _sanitize_logger.warning(
+                "UTM sanitization: rejected dangerous chars in %r: %r", key, value
+            )
+            continue
+        if not _UTM_VALUE_PATTERN.match(value):
+            _sanitize_logger.warning(
+                "UTM sanitization: invalid characters in %r: %r", key, value
+            )
+            continue
+        clean[key] = value
+    return clean
+
+
+def validate_affiliate_url(url: str) -> bool:
+    """Validate an affiliate URL meets security requirements.
+
+    Rules:
+        - Must start with ``https://``
+        - Must not contain ``javascript:``, ``data:``, or ``vbscript:``
+        - Max length 2000 characters
+
+    Returns:
+        ``True`` if the URL is acceptable, ``False`` otherwise.
+    """
+    if not isinstance(url, str):
+        return False
+    if not url.startswith("https://"):
+        return False
+    if len(url) > 2000:
+        return False
+    lower = url.lower()
+    if "javascript:" in lower or "data:" in lower or "vbscript:" in lower:
+        return False
+    return True
+
+from simp.organs.media.agents.base_media_agent import (
+    BaseMediaAgent, CircuitBreaker, CircuitBreakerOpenError
+)
 from simp.organs.media.models import (
     PublishedPost, ContentPlatform, ContentPackage
 )
+from simp.organs.media.predictors import ContentEngagementPredictor, EngagementScore
 
 
 class PublisherAgent(BaseMediaAgent):
@@ -30,9 +116,21 @@ class PublisherAgent(BaseMediaAgent):
         data_dir: Optional[str] = None,
         log_level: str = "INFO",
         max_retries: int = 3,
-        retry_delay: int = 60  # seconds
+        retry_delay: int = 60,  # seconds
+        predictor: Optional[ContentEngagementPredictor] = None,
+        engagement_threshold: float = 40.0,
     ):
-        """Initialize the Publisher Agent."""
+        """Initialize the Publisher Agent.
+
+        Args:
+            agent_id: Unique identifier for this agent.
+            data_dir: Directory for data storage.
+            log_level: Logging level.
+            max_retries: Maximum publish retry attempts.
+            retry_delay: Seconds between retries.
+            predictor: Optional ContentEngagementPredictor for pre-publish scoring.
+            engagement_threshold: Minimum engagement score (0-100) to publish.
+        """
         super().__init__(
             agent_id=agent_id,
             agent_name="Publisher Agent",
@@ -42,10 +140,19 @@ class PublisherAgent(BaseMediaAgent):
         
         self.max_retries = max_retries
         self.retry_delay = retry_delay
+        self.predictor = predictor
+        self.engagement_threshold = max(0.0, min(100.0, engagement_threshold))
         self.pending_packages = asyncio.Queue()
         self.active_publishing: Dict[str, Dict[str, Any]] = {}
         self.platform_clients = self._initialize_platform_clients()
         self.rate_limit_trackers = self._initialize_rate_limit_trackers()
+        
+        if self.predictor:
+            self.logger.info(
+                f"Engagement scoring enabled (threshold={self.engagement_threshold})"
+            )
+        else:
+            self.logger.info("Engagement scoring disabled (no predictor provided)")
         
         self.logger.info(f"Publisher Agent initialized with {max_retries} max retries")
     
@@ -193,6 +300,60 @@ class PublisherAgent(BaseMediaAgent):
         if tracker:
             tracker["requests_made"] += 1
     
+    async def _with_retry(
+        self,
+        func: Callable,
+        max_retries: int = 3,
+        base_delay: float = 1.0,
+        *args,
+        **kwargs
+    ) -> Any:
+        """
+        Execute a function with retry logic and exponential backoff,
+        wrapped with the circuit breaker.
+        
+        Retries on exceptions with delays: 1s, 2s, 4s (default).
+        Each retry attempt is logged.
+        
+        Args:
+            func: Async callable to invoke
+            max_retries: Maximum number of retry attempts (default 3)
+            base_delay: Base delay in seconds for exponential backoff (default 1.0)
+            *args: Positional arguments for func
+            **kwargs: Keyword arguments for func
+            
+        Returns:
+            Result of the function call
+            
+        Raises:
+            CircuitBreakerOpenError: If circuit breaker blocks the call
+            Exception: Last exception after all retries exhausted
+        """
+        last_exception = None
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                return await self._call_with_circuit_breaker(
+                    lambda: func(*args, **kwargs)
+                )
+            except CircuitBreakerOpenError:
+                raise
+            except Exception as e:
+                last_exception = e
+                if attempt < max_retries:
+                    delay = base_delay * (2 ** (attempt - 1))
+                    self.logger.warning(
+                        f"Retry {attempt}/{max_retries} for {func.__name__} "
+                        f"failed: {e}. Retrying in {delay:.1f}s..."
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    self.logger.error(
+                        f"All {max_retries} retries exhausted for {func.__name__}: {e}"
+                    )
+
+        raise last_exception  # type: ignore[misc]
+
     async def handle_intent(self, intent_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle incoming intent for content publishing.
@@ -242,12 +403,97 @@ class PublisherAgent(BaseMediaAgent):
                 "error": str(e)
             }
     
+    def score_content(
+        self,
+        predictor: Optional[ContentEngagementPredictor] = None,
+        briefs: Optional[List[Dict[str, Any]]] = None,
+    ) -> List[EngagementScore]:
+        """
+        Score content briefs before publishing. Content below the engagement
+        threshold is logged and excluded from publishing.
+
+        Args:
+            predictor: A ContentEngagementPredictor instance. Falls back to
+                       self.predictor if None.
+            briefs: List of content brief dictionaries to score. If None,
+                    briefs are loaded from the content_briefs ledger.
+
+        Returns:
+            List of EngagementScore objects for all scored briefs.
+        """
+        p = predictor or self.predictor
+        if p is None:
+            self.logger.warning("Cannot score content: no predictor provided")
+            return []
+
+        if briefs is None:
+            briefs = self._read_ledger("content_briefs", limit=100)
+
+        if not briefs:
+            self.logger.info("No briefs to score")
+            return []
+
+        scores = p.predict_batch(briefs)
+        above_threshold = 0
+        below_threshold = 0
+
+        for brief, score in zip(briefs, scores):
+            brief_id = brief.get("brief_id", brief.get("title", "unknown"))
+            if score.score >= self.engagement_threshold:
+                above_threshold += 1
+                self.logger.info(
+                    f"Brief {brief_id}: score={score.score:.1f} ✓ "
+                    f"(threshold={self.engagement_threshold})"
+                )
+            else:
+                below_threshold += 1
+                self.logger.warning(
+                    f"Brief {brief_id}: score={score.score:.1f} ✗ "
+                    f"(threshold={self.engagement_threshold}) — "
+                    f"will NOT publish. Top factors: {score.top_factors}"
+                )
+
+        # Persist scoring summary
+        summary = {
+            "operation": "score_content",
+            "total_briefs": len(briefs),
+            "above_threshold": above_threshold,
+            "below_threshold": below_threshold,
+            "threshold": self.engagement_threshold,
+        }
+        self._append_to_ledger("engagement_scoring", summary)
+
+        return scores
+
     async def publish_content_package(
         self,
         package_data: Dict[str, Any]
     ) -> List[PublishedPost]:
         """
         Publish a content package to platforms.
+        
+        Uses retry with exponential backoff and circuit breaker protection.
+        
+        Args:
+            package_data: Content package data
+            
+        Returns:
+            List of PublishedPost objects
+        """
+        # Delegate to the internal implementation via retry wrapper
+        return await self._with_retry(
+            self._publish_content_package_impl,
+            max_retries=self.max_retries,
+            base_delay=self.retry_delay,
+            package_data=package_data
+        )
+
+    async def _publish_content_package_impl(
+        self,
+        package_data: Dict[str, Any]
+    ) -> List[PublishedPost]:
+        """
+        Internal implementation of publish_content_package.
         
         Args:
             package_data: Content package data
@@ -468,40 +714,69 @@ class PublisherAgent(BaseMediaAgent):
         brief_id: str,
         script_id: str
     ) -> Dict[str, str]:
-        """Generate UTM tracking links."""
+        """Generate UTM tracking links.
+
+        UTM parameters are sanitized through :func:`sanitize_utm_params`
+        before being used — this strips any dangerous or non-allowlisted keys.
+        """
         base_url = "https://kashclaw.com/track"
-        
-        utm_params = {
+
+        raw_utm = {
             "utm_source": platform.value,
             "utm_medium": "social",
             "utm_campaign": f"content_{brief_id}" if brief_id else "content",
             "utm_content": script_id,
             "utm_term": platform_post_id
         }
-        
-        # Create tracking URL
-        param_string = "&".join([f"{k}={v}" for k, v in utm_params.items()])
+
+        # Security: sanitize UTM values before building links
+        clean_utm = sanitize_utm_params(raw_utm)
+
+        # Resolve missing keys that were dropped by sanitization
+        for key, default_value in raw_utm.items():
+            if key not in clean_utm:
+                # Use the raw value but URL-safe fallback
+                safe_val = re.sub(r"[^a-zA-Z0-9_\-]", "_", str(default_value))[:100]
+                # Only key-value from raw_utm so we know it's on the allowlist
+                clean_utm[key] = safe_val
+
+        param_string = "&".join([f"{k}={v}" for k, v in clean_utm.items()])
         tracking_url = f"{base_url}?{param_string}"
-        
+
         return {
             "click_tracking": tracking_url,
-            "utm_parameters": utm_params
+            "utm_parameters": clean_utm
         }
     
     def _generate_affiliate_links(self, brief_id: str) -> List[str]:
-        """Generate affiliate links from brief data."""
+        """Generate affiliate links from brief data.
+
+        Each URL is run through :func:`validate_affiliate_url`; invalid
+        URLs are logged and excluded from the returned list.
+        """
         if not brief_id:
             return []
-        
-        # Get brief data
+
+        validated: List[str] = []
         briefs = self._read_ledger("content_briefs", limit=100)
         for brief in briefs:
             if brief.get("brief_id") == brief_id:
                 primary_offer = brief.get("primary_offer")
                 if primary_offer and "affiliate_link" in primary_offer:
-                    return [primary_offer["affiliate_link"]]
-        
-        return []
+                    url = str(primary_offer["affiliate_link"])
+                    if validate_affiliate_url(url):
+                        validated.append(url)
+                    else:
+                        self.logger.warning(
+                            "Rejected invalid affiliate URL from brief %s: %.80s",
+                            brief_id, url,
+                        )
+                break  # brief_id is unique
+
+        if not validated:
+            self.logger.warning("No valid affiliate links for brief %s", brief_id)
+
+        return validated
     
     def _save_published_post(self, post: PublishedPost):
         """Save published post to ledger."""

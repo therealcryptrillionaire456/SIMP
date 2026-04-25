@@ -10,8 +10,10 @@ Responsible for:
 import asyncio
 import json
 import random
+import threading
 import time
-from datetime import datetime
+from datetime import datetime, date
+from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 from simp.organs.media.agents.base_media_agent import BaseMediaAgent
@@ -19,6 +21,159 @@ from simp.organs.media.models import (
     AssetJob, GeneratedAsset, ContentFormat, AssetType,
     GenerationTool, ScriptPackage
 )
+from simp.organs.media.rate_limiter import RateLimiter, RateLimitError
+
+
+class DailyBudgetTracker:
+    """Tracks spend per platform per day using an append-only JSONL ledger.
+    
+    Thread-safe. Stores records in ``data/media/budget_tracker.jsonl``.
+    """
+    
+    def __init__(
+        self,
+        data_dir: str = "data/media",
+        max_content_per_day: int = 20,
+        max_budget_per_asset: float = 5.0,
+        daily_budget_limit: float = 50.0,
+        budget_alert_threshold: float = 0.8,
+    ):
+        self._lock = threading.Lock()
+        self._data_dir = Path(data_dir)
+        self._data_dir.mkdir(parents=True, exist_ok=True)
+        self._log_path = self._data_dir / "budget_tracker.jsonl"
+        
+        self.max_content_per_day = max_content_per_day
+        self.max_budget_per_asset = max_budget_per_asset
+        self.daily_budget_limit = daily_budget_limit
+        self.budget_alert_threshold = budget_alert_threshold
+    
+    @property
+    def today(self) -> str:
+        """ISO date string for today (YYYY-MM-DD)."""
+        return date.today().isoformat()
+    
+    def _read_today_records(self) -> List[Dict[str, Any]]:
+        """Read all spend records for today."""
+        today_str = self.today
+        records: List[Dict[str, Any]] = []
+        if not self._log_path.exists():
+            return records
+        with open(self._log_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                    if rec.get("date") == today_str:
+                        records.append(rec)
+                except json.JSONDecodeError:
+                    continue
+        return records
+    
+    def can_spend(self, amount: float, platform: str) -> bool:
+        """Check whether a spend of *amount* on *platform* is permitted.
+        
+        Checks:
+        - Amount does not exceed ``max_budget_per_asset``.
+        - Total daily spend + amount does not exceed ``daily_budget_limit``.
+        - Total daily content count for the platform does not exceed
+          ``max_content_per_day``.
+        
+        Returns:
+            True if the spend is allowed, False otherwise.
+        """
+        with self._lock:
+            records = self._read_today_records()
+            
+            # Per-asset budget check
+            if amount > self.max_budget_per_asset:
+                return False
+            
+            # Total daily spend check
+            total_spend = sum(r.get("amount", 0.0) for r in records)
+            if total_spend + amount > self.daily_budget_limit:
+                return False
+            
+            # Per-platform content count check
+            platform_count = sum(
+                1 for r in records if r.get("platform") == platform
+            )
+            if platform_count >= self.max_content_per_day:
+                return False
+        
+        return True
+    
+    def record_spend(self, amount: float, platform: str, asset_type: str) -> Dict[str, Any]:
+        """Record a spend in the append-only ledger.
+        
+        Args:
+            amount: Dollar amount spent.
+            platform: Target platform string.
+            asset_type: Type of asset (e.g. "video", "image", "audio").
+        
+        Returns:
+            The stored record dictionary.
+        
+        Raises:
+            ValueError: If *amount* exceeds ``max_budget_per_asset``.
+        """
+        if amount > self.max_budget_per_asset:
+            raise ValueError(
+                f"Spend ${amount:.2f} exceeds max_budget_per_asset "
+                f"${self.max_budget_per_asset:.2f}"
+            )
+        
+        record: Dict[str, Any] = {
+            "date": self.today,
+            "timestamp": datetime.utcnow().isoformat(),
+            "platform": platform,
+            "amount": amount,
+            "asset_type": asset_type,
+        }
+        
+        with self._lock:
+            with open(self._log_path, "a") as f:
+                f.write(json.dumps(record) + "\n")
+        
+        return record
+    
+    def daily_summary(self) -> Dict[str, Any]:
+        """Compute a summary of today's spending.
+        
+        Returns:
+            Dictionary with keys: *date*, *total_spend*, *total_assets*,
+            *platforms* (per-platform breakdown), *budget_used_pct*,
+            *alert* (True if >= alert threshold).
+        """
+        with self._lock:
+            records = self._read_today_records()
+        
+        total_spend = sum(r.get("amount", 0.0) for r in records)
+        total_assets = len(records)
+        
+        platforms: Dict[str, Dict[str, Any]] = {}
+        for r in records:
+            plat = r.get("platform", "unknown")
+            if plat not in platforms:
+                platforms[plat] = {"count": 0, "spend": 0.0}
+            platforms[plat]["count"] += 1
+            platforms[plat]["spend"] += r.get("amount", 0.0)
+        
+        budget_used_pct = (
+            (total_spend / self.daily_budget_limit * 100.0)
+            if self.daily_budget_limit > 0 else 0.0
+        )
+        
+        return {
+            "date": self.today,
+            "total_spend": round(total_spend, 2),
+            "total_assets": total_assets,
+            "platforms": platforms,
+            "budget_used_pct": round(budget_used_pct, 1),
+            "alert": budget_used_pct >= (self.budget_alert_threshold * 100.0),
+        }
 
 
 class AssetAgent(BaseMediaAgent):
@@ -30,9 +185,23 @@ class AssetAgent(BaseMediaAgent):
         data_dir: Optional[str] = None,
         log_level: str = "INFO",
         default_tool: GenerationTool = GenerationTool.HIGGSFIELD,
-        budget_per_job: float = 10.0  # USD
+        budget_per_job: float = 10.0,  # USD
+        budget_tracker: Optional[DailyBudgetTracker] = None,
+        rate_limiter: Optional[RateLimiter] = None,
     ):
-        """Initialize the Asset Agent."""
+        """Initialize the Asset Agent.
+        
+        Args:
+            agent_id: Unique identifier.
+            data_dir: Data storage directory.
+            log_level: Logging verbosity.
+            default_tool: Default generation tool.
+            budget_per_job: Fallback per-job budget cap.
+            budget_tracker: Daily budget tracker instance (created from
+                config if not provided).
+            rate_limiter: Rate limiter instance (created from config if
+                not provided).
+        """
         super().__init__(
             agent_id=agent_id,
             agent_name="Asset Agent",
@@ -45,6 +214,21 @@ class AssetAgent(BaseMediaAgent):
         self.pending_jobs = asyncio.Queue()
         self.active_jobs: Dict[str, AssetJob] = {}
         self.completed_assets: Dict[str, GeneratedAsset] = {}
+        
+        # Budget tracker
+        if budget_tracker is None:
+            budget_tracker = DailyBudgetTracker(
+                data_dir=data_dir or "data/media",
+            )
+        self.budget_tracker = budget_tracker
+        
+        # Rate limiter
+        if rate_limiter is None:
+            rate_limiter = RateLimiter(
+                max_calls=10,
+                window_seconds=60.0,
+            )
+        self.rate_limiter = rate_limiter
         
         # Tool configurations
         self.tool_configs = self._load_tool_configurations()
@@ -487,11 +671,14 @@ class AssetAgent(BaseMediaAgent):
         """
         Generate asset using the specified tool.
         
+        Checks the daily budget tracker before proceeding. Rejects the
+        job with a logged warning if the budget would be exceeded.
+        
         Args:
             asset_job: Asset job specification
             
         Returns:
-            GeneratedAsset object or None if failed
+            GeneratedAsset object or None if rejected/failed
         """
         operation_id = self._log_operation(
             operation="asset_generation",
@@ -502,6 +689,34 @@ class AssetAgent(BaseMediaAgent):
         start_time = time.time()
         
         try:
+            # Rate limit check
+            if not self.rate_limiter.allow():
+                raise RateLimitError(
+                    f"Rate limit exceeded for {asset_job.job_id}"
+                )
+            
+            # Budget check before generation
+            platform = asset_job.target_formats[0].value if asset_job.target_formats else "unknown"
+            if not self.budget_tracker.can_spend(asset_job.estimated_cost, platform):
+                asset_job.status = "failed"
+                asset_job.updated_at = datetime.utcnow().isoformat()
+                self._log_operation(
+                    operation="asset_generation",
+                    status="failure",
+                    details={
+                        "job_id": asset_job.job_id,
+                        "reason": "budget_exceeded",
+                        "estimated_cost": asset_job.estimated_cost,
+                        "platform": platform,
+                    },
+                    duration_seconds=time.time() - start_time,
+                )
+                self.logger.warning(
+                    f"Asset generation rejected for {asset_job.job_id}: "
+                    f"budget limit exceeded (est. ${asset_job.estimated_cost:.2f})"
+                )
+                return None
+            
             # Update job status
             asset_job.status = "processing"
             asset_job.updated_at = datetime.utcnow().isoformat()
@@ -545,6 +760,17 @@ class AssetAgent(BaseMediaAgent):
             
             # Store completed asset
             self.completed_assets[generated_asset.asset_id] = generated_asset
+            
+            # Record spend in budget tracker
+            platform = asset_job.target_formats[0].value if asset_job.target_formats else "unknown"
+            try:
+                self.budget_tracker.record_spend(
+                    amount=actual_cost,
+                    platform=platform,
+                    asset_type=asset_job.asset_type.value,
+                )
+            except ValueError as ve:
+                self.logger.warning(f"Budget record skipped: {ve}")
             
             duration = time.time() - start_time
             
@@ -699,12 +925,16 @@ def create_asset_agent(
     agent_id: str = "asset_agent",
     data_dir: Optional[str] = None,
     default_tool: GenerationTool = GenerationTool.HIGGSFIELD,
-    budget_per_job: float = 10.0
+    budget_per_job: float = 10.0,
+    budget_tracker: Optional[DailyBudgetTracker] = None,
+    rate_limiter: Optional[RateLimiter] = None,
 ) -> AssetAgent:
     """Create and return an Asset Agent instance."""
     return AssetAgent(
         agent_id=agent_id,
         data_dir=data_dir,
         default_tool=default_tool,
-        budget_per_job=budget_per_job
+        budget_per_job=budget_per_job,
+        budget_tracker=budget_tracker,
+        rate_limiter=rate_limiter,
     )
