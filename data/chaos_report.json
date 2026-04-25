@@ -1,0 +1,72 @@
+{
+  "suite": "T20 Chaos Engineering",
+  "timestamp": "2026-04-25T00:28:13.627339+00:00",
+  "total_tests": 7,
+  "passed": 7,
+  "failed": 0,
+  "results": {
+    "T1-kill-mid-tx": {
+      "passed": true,
+      "duration_ms": 0.0,
+      "error": "",
+      "details": {
+        "legs_completed": 1,
+        "rolled_back": true
+      }
+    },
+    "T2-network-partition": {
+      "passed": true,
+      "duration_ms": 0.0,
+      "error": "",
+      "details": {
+        "attempts": 2,
+        "used_fallback": true
+      }
+    },
+    "T3-rate-limit": {
+      "passed": true,
+      "duration_ms": 0.0,
+      "error": "",
+      "details": {
+        "retries": 1,
+        "final_status": "filled"
+      }
+    },
+    "T4-stale-feed": {
+      "passed": true,
+      "duration_ms": 0.0,
+      "error": "",
+      "details": {
+        "fresh_count": 5,
+        "stale_count": 5
+      }
+    },
+    "T5-slippage": {
+      "passed": true,
+      "duration_ms": 0.0,
+      "error": "",
+      "details": {
+        "deviation_bps": 250.0,
+        "threshold_bps": 200,
+        "exceeded": true
+      }
+    },
+    "T6-memory-pressure": {
+      "passed": true,
+      "duration_ms": 0.1,
+      "error": "",
+      "details": {
+        "remaining_records": 198
+      }
+    },
+    "T7-broker-down": {
+      "passed": true,
+      "duration_ms": 0.0,
+      "error": "",
+      "details": {
+        "missed_heartbeats": 3,
+        "alerts_fired": 1
+      }
+    }
+  }
+}
