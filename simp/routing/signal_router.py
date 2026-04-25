@@ -904,6 +904,100 @@ class MultiPlatformRouter:
 
 
 # ---------------------------------------------------------------------------
+# Media Signal Router — integrates with KashClaw Media Grid
+# ---------------------------------------------------------------------------
+
+class MediaSignalRouter:
+    """
+    Routes media-related intents to the KashClaw Media Grid Orchestrator.
+    
+    Bridges the MultiPlatformRouter's signal format with the media grid's
+    intent-based workflow system.  Each media intent type maps to a workflow
+    that the MediaGridOrchestrator can execute.
+    
+    Usage:
+        from simp.routing.signal_router import MediaSignalRouter
+        
+        router = MediaSignalRouter()
+        result = await router.route_media_intent("media.trend_research", {
+            "limit": 5,
+            "platforms": ["tiktok", "youtube_shorts"]
+        })
+    """
+    
+    def __init__(self, orchestrator=None):
+        self._orchestrator = orchestrator
+        self._journal_path = REPO / "data" / "media_router_journal.jsonl"
+        log.info("MediaSignalRouter ready")
+    
+    @property
+    def orchestrator(self):
+        """Lazy-load the MediaGridOrchestrator if not provided."""
+        if self._orchestrator is None:
+            try:
+                from simp.organs.media.orchestration import MediaGridOrchestrator
+                self._orchestrator = MediaGridOrchestrator()
+                log.info("MediaSignalRouter: auto-initialized MediaGridOrchestrator")
+            except ImportError:
+                log.warning("MediaSignalRouter: MediaGridOrchestrator not available")
+        return self._orchestrator
+    
+    async def route_media_intent(self, intent_type: str, payload: dict = None) -> dict:
+        """
+        Route a media intent to the orchestrator.
+        
+        Args:
+            intent_type: One of the MEDIA_INTENT_TYPE keys
+                (media.trend_research, media.offer_scoring, etc.)
+            payload: Parameters for the workflow
+            
+        Returns:
+            Structured result from the orchestrator
+        """
+        orch = self.orchestrator
+        if not orch:
+            return {
+                "status": "error",
+                "error": "MediaGridOrchestrator not available",
+                "intent_type": intent_type
+            }
+        
+        result = await orch.handle_media_intent(intent_type, payload or {})
+        
+        # Persist to media router journal
+        self._persist({
+            "intent_type": intent_type,
+            "payload": payload or {},
+            "result": result,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+        
+        return result
+    
+    def route_media_intent_sync(self, intent_type: str, payload: dict = None) -> dict:
+        """Synchronous wrapper for route_media_intent."""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor(1) as ex:
+                    future = ex.submit(asyncio.run, self.route_media_intent(intent_type, payload))
+                    return future.result()
+            else:
+                return loop.run_until_complete(self.route_media_intent(intent_type, payload))
+        except RuntimeError:
+            return asyncio.run(self.route_media_intent(intent_type, payload))
+    
+    def _persist(self, record: dict) -> None:
+        try:
+            self._journal_path.parent.mkdir(parents=True, exist_ok=True)
+            with self._journal_path.open("a") as f:
+                f.write(json.dumps(record) + "\n")
+        except Exception as e:
+            log.warning("Failed to persist media router journal: %s", e)
+
+
+# ---------------------------------------------------------------------------
 # Module-level singleton + convenience function
 # ---------------------------------------------------------------------------
 

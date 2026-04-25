@@ -32,7 +32,9 @@ class MediaGridConfig:
         "asset_agent": True,
         "edit_packaging_agent": True,
         "publisher_agent": True,
-        "analytics_agent": True
+        "analytics_agent": True,
+        "simp_news_agent": True,
+        "offer_intelligence_agent": True
     })
     
     # Content generation

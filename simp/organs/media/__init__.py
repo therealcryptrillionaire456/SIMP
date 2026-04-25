@@ -14,6 +14,9 @@ Architecture:
 from simp.organs.media.agents.trend_harvester_agent import (
     TrendHarvesterAgent, create_trend_harvester_agent
 )
+from simp.organs.media.agents.landing_page_agent import (
+    LandingPageAgent, create_landing_page_agent
+)
 from simp.organs.media.agents.script_agent import (
     ScriptAgent, create_script_agent
 )
@@ -22,6 +25,12 @@ from simp.organs.media.agents.asset_agent import (
 )
 from simp.organs.media.agents.edit_packaging_agent import (
     EditPackagingAgent, create_edit_packaging_agent
+)
+from simp.organs.media.agents.offer_intelligence_agent import (
+    OfferIntelligenceAgent, create_offer_intelligence_agent
+)
+from simp.organs.media.agents.simp_news_agent import (
+    SimpNewsAgent, create_simp_news_agent
 )
 from simp.organs.media.agents.publisher_agent import (
     PublisherAgent, create_publisher_agent
@@ -76,6 +85,18 @@ def create_media_grid_agents(data_dir: str = "data/media"):
             agent_id="analytics_agent",
             data_dir=data_dir,
             analysis_interval_minutes=60
+        ),
+        "landing_page_agent": create_landing_page_agent(
+            agent_id="landing_page_agent",
+            data_dir=data_dir
+        ),
+        "offer_intelligence_agent": create_offer_intelligence_agent(
+            agent_id="offer_intelligence_agent",
+            data_dir=data_dir
+        ),
+        "simp_news_agent": create_simp_news_agent(
+            agent_id="simp_news_agent",
+            data_dir=data_dir
         )
     }
     return agents
@@ -90,24 +111,32 @@ MEDIA_INTENT_TYPES = {
     "media.content_publishing": "Publish content to social platforms",
     "media.performance_tracking": "Track content performance and analytics",
     "media.landing_page_generation": "Generate landing pages for offers",
-    "media.optimization_recommendation": "Generate optimization recommendations"
+    "media.optimization_recommendation": "Generate optimization recommendations",
+    "media.simp_news_generation": "Generate SIMP ecosystem news",
+    "media.offer_intelligence": "Score and analyze affiliate offers"
 }
 
 # Export main classes and functions
 __all__ = [
     # Agents
     "TrendHarvesterAgent",
+    "LandingPageAgent",
     "ScriptAgent", 
     "AssetAgent",
     "EditPackagingAgent",
+    "OfferIntelligenceAgent",
+    "SimpNewsAgent",
     "PublisherAgent",
     "AnalyticsAgent",
     
     # Factory functions
     "create_trend_harvester_agent",
+    "create_landing_page_agent",
     "create_script_agent",
     "create_asset_agent",
     "create_edit_packaging_agent",
+    "create_offer_intelligence_agent",
+    "create_simp_news_agent",
     "create_publisher_agent",
     "create_analytics_agent",
     "create_media_grid_agents",
