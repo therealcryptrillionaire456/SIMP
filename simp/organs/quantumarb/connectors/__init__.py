@@ -9,6 +9,7 @@ Whitelisted exchanges (NY/NJ allowed):
     - coinbase  -> CoinbaseConnector
     - kraken    -> KrakenConnector
     - bitstamp  -> BitstampConnector
+    - gemini    -> GeminiConnector
 """
 
 from __future__ import annotations
@@ -23,18 +24,24 @@ from ..coinbase_connector import CoinbaseConnector
 try:
     from .kraken_connector import KrakenConnector  # type: ignore[import-untyped]  # noqa: F401
 except ImportError:
-    KrakenConnector = None  # type: ignore
+    KrakenConnector = None  # type: ignore[assignment]
 
 try:
     from .bitstamp_connector import BitstampConnector  # type: ignore[import-untyped]  # noqa: F401
 except ImportError:
-    BitstampConnector = None  # type: ignore
+    BitstampConnector = None  # type: ignore[assignment]
+
+try:
+    from .gemini_connector import GeminiConnector, OrderBook  # type: ignore[import-untyped]  # noqa: F401
+except ImportError:
+    GeminiConnector = None  # type: ignore[assignment]
+    OrderBook = None  # type: ignore[assignment]
 
 LOG = logging.getLogger("exchange_connectors")
 
 # NY/NJ Jurisdiction Compliance Whitelist
 # Only these exchanges may be used in New York and New Jersey.
-EXCHANGE_WHITELIST: set[str] = {"coinbase", "kraken", "bitstamp"}
+EXCHANGE_WHITELIST: set[str] = {"coinbase", "kraken", "bitstamp", "gemini"}
 
 # Mapping of whitelisted exchange names to their connector classes.
 _CONNECTOR_MAP: dict[str, type] = {
@@ -45,6 +52,8 @@ if KrakenConnector is not None:
     _CONNECTOR_MAP["kraken"] = KrakenConnector
 if BitstampConnector is not None:
     _CONNECTOR_MAP["bitstamp"] = BitstampConnector
+if GeminiConnector is not None:
+    _CONNECTOR_MAP["gemini"] = GeminiConnector
 
 __all__ = [
     "CoinbaseConnector",

@@ -423,3 +423,254 @@
 2026-04-24 16:19:14,732 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
 2026-04-24 16:19:15,345 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
 2026-04-24 16:19:15,358 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:21:30,942 [gate4] INFO processing quantum_signal_1777062088_4bb58e2a38c3.json
+2026-04-24 16:21:30,943 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:21:31,570 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:21:31,586 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:23:47,168 [gate4] INFO processing quantum_signal_1777062223_7cb300224623.json
+2026-04-24 16:23:47,170 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:23:48,215 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:23:48,240 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:26:03,811 [gate4] INFO processing quantum_signal_1777062358_5699acb35d26.json
+2026-04-24 16:26:03,812 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:26:04,448 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:26:04,459 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:28:14,991 [gate4] INFO processing quantum_signal_1777062494_64f96b445092.json
+2026-04-24 16:28:14,992 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:28:15,793 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:28:15,852 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:30:31,399 [gate4] INFO processing quantum_signal_1777062629_e8769e990226.json
+2026-04-24 16:30:31,402 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:30:31,863 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:30:31,906 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:32:47,468 [gate4] INFO processing quantum_signal_1777062764_0fa3f6144628.json
+2026-04-24 16:32:47,470 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:32:48,359 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:32:48,386 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:35:03,993 [gate4] INFO processing quantum_signal_1777062899_3b69dc68353a.json
+2026-04-24 16:35:03,996 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:35:04,704 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:35:04,740 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:37:15,276 [gate4] INFO processing quantum_signal_1777063034_fb5f45c533b7.json
+2026-04-24 16:37:15,278 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:37:16,379 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:37:16,396 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:39:31,976 [gate4] INFO processing quantum_signal_1777063169_5e38bb34c05e.json
+2026-04-24 16:39:31,977 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:39:32,729 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:39:32,748 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:41:48,303 [gate4] INFO processing quantum_signal_1777063304_b039ad7ada06.json
+2026-04-24 16:41:48,303 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:41:48,732 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:41:48,750 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:44:04,338 [gate4] INFO processing quantum_signal_1777063439_273b5ebcdc04.json
+2026-04-24 16:44:04,339 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:44:05,101 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:44:05,157 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:46:15,730 [gate4] INFO processing quantum_signal_1777063574_01f58430262c.json
+2026-04-24 16:46:15,731 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:46:16,021 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:46:16,034 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:48:31,630 [gate4] INFO processing quantum_signal_1777063710_cdd0eb40f35f.json
+2026-04-24 16:48:31,633 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:48:31,977 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:48:32,053 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:50:47,648 [gate4] INFO processing quantum_signal_1777063845_dd4eec00c445.json
+2026-04-24 16:50:47,649 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:50:48,132 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:50:48,153 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:53:03,718 [gate4] INFO processing quantum_signal_1777063980_972230a2788d.json
+2026-04-24 16:53:03,719 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:53:04,077 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:53:04,094 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:55:19,633 [gate4] INFO processing quantum_signal_1777064115_83f6741ea370.json
+2026-04-24 16:55:19,634 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:55:19,983 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:55:19,999 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:57:30,544 [gate4] INFO processing quantum_signal_1777064250_bfb841f7221a.json
+2026-04-24 16:57:30,544 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:57:30,863 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:57:30,877 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 16:59:46,438 [gate4] INFO processing quantum_signal_1777064385_f41482848939.json
+2026-04-24 16:59:46,439 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 16:59:46,871 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 16:59:46,886 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 17:02:02,476 [gate4] INFO processing quantum_signal_1777064520_dd8607192b4e.json
+2026-04-24 17:02:02,476 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 17:02:03,050 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 17:02:03,068 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 17:04:18,631 [gate4] INFO processing quantum_signal_1777064655_d297786cbaa9.json
+2026-04-24 17:04:18,632 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 17:04:18,954 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 17:04:18,972 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 17:54:26,059 [gate4] INFO processing quantum_signal_1777067661_8bbc2ad55ab5.json
+2026-04-24 17:54:26,059 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 17:54:56,064 [gate4] WARNING coinbase get_product attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Read timed out. (read timeout=30)
+2026-04-24 17:54:56,574 [gate4] WARNING coinbase get_product attempt 2/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 17:54:57,580 [gate4] WARNING coinbase get_product attempt 3/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 17:54:57,581 [gate4] WARNING coinbase market_order_buy attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 17:54:58,093 [gate4] WARNING coinbase market_order_buy attempt 2/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 17:54:59,106 [gate4] WARNING coinbase market_order_buy attempt 3/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 17:54:59,106 [gate4] ERROR exchange error on BTC-USD buy classified=transient: market_order_buy failed after 3 attempt(s): HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+Traceback (most recent call last):
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/gate4_inbox_consumer.py", line 732, in process_signal
+    resp = client.market_order_buy(
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/exchange/coinbase_client.py", line 162, in market_order_buy
+    return self.call("market_order_buy", self._sdk.market_order_buy, **kwargs)
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/exchange/coinbase_client.py", line 140, in call
+    raise CoinbaseOperationError(
+simp.exchange.coinbase_client.CoinbaseOperationError: market_order_buy failed after 3 attempt(s): HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 17:54:59,121 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 19:06:26,719 [gate4] INFO processing quantum_signal_1777071983_32923a49aff7.json
+2026-04-24 19:06:26,720 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 19:06:26,723 [gate4] WARNING coinbase get_product attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 19:06:27,234 [gate4] WARNING coinbase get_product attempt 2/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 19:23:11,303 [gate4] WARNING coinbase get_product attempt 3/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 19:23:11,305 [gate4] WARNING coinbase market_order_buy attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 19:23:11,818 [gate4] WARNING coinbase market_order_buy attempt 2/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 19:23:12,826 [gate4] WARNING coinbase market_order_buy attempt 3/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 19:23:12,826 [gate4] ERROR exchange error on BTC-USD buy classified=transient: market_order_buy failed after 3 attempt(s): HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+Traceback (most recent call last):
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/gate4_inbox_consumer.py", line 732, in process_signal
+    resp = client.market_order_buy(
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/exchange/coinbase_client.py", line 162, in market_order_buy
+    return self.call("market_order_buy", self._sdk.market_order_buy, **kwargs)
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/exchange/coinbase_client.py", line 140, in call
+    raise CoinbaseOperationError(
+simp.exchange.coinbase_client.CoinbaseOperationError: market_order_buy failed after 3 attempt(s): HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 19:23:12,848 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:10:06,425 [gate4] INFO processing quantum_signal_1777075804_f8218e6987b5.json
+2026-04-24 20:10:06,428 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:10:06,433 [gate4] WARNING coinbase get_product attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 20:10:06,942 [gate4] WARNING coinbase get_product attempt 2/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 20:10:07,953 [gate4] WARNING coinbase get_product attempt 3/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/products/BTC-USD?get_tradability_status=False (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 20:10:07,958 [gate4] WARNING coinbase market_order_buy attempt 1/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 20:10:08,461 [gate4] WARNING coinbase market_order_buy attempt 2/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 20:10:09,468 [gate4] WARNING coinbase market_order_buy attempt 3/3 classified=transient error=HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 20:10:09,468 [gate4] ERROR exchange error on BTC-USD buy classified=transient: market_order_buy failed after 3 attempt(s): HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+Traceback (most recent call last):
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/gate4_inbox_consumer.py", line 732, in process_signal
+    resp = client.market_order_buy(
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/exchange/coinbase_client.py", line 162, in market_order_buy
+    return self.call("market_order_buy", self._sdk.market_order_buy, **kwargs)
+  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/exchange/coinbase_client.py", line 140, in call
+    raise CoinbaseOperationError(
+simp.exchange.coinbase_client.CoinbaseOperationError: market_order_buy failed after 3 attempt(s): HTTPSConnectionPool(host='api.coinbase.com', port=443): Max retries exceeded with url: /api/v3/brokerage/orders (Caused by NameResolutionError("HTTPSConnection(host='api.coinbase.com', port=443): Failed to resolve 'api.coinbase.com' ([Errno 8] nodename nor servname provided, or not known)"))
+2026-04-24 20:10:09,504 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:12:20,289 [gate4] INFO processing quantum_signal_1777075939_15676807b206.json
+2026-04-24 20:12:20,289 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:12:20,808 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:12:20,827 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:14:36,361 [gate4] INFO processing quantum_signal_1777076074_761734e4379c.json
+2026-04-24 20:14:36,362 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:14:36,583 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:14:36,606 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:16:52,260 [gate4] INFO processing quantum_signal_1777076209_bc4a78da669a.json
+2026-04-24 20:16:52,261 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:16:52,535 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:16:52,556 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:19:08,066 [gate4] INFO processing quantum_signal_1777076344_a382e1b1727d.json
+2026-04-24 20:19:08,068 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:19:08,262 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:19:08,281 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:21:23,799 [gate4] INFO processing quantum_signal_1777076479_5ae000605faf.json
+2026-04-24 20:21:23,801 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:21:24,010 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:21:24,047 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:23:39,626 [gate4] INFO processing quantum_signal_1777076614_d55d690b418b.json
+2026-04-24 20:23:39,627 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:23:39,874 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:23:39,915 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:25:50,437 [gate4] INFO processing quantum_signal_1777076749_9c40d62da212.json
+2026-04-24 20:25:50,438 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:25:50,639 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:25:50,679 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:28:06,238 [gate4] INFO processing quantum_signal_1777076885_7c185ba54513.json
+2026-04-24 20:28:06,240 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:28:06,490 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:28:06,506 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:30:22,075 [gate4] INFO processing quantum_signal_1777077020_583a9cf3bc6d.json
+2026-04-24 20:30:22,076 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:30:22,269 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:30:22,293 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:32:37,906 [gate4] INFO processing quantum_signal_1777077155_e6ed258a7d07.json
+2026-04-24 20:32:37,909 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:32:38,135 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:32:38,162 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:34:53,866 [gate4] INFO processing quantum_signal_1777077290_9a429318c7a7.json
+2026-04-24 20:34:53,869 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:34:54,183 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:34:54,213 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:37:09,840 [gate4] INFO processing quantum_signal_1777077425_6636d46ad5f4.json
+2026-04-24 20:37:09,840 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:37:10,037 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:37:10,056 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:39:20,559 [gate4] INFO processing quantum_signal_1777077560_747e688167f0.json
+2026-04-24 20:39:20,560 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:39:20,795 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:39:20,818 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:41:36,361 [gate4] INFO processing quantum_signal_1777077695_2dc212666729.json
+2026-04-24 20:41:36,363 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:41:36,558 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:41:36,595 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:43:52,141 [gate4] INFO processing quantum_signal_1777077830_cd6478c51733.json
+2026-04-24 20:43:52,141 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:43:52,654 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:43:52,670 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:46:08,258 [gate4] INFO processing quantum_signal_1777077965_ac3021d62c9e.json
+2026-04-24 20:46:08,259 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:46:08,469 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:46:08,485 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:48:24,037 [gate4] INFO processing quantum_signal_1777078100_edbb06598d11.json
+2026-04-24 20:48:24,039 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:48:24,253 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:48:24,272 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:50:39,831 [gate4] INFO processing quantum_signal_1777078235_abcff3268427.json
+2026-04-24 20:50:39,832 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:50:40,030 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:50:40,044 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:52:55,610 [gate4] INFO processing quantum_signal_1777078370_4401871b5430.json
+2026-04-24 20:52:55,612 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:52:55,814 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:52:55,827 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:55:06,344 [gate4] INFO processing quantum_signal_1777078506_8caa0bdf69af.json
+2026-04-24 20:55:06,345 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:55:06,567 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:55:06,623 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:57:22,202 [gate4] INFO processing quantum_signal_1777078641_e0d6e1be09c9.json
+2026-04-24 20:57:22,202 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:57:22,446 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:57:22,461 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 20:59:38,000 [gate4] INFO processing quantum_signal_1777078776_a16c3ddf0cd1.json
+2026-04-24 20:59:38,003 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 20:59:38,207 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 20:59:38,222 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 21:01:53,809 [gate4] INFO processing quantum_signal_1777078911_bf4c0c3f2f5a.json
+2026-04-24 21:01:53,819 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 21:01:54,152 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 21:01:54,219 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 21:04:09,805 [gate4] INFO processing quantum_signal_1777079046_37a2e19abc65.json
+2026-04-24 21:04:09,807 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 21:04:10,044 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 21:04:10,104 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 21:06:25,656 [gate4] INFO processing quantum_signal_1777079181_df1267f2fd38.json
+2026-04-24 21:06:25,657 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 21:06:25,881 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 21:06:25,896 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 21:08:36,498 [gate4] INFO processing quantum_signal_1777079316_33654ddeb407.json
+2026-04-24 21:08:36,498 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 21:08:36,725 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 21:08:36,744 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 21:10:52,328 [gate4] INFO processing quantum_signal_1777079451_006c1676406b.json
+2026-04-24 21:10:52,328 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 21:10:52,531 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 21:10:52,540 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 21:15:23,693 [gate4] INFO processing quantum_signal_1777079721_860b98c39106.json
+2026-04-24 21:15:23,694 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 21:15:23,918 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 21:15:23,932 [gate4] ERROR could not move quantum_signal_1777079721_860b98c39106.json: [Errno 28] No space left on device: '/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/data/inboxes/gate4_real/_failed/quantum_signal_1777079721_860b98c39106.json'
+2026-04-24 21:15:23,932 [gate4] INFO processed 1 signal(s) this pass
+2026-04-24 21:15:28,955 [gate4] INFO processing quantum_signal_1777079721_860b98c39106.json
+2026-04-24 21:15:28,962 [gate4] INFO Policy check PASSED: exchange=coinbase size_usd=1.00 dry_run=False open_positions=0 daily_loss_remaining=$200.00
+2026-04-24 21:15:29,183 [gate4] ERROR LIVE BUY BTC-USD $1.00 FAILED  resp={'success': False, 'error_response': {'error': 'INSUFFICIENT_FUND', 'message': 'Insufficient balance in source account', 'error_details': '', 'preview_failure_reason': 'PREVIEW_INSUFFICIENT_FUND'}, 'order_configuration': {'market_market_ioc': {'quote_size': '1.0', 'rfq_enabled': False, 'rfq_disabled': False, 'reduce_only': False}}}
+2026-04-24 21:15:29,322 [gate4] INFO processed 1 signal(s) this pass

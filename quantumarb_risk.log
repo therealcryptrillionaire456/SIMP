@@ -1,9 +1,0 @@
-WARNING:root:BRP models not available - running without BRP
-WARNING:root:Risk framework not available - running without risk limits
-WARNING:root:Monitoring system not available - running without monitoring
-Traceback (most recent call last):
-  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/agents/quantumarb_agent_with_risk.py", line 145, in <module>
-    class QuantumArbEngineWithRisk:
-  File "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/simp/agents/quantumarb_agent_with_risk.py", line 262, in QuantumArbEngineWithRisk
-    def _get_asset_class(self, symbol: str) -> AssetClass:
-NameError: name 'AssetClass' is not defined. Did you mean: 'issubclass'?

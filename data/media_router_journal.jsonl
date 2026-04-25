@@ -1,0 +1,1 @@
+{"intent_type": "media.trend_research", "payload": {"limit": 1}, "result": {"status": "success", "intent_type": "media.trend_research", "workflow_id": "intent_media_trend_research_20260425_025538", "result": {"status": "error", "message": "Trend harvester agent not available"}}, "timestamp": "2026-04-25T02:55:38.030105+00:00"}

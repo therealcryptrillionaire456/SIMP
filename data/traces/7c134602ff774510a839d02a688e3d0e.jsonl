@@ -1,0 +1,1 @@
+{"trace_id": "7c134602ff774510a839d02a688e3d0e", "span_id": "0f9a167045a24d33", "parent_span_id": null, "name": "span_0", "service": "quantumarb", "start_time": 1777081247.22014, "end_time": 1777081247.220144, "attributes": {}, "events": [], "status": "OK"}

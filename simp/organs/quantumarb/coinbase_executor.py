@@ -65,6 +65,15 @@ class ExecutionReceipt:
         return json.dumps(self.to_dict())
 
 
+def _get_coordinator_for_receipt():
+    """Return the global MultiLegCoordinator if available."""
+    try:
+        from .transaction_coordinator import get_coordinator
+        return get_coordinator()
+    except Exception:
+        return None
+
+
 class CoinbaseExecutor:
     """Executes live trades on Coinbase via CDP API."""
 
@@ -194,6 +203,7 @@ class CoinbaseExecutor:
         signal_id: str = "",
         decision_id: str = "",
         expected_price: Optional[float] = None,
+        tx_id: str = "",
     ) -> ExecutionReceipt:
         """
         Buy at market price using USD amount.
@@ -332,6 +342,7 @@ class CoinbaseExecutor:
         signal_id: str = "",
         decision_id: str = "",
         expected_price: Optional[float] = None,
+        tx_id: str = "",
     ) -> ExecutionReceipt:
         """
         Sell at market price using coin quantity.
@@ -420,6 +431,11 @@ class CoinbaseExecutor:
                 tx_hash=tx_hash,
             )
             self._write_ledger(receipt)
+            # Report to coordinator
+            if tx_id:
+                coord = _get_coordinator_for_receipt()
+                if coord:
+                    coord.report_leg_complete(tx_id, receipt)
             return receipt
 
         except Exception as e:

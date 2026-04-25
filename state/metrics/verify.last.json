@@ -1,6 +1,6 @@
 {
-  "started_at": "2026-04-24T20:20:16.167823+00:00",
-  "green": true,
+  "started_at": "2026-04-25T14:13:59.163335+00:00",
+  "green": false,
   "fatal_stage": null,
   "stages": [
     {
@@ -23,9 +23,9 @@
     },
     {
       "name": "signal_freshness",
-      "ok": true,
-      "detail": "age_s=18.3 target=60",
-      "terminal_ok": true
+      "ok": false,
+      "detail": "age_s=46718.3 target=60",
+      "terminal_ok": false
     },
     {
       "name": "bridge_reachable",
@@ -36,7 +36,7 @@
     {
       "name": "decision_present",
       "ok": true,
-      "detail": "decision_id=dec_dc122b3d8edda08a",
+      "detail": "decision_id=dec_b94a31f676aaeea8",
       "terminal_ok": true
     },
     {

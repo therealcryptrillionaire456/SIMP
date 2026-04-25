@@ -475,3 +475,257 @@ def test_transaction_coordinator():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     test_transaction_coordinator()
+
+
+# ══════════════════════════════════════════════════════════════════════
+# T26: Multi-Leg Transaction Coordinator
+# ══════════════════════════════════════════════════════════════════════
+
+from typing import TYPE_CHECKING
+from dataclasses import dataclass, asdict
+import asyncio
+import logging
+
+if TYPE_CHECKING:
+    from .coinbase_executor import CoinbaseExecutor, ExecutionReceipt
+
+log2 = logging.getLogger("multi_leg_coordinator")
+
+
+@dataclass
+class ExecutionReceipt:
+    """Lightweight receipt for coordinator reporting."""
+    execution_id: str
+    status: str = "pending"
+    fees: float = 0.0
+    pnl_usd: float = 0.0
+    venue: str = ""
+    symbol: str = ""
+    filled_qty: float = 0.0
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "ExecutionReceipt":
+        return cls(
+            execution_id=d.get("execution_id", ""),
+            status=d.get("status", ""),
+            fees=d.get("fees_usd", d.get("fees", 0.0)),
+            pnl_usd=d.get("pnl_usd", 0.0),
+            venue=d.get("venue", ""),
+            symbol=d.get("instrument", d.get("symbol", "")),
+            filled_qty=d.get("filled_qty", 0.0),
+        )
+
+
+class MultiLegCoordinator:
+    """
+    Coordinates multi-leg cross-exchange arb across executors.
+
+    State machine:
+      PENDING → LEG_1_SUBMITTED → LEG_1_CONFIRMED → LEG_2_SUBMITTED → ...
+      → COMPLETED
+      → PARTIAL (some legs completed before failure)
+      → FAILED (all legs rolled back)
+
+    Usage:
+        coord = MultiLegCoordinator()
+        coord.register_executor("coinbase", CoinbaseExecutor())
+        coord.register_executor("solana", SolanaExecutor())
+
+        receipt = await coord.execute_cross_exchange_arb(
+            legs=[
+                ("coinbase", "buy", "BTC-USD", 100.0),
+                ("solana", "sell", "BTC-USDC", 100.0),
+            ],
+            tx_id="arb_001",
+        )
+    """
+
+    _instance: "MultiLegCoordinator | None" = None
+    _lock: threading.Lock = None  # type: ignore
+
+    def __init__(self):
+        import threading as _thr
+        if MultiLegCoordinator._lock is None:
+            MultiLegCoordinator._lock = _thr.Lock()
+        self._executors: Dict[str, Any] = {}
+        self._states: Dict[str, str] = {}
+        self._transactions: Dict[str, Dict[str, Any]] = {}
+
+    @classmethod
+    def get_instance(cls) -> "MultiLegCoordinator":
+        if cls._lock is None:
+            import threading
+            cls._lock = threading.Lock()
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = cls()
+            return cls._instance
+
+    def register_executor(self, name: str, executor: Any) -> None:
+        """Register an executor by venue name."""
+        self._executors[name] = executor
+        log2.info(f"Registered executor: {name}")
+
+    def get_coordinator(self) -> "MultiLegCoordinator":
+        """Alias for get_instance() for use in executors."""
+        return self.get_instance()
+
+    def _transition(self, tx_id: str, state: str) -> None:
+        self._states[tx_id] = state
+        log2.info(f"TX {tx_id} → {state}")
+
+    def _set_transaction(self, tx_id: str, data: Dict[str, Any]) -> None:
+        self._transactions[tx_id] = data
+
+    async def execute_cross_exchange_arb(
+        self,
+        legs: List[Tuple[str, str, str, float]],
+        tx_id: str,
+    ) -> "ExecutionReceipt":
+        """
+        Execute cross-exchange arb across multiple venues.
+
+        Parameters
+        ----------
+        legs : List[Tuple[str, str, str, float]]
+            List of (venue, side, symbol, size_usd) tuples.
+        tx_id : str
+            Unique transaction identifier.
+
+        Returns
+        -------
+        ExecutionReceipt
+            Composite receipt with aggregated fees and PnL.
+        """
+        self._transition(tx_id, "PENDING")
+        self._set_transaction(tx_id, {"legs": legs, "type": "cross_exchange"})
+
+        results: List[ExecutionReceipt] = []
+        for i, (venue, side, symbol, size_usd) in enumerate(legs):
+            leg_id = f"{tx_id}_leg_{i}"
+            self._transition(tx_id, f"LEG_{i}_SUBMITTED")
+
+            executor = self._executors.get(venue)
+            if not executor:
+                self._transition(tx_id, f"LEG_{i}_FAILED")
+                await self._rollback_legs(tx_id, results)
+                raise RuntimeError(f"No executor registered for venue: {venue}")
+
+            try:
+                receipt = await self._execute_leg(
+                    executor=executor,
+                    leg_id=leg_id,
+                    tx_id=tx_id,
+                    side=side,
+                    symbol=symbol,
+                    size_usd=size_usd,
+                    timeout=60,
+                )
+                results.append(receipt)
+                self._transition(tx_id, f"LEG_{i}_CONFIRMED")
+            except Exception as e:
+                self._transition(tx_id, f"LEG_{i}_FAILED")
+                log2.error(f"Leg {i} failed: {e}")
+                await self._rollback_legs(tx_id, results)
+                raise
+
+        self._transition(tx_id, "COMPLETED")
+        return self._build_receipt(tx_id, results)
+
+    async def _execute_leg(
+        self,
+        executor: Any,
+        leg_id: str,
+        tx_id: str,
+        side: str,
+        symbol: str,
+        size_usd: float,
+        timeout: int,
+    ) -> "ExecutionReceipt":
+        """Execute a single leg with timeout and coordinator reporting."""
+        import asyncio
+
+        # Detect executor interface
+        if hasattr(executor, "execute_market"):
+            leg_task = asyncio.create_task(
+                executor.execute_market(
+                    side=side,
+                    symbol=symbol,
+                    size_usd=size_usd,
+                    tx_id=tx_id,
+                )
+            )
+        elif hasattr(executor, "buy_market") and side == "buy":
+            # coinbase-style interface
+            leg_task = asyncio.create_task(
+                asyncio.to_thread(
+                    executor.buy_market, symbol, size_usd,
+                    signal_id=f"coord_{tx_id}", decision_id=f"coord_{leg_id}"
+                )
+            )
+        elif hasattr(executor, "sell_market") and side == "sell":
+            leg_task = asyncio.create_task(
+                asyncio.to_thread(
+                    executor.sell_market, symbol, size_usd,
+                    signal_id=f"coord_{tx_id}", decision_id=f"coord_{leg_id}"
+                )
+            )
+        else:
+            raise RuntimeError(f"Executor {type(executor).__name__} has no known interface")
+
+        try:
+            result = await asyncio.wait_for(leg_task, timeout=timeout)
+            # Normalize to ExecutionReceipt
+            if isinstance(result, dict):
+                receipt = ExecutionReceipt.from_dict(result)
+            else:
+                receipt = result
+            # Report to coordinator
+            self.report_leg_complete(tx_id, receipt)
+            return receipt
+        except asyncio.TimeoutError:
+            leg_task.cancel()
+            raise RuntimeError(f"Leg {leg_id} timed out after {timeout}s")
+
+    async def _rollback_legs(
+        self, tx_id: str, completed_results: List
+    ) -> None:
+        """Rollback completed legs in reverse order."""
+        try:
+            from .rollback_manager import get_rollback_manager
+            rm = get_rollback_manager()
+        except Exception:
+            log2.warning("RollbackManager not available, skipping rollback")
+            return
+
+        for result in reversed(completed_results):
+            try:
+                await rm.rollback(execution_id=result.execution_id)
+                log2.info(f"Rolled back leg: {result.execution_id}")
+            except Exception as e:
+                log2.error(f"Rollback failed for leg {result.execution_id}: {e}")
+
+    def report_leg_complete(self, tx_id: str, receipt: "ExecutionReceipt") -> None:
+        """Allow executors to report leg completion back to coordinator."""
+        leg_results = self._transactions.get(tx_id, {}).get("results", [])
+        leg_results.append(receipt)
+        self._transactions[tx_id]["results"] = leg_results
+
+    def _build_receipt(
+        self, tx_id: str, leg_results: List[ExecutionReceipt]
+    ) -> "ExecutionReceipt":
+        """Build composite receipt from all leg results."""
+        total_fees = sum(r.fees for r in leg_results)
+        total_pnl = sum(r.pnl_usd for r in leg_results)
+        all_filled = all(r.status == "FILLED" or r.status == "filled" for r in leg_results)
+        return ExecutionReceipt(
+            execution_id=tx_id,
+            status="COMPLETED" if all_filled else "PARTIAL",
+            fees=total_fees,
+            pnl_usd=total_pnl,
+        )
+
+
+def get_coordinator() -> MultiLegCoordinator:
+    """Get the global MultiLegCoordinator singleton."""
+    return MultiLegCoordinator.get_instance()

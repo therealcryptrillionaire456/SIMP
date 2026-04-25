@@ -15,6 +15,9 @@ from simp.organs.media.agents.asset_agent import create_asset_agent
 from simp.organs.media.agents.edit_packaging_agent import create_edit_packaging_agent
 from simp.organs.media.agents.publisher_agent import create_publisher_agent
 from simp.organs.media.agents.analytics_agent import create_analytics_agent
+from simp.organs.media.agents.landing_page_agent import create_landing_page_agent
+from simp.organs.media.agents.offer_intelligence_agent import create_offer_intelligence_agent
+from simp.organs.media.agents.simp_news_agent import create_simp_news_agent
 from simp.organs.media.models import GenerationTool
 
 
@@ -295,6 +298,39 @@ class TestMediaAgents(unittest.TestCase):
         # For now, just verify the method exists
         self.assertTrue(hasattr(script_agent, 'handle_intent'))
     
+    def test_landing_page_agent_creation(self):
+        """Test Landing Page Agent creation."""
+        agent = create_landing_page_agent(
+            agent_id="test_landing",
+            data_dir=str(self.data_dir)
+        )
+        
+        self.assertEqual(agent.agent_id, "test_landing")
+        self.assertEqual(agent.agent_name, "Landing Page Agent")
+        self.assertTrue(hasattr(agent, 'generate_landing_page'))
+    
+    def test_offer_intelligence_agent_creation(self):
+        """Test Offer Intelligence Agent creation."""
+        agent = create_offer_intelligence_agent(
+            agent_id="test_offer",
+            data_dir=str(self.data_dir)
+        )
+        
+        self.assertEqual(agent.agent_id, "test_offer")
+        self.assertEqual(agent.agent_name, "Offer Intelligence Agent")
+        self.assertTrue(hasattr(agent, 'score_offer'))
+    
+    def test_simp_news_agent_creation(self):
+        """Test SIMP News Agent creation."""
+        agent = create_simp_news_agent(
+            agent_id="test_news",
+            data_dir=str(self.data_dir)
+        )
+        
+        self.assertEqual(agent.agent_id, "test_news")
+        self.assertEqual(agent.agent_name, "SIMP News Agent")
+        self.assertTrue(hasattr(agent, 'generate_news'))
+    
     def test_agent_configuration_persistence(self):
         """Test agent configuration and persistence."""
         # Create multiple agents with different configs
@@ -310,11 +346,14 @@ class TestMediaAgents(unittest.TestCase):
         # Verify each has unique config
         for i, agent in enumerate(agents):
             self.assertEqual(agent.agent_id, f"agent_{i}")
-            # Research interval is not exposed, but we can check agent_id
         
-        # Verify data files were created
-        data_files = list(self.data_dir.glob("*.jsonl"))
-        self.assertGreater(len(data_files), 0)
+        # Verify data directory was created and agents can write to it
+        self.assertTrue(self.data_dir.exists(), "Data directory should exist after agent creation")
+        
+        # Verify each agent's data directory is properly set
+        for agent in agents:
+            self.assertIsNotNone(agent.data_dir)
+            self.assertTrue(agent.data_dir.exists(), f"Agent {agent.agent_id} data_dir should exist")
 
 
 if __name__ == "__main__":

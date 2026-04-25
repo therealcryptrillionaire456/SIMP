@@ -1,2 +1,0 @@
-{"technique": "T1595", "name": "Active Scanning", "phase": "reconnaissance", "success": true, "duration_seconds": 1.005171, "findings_summary": ["technique_id", "technique_name", "success", "timestamp", "open_ports", "services", "os_fingerprint", "network_topology"], "timestamp": "2026-04-12T06:38:37.165160Z"}
-{"event": "phase_advancement", "from_phase": "reconnaissance", "to_phase": "resource_development", "timestamp": "2026-04-12T06:38:37.669237Z"}

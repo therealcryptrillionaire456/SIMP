@@ -667,6 +667,75 @@ class SolanaExecutor:
         """Access the trade history ledger."""
         return self._history
 
+    def execute_market(
+        self,
+        side: str,
+        symbol: str,
+        size_usd: float,
+        tx_id: Optional[str] = None,
+        signal_id: str = "",
+        decision_id: str = "",
+    ):
+        """
+        Execute a market order for the coordinator protocol (T26).
+
+        Calls execute_jupiter_swap for SOL swaps or falls back to
+        a dry-run stub. Reports completion to the MultiLegCoordinator.
+        """
+        try:
+            from .transaction_coordinator import get_coordinator
+        except ImportError:
+            get_coordinator = None
+
+        # Map symbol to mint addresses for Jupiter
+        parts = symbol.replace("-", "-").split("-")
+        base = parts[0] if len(parts) >= 1 else "SOL"
+
+        # Determine mints based on base asset
+        if base.upper() == "SOL":
+            input_mint = "So11111111111111111111111111111111111111112"
+            output_mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        elif base.upper() == "BTC":
+            input_mint = "9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E"
+            output_mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        else:
+            input_mint = "So11111111111111111111111111111111111111112"
+            output_mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+
+        amount = size_usd / 180.0
+        result = self.execute_jupiter_swap(
+            input_mint=input_mint,
+            output_mint=output_mint,
+            amount=amount,
+            symbol=symbol,
+        )
+
+        # Build receipt
+        from .coinbase_executor import ExecutionReceipt as CBReceipt
+        receipt = CBReceipt(
+            execution_id=result.get("tx_id", f"sol_{int(time.time())}"),
+            signal_id=signal_id,
+            decision_id=decision_id,
+            venue="solana",
+            instrument=symbol,
+            side=side,
+            size_usd=size_usd,
+            filled_qty=amount,
+            entry_px=0.0,
+            exit_px=0.0,
+            pnl_usd=0.0,
+            fees_usd=result.get("amount_usd", 0.0) * 0.006,
+            status="filled" if result.get("success") else "failed",
+            error=result.get("error", ""),
+        )
+
+        # Report to coordinator if tx_id provided
+        if tx_id and get_coordinator:
+            coord = get_coordinator()
+            coord.report_leg_complete(tx_id, receipt)
+
+        return receipt
+
 
 # ══════════════════════════════════════════════════════════════════════
 # Private helpers (module-level)

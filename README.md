@@ -1,11 +1,11 @@
-# SIMP — Structured Intent Messaging Protocol
+# SIMP — Standardized Intent Messaging Protocol
 
 [![Tests](https://img.shields.io/badge/tests-384_passing-brightgreen)]()
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)]()
-[![License](https://img.shields.io/badge/license-MIT-green)]()
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)]()
 [![Version](https://img.shields.io/badge/version-0.4.0-orange)]()
 
-A production-grade protocol for AI agent-to-agent communication. SIMP acts as a central coordination and routing layer for multi-agent systems, providing validated intent routing, task lifecycle management, and real-time observability.
+A production-grade protocol for AI agent-to-agent communication. **SIMP (Standardized Intent Messaging Protocol)** acts as a central coordination and routing layer for multi-agent systems — the "HTTP of Agentic AI" — providing validated intent routing, Ed25519 cryptographic provenance, task lifecycle management, and real-time observability via a broker-based architecture.
 
 ## Architecture
 
@@ -61,7 +61,7 @@ A production-grade protocol for AI agent-to-agent communication. SIMP acts as a 
 - **Intent-based routing** — Agents communicate via 35 typed intents with source/target/params
 - **Protocol versioning** — Version negotiation with forward-compatible validation
 - **Weighted routing** — BuilderPool with health x load x round-robin scoring
-- **Structured event logging** — Ring buffer with queryable JSON events
+- **Standardized event logging** — Ring buffer with queryable JSON events
 - **Rate limiting** — Token-bucket per-endpoint rate control
 - **Authentication** — API key + control token on admin endpoints
 - **Ed25519 signatures** — Optional cryptographic intent verification

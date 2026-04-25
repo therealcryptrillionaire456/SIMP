@@ -1,24 +1,24 @@
-# SIMP Architecture Graph - 20260424_155504
+# SIMP Architecture Graph - 20260424_225611
 
 ## Statistics
-- **Nodes**: 4556
-- **Edges**: 11727
+- **Nodes**: 7636
+- **Edges**: 18835
 - **Files Processed**: 300
-- **Total Python Files**: 26738
+- **Total Python Files**: 26188
 
 ## Top 5 Central Modules
-1. **base_command** (centrality: 0.080)
-1. **exceptions_usererror** (centrality: 0.031)
-1. **exceptions_agentsexception** (centrality: 0.030)
-1. **tool_functiontool** (centrality: 0.028)
-1. **agent_agent** (centrality: 0.028)
+1. **base_legal_agent_baselegalagent** (centrality: 0.032)
+1. **base_legal_agent_legalagentrole** (centrality: 0.030)
+1. **base_legal_agent_jurisdiction** (centrality: 0.030)
+1. **base_legal_agent_legalmatter** (centrality: 0.030)
+1. **base_legal_agent_legaldocument** (centrality: 0.030)
 
 ## Top 5 Modules by File Count
-1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/repl/commands** (714 files)
-1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/integration/modules** (627 files)
-1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents** (486 files)
+1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp** (1943 files)
+1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/keep-the-change/backend/app/services** (695 files)
+1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/pentagram_legal/agents** (434 files)
 1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/agents** (387 files)
-1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/brp_enhancement/repos/CAI/src/cai/sdk/agents/tracing** (244 files)
+1. **/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/keep-the-change/backend/tests/services** (312 files)
 
 ## Usage
 This graph can be used by AI agents to understand SIMP architecture without scanning all files.

@@ -1,0 +1,514 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "QuantumArb Trading System — Unified Observability Dashboard (T31)",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "Decision Engine",
+      "type": "row"
+    },
+    {
+      "title": "Decision Rate (go / no_go / review per minute)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 1 },
+      "id": 2,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum(rate(quantumarb_decisions_total[1m])) by (decision)",
+          "legendFormat": "{{decision}}",
+          "refId": "A",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 20
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "customAxisLabel": "Decisions/min",
+          "unit": "short"
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "go" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "no_go" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "review" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] }
+        ]
+      }
+    },
+    {
+      "title": "Decision Latency (ms) — p50 / p95 / p99",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
+      "id": 3,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantile(0.50, rate(quantumarb_decision_latency_ms_sum[5m]) / rate(quantumarb_decision_latency_ms_count[5m]))", "legendFormat": "p50", "refId": "A" },
+        { "expr": "quantile(0.95, rate(quantumarb_decision_latency_ms_sum[5m]) / rate(quantumarb_decision_latency_ms_count[5m]))", "legendFormat": "p95", "refId": "B" },
+        { "expr": "quantile(0.99, rate(quantumarb_decision_latency_ms_sum[5m]) / rate(quantumarb_decision_latency_ms_count[5m]))", "legendFormat": "p99", "refId": "C" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 1, "fillOpacity": 10 },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "title": "Calibration Error by Signal Type",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 9 },
+      "id": 4,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantumarb_calibration_error", "legendFormat": "{{signal_type}}", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 1 },
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.05 },
+              { "color": "red", "value": 0.15 }
+            ]
+          },
+          "customAxisLabel": "Calibration Error"
+        }
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+      "id": 5,
+      "title": "Execution & Trades",
+      "type": "row"
+    },
+    {
+      "title": "Total PnL by Venue & Symbol (USD)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 17 },
+      "id": 6,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantumarb_pnl_total_usd", "legendFormat": "{{venue}} / {{symbol}}", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 2 },
+          "unit": "currencyUSD",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "title": "Trade Execution Rate (per minute)",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 17 },
+      "id": 7,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "sum(rate(quantumarb_trades_executed_total[1m])) by (venue, symbol, side)", "legendFormat": "{{venue}} {{symbol}} {{side}}", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 1, "fillOpacity": 15 },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "title": "Execution Latency (ms) by Venue & Leg — p50 / p95 / p99",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 26 },
+      "id": 8,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantile(0.50, rate(quantumarb_execution_latency_ms_sum[5m]) / rate(quantumarb_execution_latency_ms_count[5m])) by (venue, leg)", "legendFormat": "p50 {{venue}} {{leg}}", "refId": "A" },
+        { "expr": "quantile(0.95, rate(quantumarb_execution_latency_ms_sum[5m]) / rate(quantumarb_execution_latency_ms_count[5m])) by (venue, leg)", "legendFormat": "p95 {{venue}} {{leg}}", "refId": "B" },
+        { "expr": "quantile(0.99, rate(quantumarb_execution_latency_ms_sum[5m]) / rate(quantumarb_execution_latency_ms_count[5m])) by (venue, leg)", "legendFormat": "p99 {{venue}} {{leg}}", "refId": "C" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 1 },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "title": "Spread Distribution (bps) by Arb Type",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 26 },
+      "id": 9,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantile(0.95, rate(quantumarb_spread_bps_sum[5m]) / rate(quantumarb_spread_bps_count[5m])) by (arb_type)", "legendFormat": "{{arb_type}} p95", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 2, "fillOpacity": 20 },
+          "unit": "short",
+          "customAxisLabel": "bps"
+        }
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 35 },
+      "id": 10,
+      "title": "Risk & Safety",
+      "type": "row"
+    },
+    {
+      "title": "Circuit Breaker State",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 36 },
+      "id": 11,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantumarb_circuit_breaker_state", "refId": "A" }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "options": { "0": { "text": "CLOSED", "color": "green" } }, "type": "value" } ,
+            { "options": { "1": { "text": "OPEN", "color": "red" } }, "type": "value" }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Current Market Regime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 36 },
+      "id": 12,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantumarb_regime_current", "refId": "A" }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "orange", "value": 2 },
+              { "color": "red", "value": 3 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Open Positions by Venue",
+      "type": "bargauge",
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 36 },
+      "id": 13,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantumarb_open_positions", "legendFormat": "{{venue}}", "refId": "A", "interval": "" }
+      ],
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Rollback Events by Reason",
+      "type": "timeseries",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 36 },
+      "id": 14,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "sum(rate(quantumarb_rollbacks_total[5m])) by (reason)", "legendFormat": "{{reason}}", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 1, "fillOpacity": 20 },
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        }
+      }
+    },
+    {
+      "title": "Kelly Fraction by Venue (p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 40 },
+      "id": 15,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantile(0.95, rate(quantumarb_kelly_fraction_sum[5m]) / rate(quantumarb_kelly_fraction_count[5m])) by (venue)", "legendFormat": "{{venue}}", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 2, "fillOpacity": 15 },
+          "unit": "percentunit",
+          "max": 1.0,
+          "min": 0.0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.25 },
+              { "color": "orange", "value": 0.50 },
+              { "color": "red", "value": 0.75 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Alert Rate by Type & Severity",
+      "type": "timeseries",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 40 },
+      "id": 16,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "sum(rate(quantumarb_alerts_sent_total[5m])) by (alert_type, severity)", "legendFormat": "{{alert_type}} ({{severity}})", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 1, "fillOpacity": 20 },
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "critical" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "warning" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }]
+          }
+        ]
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 47 },
+      "id": 17,
+      "title": "System Health",
+      "type": "row"
+    },
+    {
+      "title": "System Uptime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 48 },
+      "id": 18,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "quantumarb_uptime_seconds", "refId": "A" }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 3600 },
+              { "color": "red", "value": 86400 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Decision Summary (total per type)",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 8, "x": 6, "y": 48 },
+      "id": 19,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "sum(increase(quantumarb_decisions_total[24h])) by (decision)", "legendFormat": "{{decision}}", "refId": "A", "interval": "" }
+      ],
+      "options": {
+        "displayLabels": ["name", "percent"],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": ["value", "percent"]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "title": "PnL Rate (USD/hour) by Venue",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 10, "x": 14, "y": 48 },
+      "id": 20,
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        { "expr": "sum(rate(quantumarb_pnl_total_usd[5m])) by (venue) * 3600", "legendFormat": "{{venue}} $/h", "refId": "A", "interval": "" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 2, "fillOpacity": 15 },
+          "unit": "currencyUSD",
+          "decimals": 2
+        }
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["quantumarb", "trading", "arbitrage", "quantum"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Prometheus DS",
+        "multi": false,
+        "name": "DS_PROMETHEUS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "definition": "label_values(quantumarb_trades_executed_total, venue)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Venue",
+        "multi": true,
+        "name": "venue",
+        "options": [],
+        "query": { "query": "label_values(quantumarb_trades_executed_total, venue)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "QuantumArb — Unified Observability",
+  "uid": "quantumarb-unified-obs",
+  "version": 1,
+  "weekStart": ""
+}
