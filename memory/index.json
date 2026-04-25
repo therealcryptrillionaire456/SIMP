@@ -4031,6 +4031,402 @@
           },
           "latest_timestamp": "2026-04-24T20:06:43.035783Z"
         }
+      },
+      {
+        "title": "Mesh friction is learnable operational signal, not just transport noise",
+        "summary": "Dropped messages, TTL expiry, and no-subscriber events show where the system's intended energy transfer is being lost. The mesh should treat those failures as training data for routing and subscription hygiene.",
+        "lesson_type": "mesh_reliability",
+        "confidence": 0.9,
+        "evidence": {
+          "total_events": 4095,
+          "event_counts": {
+            "MESSAGE_DELIVERED": 1895,
+            "MESSAGE_RECEIVED": 1790,
+            "MESSAGE_DROPPED": 358,
+            "MESSAGE_STORED": 52
+          },
+          "error_counts": {
+            "NO_SENDER": 13,
+            "TTL_EXPIRED": 79,
+            "NO_SUBSCRIBERS": 266
+          },
+          "drop_rate": 0.0874,
+          "latest_timestamp": "2026-04-24T20:02:54.688931+00:00"
+        }
+      },
+      {
+        "title": "Agent churn should be scored as system instability",
+        "summary": "Repeated register-deregister cycles are not harmless bookkeeping. They are evidence of unstable orchestration or supervision and should feed trust and routing decisions.",
+        "lesson_type": "orchestration_stability",
+        "confidence": 0.87,
+        "evidence": {
+          "total_events": 19050,
+          "event_counts": {
+            "registered": 156,
+            "updated": 18748,
+            "deregistered": 146
+          },
+          "churn_ratio": 0.9359,
+          "latest_timestamp": "2026-04-25T14:22:01.758817+00:00"
+        }
+      },
+      {
+        "title": "Revenue learning must join execution outcomes with orchestration intent",
+        "summary": "To evolve recursively, the system has to connect why a plan was created, what signals were emitted, and what economic outcome followed.",
+        "lesson_type": "closed_loop_learning",
+        "confidence": 0.93,
+        "evidence": {
+          "successful_live_trades": 39,
+          "completed_plans": 2
+        }
+      },
+      {
+        "title": "Security and validation events belong in the learning loop",
+        "summary": "Operational safety is part of system intelligence. Validation errors and security events should shape prompts, routing, and execution gates.",
+        "lesson_type": "safety_learning",
+        "confidence": 0.84,
+        "evidence": {
+          "total_events": 144,
+          "event_counts": {
+            "agent_registered": 114,
+            "agent_deregistered": 28,
+            "validation_error": 2
+          },
+          "severity_counts": {
+            "low": 144
+          },
+          "latest_timestamp": "2026-04-24T20:06:43.035783Z"
+        }
+      },
+      {
+        "title": "Mesh friction is learnable operational signal, not just transport noise",
+        "summary": "Dropped messages, TTL expiry, and no-subscriber events show where the system's intended energy transfer is being lost. The mesh should treat those failures as training data for routing and subscription hygiene.",
+        "lesson_type": "mesh_reliability",
+        "confidence": 0.9,
+        "evidence": {
+          "total_events": 5233,
+          "event_counts": {
+            "MESSAGE_DELIVERED": 2459,
+            "MESSAGE_RECEIVED": 2342,
+            "MESSAGE_DROPPED": 370,
+            "MESSAGE_STORED": 62
+          },
+          "error_counts": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          },
+          "drop_rate": 0.0707,
+          "latest_timestamp": "2026-04-25T14:30:58.524609+00:00"
+        }
+      },
+      {
+        "title": "Agent churn should be scored as system instability",
+        "summary": "Repeated register-deregister cycles are not harmless bookkeeping. They are evidence of unstable orchestration or supervision and should feed trust and routing decisions.",
+        "lesson_type": "orchestration_stability",
+        "confidence": 0.87,
+        "evidence": {
+          "total_events": 19517,
+          "event_counts": {
+            "registered": 189,
+            "updated": 19130,
+            "deregistered": 198
+          },
+          "churn_ratio": 1.0476,
+          "latest_timestamp": "2026-04-25T14:37:07.448242+00:00"
+        }
+      },
+      {
+        "title": "Revenue learning must join execution outcomes with orchestration intent",
+        "summary": "To evolve recursively, the system has to connect why a plan was created, what signals were emitted, and what economic outcome followed.",
+        "lesson_type": "closed_loop_learning",
+        "confidence": 0.93,
+        "evidence": {
+          "successful_live_trades": 39,
+          "completed_plans": 2
+        }
+      },
+      {
+        "title": "Security and validation events belong in the learning loop",
+        "summary": "Operational safety is part of system intelligence. Validation errors and security events should shape prompts, routing, and execution gates.",
+        "lesson_type": "safety_learning",
+        "confidence": 0.84,
+        "evidence": {
+          "total_events": 158,
+          "event_counts": {
+            "agent_registered": 124,
+            "agent_deregistered": 30,
+            "validation_error": 4
+          },
+          "severity_counts": {
+            "low": 158
+          },
+          "latest_timestamp": "2026-04-25T14:34:59.156749Z"
+        }
+      },
+      {
+        "title": "Mesh friction is learnable operational signal, not just transport noise",
+        "summary": "Dropped messages, TTL expiry, and no-subscriber events show where the system's intended energy transfer is being lost. The mesh should treat those failures as training data for routing and subscription hygiene.",
+        "lesson_type": "mesh_reliability",
+        "confidence": 0.9,
+        "evidence": {
+          "total_events": 5233,
+          "event_counts": {
+            "MESSAGE_DELIVERED": 2459,
+            "MESSAGE_RECEIVED": 2342,
+            "MESSAGE_DROPPED": 370,
+            "MESSAGE_STORED": 62
+          },
+          "error_counts": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          },
+          "drop_rate": 0.0707,
+          "latest_timestamp": "2026-04-25T14:30:58.524609+00:00"
+        }
+      },
+      {
+        "title": "Agent churn should be scored as system instability",
+        "summary": "Repeated register-deregister cycles are not harmless bookkeeping. They are evidence of unstable orchestration or supervision and should feed trust and routing decisions.",
+        "lesson_type": "orchestration_stability",
+        "confidence": 0.87,
+        "evidence": {
+          "total_events": 19785,
+          "event_counts": {
+            "registered": 189,
+            "updated": 19398,
+            "deregistered": 198
+          },
+          "churn_ratio": 1.0476,
+          "latest_timestamp": "2026-04-25T14:52:13.956499+00:00"
+        }
+      },
+      {
+        "title": "Revenue learning must join execution outcomes with orchestration intent",
+        "summary": "To evolve recursively, the system has to connect why a plan was created, what signals were emitted, and what economic outcome followed.",
+        "lesson_type": "closed_loop_learning",
+        "confidence": 0.93,
+        "evidence": {
+          "successful_live_trades": 39,
+          "completed_plans": 2
+        }
+      },
+      {
+        "title": "Security and validation events belong in the learning loop",
+        "summary": "Operational safety is part of system intelligence. Validation errors and security events should shape prompts, routing, and execution gates.",
+        "lesson_type": "safety_learning",
+        "confidence": 0.84,
+        "evidence": {
+          "total_events": 158,
+          "event_counts": {
+            "agent_registered": 124,
+            "agent_deregistered": 30,
+            "validation_error": 4
+          },
+          "severity_counts": {
+            "low": 158
+          },
+          "latest_timestamp": "2026-04-25T14:34:59.156749Z"
+        }
+      },
+      {
+        "title": "Mesh friction is learnable operational signal, not just transport noise",
+        "summary": "Dropped messages, TTL expiry, and no-subscriber events show where the system's intended energy transfer is being lost. The mesh should treat those failures as training data for routing and subscription hygiene.",
+        "lesson_type": "mesh_reliability",
+        "confidence": 0.9,
+        "evidence": {
+          "total_events": 5233,
+          "event_counts": {
+            "MESSAGE_DELIVERED": 2459,
+            "MESSAGE_RECEIVED": 2342,
+            "MESSAGE_DROPPED": 370,
+            "MESSAGE_STORED": 62
+          },
+          "error_counts": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          },
+          "drop_rate": 0.0707,
+          "latest_timestamp": "2026-04-25T14:30:58.524609+00:00"
+        }
+      },
+      {
+        "title": "Agent churn should be scored as system instability",
+        "summary": "Repeated register-deregister cycles are not harmless bookkeeping. They are evidence of unstable orchestration or supervision and should feed trust and routing decisions.",
+        "lesson_type": "orchestration_stability",
+        "confidence": 0.87,
+        "evidence": {
+          "total_events": 20054,
+          "event_counts": {
+            "registered": 189,
+            "updated": 19667,
+            "deregistered": 198
+          },
+          "churn_ratio": 1.0476,
+          "latest_timestamp": "2026-04-25T15:07:20.597348+00:00"
+        }
+      },
+      {
+        "title": "Revenue learning must join execution outcomes with orchestration intent",
+        "summary": "To evolve recursively, the system has to connect why a plan was created, what signals were emitted, and what economic outcome followed.",
+        "lesson_type": "closed_loop_learning",
+        "confidence": 0.93,
+        "evidence": {
+          "successful_live_trades": 39,
+          "completed_plans": 2
+        }
+      },
+      {
+        "title": "Security and validation events belong in the learning loop",
+        "summary": "Operational safety is part of system intelligence. Validation errors and security events should shape prompts, routing, and execution gates.",
+        "lesson_type": "safety_learning",
+        "confidence": 0.84,
+        "evidence": {
+          "total_events": 158,
+          "event_counts": {
+            "agent_registered": 124,
+            "agent_deregistered": 30,
+            "validation_error": 4
+          },
+          "severity_counts": {
+            "low": 158
+          },
+          "latest_timestamp": "2026-04-25T14:34:59.156749Z"
+        }
+      },
+      {
+        "title": "Mesh friction is learnable operational signal, not just transport noise",
+        "summary": "Dropped messages, TTL expiry, and no-subscriber events show where the system's intended energy transfer is being lost. The mesh should treat those failures as training data for routing and subscription hygiene.",
+        "lesson_type": "mesh_reliability",
+        "confidence": 0.9,
+        "evidence": {
+          "total_events": 5233,
+          "event_counts": {
+            "MESSAGE_DELIVERED": 2459,
+            "MESSAGE_RECEIVED": 2342,
+            "MESSAGE_DROPPED": 370,
+            "MESSAGE_STORED": 62
+          },
+          "error_counts": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          },
+          "drop_rate": 0.0707,
+          "latest_timestamp": "2026-04-25T14:30:58.524609+00:00"
+        }
+      },
+      {
+        "title": "Agent churn should be scored as system instability",
+        "summary": "Repeated register-deregister cycles are not harmless bookkeeping. They are evidence of unstable orchestration or supervision and should feed trust and routing decisions.",
+        "lesson_type": "orchestration_stability",
+        "confidence": 0.87,
+        "evidence": {
+          "total_events": 20325,
+          "event_counts": {
+            "registered": 189,
+            "updated": 19938,
+            "deregistered": 198
+          },
+          "churn_ratio": 1.0476,
+          "latest_timestamp": "2026-04-25T15:22:33.458639+00:00"
+        }
+      },
+      {
+        "title": "Revenue learning must join execution outcomes with orchestration intent",
+        "summary": "To evolve recursively, the system has to connect why a plan was created, what signals were emitted, and what economic outcome followed.",
+        "lesson_type": "closed_loop_learning",
+        "confidence": 0.93,
+        "evidence": {
+          "successful_live_trades": 39,
+          "completed_plans": 2
+        }
+      },
+      {
+        "title": "Security and validation events belong in the learning loop",
+        "summary": "Operational safety is part of system intelligence. Validation errors and security events should shape prompts, routing, and execution gates.",
+        "lesson_type": "safety_learning",
+        "confidence": 0.84,
+        "evidence": {
+          "total_events": 158,
+          "event_counts": {
+            "agent_registered": 124,
+            "agent_deregistered": 30,
+            "validation_error": 4
+          },
+          "severity_counts": {
+            "low": 158
+          },
+          "latest_timestamp": "2026-04-25T14:34:59.156749Z"
+        }
+      },
+      {
+        "title": "Mesh friction is learnable operational signal, not just transport noise",
+        "summary": "Dropped messages, TTL expiry, and no-subscriber events show where the system's intended energy transfer is being lost. The mesh should treat those failures as training data for routing and subscription hygiene.",
+        "lesson_type": "mesh_reliability",
+        "confidence": 0.9,
+        "evidence": {
+          "total_events": 6371,
+          "event_counts": {
+            "MESSAGE_DELIVERED": 3023,
+            "MESSAGE_RECEIVED": 2894,
+            "MESSAGE_DROPPED": 382,
+            "MESSAGE_STORED": 72
+          },
+          "error_counts": {
+            "NO_SENDER": 17,
+            "TTL_EXPIRED": 95,
+            "NO_SUBSCRIBERS": 270
+          },
+          "drop_rate": 0.06,
+          "latest_timestamp": "2026-04-25T15:29:54.204349+00:00"
+        }
+      },
+      {
+        "title": "Agent churn should be scored as system instability",
+        "summary": "Repeated register-deregister cycles are not harmless bookkeeping. They are evidence of unstable orchestration or supervision and should feed trust and routing decisions.",
+        "lesson_type": "orchestration_stability",
+        "confidence": 0.87,
+        "evidence": {
+          "total_events": 20639,
+          "event_counts": {
+            "registered": 197,
+            "updated": 20230,
+            "deregistered": 212
+          },
+          "churn_ratio": 1.0761,
+          "latest_timestamp": "2026-04-25T15:37:35.222499+00:00"
+        }
+      },
+      {
+        "title": "Revenue learning must join execution outcomes with orchestration intent",
+        "summary": "To evolve recursively, the system has to connect why a plan was created, what signals were emitted, and what economic outcome followed.",
+        "lesson_type": "closed_loop_learning",
+        "confidence": 0.93,
+        "evidence": {
+          "successful_live_trades": 39,
+          "completed_plans": 2
+        }
+      },
+      {
+        "title": "Security and validation events belong in the learning loop",
+        "summary": "Operational safety is part of system intelligence. Validation errors and security events should shape prompts, routing, and execution gates.",
+        "lesson_type": "safety_learning",
+        "confidence": 0.84,
+        "evidence": {
+          "total_events": 160,
+          "event_counts": {
+            "agent_registered": 126,
+            "agent_deregistered": 30,
+            "validation_error": 4
+          },
+          "severity_counts": {
+            "low": 160
+          },
+          "latest_timestamp": "2026-04-25T15:32:48.980511Z"
+        }
       }
     ],
     "system_policy_candidates": [
@@ -5772,6 +6168,204 @@
           "target": "agent_registry",
           "action": "score_churn_into_trust",
           "churn_ratio": 0.9359
+        }
+      },
+      {
+        "title": "Plan-to-execution lineage capture",
+        "rationale": "Attach plan IDs and intent lineage to downstream trades so successful and failed strategies can be ranked by actual economic output.",
+        "priority": "high",
+        "payload": {
+          "target": "broker_and_execution",
+          "action": "carry_plan_lineage"
+        }
+      },
+      {
+        "title": "Daily mesh hygiene reflection",
+        "rationale": "Summarize dropped-message causes and promote targeted routing/subscription fixes instead of leaving delivery friction buried in logs.",
+        "priority": "high",
+        "payload": {
+          "target": "mesh",
+          "action": "reflect_on_drop_causes",
+          "top_error_codes": {
+            "NO_SENDER": 13,
+            "TTL_EXPIRED": 79,
+            "NO_SUBSCRIBERS": 266
+          }
+        }
+      },
+      {
+        "title": "Churn-aware routing and supervision review",
+        "rationale": "Agents with elevated churn should be deprioritized or supervised more tightly until stability recovers.",
+        "priority": "medium",
+        "payload": {
+          "target": "agent_registry",
+          "action": "score_churn_into_trust",
+          "churn_ratio": 0.9359
+        }
+      },
+      {
+        "title": "Plan-to-execution lineage capture",
+        "rationale": "Attach plan IDs and intent lineage to downstream trades so successful and failed strategies can be ranked by actual economic output.",
+        "priority": "high",
+        "payload": {
+          "target": "broker_and_execution",
+          "action": "carry_plan_lineage"
+        }
+      },
+      {
+        "title": "Daily mesh hygiene reflection",
+        "rationale": "Summarize dropped-message causes and promote targeted routing/subscription fixes instead of leaving delivery friction buried in logs.",
+        "priority": "high",
+        "payload": {
+          "target": "mesh",
+          "action": "reflect_on_drop_causes",
+          "top_error_codes": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          }
+        }
+      },
+      {
+        "title": "Churn-aware routing and supervision review",
+        "rationale": "Agents with elevated churn should be deprioritized or supervised more tightly until stability recovers.",
+        "priority": "medium",
+        "payload": {
+          "target": "agent_registry",
+          "action": "score_churn_into_trust",
+          "churn_ratio": 1.0476
+        }
+      },
+      {
+        "title": "Plan-to-execution lineage capture",
+        "rationale": "Attach plan IDs and intent lineage to downstream trades so successful and failed strategies can be ranked by actual economic output.",
+        "priority": "high",
+        "payload": {
+          "target": "broker_and_execution",
+          "action": "carry_plan_lineage"
+        }
+      },
+      {
+        "title": "Daily mesh hygiene reflection",
+        "rationale": "Summarize dropped-message causes and promote targeted routing/subscription fixes instead of leaving delivery friction buried in logs.",
+        "priority": "high",
+        "payload": {
+          "target": "mesh",
+          "action": "reflect_on_drop_causes",
+          "top_error_codes": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          }
+        }
+      },
+      {
+        "title": "Churn-aware routing and supervision review",
+        "rationale": "Agents with elevated churn should be deprioritized or supervised more tightly until stability recovers.",
+        "priority": "medium",
+        "payload": {
+          "target": "agent_registry",
+          "action": "score_churn_into_trust",
+          "churn_ratio": 1.0476
+        }
+      },
+      {
+        "title": "Plan-to-execution lineage capture",
+        "rationale": "Attach plan IDs and intent lineage to downstream trades so successful and failed strategies can be ranked by actual economic output.",
+        "priority": "high",
+        "payload": {
+          "target": "broker_and_execution",
+          "action": "carry_plan_lineage"
+        }
+      },
+      {
+        "title": "Daily mesh hygiene reflection",
+        "rationale": "Summarize dropped-message causes and promote targeted routing/subscription fixes instead of leaving delivery friction buried in logs.",
+        "priority": "high",
+        "payload": {
+          "target": "mesh",
+          "action": "reflect_on_drop_causes",
+          "top_error_codes": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          }
+        }
+      },
+      {
+        "title": "Churn-aware routing and supervision review",
+        "rationale": "Agents with elevated churn should be deprioritized or supervised more tightly until stability recovers.",
+        "priority": "medium",
+        "payload": {
+          "target": "agent_registry",
+          "action": "score_churn_into_trust",
+          "churn_ratio": 1.0476
+        }
+      },
+      {
+        "title": "Plan-to-execution lineage capture",
+        "rationale": "Attach plan IDs and intent lineage to downstream trades so successful and failed strategies can be ranked by actual economic output.",
+        "priority": "high",
+        "payload": {
+          "target": "broker_and_execution",
+          "action": "carry_plan_lineage"
+        }
+      },
+      {
+        "title": "Daily mesh hygiene reflection",
+        "rationale": "Summarize dropped-message causes and promote targeted routing/subscription fixes instead of leaving delivery friction buried in logs.",
+        "priority": "high",
+        "payload": {
+          "target": "mesh",
+          "action": "reflect_on_drop_causes",
+          "top_error_codes": {
+            "NO_SENDER": 15,
+            "TTL_EXPIRED": 87,
+            "NO_SUBSCRIBERS": 268
+          }
+        }
+      },
+      {
+        "title": "Churn-aware routing and supervision review",
+        "rationale": "Agents with elevated churn should be deprioritized or supervised more tightly until stability recovers.",
+        "priority": "medium",
+        "payload": {
+          "target": "agent_registry",
+          "action": "score_churn_into_trust",
+          "churn_ratio": 1.0476
+        }
+      },
+      {
+        "title": "Plan-to-execution lineage capture",
+        "rationale": "Attach plan IDs and intent lineage to downstream trades so successful and failed strategies can be ranked by actual economic output.",
+        "priority": "high",
+        "payload": {
+          "target": "broker_and_execution",
+          "action": "carry_plan_lineage"
+        }
+      },
+      {
+        "title": "Daily mesh hygiene reflection",
+        "rationale": "Summarize dropped-message causes and promote targeted routing/subscription fixes instead of leaving delivery friction buried in logs.",
+        "priority": "high",
+        "payload": {
+          "target": "mesh",
+          "action": "reflect_on_drop_causes",
+          "top_error_codes": {
+            "NO_SENDER": 17,
+            "TTL_EXPIRED": 95,
+            "NO_SUBSCRIBERS": 270
+          }
+        }
+      },
+      {
+        "title": "Churn-aware routing and supervision review",
+        "rationale": "Agents with elevated churn should be deprioritized or supervised more tightly until stability recovers.",
+        "priority": "medium",
+        "payload": {
+          "target": "agent_registry",
+          "action": "score_churn_into_trust",
+          "churn_ratio": 1.0761
         }
       },
       {

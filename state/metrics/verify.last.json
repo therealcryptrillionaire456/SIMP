@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-04-25T14:13:59.163335+00:00",
+  "started_at": "2026-04-25T15:49:22.599260+00:00",
   "green": false,
   "fatal_stage": null,
   "stages": [
@@ -24,7 +24,7 @@
     {
       "name": "signal_freshness",
       "ok": false,
-      "detail": "age_s=46718.3 target=60",
+      "detail": "age_s=4365.7 target=60",
       "terminal_ok": false
     },
     {
@@ -36,20 +36,20 @@
     {
       "name": "decision_present",
       "ok": true,
-      "detail": "decision_id=dec_b94a31f676aaeea8",
+      "detail": "decision_id=profit_328b30f1ca6445",
       "terminal_ok": true
     },
     {
       "name": "policy_evaluated",
       "ok": true,
-      "detail": "policy=allow",
+      "detail": "policy=shadow",
       "terminal_ok": true
     },
     {
       "name": "execution_terminal",
       "ok": false,
-      "detail": "fill_status=stale",
-      "terminal_ok": true
+      "detail": "non-terminal fill_status='pending'",
+      "terminal_ok": false
     },
     {
       "name": "fill_freshness",

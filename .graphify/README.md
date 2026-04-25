@@ -1,10 +1,10 @@
-# SIMP Architecture Graph - 20260424_225611
+# SIMP Architecture Graph - 20260425_113324
 
 ## Statistics
 - **Nodes**: 7636
-- **Edges**: 18835
+- **Edges**: 18830
 - **Files Processed**: 300
-- **Total Python Files**: 26188
+- **Total Python Files**: 26199
 
 ## Top 5 Central Modules
 1. **base_legal_agent_baselegalagent** (centrality: 0.032)

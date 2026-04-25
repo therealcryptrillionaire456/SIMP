@@ -203,8 +203,8 @@
   ],
   "graph_stats": {
     "nodes": 7636,
-    "edges": 18835,
-    "density": 0.0006461311205357863,
+    "edges": 18830,
+    "density": 0.0006459595964793658,
     "connected_components": 175
   },
   "top_modules": [
@@ -293,5 +293,5 @@
     "code": 4399,
     "rationale": 3237
   },
-  "timestamp": "2026-04-24T22:56:42.908717"
+  "timestamp": "2026-04-25T11:33:34.658111"
 }

@@ -21,7 +21,7 @@ from scipy import stats
 # SIMP imports
 from simp.server.broker import SimpBroker
 from simp.models.canonical_intent import CanonicalIntent
-from simp.compat.financial_ops import FinancialOpsAgent
+from simp.compat.financial_ops import validate_financial_op, record_would_spend, execute_approved_payment, build_financial_ops_card
 
 # Trading imports
 from simp.organs.quantumarb.arb_detector import ArbDetector, ArbOpportunity
@@ -134,7 +134,7 @@ class Gate35EnhancedAgent:
             try:
                 # Initialize broker connection
                 self.broker = SimpBroker()
-                self.financial_ops = FinancialOpsAgent()
+                self.financial_ops = build_financial_ops_card()
                 
                 # Register with broker
                 registration_intent = CanonicalIntent(

@@ -26,11 +26,11 @@ from simp.organs.quantumarb.arb_detector import ArbDetector, ArbOpportunity
 from simp.organs.quantumarb.exchange_connector import ExchangeConnector, StubExchangeConnector
 
 # Import from previous parts
-from gate4_scaled_agent_part1 import (
+from agents.gate4_scaled_agent_part1 import (
     TradingStrategy, OrderType, Gate4Config, ScaledPosition, 
     MarketMicrostructure, RiskMetrics, Gate4ScaledAgent
 )
-from gate4_scaled_agent_part2a import (
+from agents.gate4_scaled_agent_part2a import (
     TradeExecution, PositionState, PerformanceMetrics, TradeEngine
 )
 

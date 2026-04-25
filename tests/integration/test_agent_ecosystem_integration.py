@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from simp.server.broker import SimpBroker
-from simp.server.http_server import app
+from simp.server.http_server import create_app
 
 
 class TestAgentEcosystemIntegration(unittest.TestCase):

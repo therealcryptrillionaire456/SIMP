@@ -2,12 +2,12 @@
   "freshness": {
     "bridge_rtt_ms_p95": null,
     "consumer_backlog": 0,
-    "last_fill_age_s": 337032.352745,
-    "last_signal_age_s": 46724.408494
+    "last_fill_age_s": 342761.394189,
+    "last_signal_age_s": 4377.450264
   },
   "incidents_open": [],
   "kill_switch": {
-    "last_checked": "2026-04-25T14:14:05Z",
+    "last_checked": "2026-04-25T15:49:34Z",
     "path": "/Users/kaseymarcelle/Downloads/kashclaw (claude rebuild)/simp/state/KILL",
     "set": false
   },
@@ -110,10 +110,10 @@
     "signal_fresh_target_s": 60,
     "verifier_green_target": 0.95
   },
-  "updated_at": "2026-04-25T14:14:05Z",
+  "updated_at": "2026-04-25T15:49:34Z",
   "verifier": {
     "failing_stage": "processes",
-    "last_run": "2026-04-25T14:14:05Z",
+    "last_run": "2026-04-25T15:49:34Z",
     "pass_rate_6h": 0.0,
     "status": "red"
   }

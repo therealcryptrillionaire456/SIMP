@@ -30,7 +30,6 @@ class QuantumArbDecision(str, Enum):
 
 
 @dataclass
-@dataclass
 class QuantumArbDecisionSummary:
     """
     QuantumArb's internal decision summary format.
