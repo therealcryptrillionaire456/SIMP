@@ -3007,6 +3007,37 @@ class SimpHttpServer:
             self.lifecycle._run_sweep()
             return jsonify({"status": "sweep_completed"}), 200
 
+        @self.app.route("/lifecycle/agent/<agent_id>/state", methods=["PUT"])
+        @self.limiter.limit(10)
+        @require_jwt
+        @require_api_key
+        def lifecycle_set_agent_state(agent_id):
+            """T48 — Set an agent's lifecycle state (active/paused/draining/terminated)."""
+            if not hasattr(self, "lifecycle"):
+                return jsonify({"error": "Lifecycle manager not initialized"}), 503
+            data = request.get_json(force=False, silent=True) or {}
+            state = data.get("state", "")
+            reason = data.get("reason", "")
+            valid = {"active", "paused", "draining", "terminated", "running", "starting",
+                     "idle", "stopped", "unreachable", "removed"}
+            if state not in valid:
+                return jsonify({
+                    "error": f"Invalid state '{state}'. Must be one of: {sorted(valid)}"
+                }), 400
+            ok = self.broker.set_agent_lifecycle(agent_id, state, reason)
+            if not ok:
+                return jsonify({"error": f"Agent '{agent_id}' not found or transition rejected"}), 404
+            # Publish to WS bridge lifecycle_events channel
+            if hasattr(self, "_ws_bridge") and self._ws_bridge:
+                self._ws_bridge.push_to_channel("lifecycle_events", {
+                    "event": "agent_lifecycle_changed",
+                    "agent_id": agent_id,
+                    "state": state,
+                    "reason": reason,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                })
+            return jsonify({"success": True, "agent_id": agent_id, "state": state}), 200
+
         # ── End of T48 routes ────────────────────────────────────────
 
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True,
@@ -3033,6 +3064,8 @@ class SimpHttpServer:
 
             # Sprint 85 — wire WS bridge into broker for real-time push
             self.broker.set_ws_bridge(self._ws_bridge)
+            # T48 — wire lifecycle manager into broker for state machine access
+            self.broker._lifecycle_manager = self.lifecycle
 
         # T48 — Start agent lifecycle manager background sweep
         if hasattr(self, "lifecycle"):

@@ -610,6 +610,14 @@ class SimpBroker:
                     self.logger.warning(
                         f"Mesh-bus reconcile for {agent_id} failed: {e}"
                     )
+                # T48 — update lifecycle state on re-registration
+                try:
+                    self.agent_registry.update(agent_id, {
+                        "lifecycle_state": "running",
+                        "state_changed_at": _utcnow_iso(),
+                    })
+                except Exception:
+                    pass
                 # Idempotent: treat re-registration as success so the caller
                 # can proceed to subscribe / send / poll.
                 return True
@@ -637,7 +645,13 @@ class SimpBroker:
                 "heartbeat_count": 0,
                 "stale": False,
                 "file_based": is_file_based,
+                # T48 — lifecycle state machine
+                "lifecycle_state": "starting",
+                "state_changed_at": now,
             }
+
+            # T48 — lifecycle: new agent starts in "running" state after registration succeeds
+            agent_data["lifecycle_state"] = "running"
 
             # Register agent with disk persistence
             if not self.agent_registry.register(agent_id, agent_data):
@@ -759,6 +773,15 @@ class SimpBroker:
         with self.get_agent_lock(agent_id):
             if not self.agent_registry.exists(agent_id):
                 return False
+            # T48 — mark lifecycle state as terminated before removal
+            try:
+                self.agent_registry.update(agent_id, {
+                    "lifecycle_state": "terminated",
+                    "state_changed_at": _utcnow_iso(),
+                })
+            except Exception:
+                pass
+
             self.agent_registry.deregister(agent_id)
             try:
                 self.mesh_bus.deregister_agent(agent_id)
@@ -768,6 +791,37 @@ class SimpBroker:
         with self.stats_lock:
             self.stats["agents_registered"] = max(0, self.stats.get("agents_registered", 0) - 1)
         self.release_agent_lock(agent_id)
+        return True
+
+    def set_agent_lifecycle(self, agent_id: str, state: str, reason: str = "") -> bool:
+        """T48 — Set an agent's lifecycle state.
+
+        Delegates to LifecycleManager if available, otherwise updates registry directly.
+        Valid states: active, paused, draining, terminated, running, starting,
+                      idle, stopped, unreachable, removed.
+        """
+        valid_states = {
+            "active", "paused", "draining", "terminated", "running", "starting",
+            "idle", "stopped", "unreachable", "removed",
+        }
+        if state not in valid_states:
+            self.logger.warning("set_agent_lifecycle: invalid state '%s'", state)
+            return False
+
+        if not self.agent_registry.exists(agent_id):
+            return False
+
+        self.agent_registry.update(agent_id, {
+            "lifecycle_state": state,
+            "state_changed_at": _utcnow_iso(),
+            "state_change_reason": reason,
+        })
+        self._log_event(
+            "agent_lifecycle_changed",
+            f"Agent {agent_id} lifecycle -> {state} ({reason})",
+            agent_id=agent_id,
+            extra={"state": state, "reason": reason},
+        )
         return True
 
     def record_heartbeat(self, agent_id: str) -> bool:
