@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+package simp;
+
+// ── Common ───────────────────────────────────────────────────────────────────
+
+message Empty {}
+
+message Timestamp {
+  int64 seconds = 1;
+  int64 nanos   = 2;
+}
+
+// ── Agent ─────────────────────────────────────────────────────────────────────
+
+message AgentInfo {
+  string agent_id        = 1;
+  string name            = 2;
+  string agent_type      = 3;
+  string state           = 4;   // lifecycle state
+  string status          = 5;
+  string last_heartbeat  = 6;
+  int64  heartbeat_count = 7;
+  bool   stale           = 8;
+  string registered_at    = 9;
+  string endpoint         = 10;
+  repeated string capabilities = 11;
+}
+
+message RegisterAgentRequest {
+  string agent_id   = 1;
+  string name       = 2;
+  string agent_type = 3;
+  string endpoint   = 4;
+  repeated string capabilities = 5;
+}
+
+message RegisterAgentResponse {
+  bool   success = 1;
+  string message = 2;
+  string token   = 3;   // JWT for this agent
+}
+
+message DeregisterAgentRequest {
+  string agent_id = 1;
+}
+
+message DeregisterAgentResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message HeartbeatRequest {
+  string agent_id = 1;
+}
+
+message HeartbeatResponse {
+  bool   alive    = 1;
+  int64  count    = 2;
+  string server_time = 3;
+}
+
+message ListAgentsRequest {
+  bool active_only = 1;
+}
+
+message ListAgentsResponse {
+  repeated AgentInfo agents = 1;
+}
+
+message GetAgentRequest {
+  string agent_id = 1;
+}
+
+message SetAgentLifecycleRequest {
+  string agent_id = 1;
+  string state    = 2;   // active, paused, draining, terminated
+  string reason    = 3;
+}
+
+message SetAgentLifecycleResponse {
+  bool   success = 1;
+  string message = 2;
+  string new_state = 3;
+}
+
+// ── Intents ───────────────────────────────────────────────────────────────────
+
+message Intent {
+  string intent_id      = 1;
+  string intent_type    = 2;
+  string source_agent   = 3;
+  string target_agent   = 4;
+  string payload_json   = 5;
+  string priority       = 6;
+  string created_at     = 7;
+}
+
+message SubmitIntentRequest {
+  Intent intent = 1;
+}
+
+message SubmitIntentResponse {
+  bool   accepted = 1;
+  string intent_id = 2;
+  string message   = 3;
+}
+
+message GetIntentStatusRequest {
+  string intent_id = 1;
+}
+
+message IntentStatus {
+  string intent_id   = 1;
+  string state       = 2;   // pending, executing, completed, failed
+  string result_json = 3;
+  string updated_at  = 4;
+  string error       = 5;
+}
+
+message GetIntentStatusResponse {
+  IntentStatus status = 1;
+}
+
+// ── Broker / System ────────────────────────────────────────────────────────────
+
+message BrokerStats {
+  int64  agents_registered  = 1;
+  int64  intents_received   = 2;
+  int64  intents_routed     = 3;
+  int64  intents_failed     = 4;
+  int64  uptime_seconds     = 5;
+  string state              = 6;
+  string version            = 7;
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  bool   healthy = 1;
+  string state   = 2;
+  string version = 3;
+  repeated string issues = 4;
+}
+
+message StreamLogsRequest {
+  int64 limit = 1;
+}
+
+message StreamLogsResponse {
+  repeated LogEntry logs = 1;
+}
+
+message LogEntry {
+  string timestamp = 1;
+  string event     = 2;
+  string agent_id  = 3;
+  string message   = 4;
+}
+
+// ── Services ───────────────────────────────────────────────────────────────────
+
+service SimpService {
+  // Agent management
+  rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
+  rpc DeregisterAgent(DeregisterAgentRequest) returns (DeregisterAgentResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse);
+  rpc GetAgent(GetAgentRequest) returns (AgentInfo);
+  rpc SetAgentLifecycle(SetAgentLifecycleRequest) returns (SetAgentLifecycleResponse);
+
+  // Intent handling
+  rpc SubmitIntent(SubmitIntentRequest) returns (SubmitIntentResponse);
+  rpc GetIntentStatus(GetIntentStatusRequest) returns (GetIntentStatusResponse);
+
+  // System
+  rpc GetStats(Empty) returns (BrokerStats);
+  rpc Health(HealthRequest) returns (HealthResponse);
+  rpc StreamLogs(StreamLogsRequest) returns (stream StreamLogsResponse);
+}

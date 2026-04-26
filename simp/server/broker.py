@@ -11,7 +11,7 @@ import logging
 import os
 from collections import deque, OrderedDict
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Any, Callable, TYPE_CHECKING
+from typing import ClassVar, Dict, Optional, Any, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from simp.server.ws_bridge import WsBridge
@@ -125,6 +125,70 @@ class IntentRecord:
     retry_count: int = 0
 
 
+class LatencyHistogram:
+    """Fixed-bucket latency histogram for p50/p95/p99 percentile tracking.
+
+    Uses a sorted list approach for accuracy on modest sample sizes.
+    Thread-safe via RLock. Designed for the broker hot path — inserts are
+    O(log n) for the bisect, O(n) for the insert into the list (Python
+    list shift). For the broker's typical volume (<10k intents/min), this
+    is fine; for higher throughput, switch to a streaming quantile sketch
+    (e.g. T-Digest or HDR Histogram).
+    """
+
+    BUCKET_MS: ClassVar[list] = [
+        0.1, 0.5, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000
+    ]
+
+    def __init__(self, max_samples: int = 10000):
+        self._samples: list = []
+        self._max_samples = max_samples
+        self._lock = threading.RLock()
+
+    def record(self, latency_ms: float) -> None:
+        """Record a latency sample. Keeps only the most recent N samples."""
+        with self._lock:
+            self._samples.append(latency_ms)
+            if len(self._samples) > self._max_samples:
+                # Drop oldest 25% in bulk
+                trim = self._max_samples // 4
+                self._samples = self._samples[trim:]
+
+    def snapshot(self) -> Dict[str, Any]:
+        """Return p50/p95/p99/max/avg and bucket counts for the current window."""
+        with self._lock:
+            if not self._samples:
+                return {
+                    "p50_ms": 0.0, "p95_ms": 0.0, "p99_ms": 0.0,
+                    "max_ms": 0.0, "avg_ms": 0.0, "count": 0,
+                    "buckets": {},
+                }
+            samples = sorted(self._samples)
+
+        n = len(samples)
+        def _p(p: int) -> float:
+            idx = min(int(n * p / 100), n - 1)
+            return round(samples[idx], 2)
+
+        avg = round(sum(samples) / n, 2)
+
+        # Count buckets
+        buckets = {}
+        for b in self.BUCKET_MS:
+            count = sum(1 for s in samples if s <= b)
+            buckets[f"≤{b}ms"] = count
+
+        return {
+            "p50_ms": _p(50), "p95_ms": _p(95), "p99_ms": _p(99),
+            "max_ms": round(samples[-1], 2), "avg_ms": avg,
+            "count": n, "buckets": buckets,
+        }
+
+    def reset(self) -> None:
+        with self._lock:
+            self._samples = []
+
+
 class SimpBroker:
     """
     SIMP Protocol Broker
@@ -145,7 +209,22 @@ class SimpBroker:
             hooks: Optional MemoryHooks instance for event-driven memory updates.
             brp_bridge: Optional BRP bridge for plan-level security evaluation.
         """
+        # Sprint 47 — defensive: ensure all attributes exist even if prior __init__ failed mid-way
+        # These are set here AND in start() as a double-gate for test/manual instantiation
         self.config = config or BrokerConfig()
+        self.state = BrokerState.INITIALIZING
+        self.hooks = hooks
+        self._shutdown_event = threading.Event()
+        self.stats_lock = threading.RLock()
+        self._http_pool: Optional["httpx.AsyncClient"] = None
+        self._async_loop: Optional[asyncio.AbstractEventLoop] = None
+        self._background_tasks: list = []
+        self._event_log: deque = deque(maxlen=500)
+        self._event_log_lock = threading.RLock()
+        self.agent_lock = threading.RLock()
+        self.intent_lock = threading.RLock()
+        self.intent_queue = queue.Queue()
+        self.intent_records: Dict[str, Any] = {}
         try:
             self.brp_bridge = brp_bridge or BRPBridge()
         except Exception as brp_err:
@@ -247,30 +326,6 @@ class SimpBroker:
         except Exception as e:
             self.logger.warning(f"[L5] Consensus node init failed (non-fatal): {e}")
 
-        # ── Per-agent fine-grained locking helpers ────────────────────────────
-
-    # ── Per-agent fine-grained locking ──────────────────────────────────────
-
-    @contextmanager
-    def get_agent_lock(self, agent_id: str):
-        """Acquire the lock for a specific agent.
-
-        Uses a dictionary of per-agent locks to avoid contention on a single
-        global lock. The dictionary itself is protected by _agent_locks_meta.
-        """
-        with self._agent_locks_meta:
-            lock = self._agent_locks.get(agent_id)
-            if lock is None:
-                lock = threading.Lock()
-                self._agent_locks[agent_id] = lock
-        with lock:
-            yield
-
-    def release_agent_lock(self, agent_id: str):
-        """Remove an agent's lock from the dictionary after deregistration."""
-        with self._agent_locks_meta:
-            self._agent_locks.pop(agent_id, None)
-
         # KTC Mesh Agent — Keep The Change savings-to-investment agent
         self.ktc_agent = None
         try:
@@ -289,11 +344,10 @@ class SimpBroker:
             "agents_registered": 0,
             "total_route_time_ms": 0.0,
         }
-        self.stats_lock = threading.RLock()
+        # stats_lock already initialized in early-init block above
 
-        # Structured event log ring buffer
-        self._event_log: deque = deque(maxlen=500)
-        self._event_log_lock = threading.RLock()
+        # T49: Latency histogram for p50/p95/p99 tracking
+        self._latency_histogram = LatencyHistogram(max_samples=10000)
 
         # Orchestration loop (optional, enabled by default)
         self._orchestration_loop: Optional[OrchestrationLoop] = None
@@ -302,21 +356,15 @@ class SimpBroker:
         self._projectx: Optional[ProjectXComputer] = None
 
         # MeshBus for agent-to-agent messaging (SIMP-native Agent Mesh Bus)
-        self.mesh_bus = get_mesh_bus()
-
-        # HTTP connection pool (initialized in start(), closed in stop())
-        self._http_pool: Optional["httpx.AsyncClient"] = None
+        try:
+            from simp.mesh.enhanced_bus import get_mesh_bus
+            self.mesh_bus = get_mesh_bus()
+        except Exception:
+            self.mesh_bus = None
 
         # Sprint 22: Circuit breaker state
-        self._circuit_failures: Dict[str, Dict[str, Any]] = {}  # agent_id -> {"count": int, "last_failure": float}
-        self._circuit_open_until: Dict[str, float] = {}  # agent_id -> timestamp
-
-        # Shutdown coordination
-        self._shutdown_event = threading.Event()
-
-        # Background task tracking for clean cancellation
-        self._background_tasks: list = []
-        self._async_loop: Optional[asyncio.AbstractEventLoop] = None
+        self._circuit_failures: Dict[str, Dict[str, Any]] = {}
+        self._circuit_open_until: Dict[str, float] = {}
 
         # Sprint 51 — delivery engine
         from simp.server.delivery import DEFAULT_DELIVERY_ENGINE
@@ -353,6 +401,30 @@ class SimpBroker:
         self.logger.info(f"   Config: {self.config.host}:{self.config.port}")
         self.logger.info(f"   Max agents: {self.config.max_agents}")
         self.logger.info(f"   Intent timeout: {self.config.intent_timeout}s")
+
+        # ── Per-agent fine-grained locking helpers ────────────────────────────
+
+    # ── Per-agent fine-grained locking ──────────────────────────────────────
+
+    @contextmanager
+    def get_agent_lock(self, agent_id: str):
+        """Acquire the lock for a specific agent.
+
+        Uses a dictionary of per-agent locks to avoid contention on a single
+        global lock. The dictionary itself is protected by _agent_locks_meta.
+        """
+        with self._agent_locks_meta:
+            lock = self._agent_locks.get(agent_id)
+            if lock is None:
+                lock = threading.Lock()
+                self._agent_locks[agent_id] = lock
+        with lock:
+            yield
+
+    def release_agent_lock(self, agent_id: str):
+        """Remove an agent's lock from the dictionary after deregistration."""
+        with self._agent_locks_meta:
+            self._agent_locks.pop(agent_id, None)
 
     def init_projectx(self, log_dir: Optional[str] = None, max_tier: int = 2) -> None:
         """Initialize the ProjectX computer-use capability."""
@@ -1367,6 +1439,9 @@ class SimpBroker:
         delivery_result["delivery_latency_ms"] = round(delivery_latency_ms, 1)
         delivery_result["retry_count"] = retry_count
 
+        # Record latency in histogram for p50/p95/p99 tracking (T49)
+        self._latency_histogram.record(delivery_latency_ms)
+
         with self.intent_lock:
             record = self.intent_records.get(intent_id)
             if record:
@@ -2340,6 +2415,9 @@ class SimpBroker:
         else:
             stats["avg_route_time_ms"] = 0.0
 
+        # T49: Latency histogram (p50/p95/p99)
+        stats["latency_ms"] = self._latency_histogram.snapshot()
+
         # Sprint 52 — intent ledger stats
         try:
             stats["task_ledger"] = self.intent_ledger.get_stats()
@@ -2395,6 +2473,41 @@ class SimpBroker:
                 self._log_event("stale_tasks_expired", f"Expired {expired} stale tasks on startup")
         except Exception as exc:
             self.logger.warning(f"⚠️ Stale task cleanup failed: {exc}")
+
+        # Sprint 47 — ensure all required attributes exist before start()
+        if not hasattr(self, "_shutdown_event"):
+            self._shutdown_event = threading.Event()
+        if not hasattr(self, "stats_lock"):
+            self.stats_lock = threading.RLock()
+        if not hasattr(self, "_http_pool"):
+            self._http_pool = None
+        if not hasattr(self, "_async_loop"):
+            self._async_loop = None
+        if not hasattr(self, "_background_tasks"):
+            self._background_tasks = []
+        if not hasattr(self, "mesh_bus"):
+            from simp.mesh import get_mesh_bus
+            self.mesh_bus = get_mesh_bus()
+        if not hasattr(self, "agent_lock"):
+            self.agent_lock = threading.RLock()
+        if not hasattr(self, "_event_log"):
+            self._event_log = __import__('collections').deque(maxlen=500)
+        if not hasattr(self, "_event_log_lock"):
+            self._event_log_lock = threading.RLock()
+        if not hasattr(self, "delivery_engine"):
+            from simp.server.delivery import DEFAULT_DELIVERY_ENGINE
+            self.delivery_engine = DEFAULT_DELIVERY_ENGINE
+        if not hasattr(self, "ws_bridge"):
+            self.ws_bridge = None
+        if not hasattr(self, "intent_ledger"):
+            from simp.server.intent_ledger import INTENT_LEDGER
+            self.intent_ledger = INTENT_LEDGER
+        if not hasattr(self, "intent_records"):
+            self.intent_records: Dict[str, Any] = {}
+        if not hasattr(self, "intent_queue"):
+            self.intent_queue = __import__('queue').Queue()
+        if not hasattr(self, "intent_lock"):
+            self.intent_lock = threading.RLock()
 
         # Initialize shared HTTP connection pool
         if _HTTPX_AVAILABLE and self._http_pool is None:

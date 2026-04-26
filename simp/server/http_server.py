@@ -46,6 +46,7 @@ from simp.security.brp_nonce_store import NonceStore
 from simp.security.brp_nonce_store import NonceStore
 from simp.server.ws_bridge import WsBridge
 from simp.server.grpc_server import GrpcServer
+from simp.server.lifecycle_manager import LifecycleManager
 from simp.memory.hooks import MemoryHooks
 from simp.memory.conversation_archive import ConversationArchive
 from simp.memory.task_memory import TaskMemory
@@ -317,6 +318,14 @@ class SimpHttpServer:
         # Periodic nonce eviction (every 5 minutes)
         self._nonce_evict_thread = threading.Thread(target=self._evict_nonces_loop, daemon=True)
         self._nonce_evict_thread.start()
+
+        # T48 — Agent Lifecycle Manager with organ cluster support
+        self.lifecycle = LifecycleManager(broker=self.broker)
+        self.logger.info(
+            "🔁 Agent lifecycle manager initialized (%d organs, sweep=%ds)",
+            len(self.lifecycle.organs),
+            self.lifecycle.sweep_interval,
+        )
         self.logger.debug("Nonce eviction thread started (5min interval)")
 
         # A2A card generator
@@ -549,6 +558,49 @@ class SimpHttpServer:
         @self.app.route("/health", methods=["GET"])
         def health():
             return jsonify(self.broker.health_check()), 200
+
+        # General broker metrics endpoint (Prometheus format)
+        @self.app.route("/metrics", methods=["GET"])
+        def broker_metrics():
+            """Prometheus-formatted metrics for the broker."""
+            stats = self.broker.get_statistics()
+            lines = [
+                "# HELP simp_broker_intents_received Total intents received",
+                "# TYPE simp_broker_intents_received counter",
+                f"simp_broker_intents_received {stats.get('intents_received', 0)}",
+                "# HELP simp_broker_intents_routed Total intents routed",
+                "# TYPE simp_broker_intents_routed counter",
+                f"simp_broker_intents_routed {stats.get('intents_routed', 0)}",
+                "# HELP simp_broker_intents_completed Total intents completed",
+                "# TYPE simp_broker_intents_completed counter",
+                f"simp_broker_intents_completed {stats.get('intents_completed', 0)}",
+                "# HELP simp_broker_intents_failed Total intents failed",
+                "# TYPE simp_broker_intents_failed counter",
+                f"simp_broker_intents_failed {stats.get('intents_failed', 0)}",
+                "# HELP simp_broker_agents_online Number of registered agents",
+                "# TYPE simp_broker_agents_online gauge",
+                f"simp_broker_agents_online {stats.get('agents_online', 0)}",
+                "# HELP simp_broker_queue_depth Current intent queue depth",
+                "# TYPE simp_broker_queue_depth gauge",
+                f"simp_broker_queue_depth {stats.get('queue_depth', 0)}",
+                "# HELP simp_broker_stale_agents Number of stale agents",
+                "# TYPE simp_broker_stale_agents gauge",
+                f"simp_broker_stale_agents {stats.get('stale_agents', 0)}",
+            ]
+            # Add latency histogram if available
+            latency = stats.get('latency_ms', {})
+            if latency and latency.get('count', 0) > 0:
+                lines.extend([
+                    "# HELP simp_broker_latency_ms Latency histogram (ms)",
+                    "# TYPE simp_broker_latency_ms gauge",
+                    f'simp_broker_latency_p50_ms {latency["p50_ms"]}',
+                    f'simp_broker_latency_p95_ms {latency["p95_ms"]}',
+                    f'simp_broker_latency_p99_ms {latency["p99_ms"]}',
+                    f'simp_broker_latency_max_ms {latency["max_ms"]}',
+                    f'simp_broker_latency_avg_ms {latency["avg_ms"]}',
+                    f'simp_broker_latency_samples_total {latency["count"]}',
+                ])
+            return "\n".join(lines) + "\n", 200, {"Content-Type": "text/plain; charset=utf-8"}
 
         # Sprint 85 — WebSocket bridge stats endpoint
         @self.app.route("/ws/metrics", methods=["GET"])
@@ -2878,6 +2930,85 @@ class SimpHttpServer:
             self.logger.info("[R6] Config reloaded: %s", report["reloaded"])
             return jsonify(report), 200
 
+        # ── T48: Lifecycle & Organ Endpoints ─────────────────────────
+        @self.app.route("/lifecycle/organs", methods=["GET"])
+        @require_jwt
+        @require_api_key
+        def lifecycle_organs():
+            """Get status of all organ clusters."""
+            if not hasattr(self, "lifecycle"):
+                return jsonify({"error": "Lifecycle manager not initialized"}), 503
+            return jsonify(self.lifecycle.get_organ_status()), 200
+
+        @self.app.route("/lifecycle/organs/<organ>/agents", methods=["GET"])
+        @require_jwt
+        @require_api_key
+        def lifecycle_organ_agents(organ):
+            """Get agents in an organ cluster."""
+            if not hasattr(self, "lifecycle"):
+                return jsonify({"error": "Lifecycle manager not initialized"}), 503
+            agents = self.lifecycle.get_organ_agents(organ)
+            return jsonify({
+                "organ": organ,
+                "agents": agents,
+                "count": len(agents),
+            }), 200
+
+        @self.app.route("/lifecycle/agent/<agent_id>", methods=["GET"])
+        @require_jwt
+        @require_api_key
+        def lifecycle_agent(agent_id):
+            """Get lifecycle info for a specific agent."""
+            if not hasattr(self, "lifecycle"):
+                return jsonify({"error": "Lifecycle manager not initialized"}), 503
+            info = self.lifecycle.get_agent_lifecycle(agent_id)
+            if not info:
+                return jsonify({"error": "Agent not found"}), 404
+            return jsonify(info), 200
+
+        @self.app.route("/lifecycle/agent/<agent_id>/organ", methods=["POST"])
+        @require_jwt
+        @require_api_key
+        def lifecycle_assign_organ(agent_id):
+            """Assign an agent to an organ cluster."""
+            if not hasattr(self, "lifecycle"):
+                return jsonify({"error": "Lifecycle manager not initialized"}), 503
+            data = request.get_json(force=False, silent=True) or {}
+            organ = data.get("organ", "")
+            if not organ:
+                return jsonify({"error": "Missing 'organ' in request body"}), 400
+            success = self.lifecycle.assign_agent_to_organ(agent_id, organ)
+            if not success:
+                return jsonify({
+                    "error": f"Could not assign {agent_id} to organ {organ}"
+                }), 400
+            return jsonify({
+                "success": True,
+                "agent_id": agent_id,
+                "organ": organ,
+            }), 200
+
+        @self.app.route("/lifecycle/stats", methods=["GET"])
+        @require_jwt
+        @require_api_key
+        def lifecycle_stats():
+            """Get lifecycle manager statistics."""
+            if not hasattr(self, "lifecycle"):
+                return jsonify({"error": "Lifecycle manager not initialized"}), 503
+            return jsonify(self.lifecycle.get_stats()), 200
+
+        @self.app.route("/lifecycle/sweep", methods=["POST"])
+        @require_jwt
+        @require_api_key
+        def lifecycle_sweep():
+            """Trigger an immediate stale agent sweep."""
+            if not hasattr(self, "lifecycle"):
+                return jsonify({"error": "Lifecycle manager not initialized"}), 503
+            self.lifecycle._run_sweep()
+            return jsonify({"status": "sweep_completed"}), 200
+
+        # ── End of T48 routes ────────────────────────────────────────
+
     def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True,
             tls_cert: str = None, tls_key: str = None):
         self.broker.start(async_loop=self._async_loop)
@@ -2887,6 +3018,9 @@ class SimpHttpServer:
         ws_bridge_host = os.environ.get("SIMP_WS_HOST", "127.0.0.1")
         if os.environ.get("SIMP_WS_DISABLE", "").lower() not in ("1", "true", "yes"):
             self._ws_bridge = WsBridge(host=ws_bridge_host, port=ws_port)
+            # T48 — Wire lifecycle hook into WS bridge for disconnect handling
+            if hasattr(self, "lifecycle"):
+                self._ws_bridge.lifecycle_hook = self.lifecycle.handle_ws_disconnect
             # Run WS bridge in a background thread with its own event loop
             def _run_ws():
                 loop = asyncio.new_event_loop()
@@ -2900,15 +3034,21 @@ class SimpHttpServer:
             # Sprint 85 — wire WS bridge into broker for real-time push
             self.broker.set_ws_bridge(self._ws_bridge)
 
+        # T48 — Start agent lifecycle manager background sweep
+        if hasattr(self, "lifecycle"):
+            self.lifecycle.start()
+            self.logger.info("🔁 Agent lifecycle background sweep started")
+
         # T47 — gRPC transport (parallel to HTTP + WS)
         grpc_port = int(os.environ.get("SIMP_GRPC_PORT", 5557))
         grpc_host = os.environ.get("SIMP_GRPC_HOST", "127.0.0.1")
         if os.environ.get("SIMP_GRPC_DISABLE", "").lower() not in ("1", "true", "yes"):
             self._grpc_server = GrpcServer(
                 broker=self.broker,
+                lifecycle_manager=getattr(self, "lifecycle", None),
+                ws_bridge=getattr(self, "_ws_bridge", None),
                 host=grpc_host,
                 port=grpc_port,
-                nonce_store=getattr(self, "nonce_store", None),
             )
             self._grpc_server.start_in_thread()
             self.logger.info("gRPC server listening on %s:%d", grpc_host, grpc_port)
