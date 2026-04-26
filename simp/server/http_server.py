@@ -42,7 +42,10 @@ from simp.server.jwt_auth import (
     build_token_verify_handler,
     get_authenticated_agent_id,
 )
+from simp.security.brp_nonce_store import NonceStore
+from simp.security.brp_nonce_store import NonceStore
 from simp.server.ws_bridge import WsBridge
+from simp.server.grpc_server import GrpcServer
 from simp.memory.hooks import MemoryHooks
 from simp.memory.conversation_archive import ConversationArchive
 from simp.memory.task_memory import TaskMemory
@@ -300,6 +303,22 @@ class SimpHttpServer:
         else:
             self.logger.info("ℹ️  JWT auth disabled (set SIMP_JWT_SECRET to enable)")
 
+        # Sprint 82 — Nonce replay protection store
+        self.nonce_store = NonceStore(
+            db_path=str(Path("/tmp/simp_http_nonce_store.db")),
+            broker_id="http_server",
+        )
+        self.logger.info(
+            "🔐 Nonce replay protection active (TTL=%ds, store=%s)",
+            600,
+            "/tmp/simp_http_nonce_store.db",
+        )
+
+        # Periodic nonce eviction (every 5 minutes)
+        self._nonce_evict_thread = threading.Thread(target=self._evict_nonces_loop, daemon=True)
+        self._nonce_evict_thread.start()
+        self.logger.debug("Nonce eviction thread started (5min interval)")
+
         # A2A card generator
         self._card_gen = AgentCardGenerator()
 
@@ -326,6 +345,17 @@ class SimpHttpServer:
     # ------------------------------------------------------------------
     # SSE streaming (Sprint 41)
     # ------------------------------------------------------------------
+    def _evict_nonces_loop(self):
+        """Periodically evict expired nonces from the replay protection store."""
+        while True:
+            try:
+                time.sleep(300)  # every 5 minutes
+                evicted = self.nonce_store.evict_expired()
+                if evicted:
+                    self.logger.debug("Evicted %d expired nonces", evicted)
+            except Exception:
+                pass
+
     def register_sse_with_runtime(self, runtime):
         """Register the SSE subscriber layer with the given runtime.
         
@@ -447,6 +477,10 @@ class SimpHttpServer:
             This runs for every request but does NOT reject — the per-route
             ``@require_jwt`` decorator handles enforcement. This pre-parser
             avoids redundant header extraction in route handlers.
+
+            When JWT is present, also validates X-Nonce header for replay
+            protection. Requests without a nonce are allowed (not all clients
+            can provide one), but replayed nonces are rejected with 403.
             """
             if not self.jwt_config.enabled:
                 request.jwt_claims = None
@@ -463,6 +497,31 @@ class SimpHttpServer:
                 from simp.server.jwt_auth import verify_jwt
                 claims = verify_jwt(token)
                 request.jwt_claims = claims
+                
+                # Nonce replay protection — only check when JWT is present
+                # and the route is a mutating operation
+                if claims is not None and request.method in ("POST", "PUT", "PATCH", "DELETE"):
+                    nonce = request.headers.get("X-Nonce", "")
+                    if nonce:
+                        if not self.nonce_store.add(nonce):
+                            self.audit_log.log_event(
+                                "nonce_replay_detected",
+                                {
+                                    "nonce": nonce,
+                                    "path": request.path,
+                                    "method": request.method,
+                                    "agent_id": claims.get("sub", "unknown"),
+                                },
+                                severity="high",
+                            )
+                            return (
+                                jsonify({
+                                    "status": "error",
+                                    "error": "Nonce replay detected",
+                                    "error_code": "NONCE_REPLAY",
+                                }),
+                                403,
+                            )
             else:
                 request.jwt_claims = None
             return None
@@ -902,6 +961,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/agents/heartbeat", methods=["POST"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def post_heartbeat():
@@ -922,6 +982,7 @@ class SimpHttpServer:
             return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
 
         @self.app.route("/agents/<agent_id>", methods=["GET"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def get_agent(agent_id):
@@ -1015,6 +1076,7 @@ class SimpHttpServer:
             return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
 
         @self.app.route("/agents/<agent_id>/heartbeat", methods=["GET"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def get_heartbeat(agent_id):
@@ -1093,6 +1155,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/projectx/contracts", methods=["GET"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def get_projectx_contracts():
@@ -1113,6 +1176,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/contracts", methods=["POST"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def post_projectx_contract():
@@ -1145,6 +1209,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/contracts/summary", methods=["GET"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def get_projectx_contract_summary():
@@ -1155,6 +1220,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/phases/status", methods=["GET"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def get_projectx_phase_status():
@@ -1167,6 +1233,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/phases/status", methods=["POST"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def post_projectx_phase_status():
@@ -1190,6 +1257,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/phases/summary", methods=["GET"])
+        @self.limiter.limit(10)
         @require_jwt
         @require_api_key
         def get_projectx_phase_summary():
@@ -1266,6 +1334,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/stats", methods=["GET"])
+        @self.limiter.limit(60)
         @require_jwt
         @require_api_key
         def get_stats():
@@ -1275,6 +1344,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/status", methods=["GET"])
+        @self.limiter.limit(60)
         @require_jwt
         @require_api_key
         def get_status():
@@ -1363,6 +1433,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/tasks/<task_id>", methods=["GET"])
+        @self.limiter.limit(30)
         @require_jwt
         @require_api_key
         def get_task(task_id):
@@ -1375,6 +1446,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/tasks/queue", methods=["GET"])
+        @self.limiter.limit(30)
         @require_jwt
         @require_api_key
         def get_task_queue():
@@ -1386,6 +1458,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/routing/policy", methods=["GET"])
+        @self.limiter.limit(60)
         @require_jwt
         @require_api_key
         def get_routing_policy():
@@ -1407,6 +1480,7 @@ class SimpHttpServer:
         # ----- Structured Event Log -----
 
         @self.app.route("/logs", methods=["GET"])
+        @self.limiter.limit(60)
         def get_logs():
             try:
                 limit = int(request.args.get("limit", 100))
@@ -1423,6 +1497,7 @@ class SimpHttpServer:
         # ----- Memory Layer Endpoints -----
 
         @self.app.route("/memory/conversations", methods=["GET"])
+        @self.limiter.limit(30)
         def list_conversations():
             topic = request.args.get("topic")
             tag = request.args.get("tag")
@@ -1437,6 +1512,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/memory/conversations/<conv_id>", methods=["GET"])
+        @self.limiter.limit(30)
         def get_conversation(conv_id):
             conv = self.conversation_archive.get_conversation(conv_id)
             if conv:
@@ -1464,6 +1540,7 @@ class SimpHttpServer:
             }), 201
 
         @self.app.route("/memory/tasks", methods=["GET"])
+        @self.limiter.limit(30)
         def list_memory_tasks():
             tasks = self.task_memory.list_tasks()
             return jsonify({
@@ -1473,6 +1550,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/memory/tasks/<slug>", methods=["GET"])
+        @self.limiter.limit(30)
         def get_memory_task(slug):
             task = self.task_memory.get_task(slug)
             if task:
@@ -1483,6 +1561,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/memory/index", methods=["GET"])
+        @self.limiter.limit(30)
         def get_knowledge_index():
             return jsonify({
                 "status": "success",
@@ -1490,6 +1569,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/memory/context-pack", methods=["GET"])
+        @self.limiter.limit(30)
         def get_context_pack():
             task_id = request.args.get("task_id")
             topic = request.args.get("topic")
@@ -1529,6 +1609,7 @@ class SimpHttpServer:
             return Response(css, mimetype="text/css")
 
         @self.app.route("/security/audit-log", methods=["GET"])
+        @self.limiter.limit(30)
         @require_jwt
         @require_api_key
         def get_audit_log_endpoint():
@@ -1566,6 +1647,7 @@ class SimpHttpServer:
             return jsonify(card), 200
 
         @self.app.route("/a2a/tasks", methods=["POST"])
+        @self.limiter.limit(10)
         @_require_api_key
         def a2a_submit_task():
             if request.content_length and request.content_length > _A2A_MAX_PAYLOAD:
@@ -2168,6 +2250,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(e)}), 500
         
         @self.app.route("/mesh/routing/discover", methods=["POST"])
+        @self.limiter.limit(10)
         @_require_api_key
         def mesh_routing_discover():
             """Discover mesh capabilities."""
@@ -2187,6 +2270,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(e)}), 500
         
         @self.app.route("/mesh/routing/agent/<agent_id>", methods=["GET"])
+        @self.limiter.limit(30)
         @_require_api_key
         def mesh_routing_agent_info(agent_id):
             """Get mesh information for a specific agent."""
@@ -2523,12 +2607,16 @@ class SimpHttpServer:
         """Routes added by Sprints 51-55."""
 
         @self.app.route("/routing-policy", methods=["GET"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def get_routing_policy_v2():
             summary = self.broker.routing_engine.get_policy_summary()
             return jsonify({"status": "success", "routing_policy": summary}), 200
 
         @self.app.route("/reload-routing-policy", methods=["POST"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def reload_routing_policy():
             count = self.broker.routing_engine.reload_policy()
@@ -2541,6 +2629,8 @@ class SimpHttpServer:
         # ----- Sprint 63: Planner Telemetry / Flows -----
 
         @self.app.route("/intents/flows", methods=["GET"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def get_intent_flows():
             """Return intent records grouped into flows with timing telemetry."""
@@ -2548,6 +2638,8 @@ class SimpHttpServer:
             return jsonify({"status": "success", "flows": flows, "count": len(flows)}), 200
 
         @self.app.route("/intents/flows/<flow_id>", methods=["GET"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def get_intent_flow_detail(flow_id):
             """Return a single flow by ID."""
@@ -2558,6 +2650,8 @@ class SimpHttpServer:
             return jsonify({"status": "error", "error": f"Flow '{flow_id}' not found"}), 404
 
         @self.app.route("/orchestration/plans", methods=["POST"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def create_orchestration_plan():
             data = request.get_json(silent=True) or {}
@@ -2570,24 +2664,32 @@ class SimpHttpServer:
             return jsonify({"status": "created", "plan": plan.to_dict()}), 201
 
         @self.app.route("/orchestration/plans/maintenance", methods=["POST"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def create_maintenance_plan():
             plan = self._orchestration.make_maintenance_plan()
             return jsonify({"status": "created", "plan": plan.to_dict()}), 201
 
         @self.app.route("/orchestration/plans/demo", methods=["POST"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def create_demo_plan():
             plan = self._orchestration.make_full_demo_plan()
             return jsonify({"status": "created", "plan": plan.to_dict()}), 201
 
         @self.app.route("/orchestration/plans", methods=["GET"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def list_orchestration_plans():
             plans = self._orchestration.list_plans()
             return jsonify({"status": "success", "plans": plans, "count": len(plans)}), 200
 
         @self.app.route("/orchestration/plans/<plan_id>", methods=["GET"])
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def get_orchestration_plan(plan_id):
             plan = self._orchestration.get_plan(plan_id)
@@ -2596,6 +2698,9 @@ class SimpHttpServer:
             return jsonify({"status": "success", "plan": plan.to_dict()}), 200
 
         @self.app.route("/orchestration/plans/<plan_id>/execute", methods=["POST"])
+        @self.limiter.limit(30)
+        @self.limiter.limit(30)
+        @require_jwt
         @_require_api_key
         def execute_orchestration_plan(plan_id):
             plan = self._orchestration.get_plan(plan_id)
@@ -2794,6 +2899,19 @@ class SimpHttpServer:
 
             # Sprint 85 — wire WS bridge into broker for real-time push
             self.broker.set_ws_bridge(self._ws_bridge)
+
+        # T47 — gRPC transport (parallel to HTTP + WS)
+        grpc_port = int(os.environ.get("SIMP_GRPC_PORT", 5557))
+        grpc_host = os.environ.get("SIMP_GRPC_HOST", "127.0.0.1")
+        if os.environ.get("SIMP_GRPC_DISABLE", "").lower() not in ("1", "true", "yes"):
+            self._grpc_server = GrpcServer(
+                broker=self.broker,
+                host=grpc_host,
+                port=grpc_port,
+                nonce_store=getattr(self, "nonce_store", None),
+            )
+            self._grpc_server.start_in_thread()
+            self.logger.info("gRPC server listening on %s:%d", grpc_host, grpc_port)
 
         self.logger.info(f"SIMP HTTP Server starting on {host}:{port}")
 

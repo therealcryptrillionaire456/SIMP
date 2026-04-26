@@ -26,6 +26,7 @@ import ssl
 import time
 from dataclasses import dataclass
 from collections import defaultdict
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 import websockets
@@ -56,6 +57,7 @@ WILDCARD_PATTERNS = True
 
 # ── JWT verification (reuses jwt_auth.py patterns) ──────────────────────────
 from simp.server.jwt_auth import verify_jwt, get_jwt_config
+from simp.security.brp_nonce_store import NonceStore
 
 # ── Broker HTTP client (forwards intents via HTTP) ───────────────────────────
 
@@ -125,6 +127,12 @@ class WsBridge:
         self._server: Optional[websockets.WebSocketServer] = None
         # Background task for broker polling (push mode)
         self._poll_task: Optional[asyncio.Task] = None
+
+        # Sprint 82 — Nonce replay protection store
+        self.nonce_store = NonceStore(
+            db_path=str(Path("/tmp/simp_ws_nonce_store.db")),
+            broker_id="ws_bridge",
+        )
 
         # Stats
         self.stats = {
@@ -247,6 +255,19 @@ class WsBridge:
                 self.stats["auth_failures"] += 1
                 return
 
+            # Nonce replay protection on auth (optional, but enforced if present)
+            nonce = msg.get("nonce", "")
+            if nonce:
+                if not self.nonce_store.add(nonce):
+                    await ws.send(json.dumps({
+                        "type": "error",
+                        "code": "NONCE_REPLAY",
+                        "message": "Nonce replay detected — this nonce has already been used",
+                    }))
+                    await ws.close(4001, "Nonce replay")
+                    self.stats["auth_failures"] += 1
+                    return
+
             # Register connection
             capabilities = claims.get("capabilities", [])
             conn = WsConnection(
@@ -278,6 +299,15 @@ class WsBridge:
                     await ws.send(json.dumps({"type": "pong"}))
 
                 elif msg_type == "intent":
+                    # Nonce protection on intent messages
+                    intent_nonce = msg.get("nonce", "")
+                    if intent_nonce and not self.nonce_store.add(intent_nonce):
+                        await ws.send(json.dumps({
+                            "type": "error",
+                            "code": "NONCE_REPLAY",
+                            "message": "Nonce replay detected on intent",
+                        }))
+                        continue
                     await self._handle_intent(agent_id, msg.get("intent", {}))
 
                 elif msg_type == "subscribe":
