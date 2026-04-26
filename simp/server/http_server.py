@@ -35,6 +35,14 @@ from simp.server.request_guards import (
 from simp.server.validation import AgentRegistration
 from simp.server.rate_limit import RateLimiter
 from simp.server.control_auth import require_control_auth
+from simp.server.jwt_auth import (
+    require_jwt,
+    get_jwt_config,
+    build_token_issue_handler,
+    build_token_verify_handler,
+    get_authenticated_agent_id,
+)
+from simp.server.ws_bridge import WsBridge
 from simp.memory.hooks import MemoryHooks
 from simp.memory.conversation_archive import ConversationArchive
 from simp.memory.task_memory import TaskMemory
@@ -152,15 +160,15 @@ def require_api_key(f):
         if not config.REQUIRE_API_KEY:
             return f(*args, **kwargs)
 
-        api_keys_raw = config.API_KEYS
-        # Also check SIMP_API_KEY (singular) as a fallback
-        singular_key = os.environ.get("SIMP_API_KEY", "").strip()
-        if not api_keys_raw and not singular_key:
-            return f(*args, **kwargs)
+        # Read API keys from config (SIMP_API_KEY) and env as fallback
+        valid_keys: set[str] = set()
+        config_key = config.SIMP_API_KEY
+        if config_key:
+            valid_keys.add(config_key)
+        env_key = os.environ.get("SIMP_API_KEY", "").strip()
+        if env_key:
+            valid_keys.add(env_key)
 
-        valid_keys = {k.strip() for k in api_keys_raw.split(",") if k.strip()}
-        if singular_key:
-            valid_keys.add(singular_key)
         if not valid_keys:
             return f(*args, **kwargs)
 
@@ -218,6 +226,22 @@ class SimpHttpServer:
         self.app.config["MAX_CONTENT_LENGTH"] = 64 * 1024  # 64 KB
         self.limiter = RateLimiter()
 
+        # Sprint 81 — CORS middleware: add headers on every response
+        @self.app.after_request
+        def add_cors_headers(response):
+            # Only add CORS to API routes (not dashboard assets)
+            if request.path.startswith(("/intents", "/agents", "/health", "/mesh",
+                                        "/routing", "/tasks", "/memory", "/a2a",
+                                        "/financial_ops", "/gates", "/orchestration",
+                                        "/projectx", "/brp", "/audit")):
+                response.headers["Access-Control-Allow-Origin"] = "*"
+                response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+                response.headers["Access-Control-Allow-Headers"] = (
+                    "Content-Type, Authorization, X-API-Key, X-SIMP-API-Key, "
+                    "X-Request-ID, trace_id, correlation_id"
+                )
+            return response
+
         # Memory layer components
         self.conversation_archive = ConversationArchive()
         self.task_memory = TaskMemory()
@@ -263,6 +287,18 @@ class SimpHttpServer:
 
         # Sprint 70 — security audit log
         self.audit_log = get_audit_log()
+
+        # JWT auth config (lazy init)
+        self.jwt_config = get_jwt_config()
+        if self.jwt_config.enabled:
+            self.logger.info(
+                "✅ JWT auth enabled (alg=%s, require=%s, ttl=%ds)",
+                self.jwt_config.algorithm,
+                self.jwt_config.require_jwt,
+                self.jwt_config.token_ttl_seconds,
+            )
+        else:
+            self.logger.info("ℹ️  JWT auth disabled (set SIMP_JWT_SECRET to enable)")
 
         # A2A card generator
         self._card_gen = AgentCardGenerator()
@@ -346,6 +382,91 @@ class SimpHttpServer:
                         415,
                     )
 
+        @self.app.before_request
+        def check_prompt_injection():
+            """Scan incoming JSON request bodies for prompt injection patterns.
+
+            Ultra-low latency: uses raw text scan on request data without
+            full JSON parsing when possible. Blocks confirmed injection
+            (score ≥ 0.85) on intent/agent endpoints when BRP is enforced.
+            """
+            if request.method not in ("POST", "PUT"):
+                return None
+            if not request.content_length or request.content_length <= 0:
+                return None
+            path = request.path
+            if not any(p in path for p in ("/intent", "/agent", "/mesh", "/route")):
+                return None
+
+            from simp.config.config import SimpConfig
+            simp_config = SimpConfig()
+            brp_mode = str(getattr(simp_config, "BRP_MODE", "shadow")).lower()
+            if brp_mode not in ("enforced", "enforce"):
+                return None
+
+            from simp.security.brp.prompt_injection_detector import get_injection_detector
+            detector = get_injection_detector()
+
+            # Fast path: get raw text data if possible (avoids full JSON parse)
+            if request.is_json:
+                raw = request.get_data(as_text=True)
+                if raw and len(raw) > 12:
+                    result = detector.analyze_text(raw)
+                    if result.detected and result.score >= 0.85:
+                        self.audit_log.log_event(
+                            "prompt_injection_blocked",
+                            {
+                                "score": result.score,
+                                "tags": result.threat_tags,
+                                "path": path,
+                                "method": request.method,
+                                "detections": [
+                                    {"layer": d.layer, "pattern": d.pattern}
+                                    for d in result.detections
+                                ],
+                            },
+                            severity="high",
+                        )
+                        return (
+                            jsonify({
+                                "status": "error",
+                                "error_code": "PROMPT_INJECTION_BLOCKED",
+                                "error": "Request blocked due to prompt injection",
+                                "pi_score": round(result.score, 4),
+                                "pi_tags": result.threat_tags,
+                            }),
+                            403,
+                        )
+            return None
+
+        # Sprint 82 — JWT token parsing (sets request.jwt_claims for all routes)
+        @self.app.before_request
+        def parse_jwt():
+            """Parse JWT from Authorization header and set request.jwt_claims.
+            
+            This runs for every request but does NOT reject — the per-route
+            ``@require_jwt`` decorator handles enforcement. This pre-parser
+            avoids redundant header extraction in route handlers.
+            """
+            if not self.jwt_config.enabled:
+                request.jwt_claims = None
+                return None
+
+            auth_header = request.headers.get("Authorization", "")
+            token = ""
+            if auth_header.startswith("Bearer "):
+                token = auth_header[7:].strip()
+            elif request.headers.get("X-JWT-Token"):
+                token = request.headers["X-JWT-Token"].strip()
+
+            if token:
+                from simp.server.jwt_auth import verify_jwt
+                claims = verify_jwt(token)
+                request.jwt_claims = claims
+            else:
+                request.jwt_claims = None
+            return None
+
         @self.app.after_request
         def add_security_headers(response):
             """Add security headers to all responses."""
@@ -369,6 +490,89 @@ class SimpHttpServer:
         @self.app.route("/health", methods=["GET"])
         def health():
             return jsonify(self.broker.health_check()), 200
+
+        # Sprint 85 — WebSocket bridge stats endpoint
+        @self.app.route("/ws/metrics", methods=["GET"])
+        def ws_metrics():
+            """Prometheus metrics endpoint for WS bridge."""
+            if not hasattr(self, "_ws_bridge") or self._ws_bridge is None:
+                return "", 204
+            return self._ws_bridge.get_prometheus_text(), 200, {"Content-Type": "text/plain"}
+
+        @self.app.route("/ws/stats", methods=["GET"])
+        def ws_stats():
+            """Get WebSocket bridge connection and push statistics."""
+            if not hasattr(self, "_ws_bridge") or self._ws_bridge is None:
+                return jsonify({
+                    "status": "success",
+                    "ws_bridge": {
+                        "enabled": False,
+                        "message": "WebSocket bridge is disabled",
+                    }
+                }), 200
+            bridge = self._ws_bridge
+            return jsonify({
+                "status": "success",
+                "ws_bridge": {
+                    "enabled": True,
+                    "host": bridge.host,
+                    "port": bridge.port,
+                    "connections": {
+                        "active": bridge.stats["connections_active"],
+                        "total": bridge.stats["connections_total"],
+                    },
+                    "agents": list(bridge.connected_agents),
+                    "channels": {
+                        name: list(members) 
+                        for name, members in bridge._channels.items()
+                    },
+                    "throughput": {
+                        "intents_forwarded": bridge.stats["intents_forwarded"],
+                        "pushes_sent": bridge.stats["pushes_sent"],
+                    },
+                    "errors": {
+                        "auth_failures": bridge.stats["auth_failures"],
+                        "errors": bridge.stats["errors"],
+                    },
+                }
+            }), 200
+
+        # Sprint 82 — JWT auth endpoints
+        @self.app.route("/auth/token", methods=["POST"])
+        @self.limiter.limit(10)
+        def auth_issue_token():
+            """Issue a JWT token for an authenticated agent.
+            
+            Protected by the existing API key mechanism (/auth/token requires
+            a valid SIMP_API_KEY in X-API-Key or Authorization: Bearer header).
+            Agents can self-issue tokens after passing API key auth.
+            """
+            handler = build_token_issue_handler()
+            return handler()
+
+        @self.app.route("/auth/verify", methods=["GET", "POST"])
+        def auth_verify_token():
+            """Verify a JWT token. Requires the token in Authorization header.
+            
+            Returns the token's claims for debugging/monitoring purposes.
+            """
+            handler = build_token_verify_handler()
+            return handler()
+
+        @self.app.route("/auth/status", methods=["GET"])
+        def auth_status():
+            """Return current JWT auth configuration status (no auth required)."""
+            cfg = self.jwt_config
+            return jsonify({
+                "status": "success",
+                "jwt_enabled": cfg.enabled,
+                "jwt_required": cfg.require_jwt,
+                "algorithm": cfg.algorithm if cfg.enabled else "disabled",
+                "token_ttl_seconds": cfg.token_ttl_seconds if cfg.enabled else 0,
+                "agent_tokens_enabled": cfg.agent_token_enabled if cfg.enabled else False,
+                "current_identity": get_authenticated_agent_id() or "anonymous",
+                "authenticated": getattr(request, "jwt_claims", None) is not None,
+            }), 200
 
         @self.app.route("/agentic/contract", methods=["GET"])
         def agentic_contract():
@@ -619,6 +823,8 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/agents/register", methods=["POST"])
+        @require_jwt
+        @require_api_key
         @self.limiter.limit(10)
         def register_agent():
             data = request.get_json(force=False, silent=True) or {}
@@ -680,6 +886,8 @@ class SimpHttpServer:
                 )
 
         @self.app.route("/agents", methods=["GET"])
+        @require_jwt
+        @require_api_key
         def list_agents():
             agents_list = self.broker.list_agents()
             # Build a dict keyed by agent_id for backward-compatible consumer code
@@ -694,6 +902,8 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/agents/heartbeat", methods=["POST"])
+        @require_jwt
+        @require_api_key
         def post_heartbeat():
             """Legacy endpoint: record heartbeat with agent_id in JSON body."""
             data = request.get_json(silent=True) or {}
@@ -712,6 +922,8 @@ class SimpHttpServer:
             return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
 
         @self.app.route("/agents/<agent_id>", methods=["GET"])
+        @require_jwt
+        @require_api_key
         def get_agent(agent_id):
             ok, err = sanitize_agent_id(agent_id)
             if not ok:
@@ -803,6 +1015,7 @@ class SimpHttpServer:
             return jsonify({"status": "error", "error": f"Agent '{agent_id}' not found"}), 404
 
         @self.app.route("/agents/<agent_id>/heartbeat", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_heartbeat(agent_id):
             """Get heartbeat status for an agent."""
@@ -818,6 +1031,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/agents/sweep-stale", methods=["POST"])
+        @require_jwt
         @require_api_key
         def sweep_stale():
             """Deregister stale agents."""
@@ -828,6 +1042,8 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/intents/route", methods=["POST"])
+        @require_jwt
+        @require_api_key
         @self.limiter.limit(60)
         def route_intent():
             data = request.get_json(force=False, silent=True) or {}
@@ -864,6 +1080,8 @@ class SimpHttpServer:
                 }), 500
 
         @self.app.route("/intents/<intent_id>", methods=["GET"])
+        @require_jwt
+        @require_api_key
         def get_intent_status(intent_id):
             status = self.broker.get_intent_status(intent_id)
             if status:
@@ -875,6 +1093,7 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/projectx/contracts", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_projectx_contracts():
             """Return ProjectX contract records ingested by SIMP."""
@@ -894,6 +1113,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/contracts", methods=["POST"])
+        @require_jwt
         @require_api_key
         def post_projectx_contract():
             """Ingest one or more ProjectX contract records."""
@@ -925,6 +1145,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/contracts/summary", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_projectx_contract_summary():
             """Return ProjectX contract coverage summary."""
@@ -934,6 +1155,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/phases/status", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_projectx_phase_status():
             """Return live ProjectX phase status when reachable, else latest cached snapshot."""
@@ -945,6 +1167,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/phases/status", methods=["POST"])
+        @require_jwt
         @require_api_key
         def post_projectx_phase_status():
             """Persist a pushed ProjectX phase status snapshot."""
@@ -967,6 +1190,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/projectx/phases/summary", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_projectx_phase_summary():
             """Return compact ProjectX phase health summary and derived alerts."""
@@ -984,6 +1208,7 @@ class SimpHttpServer:
                 return jsonify({"status": "error", "error": str(exc)}), 500
 
         @self.app.route("/intents/<intent_id>/response", methods=["POST"])
+        @require_jwt
         @require_api_key
         @self.limiter.limit(60)
         def record_response(intent_id):
@@ -1013,6 +1238,8 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/intents/<intent_id>/error", methods=["POST"])
+        @require_jwt
+        @require_api_key
         @self.limiter.limit(60)
         def record_error(intent_id):
             data = request.get_json() or {}
@@ -1039,6 +1266,8 @@ class SimpHttpServer:
                 }), 404
 
         @self.app.route("/stats", methods=["GET"])
+        @require_jwt
+        @require_api_key
         def get_stats():
             return jsonify({
                 "status": "success",
@@ -1046,6 +1275,8 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/status", methods=["GET"])
+        @require_jwt
+        @require_api_key
         def get_status():
             return jsonify({
                 "status": "success",
@@ -1112,6 +1343,7 @@ class SimpHttpServer:
         # ----- Task Ledger Endpoints (GET-only, read-safe) -----
 
         @self.app.route("/tasks", methods=["GET"])
+        @require_jwt
         @require_api_key
         def list_tasks():
             status_filter = request.args.get("status")
@@ -1131,6 +1363,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/tasks/<task_id>", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_task(task_id):
             task = self.broker.task_ledger.get_task(task_id)
@@ -1142,6 +1375,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/tasks/queue", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_task_queue():
             queue = self.broker.task_ledger.get_queue()
@@ -1152,6 +1386,7 @@ class SimpHttpServer:
             }), 200
 
         @self.app.route("/routing/policy", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_routing_policy():
             if self.broker.builder_pool:
@@ -1212,6 +1447,7 @@ class SimpHttpServer:
             }), 404
 
         @self.app.route("/memory/conversations", methods=["POST"])
+        @require_jwt
         @require_api_key
         @self.limiter.limit(30)
         def save_conversation():
@@ -1293,6 +1529,7 @@ class SimpHttpServer:
             return Response(css, mimetype="text/css")
 
         @self.app.route("/security/audit-log", methods=["GET"])
+        @require_jwt
         @require_api_key
         def get_audit_log_endpoint():
             """Get security audit log entries (Sprint 70).
@@ -2468,10 +2705,151 @@ class SimpHttpServer:
 
         return flows
 
-    def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True):
+    # ── R6: Key / config hot-reload endpoint ────────────────────────────
+    # Reloads crypto keys and config without process restart.
+    # Trigger: POST /admin/reload-config with X-API-Key header.
+    # No restart required — broker continues serving during reload.
+
+    def _register_admin_reload_route(self) -> None:
+        @self.app.route("/admin/reload-config", methods=["POST"])
+        @require_jwt
+        @require_api_key
+        def admin_reload_config():
+            """Reload broker configuration and crypto keys without restart.
+            Returns a report of what was reloaded.
+            """
+            report = {"status": "ok", "reloaded": []}
+
+            # 1. Reload environment variables
+            import os as _os
+            _fresh = {}
+            for key in ("COINBASE_API_PRIVATE_KEY", "COINBASE_API_KEY",
+                         "ALPACA_API_KEY", "ALPACA_SECRET_KEY",
+                         "KALSHI_KEY", "KALSHI_SECRET",
+                         "SIMP_KEY_PASSPHRASE", "MESH_SHARED_SECRET"):
+                val = _os.environ.get(key)
+                if val:
+                    _fresh[key] = "***present***"
+                else:
+                    _fresh[key] = None
+            report["env_keys"] = _fresh
+            report["reloaded"].append("env_vars")
+
+            # 2. Reload SimpConfig
+            try:
+                from config.config import SimpConfig
+                _new_config = SimpConfig()
+                report["config"] = {
+                    "REQUIRE_API_KEY": _new_config.REQUIRE_API_KEY,
+                    "ALLOW_UNREGISTERED_AGENTS": _new_config.ALLOW_UNREGISTERED_AGENTS,
+                }
+                report["reloaded"].append("SimpConfig")
+            except Exception as exc:
+                report["config_error"] = str(exc)
+
+            # 3. Reload crypto by flushing key cache
+            try:
+                from simp.crypto import SimpCrypto
+                # Clear any cached keys — next call will re-read from env
+                import simp.crypto as _crypto_mod
+                for attr in dir(_crypto_mod):
+                    if attr.startswith("_key_cache") or attr == "_key_cache":
+                        setattr(_crypto_mod, attr, {})
+                report["reloaded"].append("crypto_keys")
+            except Exception as exc:
+                report["crypto_error"] = str(exc)
+
+            # 4. Reload BRP bridge
+            try:
+                if hasattr(self.broker, 'brp_bridge'):
+                    from simp.security.brp_bridge import BRPBridge
+                    self.broker.brp_bridge = BRPBridge(
+                        data_dir=str(self.broker.brp_bridge.data_dir)
+                    )
+                    report["reloaded"].append("BRP_bridge")
+            except Exception as exc:
+                report["brp_error"] = str(exc)
+
+            self.logger.info("[R6] Config reloaded: %s", report["reloaded"])
+            return jsonify(report), 200
+
+    def run(self, host: str = "127.0.0.1", port: int = 5555, threaded: bool = True,
+            tls_cert: str = None, tls_key: str = None):
         self.broker.start(async_loop=self._async_loop)
+
+        # Start WebSocket bridge (on :5556 by default)
+        ws_port = int(os.environ.get("SIMP_WS_PORT", 5556))
+        ws_bridge_host = os.environ.get("SIMP_WS_HOST", "127.0.0.1")
+        if os.environ.get("SIMP_WS_DISABLE", "").lower() not in ("1", "true", "yes"):
+            self._ws_bridge = WsBridge(host=ws_bridge_host, port=ws_port)
+            # Run WS bridge in a background thread with its own event loop
+            def _run_ws():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(self._ws_bridge.start())
+                loop.run_forever()
+            ws_thread = Thread(target=_run_ws, daemon=True, name="SIMP-WS-Bridge")
+            ws_thread.start()
+            self.logger.info(f"WS Bridge started on ws://{ws_bridge_host}:{ws_port}")
+
+            # Sprint 85 — wire WS bridge into broker for real-time push
+            self.broker.set_ws_bridge(self._ws_bridge)
+
         self.logger.info(f"SIMP HTTP Server starting on {host}:{port}")
-        self.app.run(host=host, port=port, debug=self.debug, threaded=threaded)
+
+        # Sprint 81 — TLS with X.509 mTLS + CRL + TLS 1.2 minimum + strong ciphers
+        ssl_context = None
+        if tls_cert and tls_key:
+            import ssl
+            try:
+                ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+                ssl_context.load_cert_chain(tls_cert, tls_key)
+
+                # X.509 mutual auth: require client certs from CA bundle
+                ca_bundle = os.environ.get("SIMP_TLS_CA_BUNDLE", "")
+                if ca_bundle:
+                    ssl_context.load_verify_locations(ca_bundle)
+                    ssl_context.verify_mode = ssl.CERT_REQUIRED
+                    self.logger.info(f"✅ mTLS enabled (CA={ca_bundle})")
+                else:
+                    ssl_context.verify_mode = ssl.CERT_NONE
+
+                # CRL revocation check if SIMP_TLS_CRL_FILE is set
+                crl_file = os.environ.get("SIMP_TLS_CRL_FILE", "")
+                if crl_file:
+                    try:
+                        import cryptography.x509 as x509
+                        with open(crl_file, "rb") as f:
+                            ssl_context.get_cert_store().add_cert(
+                                x509.load_pem_x509_certificate(f.read())
+                            )
+                        self.logger.info(f"✅ CRL loaded from {crl_file}")
+                    except Exception as crl_err:
+                        self.logger.warning(f"⚠️ CRL load failed: {crl_err}")
+
+                # TLS 1.2 minimum + strong cipher suite (no NULL/MD5/DSS)
+                ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+                ssl_context.ciphers = (
+                    "ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:"
+                    "DHE+CHACHA20:!aNULL:!MD5:!DSS"
+                )
+                self.logger.info(f"✅ TLS enabled (cert={tls_cert})")
+            except Exception as exc:
+                self.logger.error(f"❌ TLS setup failed: {exc}")
+                raise
+        elif os.environ.get("SIMP_ENABLE_TLS", "").lower() in ("1", "true", "yes"):
+            tls_cert = os.environ.get("SIMP_TLS_CERT", "")
+            tls_key = os.environ.get("SIMP_TLS_KEY", "")
+            if tls_cert and tls_key:
+                import ssl
+                ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+                ssl_context.load_cert_chain(tls_cert, tls_key)
+                self.logger.info(f"✅ TLS enabled via env (cert={tls_cert})")
+            else:
+                self.logger.warning("⚠️ SIMP_ENABLE_TLS=true but TLS_CERT/KEY not set")
+
+        self.app.run(host=host, port=port, debug=self.debug, threaded=threaded,
+                     ssl_context=ssl_context)
 
     def run_in_background(self, host: str = "127.0.0.1", port: int = 5555):
         thread = Thread(

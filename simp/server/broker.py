@@ -11,7 +11,11 @@ import logging
 import os
 from collections import deque, OrderedDict
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Any, Callable
+from typing import Dict, Optional, Any, Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from simp.server.ws_bridge import WsBridge
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
@@ -78,6 +82,7 @@ class BrokerConfig:
     log_level: str = ""
     max_log_lines: int = 10000
     max_intent_records: int = 10000
+    data_dir: str = os.path.join(_REPO_ROOT, "data")
     agent_registry_config: Optional[AgentRegistryConfig] = None
 
     def __post_init__(self):
@@ -153,10 +158,15 @@ class SimpBroker:
         self.hooks = hooks
         self.logger = self._setup_logging()
         self.logger.info(
-            "[BRP] Bill Russell Protocol active — mode=%s, data_dir=%s",
-            self.brp_bridge.default_mode, self.brp_bridge.data_dir,
+            "[BRP] Bill Russell Protocol active",
+            mode=self.brp_bridge.default_mode,
+            data_dir=str(self.brp_bridge.data_dir),
         )
-        self._seen_signature_nonces: set[str] = set()
+        # ── R3: Persistent nonce store (SQLite-backed with TTL) ──────────
+        self._nonce_db_path: str = os.path.join(self.config.data_dir, "nonce_store.db")
+        self._nonce_ttl_seconds: int = 3600  # 1-hour TTL
+        self._init_nonce_store()
+        self._start_nonce_eviction_loop()
 
         # Sprint 64 — restart resilience
         self._startup_at: datetime = datetime.now(timezone.utc)
@@ -166,7 +176,9 @@ class SimpBroker:
         # Agent registry with disk persistence
         self.agent_registry = AgentRegistry(self.config.agent_registry_config)
         self.agents = self.agent_registry  # Backward compatibility
-        self.agent_lock = threading.RLock()
+        self._agent_locks: Dict[str, threading.Lock] = {}   # per-agent fine-grained locks
+        self._agent_locks_meta = threading.Lock()          # protects _agent_locks dict itself
+        self.agent_lock = threading.RLock()                 # kept for list_agents / bulk ops
 
         # Intent tracking — bounded OrderedDict with LRU eviction
         self._max_intent_records = self.config.max_intent_records
@@ -235,6 +247,30 @@ class SimpBroker:
         except Exception as e:
             self.logger.warning(f"[L5] Consensus node init failed (non-fatal): {e}")
 
+        # ── Per-agent fine-grained locking helpers ────────────────────────────
+
+    # ── Per-agent fine-grained locking ──────────────────────────────────────
+
+    @contextmanager
+    def get_agent_lock(self, agent_id: str):
+        """Acquire the lock for a specific agent.
+
+        Uses a dictionary of per-agent locks to avoid contention on a single
+        global lock. The dictionary itself is protected by _agent_locks_meta.
+        """
+        with self._agent_locks_meta:
+            lock = self._agent_locks.get(agent_id)
+            if lock is None:
+                lock = threading.Lock()
+                self._agent_locks[agent_id] = lock
+        with lock:
+            yield
+
+    def release_agent_lock(self, agent_id: str):
+        """Remove an agent's lock from the dictionary after deregistration."""
+        with self._agent_locks_meta:
+            self._agent_locks.pop(agent_id, None)
+
         # KTC Mesh Agent — Keep The Change savings-to-investment agent
         self.ktc_agent = None
         try:
@@ -285,6 +321,9 @@ class SimpBroker:
         # Sprint 51 — delivery engine
         from simp.server.delivery import DEFAULT_DELIVERY_ENGINE
         self.delivery_engine = DEFAULT_DELIVERY_ENGINE
+
+        # Sprint 85 — WebSocket bridge for real-time push
+        self.ws_bridge: Optional["WsBridge"] = None
 
         # Sprint 52 — intent ledger (renamed from task_ledger in Sprint 61)
         from simp.server.intent_ledger import INTENT_LEDGER
@@ -338,7 +377,6 @@ class SimpBroker:
         self._structured_logger = StructuredLogger(
             service="SIMP.Broker",
             log_dir=self.config.data_dir or "logs",
-            retention_days=7,
         )
         # Also keep standard logger for backward compat
         logger = logging.getLogger("SIMP.Broker")
@@ -349,6 +387,101 @@ class SimpBroker:
         ))
         logger.addHandler(handler)
         return self._structured_logger
+
+    # ── R3: Persistent nonce store (SQLite-backed with TTL) ──────────────
+
+    def _init_nonce_store(self) -> None:
+        """Initialise the SQLite-backed nonce store.
+        Survives broker restarts and supports cross-broker deployments.
+        """
+        import sqlite3
+        os.makedirs(os.path.dirname(self._nonce_db_path), exist_ok=True)
+        try:
+            conn = sqlite3.connect(self._nonce_db_path, timeout=5)
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS seen_nonces ("
+                "  nonce TEXT PRIMARY KEY,"
+                "  seen_at REAL NOT NULL,"
+                "  expires_at REAL NOT NULL"
+                ")"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_nonce_expires "
+                "ON seen_nonces(expires_at)"
+            )
+            conn.commit()
+            conn.close()
+            self.logger.info(
+                "[R3] Nonce store initialised at %s (TTL=%ss)",
+                self._nonce_db_path, self._nonce_ttl_seconds,
+            )
+        except Exception as exc:
+            self.logger.error("[R3] Failed to initialise nonce store", error=str(exc))
+            # Fall back to in-memory set
+            self._nonce_fallback_set: set[str] = set()
+
+    def _start_nonce_eviction_loop(self) -> None:
+        """Start a background thread that purges expired nonces every 5 minutes."""
+        import threading as _t
+        evictor = _t.Thread(
+            target=self._nonce_eviction_worker,
+            daemon=True,
+            name="nonce-evictor",
+        )
+        evictor.start()
+
+    def _nonce_eviction_worker(self) -> None:
+        """Evict expired nonces from the SQLite store periodically."""
+        import sqlite3
+        import time as _time
+        while getattr(self, 'state', None) not in (
+            BrokerState.SHUTTING_DOWN, BrokerState.STOPPED
+        ):
+            try:
+                conn = sqlite3.connect(self._nonce_db_path, timeout=3)
+                now = _time.time()
+                deleted = conn.execute(
+                    "DELETE FROM seen_nonces WHERE expires_at <= ?",
+                    (now,),
+                ).rowcount
+                conn.commit()
+                if deleted:
+                    self.logger.debug("[R3] Evicted %s expired nonces", deleted)
+                conn.close()
+            except Exception:
+                pass
+            _time.sleep(300)  # every 5 minutes
+
+    def check_and_record_nonce(self, nonce: str) -> bool:
+        """Check if a nonce has been seen. Returns True if fresh (first-seen),
+        False if replay. Inserts the nonce on first-seen.
+        Thread-safe via SQLite transactions.
+        """
+        import sqlite3
+        import time as _time
+        now = _time.time()
+        expires_at = now + self._nonce_ttl_seconds
+        try:
+            conn = sqlite3.connect(self._nonce_db_path, timeout=5)
+            # Insert — will fail with IntegrityError if nonce exists
+            conn.execute(
+                "INSERT INTO seen_nonces (nonce, seen_at, expires_at) VALUES (?, ?, ?)",
+                (nonce, now, expires_at),
+            )
+            conn.commit()
+            conn.close()
+            return True  # first time seen
+        except sqlite3.IntegrityError:
+            conn.close()
+            return False  # replay detected
+        except Exception:
+            # Fallback: in-memory set
+            fb = getattr(self, '_nonce_fallback_set', None)
+            if fb is not None:
+                if nonce in fb:
+                    return False
+                fb.add(nonce)
+            return True
 
     def _add_intent_record(self, intent_id: str, record: IntentRecord) -> None:
         """Add an intent record with LRU eviction when at capacity.
@@ -551,17 +684,18 @@ class SimpBroker:
 
     def deregister_agent(self, agent_id: str) -> bool:
         """Deregister an agent from broker persistence and mesh routing."""
-        with self.agent_lock:
+        with self.get_agent_lock(agent_id):
             if not self.agent_registry.exists(agent_id):
                 return False
             self.agent_registry.deregister(agent_id)
             try:
                 self.mesh_bus.deregister_agent(agent_id)
             except Exception:
-                self.logger.warning("MeshBus deregistration failed for %s", agent_id, exc_info=True)
+                self.logger.warning("MeshBus deregistration failed for %s", agent_id=agent_id, exc_info=True)
             self._log_event("agent_deregistered", f"Agent {agent_id} deregistered", agent_id=agent_id)
         with self.stats_lock:
             self.stats["agents_registered"] = max(0, self.stats.get("agents_registered", 0) - 1)
+        self.release_agent_lock(agent_id)
         return True
 
     def record_heartbeat(self, agent_id: str) -> bool:
@@ -640,6 +774,66 @@ class SimpBroker:
             return {"status": "error", "errors": errors}
         intent_data = canonical.to_dict()
 
+        # ── Prompt Injection Scan (Phase 2) ─────────────────────────
+        # Check all text fields in the intent for prompt injection before
+        # any further processing. This is a first-line defense.
+        pi_blocked = False
+        pi_result = None
+        try:
+            from simp.security.brp.prompt_injection_detector import get_injection_detector
+            detector = get_injection_detector()
+            pi_result = detector.analyze_intent(intent_data)
+            if pi_result.detected and pi_result.score >= 0.70:
+                self.logger.warning(
+                    "Prompt injection detected in intent %s: score=%.2f tags=%s",
+                    intent_id, pi_result.score, pi_result.threat_tags,
+                )
+                # Log to BRP as an injection event (evaluate_event persists)
+                try:
+                    pi_event = BRPEvent(
+                        source_agent=source_agent,
+                        event_type=BRPEventType.SECURITY_AUDIT.value,
+                        action="prompt_injection",
+                        params={
+                            "score": pi_result.score,
+                            "confidence": pi_result.confidence,
+                            "detections": [
+                                {"layer": d.layer, "pattern": d.pattern, "confidence": d.confidence}
+                                for d in pi_result.detections
+                            ],
+                            "payload": intent_data.get("prompt", intent_data.get("text", "")),
+                        },
+                        context={
+                            "intent_id": intent_id,
+                            "broker_mode": "injection_block",
+                        },
+                        mode="enforced",
+                        tags=["prompt_injection", "auto_blocked"] + pi_result.threat_tags,
+                    )
+                    self.brp_bridge.evaluate_event(pi_event)
+                except Exception as pi_log_err:
+                    self.logger.warning("Failed to log injection event: %s", pi_log_err)
+
+                simp_config = SimpConfig()
+                if pi_result.score >= 0.85:
+                    # Confirmed injection — block immediately
+                    pi_blocked = True
+                elif pi_result.score >= 0.70:
+                    # Probable injection — block in enforced/advisory modes
+                    pi_blocked = getattr(simp_config, "BRP_MODE", "shadow") in ("enforced", "enforce")
+        except Exception as pi_err:
+            self.logger.warning("Prompt injection scan failed: %s", pi_err)
+
+        if pi_blocked:
+            return {
+                "status": "error",
+                "error_code": "PROMPT_INJECTION_BLOCKED",
+                "error": f"Prompt injection detected (score={pi_result.score:.2f})",
+                "pi_score": round(pi_result.score, 4) if pi_result else 0.0,
+                "pi_threat_tags": pi_result.threat_tags if pi_result else [],
+                "intent_id": intent_id,
+            }
+
         # Signature verification (if enabled)
         simp_config = SimpConfig()
         if simp_config.REQUIRE_SIGNATURES:
@@ -668,9 +862,15 @@ class SimpBroker:
                     pub_key = SimpCrypto.load_public_key(
                         public_key_pem.encode() if isinstance(public_key_pem, str) else public_key_pem
                     )
+                    # R3: Use persistent nonce store instead of in-memory set
                     valid, reason = SimpCrypto.verify_signature_strict(
-                        intent_data, pub_key, self._seen_signature_nonces
+                        intent_data, pub_key, seen_nonces=None
                     )
+                    if valid:
+                        sig_nonce = intent_data.get("_sig_nonce")
+                        if sig_nonce and not self.check_and_record_nonce(sig_nonce):
+                            valid = False
+                            reason = "nonce_replay"
                     if not valid:
                         return {
                             "status": "error",
@@ -757,7 +957,7 @@ class SimpBroker:
             brp_route_denied = brp_response.decision == "DENY"
             brp_review_required = brp_response.decision == "ELEVATE"
         except Exception:
-            self.logger.warning("BRP event evaluation failed for intent %s", intent_id, exc_info=True)
+            self.logger.warning("BRP event evaluation failed for intent %s", intent_id=intent_id, exc_info=True)
 
         # BRP plan-level evaluation for multi-step intents
         steps = intent_data.get("params", {}).get("steps") if isinstance(intent_data.get("params"), dict) else None
@@ -769,7 +969,7 @@ class SimpBroker:
                     mode=brp_mode,
                 )
             except Exception:
-                self.logger.warning("BRP plan evaluation failed for intent %s", intent_id, exc_info=True)
+                self.logger.warning("BRP plan evaluation failed for intent %s", intent_id=intent_id, exc_info=True)
         brp_plan_decision = str((brp_plan_response or {}).get("decision") or "")
         brp_plan_review_required = bool((brp_plan_response or {}).get("review_required"))
         brp_plan_denied = brp_plan_decision == "DENY"
@@ -1251,6 +1451,33 @@ class SimpBroker:
             except Exception:
                 self.logger.debug("Memory hook on_intent_routed failed", exc_info=True)
 
+        # Sprint 85 — push route events to WS-connected agents
+        if self.ws_bridge and self._async_loop:
+            loop = self._async_loop
+            # Push to channel: intent.routed.<target_agent>
+            target = target_agent or ""
+            channel = f"intent.routed.{target}"
+            payload = {
+                "intent_id": intent_id,
+                "source_agent": source_agent,
+                "target_agent": target,
+                "intent_type": intent_type,
+                "status": delivery_status,
+                "result": route_result,
+            }
+            asyncio.run_coroutine_threadsafe(
+                self.ws_bridge.push_to_channel(channel, payload), loop
+            )
+            # Also push to general intent channel
+            asyncio.run_coroutine_threadsafe(
+                self.ws_bridge.push_to_channel("intent.routed", payload), loop
+            )
+            # Direct push to source agent if connected
+            if source_agent:
+                asyncio.run_coroutine_threadsafe(
+                    self.ws_bridge.push_to_agent(source_agent, payload), loop
+                )
+
         return route_result
 
     async def route_agentic_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -1261,9 +1488,15 @@ class SimpBroker:
         if request.identity and request.identity.public_key and payload.get("signature"):
             try:
                 public_key = SimpCrypto.load_public_key(request.identity.public_key.encode())
+                # R3: Use persistent nonce store instead of in-memory set
                 valid, reason = SimpCrypto.verify_signature_strict(
-                    payload, public_key, self._seen_signature_nonces
+                    payload, public_key, seen_nonces=None
                 )
+                if valid:
+                    sig_nonce = payload.get("_sig_nonce")
+                    if sig_nonce and not self.check_and_record_nonce(sig_nonce):
+                        valid = False
+                        reason = "nonce_replay"
                 if not valid:
                     return AgenticIntentResponse(
                         status="error",
@@ -1339,7 +1572,7 @@ class SimpBroker:
                 data_dir=str(self.brp_bridge.data_dir),
             )
         except Exception:
-            self.logger.debug("[BRP] Failed to read evaluation detail for %s", event_id, exc_info=True)
+            self.logger.debug("[BRP] Failed to read evaluation detail for %s", event_id=event_id, exc_info=True)
             return None
 
         incident = (detail or {}).get("incident")
@@ -2366,7 +2599,7 @@ class SimpBroker:
                 } if isinstance(latest_alert, dict) else None,
             }
         except Exception as exc:
-            self.logger.debug("[BRP] Failed to collect broker BRP summary: %s", exc)
+            self.logger.debug("[BRP] Failed to collect broker BRP summary", exc=exc)
             return {
                 "enabled": False,
                 "mode": getattr(self.brp_bridge, "default_mode", BRPMode.SHADOW.value),

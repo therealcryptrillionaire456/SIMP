@@ -22,14 +22,37 @@ import asyncio
 import json
 import logging
 import os
+import ssl
 import time
 from dataclasses import dataclass
+from collections import defaultdict
 from typing import Any, Dict, List, Optional, Set
 
 import websockets
 from websockets.server import WebSocketServerProtocol, serve
 
 logger = logging.getLogger("SIMP.WS.Bridge")
+
+# ── Channel ACL definitions ───────────────────────────────────────────────────
+
+# Reserved channels that require specific capabilities
+CHANNEL_CAPABILITY_REQUIREMENTS: Dict[str, List[str]] = {
+    "signals.trading": ["trade"],
+    "signals.alpha": ["trade", "analyze"],
+    "admin": ["admin"],
+    "intent.routed": ["route"],
+    "system": ["admin"],
+}
+
+# Channels that are open to all authenticated agents
+OPEN_CHANNELS: Set[str] = {
+    "alerts",
+    "intent.routed",
+    "heartbeat",
+}
+
+# Wildcard patterns (e.g., "intent.routed.*")
+WILDCARD_PATTERNS = True
 
 # ── JWT verification (reuses jwt_auth.py patterns) ──────────────────────────
 from simp.server.jwt_auth import verify_jwt, get_jwt_config
@@ -71,6 +94,24 @@ class WsBridge:
             os.environ.get("SIMP_WS_PING_TIMEOUT", ws_ping_timeout)
         )
 
+        # Sprint 85 — TLS termination (wss://)
+        self.ssl_context: Optional[ssl.SSLContext] = None
+        tls_cert = os.environ.get("SIMP_WS_TLS_CERT", "")
+        tls_key = os.environ.get("SIMP_WS_TLS_KEY", "")
+        if tls_cert and tls_key:
+            try:
+                self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+                self.ssl_context.load_cert_chain(tls_cert, tls_key)
+                logger.info(f"TLS enabled: wss://{self.host}:{self.port}")
+            except Exception as exc:
+                logger.error(f"Failed to load TLS cert/key: {exc}")
+                self.ssl_context = None
+
+        # Sprint 85 — Rate limiting per agent
+        self._rate_limit = int(os.environ.get("SIMP_WS_RATE_LIMIT", 100))  # intents/sec
+        self._rate_window = float(os.environ.get("SIMP_WS_RATE_WINDOW", 1.0))  # seconds
+        self._intent_timestamps: Dict[str, List[float]] = defaultdict(list)
+
         # Connected agents: agent_id -> (websocket, channels)
         self._connections: Dict[str, "WsConnection"] = {}
         # Channel subscribers: channel_name -> set of agent_ids
@@ -110,6 +151,7 @@ class WsBridge:
             self.port,
             ping_interval=self.ws_ping_interval,
             ping_timeout=self.ws_ping_timeout,
+            ssl=self.ssl_context,
         )
         logger.info(f"WsBridge listening on ws://{self.host}:{self.port}")
         return self
@@ -281,11 +323,36 @@ class WsBridge:
                 self._ws_to_agent.pop(connection_id, None)
                 self.stats["connections_active"] -= 1
 
+    # ── Rate Limiting ─────────────────────────────────────────────────────
+
+    def _check_rate_limit(self, agent_id: str) -> bool:
+        """Return True if agent is within rate limit, False if exceeded."""
+        now = time.time()
+        window_start = now - self._rate_window
+        # Prune old timestamps
+        self._intent_timestamps[agent_id] = [
+            ts for ts in self._intent_timestamps[agent_id] if ts > window_start
+        ]
+        if len(self._intent_timestamps[agent_id]) >= self._rate_limit:
+            return False
+        self._intent_timestamps[agent_id].append(now)
+        return True
+
     # ── Message Handlers ────────────────────────────────────────────────────
 
     async def _handle_intent(self, agent_id: str, intent_data: Dict[str, Any]):
         """Forward an intent from WS to the broker via HTTP."""
         if not intent_data:
+            return
+
+        # Rate limiting
+        if not self._check_rate_limit(agent_id):
+            logger.warning(f"Rate limit exceeded for agent '{agent_id}'")
+            await self._connections[agent_id].ws.send(json.dumps({
+                "type": "error",
+                "code": "RATE_LIMITED",
+                "message": f"Rate limit exceeded ({self._rate_limit} intents per {self._rate_window}s)",
+            }))
             return
 
         # Enrich with source info
@@ -340,17 +407,32 @@ class WsBridge:
                 pass
 
     async def _handle_subscribe(self, agent_id: str, channels: List[str]):
-        """Subscribe an agent to one or more channels."""
-        for channel in channels:
+        """Subscribe an agent to one or more channels, checking ACLs."""
+        if agent_id not in self._connections:
+            return
+        conn = self._connections[agent_id]
+        allowed, denied = self._filter_allowed_channels(agent_id, channels, conn.capabilities)
+
+        if denied:
+            await conn.ws.send(json.dumps({
+                "type": "error",
+                "code": "CHANNEL_DENIED",
+                "message": f"Access denied to channels: {denied}",
+                "denied": denied,
+            }))
+
+        for channel in allowed:
             if channel not in self._channels:
                 self._channels[channel] = set()
             self._channels[channel].add(agent_id)
             logger.info(f"Agent '{agent_id}' subscribed to channel '{channel}'")
 
-        await self._connections[agent_id].ws.send(json.dumps({
-            "type": "subscribed",
-            "channels": channels,
-        }))
+        if allowed:
+            await conn.ws.send(json.dumps({
+                "type": "subscribed",
+                "channels": allowed,
+                "denied": denied if denied else None,
+            }))
 
     async def _handle_unsubscribe(self, agent_id: str, channels: List[str]):
         """Unsubscribe an agent from one or more channels."""
@@ -440,6 +522,85 @@ class WsBridge:
             return None
         # verify_jwt returns claims dict directly (not nested under "claims")
         return result
+
+    def _check_channel_permission(self, agent_id: str, channel: str, capabilities: List[str]) -> bool:
+        """Check if an agent has permission to subscribe to a channel."""
+        # Open channels are accessible to all authenticated agents
+        if channel in OPEN_CHANNELS:
+            return True
+
+        # Check capability requirements
+        required_caps = CHANNEL_CAPABILITY_REQUIREMENTS.get(channel, [])
+        if required_caps:
+            return all(cap in capabilities for cap in required_caps)
+
+        # Pattern-based matching (e.g., "intent.routed.*")
+        if "." in channel:
+            prefix = channel.rsplit(".", 1)[0]
+            required_caps = CHANNEL_CAPABILITY_REQUIREMENTS.get(prefix + ".*", 
+                CHANNEL_CAPABILITY_REQUIREMENTS.get(prefix, []))
+            if required_caps:
+                return all(cap in capabilities for cap in required_caps)
+
+        # Default: allow if no specific requirements
+        return True
+
+    def _filter_allowed_channels(self, agent_id: str, channels: List[str], 
+                                   capabilities: List[str]) -> tuple:
+        """Filter channels to only those the agent can access. Returns (allowed, denied)."""
+        allowed = []
+        denied = []
+        for ch in channels:
+            if self._check_channel_permission(agent_id, ch, capabilities):
+                allowed.append(ch)
+            else:
+                denied.append(ch)
+                logger.warning(f"Agent '{agent_id}' denied access to channel '{ch}'")
+        return allowed, denied
+
+    def get_metrics(self) -> Dict[str, Any]:
+        """Return metrics in Prometheus-compatible format."""
+        return {
+            "ws_bridge_connections_active": self.stats["connections_active"],
+            "ws_bridge_connections_total": self.stats["connections_total"],
+            "ws_bridge_intents_forwarded": self.stats["intents_forwarded"],
+            "ws_bridge_pushes_sent": self.stats["pushes_sent"],
+            "ws_bridge_auth_failures": self.stats["auth_failures"],
+            "ws_bridge_errors": self.stats["errors"],
+            "ws_bridge_channels_total": len(self._channels),
+            "ws_bridge_agents_connected": len(self._connections),
+        }
+
+    def get_prometheus_text(self) -> str:
+        """Return Prometheus-formatted metrics text."""
+        m = self.get_metrics()
+        lines = [
+            "# HELP ws_bridge_connections_active Number of active WebSocket connections",
+            "# TYPE ws_bridge_connections_active gauge",
+            f"ws_bridge_connections_active {m['ws_bridge_connections_active']}",
+            "# HELP ws_bridge_connections_total Total WebSocket connections",
+            "# TYPE ws_bridge_connections_total counter",
+            f"ws_bridge_connections_total {m['ws_bridge_connections_total']}",
+            "# HELP ws_bridge_intents_forwarded Total intents forwarded to broker",
+            "# TYPE ws_bridge_intents_forwarded counter",
+            f"ws_bridge_intents_forwarded {m['ws_bridge_intents_forwarded']}",
+            "# HELP ws_bridge_pushes_sent Total push messages sent",
+            "# TYPE ws_bridge_pushes_sent counter",
+            f"ws_bridge_pushes_sent {m['ws_bridge_pushes_sent']}",
+            "# HELP ws_bridge_auth_failures Total authentication failures",
+            "# TYPE ws_bridge_auth_failures counter",
+            f"ws_bridge_auth_failures {m['ws_bridge_auth_failures']}",
+            "# HELP ws_bridge_errors Total errors",
+            "# TYPE ws_bridge_errors counter",
+            f"ws_bridge_errors {m['ws_bridge_errors']}",
+            "# HELP ws_bridge_channels_total Number of active channels",
+            "# TYPE ws_bridge_channels_total gauge",
+            f"ws_bridge_channels_total {m['ws_bridge_channels_total']}",
+            "# HELP ws_bridge_agents_connected Number of connected agents",
+            "# TYPE ws_bridge_agents_connected gauge",
+            f"ws_bridge_agents_connected {m['ws_bridge_agents_connected']}",
+        ]
+        return "\n".join(lines) + "\n"
 
     @property
     def connected_agents(self) -> Set[str]:
