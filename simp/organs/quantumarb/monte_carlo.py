@@ -264,9 +264,9 @@ class MonteCarloEngine:
             sum((s - sharpe_mean) ** 2 for s in sharpe_list) / n
         ) if n > 0 else 0.0
 
-        prob_positive = sum(1 for r in returns_list if r > 0) / n
-        prob_double = sum(1 for r in returns_list if r > 1.0) / n
-        prob_ruin = sum(1 for r in returns_list if r < -0.5) / n
+        prob_positive = sum(1 for r in returns_list if r > 0) / n if n > 0 else 0.0
+        prob_double = sum(1 for r in returns_list if r > 1.0) / n if n > 0 else 0.0
+        prob_ruin = sum(1 for r in returns_list if r < -0.5) / n if n > 0 else 0.0
 
         result = MCResult(
             config=config,
