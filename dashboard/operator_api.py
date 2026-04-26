@@ -127,3 +127,31 @@ async def get_recent_alerts():
             return {"total_alerts": 0, "recent_alerts": []}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# T31.3/E8: Strategy Health endpoint
+@router.get("/api/health/strategy")
+async def get_strategy_health():
+    """Get strategy health scores from StrategyHealthMonitor"""
+    try:
+        from simp.organs.quantumarb.strategy_health import StrategyHealthMonitor
+        monitor = StrategyHealthMonitor()
+        summary = monitor.evaluate()
+        return summary.to_dict()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/api/health/strategy/{strategy_name}")
+async def get_strategy_health_detail(strategy_name: str):
+    """Get detailed health score for a specific strategy"""
+    try:
+        from simp.organs.quantumarb.strategy_health import StrategyHealthMonitor
+        monitor = StrategyHealthMonitor()
+        summary = monitor.evaluate()
+        if strategy_name in summary.strategy_scores:
+            score = summary.strategy_scores[strategy_name]
+            return score.__dict__ if hasattr(score, '__dict__') else str(score)
+        return {"error": "Strategy not found", "available": list(summary.strategy_scores.keys())}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

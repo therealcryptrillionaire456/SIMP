@@ -111,6 +111,15 @@ class CoinbaseExecutor:
         # Ensure ledger directory exists
         self.ledger_path.parent.mkdir(parents=True, exist_ok=True)
 
+        # E1: Gas price oracle for fee estimation
+        self._gas_oracle = None
+        try:
+            from .gas_oracle import GasOracle
+            self._gas_oracle = GasOracle(data_dir="data/gas_prices")
+            log.info("[E1] GasOracle initialized: cheapest=%s", self._gas_oracle.cheapest_chain("standard")["cheapest_chain"])
+        except Exception as e:
+            log.warning("[E1] GasOracle not available: %s", e)
+
     def _get_client(self):
         """Lazy-initialize RESTClient from CDP key file."""
         if self._client is not None:
@@ -245,6 +254,15 @@ class CoinbaseExecutor:
         if self.dry_run:
             filled_qty = amount_usd / market_price
             fees = amount_usd * 0.006  # simulated 0.6% fee
+            # E1: Log gas cost for Coinbase (uses their fee structure)
+            if self._gas_oracle:
+                try:
+                    chain_info = self._gas_oracle.cheapest_chain("standard")
+                    gas_cost = next((c["estimated_fee_usd"] for c in chain_info.get("all_chains_ranked", []) if c["chain"] == "base"), 0)
+                    if gas_cost > 0:
+                        log.info("[E1] GasOracle: base chain cost=$%.4f, cheapest=%s", gas_cost, chain_info.get("cheapest_chain", "unknown"))
+                except Exception:
+                    pass
             fill_price = market_price * 1.001  # simulated 10bps slippage
             slippage = abs(fill_price - market_price) / market_price * 10000
             receipt = ExecutionReceipt(

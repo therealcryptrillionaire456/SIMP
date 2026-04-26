@@ -19,6 +19,7 @@ import uuid
 import queue
 import threading
 import time
+from simp.organs.quantumarb.structured_logger import StructuredLogger, get_logger, set_trace_id
 
 from config.config import SimpConfig
 from simp.agentic_https import AgenticIntentRequest, AgenticIntentResponse
@@ -331,23 +332,23 @@ class SimpBroker:
         """Access the ProjectX computer-use layer."""
         return self._projectx
 
-    def _setup_logging(self) -> logging.Logger:
-        """Setup logging for broker"""
+    def _setup_logging(self) -> StructuredLogger:
+        """Setup structured logging for broker (T34.1/E4)"""
+        # Use StructuredLogger for JSON-formatted, traceable logs
+        self._structured_logger = StructuredLogger(
+            service="SIMP.Broker",
+            log_dir=self.config.data_dir or "logs",
+            retention_days=7,
+        )
+        # Also keep standard logger for backward compat
         logger = logging.getLogger("SIMP.Broker")
         logger.setLevel(self.config.log_level)
-
-        # Console handler
         handler = logging.StreamHandler()
-        handler.setLevel(self.config.log_level)
-
-        # Formatter
-        formatter = logging.Formatter(
+        handler.setFormatter(logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-        handler.setFormatter(formatter)
-
+        ))
         logger.addHandler(handler)
-        return logger
+        return self._structured_logger
 
     def _add_intent_record(self, intent_id: str, record: IntentRecord) -> None:
         """Add an intent record with LRU eviction when at capacity.
@@ -477,9 +478,6 @@ class SimpBroker:
                         self.logger.warning(f"Failed to register agent {agent_id} with MeshBus after {max_retries} attempts: {e}")
                         # Log more details for debugging
                         self.logger.debug(f"Mesh bus state: registered_agents={list(self.mesh_bus._registered_agents)}")
-                    else:
-                        self.logger.debug(f"Mesh bus registration attempt {attempt + 1} failed for {agent_id}: {e}")
-                        import time
                         time.sleep(0.1 * (attempt + 1))  # Small backoff
             
             # If registration failed, log it prominently for QIP
