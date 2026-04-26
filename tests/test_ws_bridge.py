@@ -18,7 +18,7 @@ import time
 # Ensure JWT is configured
 os.environ["SIMP_JWT_SECRET"] = "test-secret-key-for-websocket-test-32chars"
 os.environ["SIMP_JWT_REQUIRED"] = "false"
-os.environ["SIMP_WS_PORT"] = "15556"  # Avoid collision with real broker
+os.environ.setdefault("SIMP_WS_PORT", "15556")  # Override with SIMP_WS_PORT env var
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -46,9 +46,11 @@ def issue_jwt(agent_id: str) -> str:
 async def run_tests():
     """Run all WS bridge tests."""
 
-    bridge = WsBridge(port=15556, broker_url="http://127.0.0.1:15555")
+    test_port = int(os.environ.get("SIMP_WS_PORT", 15556))
+    ws_uri = f"ws://127.0.0.1:{test_port}"
+    bridge = WsBridge(port=test_port, broker_url="http://127.0.0.1:15555")
     await bridge.start()
-    logger.info("WS Bridge started on :15556")
+    logger.info(f"WS Bridge started on :{test_port}")
 
     passed = 0
     failed = 0
@@ -56,7 +58,7 @@ async def run_tests():
     # ── Test 1: Auth required (no token) ─────────────────────────────────────
     logger.info("\n═══ Test 1: Auth required (no token) ═══")
     try:
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "ping"}))  # Skip auth
         response = await asyncio.wait_for(ws.recv(), timeout=3.0)
         result = json.loads(response)
@@ -72,7 +74,7 @@ async def run_tests():
     logger.info("\n═══ Test 2: Auth with valid JWT ═══")
     try:
         token = issue_jwt("test-agent-1")
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "auth", "token": token}))
         response = await asyncio.wait_for(ws.recv(), timeout=3.0)
         result = json.loads(response)
@@ -92,7 +94,7 @@ async def run_tests():
     # ── Test 3: Auth with invalid JWT ────────────────────────────────────────
     logger.info("\n═══ Test 3: Auth with invalid JWT ═══")
     try:
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "auth", "token": "not-a-real-token"}))
         response = await asyncio.wait_for(ws.recv(), timeout=3.0)
         result = json.loads(response)
@@ -107,7 +109,7 @@ async def run_tests():
     logger.info("\n═══ Test 4: Ping/Pong ═══")
     try:
         token = issue_jwt("test-agent-2")
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "auth", "token": token}))
         await asyncio.wait_for(ws.recv(), timeout=3.0)  # auth_ok
 
@@ -130,7 +132,7 @@ async def run_tests():
     logger.info("\n═══ Test 5: Subscribe / Unsubscribe ═══")
     try:
         token = issue_jwt("test-agent-3")
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "auth", "token": token}))
         await asyncio.wait_for(ws.recv(), timeout=3.0)  # auth_ok
 
@@ -169,7 +171,7 @@ async def run_tests():
     logger.info("\n═══ Test 6: Push to channel ═══")
     try:
         token = issue_jwt("test-agent-4")
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "auth", "token": token}))
         await asyncio.wait_for(ws.recv(), timeout=3.0)  # auth_ok
 
@@ -200,7 +202,7 @@ async def run_tests():
     logger.info("\n═══ Test 7: Push to specific agent ═══")
     try:
         token = issue_jwt("test-agent-5")
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "auth", "token": token}))
         await asyncio.wait_for(ws.recv(), timeout=3.0)  # auth_ok
 
@@ -229,7 +231,7 @@ async def run_tests():
 
         for agent_id in agents:
             token = issue_jwt(agent_id)
-            ws = await websockets.connect("ws://127.0.0.1:15556")
+            ws = await websockets.connect(ws_uri)
             await ws.send(json.dumps({"type": "auth", "token": token}))
             await asyncio.wait_for(ws.recv(), timeout=3.0)  # auth_ok
             connections.append(ws)
@@ -251,7 +253,7 @@ async def run_tests():
     logger.info("\n═══ Test 9: Unknown message type ═══")
     try:
         token = issue_jwt("test-agent-6")
-        ws = await websockets.connect("ws://127.0.0.1:15556")
+        ws = await websockets.connect(ws_uri)
         await ws.send(json.dumps({"type": "auth", "token": token}))
         await asyncio.wait_for(ws.recv(), timeout=3.0)  # auth_ok
 
