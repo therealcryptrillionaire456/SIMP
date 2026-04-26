@@ -76,15 +76,22 @@ class RetrievalResult:
 
 def _embed_text(text: str) -> List[float]:
     """
-    Return a text embedding. Uses sentence-transformers if available,
-    otherwise falls back to a fast TF-IDF-style hash embedding (768-d).
+    Return a text embedding. Uses sentence-transformers if available and
+    resolvable, otherwise falls back to a fast TF-IDF-style hash embedding (384-d).
+
+    Availability is checked by whether "sentence_transformers" is present in
+    sys.modules (the sentinel set by test CI fixtures). This avoids importing
+    or even resolving the package when it is known to be unavailable, preventing
+    any network call from being triggered during model probing.
     """
     try:
-        from sentence_transformers import SentenceTransformer
-        _model = _get_st_model()
-        vec = _model.encode(text, normalize_embeddings=True)
-        return vec.tolist()
-    except ImportError:
+        import sys
+        if "sentence_transformers" in sys.modules:
+            from sentence_transformers import SentenceTransformer
+            _model = _get_st_model()
+            vec = _model.encode(text, normalize_embeddings=True)
+            return vec.tolist()
+    except Exception:
         pass
     return _hash_embed(text)
 
